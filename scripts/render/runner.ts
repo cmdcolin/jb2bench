@@ -1,5 +1,5 @@
 // Orchestrates the alignments render benchmark: every (build x case) pair gets
-// a warmup run plus N measured runs of scripts/profile.ts, which prints the
+// a warmup run plus N measured runs of scripts/render/profile.ts, which prints the
 // in-page navigation->render-complete time in ms. Aggregates median/mean/stddev
 // and writes a markdown comparison table + raw JSON to results/.
 import { execFileSync } from 'child_process'
@@ -43,7 +43,7 @@ function runOnceRaw(build: (typeof builds)[number], track: string): number {
   // stdout on the thrown error, so read from either path.
   let out = ''
   try {
-    out = execFileSync('node', ['scripts/profile.ts', url], {
+    out = execFileSync('node', ['scripts/render/profile.ts', url], {
       encoding: 'utf8',
       stdio: ['ignore', 'pipe', 'pipe'],
       env: { ...process.env, DISPLAY: process.env.DISPLAY || ':0' },

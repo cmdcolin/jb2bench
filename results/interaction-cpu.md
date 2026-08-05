@@ -1,7 +1,7 @@
 # Interaction CPU profile — zoom, per-frame React/MobX cost
 
 Measures the per-frame main-thread cost of a sustained interaction (not
-time-to-content). Driven by `scripts/interaction-profile.ts`: after initial
+time-to-content). Driven by `scripts/flamegraph/interaction-profile.ts`: after initial
 render it arms the V8 CPU profiler and drives an rAF-paced interaction that stays
 WITHIN loaded data (no refetch), so the profile is pure re-render/recompute.
 `THROTTLE=n` applies CDP CPU throttling to emulate a slower machine.
@@ -110,5 +110,5 @@ React renders per frame** and **less CSS-in-JS work per render**.
 - One light locus (1kb, plain pileup). Heavier loci that mount more overlays
   (sashimi, linked-read beziers, grouped sections, coverage ticks) churn more
   React/DOM per frame — expect the throttled gap to widen.
-- `scripts/interaction-profile.ts <url> <label> [pan|scroll|zoom|both]`,
+- `scripts/flamegraph/interaction-profile.ts <url> <label> [pan|scroll|zoom|both]`,
   `THROTTLE=n` for CPU emulation. Profiles saved under `flame/`.

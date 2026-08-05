@@ -36,10 +36,10 @@ import {
   BAM_CASES,
   BW_CASES,
   CRAM_CASES,
+  DATA,
   END,
   OLD_CRAM_OPTS,
   REF,
-  ROOT,
   START,
   seqFetch,
 } from './lib/corpus.ts'
@@ -235,7 +235,9 @@ test.each(BW_CASES)('bigwig $label agrees', async ({ label, file }) => {
 
 test('bgzf decompresses to the same bytes', async () => {
   for (const name of ['20x.shortread.bam', '20x.longread.bam']) {
-    const data = new Uint8Array(readFileSync(`${ROOT}${name}`))
+    // Buffer, not a Uint8Array wrapper: 1.4.3 declares `unzip(input: Buffer)`
+    // while 6.3.2 takes a Uint8Array, and Buffer satisfies both.
+    const data = readFileSync(`${DATA}${name}`)
     const [browser, node, current] = await Promise.all([
       oldBrowserUnzip(data),
       oldNodeUnzip(data),

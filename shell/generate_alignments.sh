@@ -2,15 +2,16 @@
 # Regenerate BAM/CRAM alignment test data for jb2bench.
 # Simulates short reads (wgsim) and long reads (pbsim), aligns with minimap2,
 # subsamples to several coverage levels, and emits indexed BAM + CRAM.
+# Everything is read from and written into data/, alongside the reference.
 set -e
-cd "$(dirname "$0")/.."
+cd "$(dirname "$0")/../data"
 REF=hg19mod.fa
 
 echo "[$(date +%T)] simulate shortreads (wgsim 1M pairs)"
 wgsim -1 150 -2 150 -N 1000000 "$REF" 1000x.1.fq 1000x.2.fq > /dev/null 2>&1
 
 echo "[$(date +%T)] simulate longreads (pbsim depth 1000)"
-pbsim "$REF" --depth 1000 --hmm_model data/R103.model --length-mean 50000 --prefix 1000x > /dev/null 2>&1
+pbsim "$REF" --depth 1000 --hmm_model R103.model --length-mean 50000 --prefix 1000x > /dev/null 2>&1
 rm -f *.ref *.maf
 
 echo "[$(date +%T)] align shortreads"

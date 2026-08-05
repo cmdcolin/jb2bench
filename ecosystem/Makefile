@@ -7,7 +7,7 @@
 # libraries that return different records is not a comparison, so the gate runs
 # first and a failure stops the run.
 
-.PHONY: all bench setup install verify time report clean distclean
+.PHONY: all bench setup install typecheck verify time report clean distclean
 
 all: bench
 
@@ -21,7 +21,13 @@ install: node_modules
 
 setup: .libs/manifest.txt
 
-verify: install setup
+# Runs before the gate: vitest strips types without checking them, so a broken
+# import here is otherwise only discovered minutes into a run, as a runtime
+# ENOENT on a path that reads `undefined...`.
+typecheck: install
+	pnpm exec tsc --noEmit -p tsconfig.json
+
+verify: install setup typecheck
 	pnpm exec vitest run equivalence.test.ts
 
 time: install setup

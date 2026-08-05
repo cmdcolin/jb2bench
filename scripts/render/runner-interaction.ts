@@ -1,4 +1,4 @@
-// Runs the zoom interaction benchmark (scripts/interaction.ts) across the build
+// Runs the zoom interaction benchmark (scripts/render/interaction.ts) across the build
 // x case matrix and tabulates time-to-content (ms a loading indicator is shown
 // after a zoom-in) and redraw frame cost. The headline: old builds refetch +
 // re-render on every zoom (seconds of "Downloading..."), the GPU branch
@@ -26,7 +26,7 @@ interface Result {
 
 function run(build: (typeof builds)[number], track: string): Result {
   const url = `http://localhost:${build.port}/?loc=${LOC}&assembly=hg19mod&tracks=${track}${build.extra}`
-  const out = execFileSync('node', ['scripts/interaction.ts', url], {
+  const out = execFileSync('node', ['scripts/render/interaction.ts', url], {
     encoding: 'utf8',
     stdio: ['ignore', 'pipe', 'ignore'],
     env: { ...process.env, DISPLAY: process.env.DISPLAY || ':0' },

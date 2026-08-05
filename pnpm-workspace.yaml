@@ -1,2 +1,12 @@
+# Not a package workspace — `packages:` is deliberately absent, and ecosystem/
+# installs itself with `pnpm install --ignore-workspace` (see its Makefile).
+#
+# puppeteer's postinstall is deliberately NOT run. It downloads
+# chrome-headless-shell alongside Chrome, which this repo never drives: the
+# headless setup keeps hardware acceleration (`--use-angle=gl` /
+# `--use-angle=vulkan`), and headless-shell does not provide it. Letting the
+# postinstall run therefore spends a large download on a browser nothing here
+# reads, and lets an unrelated browser-download failure fail `pnpm install`.
+# Install the measurement browser explicitly instead, as the README describes.
 allowBuilds:
-  puppeteer: set this to true or false
+  puppeteer: false

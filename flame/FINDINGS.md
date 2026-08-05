@@ -3,9 +3,9 @@
 Case: `chr22_mask:124000-143000` (19kb), track `1000x.shortread.bam`, the only
 case where `webgl-poc` is slower than release-4.3.0 (7137ms vs 4581ms, 0.64×).
 
-Profiles (main thread + RPC worker) captured with `scripts/flameprofile.ts`,
+Profiles (main thread + RPC worker) captured with `scripts/flamegraph/flameprofile.ts`,
 flamegraphs in `flame/*.svg`, hot frames resolved through the build sourcemaps
-with `scripts/resolve.ts`.
+with `scripts/flamegraph/resolve.ts`.
 
 ## Root cause: per-read layout runs on the MAIN THREAD
 
@@ -83,8 +83,8 @@ are needed for the pileup path at this coverage.
 ## Reproduce
 
 ```bash
-node scripts/flameprofile.ts "http://localhost:8000/?loc=chr22_mask:124000-143000&assembly=hg19mod&tracks=1000x.shortread.bam&renderer=webgl" webgl-1000short
-node scripts/cpuprofile2collapsed.ts flame/webgl-1000short.main.cpuprofile > flame/webgl-main.folded
-perl scripts/flamegraph.pl flame/webgl-main.folded > flame/webgl-main.svg
-node scripts/resolve.ts flame/webgl-1000short.main.cpuprofile builds/webgl-poc/static/js 16
+node scripts/flamegraph/flameprofile.ts "http://localhost:8000/?loc=chr22_mask:124000-143000&assembly=hg19mod&tracks=1000x.shortread.bam&renderer=webgl" webgl-1000short
+node scripts/flamegraph/cpuprofile2collapsed.ts flame/webgl-1000short.main.cpuprofile > flame/webgl-main.folded
+perl scripts/flamegraph/flamegraph.pl flame/webgl-main.folded > flame/webgl-main.svg
+node scripts/flamegraph/resolve.ts flame/webgl-1000short.main.cpuprofile builds/webgl-poc/static/js 16
 ```

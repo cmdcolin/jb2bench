@@ -1,11 +1,13 @@
 # Simulated alignments — ~750 MB, and reproducible. Regenerate with
 # shell/generate_alignments.sh (needs wgsim, pbsim, minimap2, samtools), then
 # shell/load_alignments.sh to wire them into every build under builds/.
-*.bam
-*.bam.bai
-*.cram
-*.cram.crai
-*.bw
+# The small tracked inputs that sit alongside them in data/ — hg19mod.fa(.fai),
+# hg19_17.chrom.sizes, R103.model — are not matched by these patterns.
+data/*.bam
+data/*.bam.bai
+data/*.cram
+data/*.cram.crai
+data/*.bw
 
 # jbrowse-web builds under test. Each is a deployed build plus symlinked copies
 # of the alignment data; stage them per README ("Builds compared").

@@ -15,7 +15,7 @@
 // interval between consecutive animation-frame callbacks, vsync-paced, so
 // ~16.7 ms is the floor on a 60 Hz display and means "inside one frame".
 //
-// Usage: node scripts/rowsweep.ts [--port=8000] [--runs=3] [--frames=240]
+// Usage: node scripts/render/rowsweep.ts [--port=8000] [--runs=3] [--frames=240]
 import fs from 'node:fs'
 
 import { launch } from 'puppeteer'

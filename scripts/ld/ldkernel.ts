@@ -7,8 +7,9 @@
 //    browser has no WebGPU". Serving a blank page over http://localhost fixes it.
 //    (scripts/gpucheck.ts evaluates on the default about:blank page and so reports
 //    `navigator.gpu: false` on machines that do support it.)
-// 2. **Chrome resolution.** jb2bench's puppeteer has no browser downloaded; the
-//    jbrowse-components checkout does. chromePath() finds whatever is installed.
+// 2. **Chrome resolution.** chromePath() resolves the browser puppeteer pins,
+//    so these run on the same Chrome as the render benchmarks; it falls back to
+//    scanning the puppeteer cache, then to a system Chrome.
 import { execSync } from 'node:child_process'
 import { existsSync, readFileSync, readdirSync } from 'node:fs'
 import http from 'node:http'
@@ -36,6 +37,21 @@ export function chromePath(): string {
   if (process.env.PUPPETEER_EXECUTABLE_PATH) {
     return process.env.PUPPETEER_EXECUTABLE_PATH
   }
+  // Prefer the browser this repo's puppeteer pins, so these benchmarks run on
+  // the same Chrome as the render benchmarks (which launch puppeteer with no
+  // executablePath and therefore always get that one).
+  try {
+    const pinned = puppeteer.executablePath()
+    if (existsSync(pinned)) {
+      return pinned
+    }
+  } catch {
+    // no browser configured for this puppeteer install; fall through
+  }
+  // Fallback for a checkout whose puppeteer browser was never downloaded. Note
+  // this orders version directories as strings, which is only approximately a
+  // version order ("linux-99" sorts above "linux-100"), so it can pick an older
+  // build than intended — it is a last resort, not the normal path.
   const cache = path.join(os.homedir(), '.cache/puppeteer/chrome')
   if (existsSync(cache)) {
     for (const dir of readdirSync(cache).sort().reverse()) {
@@ -91,8 +107,14 @@ export async function launchGpuPage(): Promise<GpuSession> {
     args: GPU_ARGS,
   })
   const page = await browser.newPage()
-  page.on('pageerror', m => {
-    console.error('  [pageerror]', m.message)
+  // puppeteer types this payload as `unknown`, and rightly so: a page can throw
+  // a non-Error value, in which case reading `.message` would log `undefined`
+  // and swallow the actual failure.
+  page.on('pageerror', err => {
+    console.error(
+      '  [pageerror]',
+      err instanceof Error ? err.message : String(err),
+    )
   })
   await page.goto(`http://localhost:${port}/`)
   const ok = await page.evaluate(() => !!navigator.gpu)
