@@ -1,0 +1,64 @@
+=== before ===
+ 03:20:41 up 2 days, 19:31,  1 user,  load average: 1.45, 4.87, 6.66
+chrome procs: 0
+0
+
+20x-shortread / webgl-poc / zoom-in: time-to-content 0ms (loading=false, steps=5)
+20x-shortread / release-4.3.0 / zoom-in: time-to-content 1060ms (loading=true, steps=5)
+20x-shortread / webgl-poc / zoom-out: time-to-content 0ms (loading=true, steps=4)
+20x-shortread / release-4.3.0 / zoom-out: time-to-content 2022ms (loading=true, steps=4)
+200x-shortread / webgl-poc / zoom-in: time-to-content 0ms (loading=false, steps=5)
+200x-shortread / release-4.3.0 / zoom-in: time-to-content 1127ms (loading=true, steps=5)
+200x-shortread / webgl-poc / zoom-out: time-to-content 0ms (loading=true, steps=4)
+200x-shortread / release-4.3.0 / zoom-out: time-to-content 101ms (loading=true, steps=4)
+1000x-shortread / webgl-poc / zoom-in: time-to-content 0ms (loading=false, steps=5)
+1000x-shortread / release-4.3.0 / zoom-in: time-to-content 1749ms (loading=true, steps=5)
+1000x-shortread / webgl-poc / zoom-out: time-to-content 0ms (loading=true, steps=4)
+1000x-shortread / release-4.3.0 / zoom-out: time-to-content 91ms (loading=true, steps=4)
+20x-longread / webgl-poc / zoom-in: time-to-content 0ms (loading=false, steps=5)
+20x-longread / release-4.3.0 / zoom-in: time-to-content 1169ms (loading=true, steps=5)
+20x-longread / webgl-poc / zoom-out: time-to-content 0ms (loading=true, steps=4)
+20x-longread / release-4.3.0 / zoom-out: time-to-content 102ms (loading=true, steps=4)
+200x-longread / webgl-poc / zoom-in: time-to-content 0ms (loading=false, steps=5)
+200x-longread / release-4.3.0 / zoom-in: time-to-content 2837ms (loading=true, steps=5)
+200x-longread / webgl-poc / zoom-out: time-to-content 0ms (loading=true, steps=4)
+200x-longread / release-4.3.0 / zoom-out: time-to-content 101ms (loading=true, steps=4)
+1000x-longread / webgl-poc / zoom-in: time-to-content 0ms (loading=false, steps=5)
+1000x-longread / release-4.3.0 / zoom-in: time-to-content 13663ms (loading=true, steps=5)
+1000x-longread / webgl-poc / zoom-out: time-to-content 0ms (loading=true, steps=4)
+1000x-longread / release-4.3.0 / zoom-out: time-to-content 102ms (loading=true, steps=4)
+
+# Zoom interaction benchmark
+
+Region `chr22_mask:124000-143000`. **time-to-content** = ms a loading indicator ("Downloading alignments...") is shown after a zoom before correct content returns; median over the measured steps. redraw = longest frame (ms) of the GPU redraw. A `≥` prefix marks a censored value: the step was still loading at MAX_WAIT (120000 ms), so the true figure is larger.
+
+## Zoom IN — only the old renderer refetches
+
+The new view is a strict subset of already-loaded reads, so the GPU branch re-projects without going to the network. This is its best case.
+
+| case | webgl-poc | release-4.3.0 | webgl-poc redraw frame |
+|---|---:|---:|---:|
+| 20x-shortread | 0ms | 1060ms | 17ms |
+| 200x-shortread | 0ms | 1127ms | 17ms |
+| 1000x-shortread | 0ms | 1749ms | 17ms |
+| 20x-longread | 0ms | 1169ms | 17ms |
+| 200x-longread | 0ms | 2837ms | 17ms |
+| 1000x-longread | 0ms | 13663ms | 33ms |
+
+## Zoom OUT — both refetch
+
+The new view needs data neither build has loaded, so both must fetch. What remains of the gap here is render cost rather than avoided fetching. Steps stop early when the view clamps at the 250 kb contig.
+
+| case | webgl-poc | release-4.3.0 | webgl-poc redraw frame | steps |
+|---|---:|---:|---:|---:|
+| 20x-shortread | 0ms | 2022ms | 17ms | 4 |
+| 200x-shortread | 0ms | 101ms | 17ms | 4 |
+| 1000x-shortread | 0ms | 91ms | 17ms | 4 |
+| 20x-longread | 0ms | 102ms | 17ms | 4 |
+| 200x-longread | 0ms | 101ms | 17ms | 4 |
+| 1000x-longread | 0ms | 102ms | 33ms | 4 |
+
+Wrote results/interaction.{json,md}
+
+=== after ===
+ 03:27:10 up 2 days, 19:37,  1 user,  load average: 2.49, 3.13, 5.24

@@ -125,34 +125,37 @@ so Emotion stops re-serializing.
 
 Both are worth re-profiling against a fresh build first (§2).
 
-### Zoom-out — implemented, never run
+### Pan at constant zoom — the refetch test that would actually work
 
-**Added in `a4f2746`; no numbers exist for it yet.** `ZOOM=out` zooms out
-instead of in, so the new view needs data neither build has and *both* must
-refetch — isolating redraw cost from avoided fetching, which the zoom-in case
-cannot do because the GPU branch never goes to the network there.
+**This is the open item.** Zoom-out was built to make both architectures refetch,
+and it fails: JBrowse declines any fetch past a byte threshold and renders
+"Requested too much data (N Mb)" instead of reads. release-4.3.0 refuses on five
+of six cases outright; the branch manages one step of four. There is no render
+timing in that comparison for anything heavier than 20x shortread.
 
-```bash
-# needs an idle machine: builds/webgl-poc on 8000, builds/release-4.3.0 on 8001
-node scripts/render/runner-interaction.ts   # runs both directions, writes both tables
-```
+Panning sideways at fixed `bpPerPx` keeps the data volume constant, so it never
+crosses the cap while still requiring both builds to fetch a region neither has.
+That is the honest "both refetch" measurement, and nothing implements it yet.
+`scripts/flamegraph/interaction-profile.ts` already has a pan driver worth
+reusing.
 
-Expect roughly three usable zoom-out steps before the 250 kb contig clamps the
-view; the runner reports `steps` per row so a short row is visible rather than
-silent. Pan is still not covered.
+Whatever implements it must keep the bail check from `interaction.ts` — a track
+that refuses to draw returns in ~90 ms and will otherwise be recorded as the
+fastest cell in the table.
 
-### The recorded 1000x-longread zoom figure is censored
+### Resolved: the 1000x-longread zoom figure
 
-`results/interaction.md` reports 15008 ms for `1000x-longread` on
-release-4.3.0. That is not a measurement: all five steps landed within 19 ms of
-the old `MAX_WAIT` of 15000 ms, i.e. the harness gave up while content was still
-loading, whereas every other row varies naturally (e.g. 1112/1074/1086/1062/1064).
-The true value is unbounded above 15 s.
+Was 15008 ms, which was **censored** rather than measured — all five steps sat
+within 19 ms of the old 15000 ms `MAX_WAIT`. With the cap raised to 120 s it
+completes honestly at **13.9 s** (13663 ms and 13913 ms on two runs).
 
-The cap is now 120 s and tunable via `MAX_WAIT`, and censored steps are flagged
-and rendered as `≥N`. **But the table still holds the old censored number** —
-regenerating it needs the same idle-machine run as above. Until then, treat
-"1–15 s" anywhere it appears as a lower bound.
+One loose end: June's run had every step *above* 15 s, while both 2026-08-05
+runs agree on ~13.7–13.9 s, and the other five zoom-in cells reproduce within
+2% of June. A >10% shift confined to the single heaviest case is more likely
+page cache — `1000x.longread.bam` is 268 MB and the ecosystem gate had read it
+earlier that night — than drift. Worth confirming with a cold-cache run
+(`echo 3 | sudo tee /proc/sys/vm/drop_caches`) before the number is quoted, since
+it carries the architectural argument.
 
 ## 5. Smaller items
 

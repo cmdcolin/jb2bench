@@ -97,15 +97,22 @@ and the two directions ask different questions:
 
 - **in** (default) — the new view is a strict subset of loaded data, so only the
   old renderer refetches. This is the branch's best case by construction.
-- **out** — the new view needs data neither build has, so **both** refetch. This
-  isolates redraw cost from avoided fetching, and is the harder, fairer case.
-  It stops early when the view clamps at the 250 kb contig.
+- **out** — intended as the case where *both* refetch. **It does not work**, and
+  the table says so: past a byte threshold JBrowse declines the fetch and draws
+  "Requested too much data (N Mb). Zoom in to see features or force load"
+  instead of reads. That path paints nothing and returns in ~90 ms, so before
+  this was detected it scored as the fastest result in the benchmark.
+  release-4.3.0 refuses outright on five of six cases. Steps that refused are
+  marked `_bail_` / `(n bail)` and excluded from the median.
 
-> The `1000x-longread` figure in `results/interaction.md` (15008 ms) is
-> **censored**, not measured: all five steps landed within 19 ms of the old
-> 15000 ms `MAX_WAIT`, meaning the harness gave up while content was still
-> loading. The true value is unbounded above 15 s. The cap is now 120 s and
-> censored steps are flagged, but that table has not been regenerated yet.
+To test refetch against refetch, **pan at constant zoom** — same data volume, new
+region, no density cap crossed. That is not yet implemented.
+
+> Two corrections from the 2026-08-05 run. The old `1000x-longread` figure of
+> 15008 ms was **censored**, not measured — all five steps sat within 19 ms of
+> the then 15000 ms `MAX_WAIT`. With the cap at 120 s it completes honestly at
+> **~13.9 s**. And the zoom-out row, added the same day, measured refusals
+> rather than renders until the bail check landed.
 
 ### Per-frame interaction cost
 

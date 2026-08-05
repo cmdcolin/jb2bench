@@ -29,9 +29,12 @@ interface Result {
   zoomTimeToContentMs: number
   zoomRedrawGapMs: number
   loadingEverSeen: boolean
+  stepsAttempted: number
   stepsMeasured: number
+  stepsBailed: number
   stepsCensored: number
   censored: boolean
+  allBailed: boolean
   maxWaitMs: number
 }
 
@@ -49,14 +52,22 @@ function run(
   return JSON.parse(out.trim().split('\n').pop()!) as Result
 }
 
-// A censored cell is a lower bound, so render it as ">=N" rather than as a
-// number that reads like a measurement. No measured step at all (the view was
-// already at the contig edge) is "n/a", not 0 — 0 means "content never went
-// away", which is the opposite conclusion.
-const cell = (r: Result) =>
-  Number.isFinite(r.zoomTimeToContentMs)
-    ? `${r.censored ? '≥' : ''}${r.zoomTimeToContentMs.toFixed(0)}ms`
-    : 'n/a'
+// Three things that are NOT a time, and must not be printed as one:
+//   allBailed  — the track refused the fetch and drew nothing on every step
+//   NaN        — no step applied (view already clamped at the contig edge)
+//   censored   — still loading at MAX_WAIT, so the value is a lower bound
+// Reporting a bail as "91ms" is what previously made a refusal to render look
+// like the fastest result in the table.
+const cell = (r: Result) => {
+  if (r.allBailed) {
+    return '_bail_'
+  }
+  if (!Number.isFinite(r.zoomTimeToContentMs)) {
+    return 'n/a'
+  }
+  const bail = r.stepsBailed ? ` (${r.stepsBailed} bail)` : ''
+  return `${r.censored ? '≥' : ''}${r.zoomTimeToContentMs.toFixed(0)}ms${bail}`
+}
 
 const results: Record<string, Record<Direction, Record<string, Result>>> = {}
 for (const c of cases) {
@@ -96,14 +107,19 @@ for (const c of cases) {
   md += `| ${c.id} | ${cell(w)} | ${cell(r)} | ${w.zoomRedrawGapMs.toFixed(0)}ms |\n`
 }
 
-md += `\n## Zoom OUT — both refetch\n\n`
-md += `The new view needs data neither build has loaded, so both must fetch. What remains of the gap here is render cost rather than avoided fetching. Steps stop early when the view clamps at the 250 kb contig.\n\n`
-md += `| case | webgl-poc | release-4.3.0 | webgl-poc redraw frame | steps |\n`
+md += `\n## Zoom OUT — mostly refused, not measured\n\n`
+md += `Zooming out was meant to be the case where BOTH builds refetch, isolating render cost from avoided fetching. It largely does not work: past a byte threshold JBrowse declines the fetch and renders "Requested too much data (N Mb). Zoom in to see features or force load" instead of reads.\n\n`
+md += `That path is fast and paints nothing, so it previously scored as a ~90ms success — the best-looking number in the table was a refusal to draw. \`_bail_\` marks a cell where no step drew anything; \`(n bail)\` marks partial refusal, with the median taken only over steps that did draw.\n\n`
+md += `The honest reading: for anything heavier than 20x shortread, this comparison has no render timing in it. Panning at constant zoom is the way to test refetch against refetch without crossing the cap.\n\n`
+md += `| case | webgl-poc | release-4.3.0 | webgl-poc redraw frame | drew/attempted |\n`
 md += `|---|---:|---:|---:|---:|\n`
 for (const c of cases) {
   const w = results[c.id]!.out['webgl-poc']!
   const r = results[c.id]!.out['release-4.3.0']!
-  md += `| ${c.id} | ${cell(w)} | ${cell(r)} | ${w.zoomRedrawGapMs.toFixed(0)}ms | ${w.stepsMeasured} |\n`
+  const gap = Number.isFinite(w.zoomRedrawGapMs)
+    ? `${w.zoomRedrawGapMs.toFixed(0)}ms`
+    : 'n/a'
+  md += `| ${c.id} | ${cell(w)} | ${cell(r)} | ${gap} | ${w.stepsMeasured}/${w.stepsAttempted} |\n`
 }
 fs.writeFileSync('results/interaction.md', md)
 console.log('\n' + md)

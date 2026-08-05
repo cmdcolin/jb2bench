@@ -115,6 +115,17 @@ const LOADING_FN = () => {
 const MAX_WAIT = Number(process.env.MAX_WAIT ?? 120000)
 const QUIET = 300 // content considered back once loading stays false this long
 
+// Past a byte threshold JBrowse refuses the fetch and renders "Requested too
+// much data (N Mb). Zoom in to see features or force load" instead of reads.
+// That path is FAST — the track paints nothing — so without this check a refusal
+// scores as content-returned-in-90ms and reads as a good result. Verified
+// directly: release-4.3.0 on 200x.shortread bails one zoom-out step in, with 0
+// painted pixels, while 20x.shortread renders every step.
+const BAILED_FN = () =>
+  /Requested too much|Zoom in to see features|force load/i.test(
+    document.body.innerText,
+  )
+
 interface StepMetric {
   timeToContentMs: number // how long a loading indicator was shown post-zoom
   loadingSeen: boolean // did a refetch/re-render loading state appear at all
@@ -123,6 +134,8 @@ interface StepMetric {
   applied: boolean
   /** true if MAX_WAIT expired with content still not back: value is a lower bound */
   censored: boolean
+  /** true if the track refused the fetch and drew no reads — NOT a render timing */
+  bailed: boolean
 }
 
 async function zoomStep(): Promise<StepMetric> {
@@ -153,6 +166,7 @@ async function zoomStep(): Promise<StepMetric> {
       redrawGapMs: Number.NaN,
       applied: false,
       censored: false,
+      bailed: false,
     }
   }
 
@@ -190,12 +204,15 @@ async function zoomStep(): Promise<StepMetric> {
     return g
   }, t0)
 
+  const bailed = await page.evaluate(BAILED_FN)
+
   return {
     timeToContentMs: loadingSeen ? lastLoadingTrue : 0,
     loadingSeen,
     redrawGapMs,
     applied: true,
     censored,
+    bailed,
   }
 }
 
@@ -224,17 +241,25 @@ if (screenshotPath) {
   await page.screenshot({ path: screenshotPath })
 }
 
-const censoredSteps = steps.filter(s => s.censored).length
+// Steps where the track refused to draw are not render timings and must not be
+// averaged in with ones that are — including them is what made a refusal look
+// like a 90ms success.
+const drew = steps.filter(s => !s.bailed)
+const censoredSteps = drew.filter(s => s.censored).length
 const summary = {
   mode: DIRECTION,
   maxWaitMs: MAX_WAIT,
-  stepsMeasured: steps.length,
+  stepsAttempted: steps.length,
+  stepsMeasured: drew.length,
+  stepsBailed: steps.length - drew.length,
   stepsCensored: censoredSteps,
-  // when any step is censored the median is a LOWER BOUND, not a value
+  // when any counted step is censored the median is a LOWER BOUND, not a value
   censored: censoredSteps > 0,
-  zoomTimeToContentMs: median(steps.map(s => s.timeToContentMs)),
-  zoomRedrawGapMs: median(steps.map(s => s.redrawGapMs)),
-  loadingEverSeen: steps.some(s => s.loadingSeen),
+  // nothing was ever drawn: there is no timing here at all
+  allBailed: steps.length > 0 && drew.length === 0,
+  zoomTimeToContentMs: median(drew.map(s => s.timeToContentMs)),
+  zoomRedrawGapMs: median(drew.map(s => s.redrawGapMs)),
+  loadingEverSeen: drew.some(s => s.loadingSeen),
   steps,
 }
 console.log(JSON.stringify(summary))
