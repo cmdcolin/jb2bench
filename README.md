@@ -21,6 +21,8 @@ numbers describe the same bytes.
 | `scripts/render/` | the render and zoom-interaction benchmarks |
 | `scripts/flamegraph/` | CPU-profile capture and the flamegraph toolkit |
 | `scripts/ld/` | the WebGPU LD compute-shader benchmarks (unrelated to render) |
+| `scripts/crosstool/` | the igv.js comparison: paint-quiescence profiler and matrix |
+| `crosstool/` | the igv.js harness page, plus symlinks to `data/` and the igv bundle |
 | `scripts/probe.ts`, `scripts/gpucheck.ts` | dev helpers: render testids, GPU backend |
 | `shell/` | regenerate the corpus, load it into the builds |
 | `builds/` | the jbrowse-web builds under test (untracked, staged by hand) |
@@ -42,6 +44,7 @@ Every number lives in a file; nothing is summarized only here.
 | [`results/ld-dispatch-limit.md`](results/ld-dispatch-limit.md) | where does the LD dispatch break, and how loudly? |
 | [`flame/FINDINGS.md`](flame/FINDINGS.md) | why is 1000x-shortread a regression? |
 | [`flame/WORKER_FINDINGS.md`](flame/WORKER_FINDINGS.md) | which worker-side plugin optimizations are worth doing? |
+| [`results/crosstool.md`](results/crosstool.md) | how does the render time compare against igv.js? |
 | [`ecosystem/README.md`](ecosystem/README.md) | how much faster did the parser libraries get since 2023? |
 
 ## The corpus
@@ -220,6 +223,76 @@ Two gotchas if you write more WebGPU here:
 - **WebGPU needs the Vulkan ANGLE backend here** (`--use-angle=vulkan`), not the
   `--use-angle=gl` the WebGL benchmarks use. This box exposes an `amd gcn-4`
   adapter to WebGPU, distinct from the Mesa Intel UHD 630 the WebGL path names.
+
+### Cross-tool: JBrowse vs igv.js
+
+`scripts/crosstool/runner.ts` → `results/crosstool.md`. The only comparison here
+that leaves the JBrowse family. Both tools read the same indexed BAMs out of
+`data/` over HTTP range requests and draw a pileup, so the workload is genuinely
+shared; `crosstool/index.html` is an igv.js page driven entirely by URL
+parameters, the way the runners drive a JBrowse build.
+
+Three things make it a comparison rather than a ranking:
+
+- **The instrument belongs to neither tool.** `scripts/crosstool/paintprofile.ts`
+  polls a screenshot and waits for the pixels to stop changing. igv.js hides its
+  spinner when features finish *loading*, before it draws them, so trusting its
+  loading state would credit it with a render it has not done — the same class of
+  error as the zoom-out refusals above. Cost: the paint instrument reads a few
+  hundred ms higher than the testid instrument, because it also waits out
+  everything else settling on the page. Measured on `builds/current` at
+  20x-shortread, paint vs testid was 3070 vs 2435 ms and 3395 vs 2921 ms — a
+  consistent offset, applied to both columns.
+- **Runs are interleaved.** Each round runs every tool back to back, so a load
+  spike on this shared box lands on all of them. It does: `1000x-shortread`
+  moved 5730 → 8495 ms for JBrowse and 51789 → 76254 ms for igv between rounds,
+  and the *ratio* held at roughly 9× through it.
+- **Downsampling is controlled for, not assumed away.** igv draws at most
+  `samplingDepth` reads per 100 bp window (default 500, hard maximum 10000);
+  JBrowse draws every read. On this corpus the deepest 100 bp window holds
+  roughly 700 short reads, so the default clips slightly and the maximum clips
+  nothing. The two igv columns therefore answer "is downsampling what we are
+  measuring?" rather than trading workload for speed.
+
+`?depth=N` on the harness page sets `samplingDepth` (values above 10000 are
+clamped by igv itself with a console warning) and `?height=N` the track height.
+Both controls came out the same way: neither downsampling nor track height
+moves igv enough to explain the ratios. At 300 px igv was in fact slightly
+*slower* than at 600 px in both cases measured — 14928 vs 12344 ms at
+200x-shortread, 39804 vs 38089 ms at 1000x-shortread — which is the run-to-run
+spread on this box, not an effect.
+
+Run the height control as `TOOLS=igv-h600ctl,igv-h300`, **never** as
+`TOOLS=igv,igv-h300`. The latter re-measures the main table's `igv` cell in a
+round that does not re-measure `jbrowse`, and the headline ratio silently ends
+up comparing two rounds taken at different loads. That happened once and had to
+be undone from `results/crosstool-h600-backup.json`.
+
+```bash
+npx http-server crosstool -p 8003 -s --cors &
+RUNS=3 node scripts/crosstool/runner.ts          # → results/crosstool.{md,json}
+TOOLS=igv-h600ctl,igv-h300 CASES=200x-shortread node scripts/crosstool/runner.ts
+node scripts/crosstool/zoomrunner.ts             # → results/crosstool-zoom.{md,json}
+```
+
+### The zoom result is not what it looks like
+
+`results/crosstool-zoom.md` says igv.js settles a 2x zoom-in in ~340 ms against
+JBrowse's ~800 ms. **That is not a rendering comparison.** JBrowse's figure does
+not move between 20x and 1000x coverage — 894/895/735/814/793 ms at 20x against
+731/788/811/700/896 at 1000x — so it is a fixed cost, not drawing and not
+per-read relayout. The 600 ms debounce on the fetch-scheduling autorun is the
+obvious suspect and is unconfirmed; the instrument hashes the whole viewport, so
+the pixels still changing may be a small piece of chrome. igv.js's numbers
+*fall* across successive steps as its visible read count drops, which is the
+shape a CPU redraw should have. Localizing JBrowse's is open work.
+
+Caveats to attach to any external claim: it is one other tool, on one workload
+family (alignment pileups), at one locus, on one machine. igv.js parses in the
+main thread and JBrowse in workers, and JBrowse boots a full application shell
+where igv.js mounts a widget — both are real architectural differences and both
+are inside the number, which is why the light rows and the heavy rows say
+different things.
 
 ### Row sweep — written, not yet run
 

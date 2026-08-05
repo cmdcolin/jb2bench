@@ -1,0 +1,101 @@
+<!doctype html>
+<!--
+  igv.js harness for the cross-tool comparison.
+
+  Serves the same corpus and the same window as the JBrowse benchmarks, so the
+  two tools are reading the same bytes off the same disk. Everything that varies
+  between runs is a URL parameter, because the runner drives this page by URL
+  exactly as it drives a JBrowse build.
+
+    ?track=1000x.shortread.bam    file in ../data
+    ?loc=chr22_mask:124000-143000 the shared benchmark window
+    ?depth=N                      igv's samplingDepth; omit for igv's default
+    ?height=N                     track height in px (default 600)
+
+  height matters because igv draws packed rows until it runs out of canvas,
+  while JBrowse uploads and draws every read it holds and lets the rasterizer
+  clip. A taller igv track is therefore more igv work and no more JBrowse work,
+  so the runner uses it as a sensitivity check rather than leaving it implicit.
+
+  samplingDepth is a parameter rather than a constant because igv.js downsamples
+  alignments by default (500 reads per 100 bp window) and JBrowse does not. igv
+  clamps this at its own MAXIMUM_SAMPLING_DEPTH of 10000, which is well above
+  the deepest window in this corpus, so ?depth=10000 is "downsampling off". The
+  runner measures both, as a control on whether downsampling explains anything.
+-->
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>igv.js harness</title>
+    <style>
+      html,
+      body {
+        margin: 0;
+        padding: 0;
+        font-family: sans-serif;
+      }
+      #igv {
+        width: 1280px;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="igv"></div>
+    <script type="module">
+      import igv from './igv.esm.js'
+
+      const params = new URLSearchParams(location.search)
+      const track = params.get('track') ?? '20x.shortread.bam'
+      const locus = params.get('loc') ?? 'chr22_mask:124000-143000'
+      const depth = params.get('depth')
+      const height = Number(params.get('height') ?? 600)
+      const isCram = track.endsWith('.cram')
+
+      const alignmentTrack = {}
+      if (depth) {
+        // igv reads samplingDepth off the track config and passes it down to
+        // the alignment container; setting the window to 1 with a large depth
+        // is how you turn the downsampler off in practice.
+        alignmentTrack.samplingDepth = Number(depth)
+      }
+
+      const options = {
+        reference: {
+          id: 'hg19mod',
+          name: 'hg19mod',
+          fastaURL: './data/hg19mod.fa',
+          indexURL: './data/hg19mod.fa.fai',
+        },
+        locus,
+        showChromosomeWidget: false,
+        showCenterGuide: false,
+        tracks: [
+          {
+            type: 'alignment',
+            format: isCram ? 'cram' : 'bam',
+            url: `./data/${track}`,
+            indexURL: `./data/${track}${isCram ? '.crai' : '.bai'}`,
+            name: track,
+            height,
+            // the whole window must be inside the visibility window or igv
+            // declines to draw, the same way JBrowse's byte gate does
+            visibilityWindow: 1_000_000,
+            ...(depth ? { samplingDepth: Number(depth) } : {}),
+          },
+        ],
+      }
+
+      window.__igvState = { ready: false, error: null }
+      igv
+        .createBrowser(document.getElementById('igv'), options)
+        .then(browser => {
+          window.igvBrowser = browser
+          window.__igvState.ready = true
+        })
+        .catch(e => {
+          window.__igvState.error = String(e)
+          console.error(e)
+        })
+    </script>
+  </body>
+</html>

@@ -11,6 +11,9 @@ importers:
       http-server:
         specifier: ^14.1.0
         version: 14.1.1
+      igv:
+        specifier: 3.8.5
+        version: 3.8.5
       puppeteer:
         specifier: 24.43.1
         version: 24.43.1(typescript@5.9.3)
@@ -367,6 +370,9 @@ packages:
   iconv-lite@0.6.3:
     resolution: {integrity: sha512-4fCk79wshMdzMp2rH06qWrJE4iolqLhCUH+OiuIgU++RB0+94NlDL81atO7GX55uUKueo0txHNtvEyI6D7WdMw==}
     engines: {node: '>=0.10.0'}
+
+  igv@3.8.5:
+    resolution: {integrity: sha512-Tdt0+z0DlQULSPByZG4wm3CeF4VzI+WehEKUyPTsT8W+EhRVV8VVlIZA5U+OXl9mVRMOL444qvN7w4IZJaW9Xw==}
 
   import-fresh@3.3.1:
     resolution: {integrity: sha512-TR3KfrTZTYLPB6jUjfx6MF9WcWrHL9su5TObK4ZkYgBdWKPOFoSoQIdEuTuR82pmtxH2spWG9h6etwfr1pLBqQ==}
@@ -993,6 +999,8 @@ snapshots:
   iconv-lite@0.6.3:
     dependencies:
       safer-buffer: 2.1.2
+
+  igv@3.8.5: {}
 
   import-fresh@3.3.1:
     dependencies:

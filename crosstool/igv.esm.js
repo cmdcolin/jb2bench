@@ -1,0 +1,1 @@
+../node_modules/igv/dist/igv.esm.js
