@@ -43,6 +43,7 @@ Every number lives in a file; nothing is summarized only here.
 | [`results/ld-gpu-vs-cpu.md`](results/ld-gpu-vs-cpu.md) | is the LD compute shader worth it vs the CPU path? |
 | [`results/ld-dispatch-limit.md`](results/ld-dispatch-limit.md) | where does the LD dispatch break, and how loudly? |
 | [`flame/FINDINGS.md`](flame/FINDINGS.md) | why is 1000x-shortread a regression? |
+| [`flame/ZOOM_SETTLE.md`](flame/ZOOM_SETTLE.md) | why does a zoom take 0.8 s to stop changing? |
 | [`flame/WORKER_FINDINGS.md`](flame/WORKER_FINDINGS.md) | which worker-side plugin optimizations are worth doing? |
 | [`results/crosstool.md`](results/crosstool.md) | how does the render time compare against igv.js? |
 | [`ecosystem/README.md`](ecosystem/README.md) | how much faster did the parser libraries get since 2023? |
@@ -278,14 +279,25 @@ node scripts/crosstool/zoomrunner.ts             # → results/crosstool-zoom.{m
 ### The zoom result is not what it looks like
 
 `results/crosstool-zoom.md` says igv.js settles a 2x zoom-in in ~340 ms against
-JBrowse's ~800 ms. **That is not a rendering comparison.** JBrowse's figure does
-not move between 20x and 1000x coverage — 894/895/735/814/793 ms at 20x against
-731/788/811/700/896 at 1000x — so it is a fixed cost, not drawing and not
-per-read relayout. The 600 ms debounce on the fetch-scheduling autorun is the
-obvious suspect and is unconfirmed; the instrument hashes the whole viewport, so
-the pixels still changing may be a small piece of chrome. igv.js's numbers
-*fall* across successive steps as its visible read count drops, which is the
-shape a CPU redraw should have. Localizing JBrowse's is open work.
+JBrowse's ~800 ms. **That is not a rendering comparison, and JBrowse's figure is
+not a cost of zooming.** Run the same measurement with no zoom at all and the
+churn is identical: at rest, `builds/current` re-enters its loading phase and
+remounts the track canvas several times a second, where release-4.3.0 is
+completely silent. The reported number is the expected wait to catch a quiet
+300 ms gap in that loop, which is why it does not move when the data volume
+changes by 50x. The track's own pixels settle at the first poll after the zoom.
+
+[`flame/ZOOM_SETTLE.md`](flame/ZOOM_SETTLE.md) has the channels, the four
+controls that pin it down, and what is still open. `scripts/crosstool/zoomdiag.ts`
+reproduces it:
+
+```bash
+NO_ZOOM=1 node scripts/crosstool/zoomdiag.ts "<url>"   # the control
+TRACE_TIMERS=1 node scripts/crosstool/zoomdiag.ts "<url>"
+```
+
+igv.js's numbers *fall* across successive steps as its visible read count drops,
+which is the shape a CPU redraw should have.
 
 Caveats to attach to any external claim: it is one other tool, on one workload
 family (alignment pileups), at one locus, on one machine. igv.js parses in the
