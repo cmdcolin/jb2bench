@@ -146,6 +146,21 @@ await page.evaluate(() => {
     }
   }
 
+  // Context loss is dispatched on the canvas and does not bubble, so listen in
+  // the capture phase from the document — that reaches an element replaced
+  // mid-flight, which per-element listeners would miss.
+  const ctx = (w as unknown as { __ctxEvents: { t: number; type: string }[] })
+  ctx.__ctxEvents = []
+  for (const type of ['webglcontextlost', 'webglcontextrestored', 'webglcontextcreationerror']) {
+    document.addEventListener(
+      type,
+      () => {
+        ctx.__ctxEvents.push({ t: performance.now(), type })
+      },
+      true,
+    )
+  }
+
   const describe = (n: Node) => {
     const el = n.nodeType === 1 ? (n as Element) : n.parentElement
     if (!el) {
@@ -171,6 +186,22 @@ await page.evaluate(() => {
         if (attr && r.target.nodeType === 1) {
           const now = (r.target as Element).getAttribute(attr)
           attr = `${attr}: ${r.oldValue ?? '?'} -> ${now ?? '?'}`
+        }
+        // Whether a canvas is mounted/unmounted or merely rewritten is the
+        // difference between a remount loop and a re-render that clears the
+        // bitmap, and only childList records can tell them apart.
+        if (r.type === 'childList') {
+          const names = (list: NodeList, sign: string) =>
+            [...list]
+              .filter(n => n.nodeType === 1)
+              .map(n => `${sign}${(n as Element).tagName.toLowerCase()}`)
+          const moved = [
+            ...names(r.addedNodes, '+'),
+            ...names(r.removedNodes, '-'),
+          ]
+          if (moved.length) {
+            attr = moved.join(' ')
+          }
         }
         w.__diag.muts.push({
           t,
@@ -209,10 +240,54 @@ await page.evaluate(zoom => {
 }, !noZoom)
 console.log(noZoom ? '\n(control: no zoom applied)' : '\n(zoomed 2x)')
 
+// A 5 ms in-page sampler on the view state the canvas subtree is gated on.
+// `PileupBody` returns null when `width` is falsy, which unmounts the canvas, so
+// a transient here is the difference between "React re-rendered" and "the view
+// briefly reported itself uninitialized".
+await page.evaluate(() => {
+  const w = window as unknown as {
+    __state: { t: number; v: string }[]
+    __diag: { t0: number }
+    JBrowseSession: { views: Record<string, unknown>[] }
+  }
+  w.__state = []
+  let last = ''
+  setInterval(() => {
+    const v = w.JBrowseSession?.views?.[0] as
+      | Record<string, unknown>
+      | undefined
+    if (!v) {
+      return
+    }
+    const read = (k: string) => {
+      try {
+        return String(v[k])
+      } catch (e) {
+        return `throw:${(e as Error).message.slice(0, 24)}`
+      }
+    }
+    const s = [
+      `initialized=${read('initialized')}`,
+      `volatileWidth=${read('volatileWidth')}`,
+      `trackWidthPx=${read('trackWidthPx')}`,
+      `assembliesInitialized=${read('assembliesInitialized')}`,
+    ].join(' ')
+    if (s !== last) {
+      w.__state.push({ t: Math.round(performance.now() - w.__diag.t0), v: s })
+      last = s
+    }
+  }, 5)
+})
+
 const started = Date.now()
 const frames: { t: number; track: string }[] = []
+// NO_SHOTS=1 drops the screenshot channel. A screenshot is not free — it forces
+// a frame capture, and in headless Chrome it can perturb the very page it is
+// measuring — so a finding that survives without it is a finding about the app,
+// and one that does not is a finding about the instrument.
+const noShots = process.env.NO_SHOTS === '1'
 while (Date.now() - started < WATCH_MS) {
-  if (box) {
+  if (box && !noShots) {
     frames.push({
       t: Date.now() - started,
       track: hash(await page.screenshot({ type: 'png', clip: box, optimizeForSpeed: true })),
@@ -244,6 +319,20 @@ for (const f of frames) {
 }
 console.log(`changed at ${JSON.stringify(changes)} ms; last change ${changes.at(-1)} ms`)
 
+const ctxEvents = await page.evaluate(() => {
+  const w = window as unknown as {
+    __ctxEvents: { t: number; type: string }[]
+    __diag: { t0: number }
+  }
+  return w.__ctxEvents.map(e => ({ ...e, t: Math.round(e.t - w.__diag.t0) }))
+})
+console.log('\n--- WebGL context events ---')
+console.log(
+  ctxEvents.length
+    ? ctxEvents.map(e => `${e.t} ms ${e.type}`).join('\n')
+    : 'none',
+)
+
 console.log('\n--- GPU draw calls ---')
 console.log(
   diag.draws.length
@@ -261,9 +350,23 @@ for (const [b, n] of [...buckets].sort((a, x) => a[0] - x[0])) {
   console.log(`${String(b).padStart(5)} ms  ${'#'.repeat(Math.min(60, n))} ${n}`)
 }
 
-console.log('\n--- canvas attribute writes ---')
-for (const m of diag.muts.filter(x => x.target.startsWith('canvas')).slice(0, 14)) {
-  console.log(`${String(m.t).padStart(5)} ms  ${m.attr}`)
+const state = await page.evaluate(() => {
+  const w = window as unknown as { __state: { t: number; v: string }[] }
+  return w.__state
+})
+console.log('\n--- view state transitions (5 ms sampler) ---')
+for (const s of state.slice(0, 20)) {
+  console.log(`${String(s.t).padStart(5)} ms  ${s.v}`)
+}
+if (!state.length) {
+  console.log('(no change)')
+}
+
+console.log('\n--- everything touching a canvas ---')
+for (const m of diag.muts
+  .filter(x => x.target.startsWith('canvas') || (x.attr ?? '').includes('canvas'))
+  .slice(0, 30)) {
+  console.log(`${String(m.t).padStart(5)} ms  ${m.type} ${m.target}  ${m.attr}`)
 }
 
 console.log('\n--- DOM mutations by target, after 300 ms ---')

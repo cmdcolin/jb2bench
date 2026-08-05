@@ -279,21 +279,26 @@ node scripts/crosstool/zoomrunner.ts             # → results/crosstool-zoom.{m
 ### The zoom result is not what it looks like
 
 `results/crosstool-zoom.md` says igv.js settles a 2x zoom-in in ~340 ms against
-JBrowse's ~800 ms. **That is not a rendering comparison, and JBrowse's figure is
-not a cost of zooming.** Run the same measurement with no zoom at all and the
-churn is identical: at rest, `builds/current` re-enters its loading phase and
-remounts the track canvas several times a second, where release-4.3.0 is
-completely silent. The reported number is the expected wait to catch a quiet
-300 ms gap in that loop, which is why it does not move when the data volume
-changes by 50x. The track's own pixels settle at the first poll after the zoom.
+JBrowse's ~800 ms. **That is not a drawing comparison.** Measured from inside the
+page with no screenshots at all, JBrowse's real post-zoom tail is 505 ms — 505,
+505 and 506 ms across three runs, which is a timer and not work. It is the
+500 ms `LGVCoarseDynamicBlocks` autorun; the track's own pixels are correct at
+the first frame. The rest of the 0.8 s is `zoomprofile.ts` under-subtracting its
+own settle window, since each poll costs a screenshot.
 
-[`flame/ZOOM_SETTLE.md`](flame/ZOOM_SETTLE.md) has the channels, the four
-controls that pin it down, and what is still open. `scripts/crosstool/zoomdiag.ts`
-reproduces it:
+At rest the page is idle: 95.7% idle over a 6 s CPU profile, ~1 ms of
+JavaScript, no draws. [`flame/ZOOM_SETTLE.md`](flame/ZOOM_SETTLE.md) has the
+numbers, and the retraction of an earlier version of this section that reported
+an at-rest re-render loop — which was `zoomdiag.ts`'s own **clipped**
+screenshots perturbing the page. A clipped capture behaves like a resize (90
+induced draws in a direct test) where a full-viewport one does not (0), so
+`zoomprofile.ts` and `paintprofile.ts` are unaffected and `zoomdiag.ts` grew a
+`NO_SHOTS=1` mode:
 
 ```bash
-NO_ZOOM=1 node scripts/crosstool/zoomdiag.ts "<url>"   # the control
-TRACE_TIMERS=1 node scripts/crosstool/zoomdiag.ts "<url>"
+NO_SHOTS=1 node scripts/crosstool/zoomdiag.ts "<url>"           # real activity
+NO_SHOTS=1 NO_ZOOM=1 node scripts/crosstool/zoomdiag.ts "<url>" # at rest: silent
+node scripts/crosstool/restprofile.ts "<url>" rest 6000         # idle CPU profile
 ```
 
 igv.js's numbers *fall* across successive steps as its visible read count drops,
