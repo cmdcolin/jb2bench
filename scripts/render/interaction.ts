@@ -9,13 +9,28 @@
 //
 // So the metric that matters is TIME-TO-CONTENT after a zoom: how long a loading
 // indicator is shown before correct content is back. We drive the view model
-// directly via window.JBrowseSession (exposed by both builds), zoom IN by fixed
-// steps (subset of already-loaded data — isolates the cache-redraw path), and
-// sample the loading state at high frequency. We also record the redraw frame
-// cost (max rAF gap), which is small for both but slightly higher on the GPU
-// branch since it genuinely redraws on each zoom. Hardware-GPU headless.
+// directly via window.JBrowseSession (exposed by both builds) and sample the
+// loading state at high frequency. We also record the redraw frame cost (max rAF
+// gap). Hardware-GPU headless.
 //
-// Usage: interaction.ts <url> [screenshotPath]
+// TWO DIRECTIONS, set by ZOOM=in|out (default in):
+//
+//   in  — zoom IN by 2x per step. The new view is a strict subset of loaded
+//         data, so the GPU branch never refetches and this isolates the
+//         cache-redraw path. This is the asymmetric case: it is the branch's
+//         best showing, because only the old renderer has to go back to the
+//         network.
+//   out — zoom OUT by 2x per step. The new view needs data outside what is
+//         loaded, so BOTH architectures must refetch. This is the harder,
+//         fairer case: it isolates redraw cost from fetch cost, and answers
+//         "when both have to fetch, what is left of the advantage?".
+//
+// Zoom-out is self-limiting: `chr22_mask` is only 250 kb, so a 19 kb window can
+// widen about three times before the view clamps at the contig. A clamped step
+// is a no-op, not a measurement, so we detect it (bpPerPx did not change) and
+// stop rather than reporting zeros that look like instant content.
+//
+// Usage: interaction.ts <url> [screenshotPath]     (ZOOM=in|out, MAX_WAIT=ms)
 // Prints JSON with per-step time-to-content and redraw cost.
 import puppeteer from 'puppeteer'
 import fs from 'fs'
@@ -30,7 +45,9 @@ if (screenshotPath) {
   fs.mkdirSync(path.dirname(screenshotPath), { recursive: true })
 }
 
-const STEPS = 5 // zoom-in steps measured (each halves bpPerPx)
+const DIRECTION = process.env.ZOOM === 'out' ? 'out' : 'in'
+const FACTOR = DIRECTION === 'out' ? 2 : 0.5
+const STEPS = 5 // steps attempted (zoom-out stops early when the view clamps)
 
 const browser = await puppeteer.launch({
   headless: process.env.HEADLESS !== '0',
@@ -90,31 +107,59 @@ const LOADING_FN = () => {
   return overlay || msg
 }
 
-const MAX_WAIT = 15000
+// A step that is still loading when this expires is reported as CENSORED, not as
+// a number. The original 15000 silently produced the recorded 1000x-longread
+// figure of "15008ms" — five steps that all landed within 19ms of the cap, which
+// is the harness giving up rather than content arriving. Zoom-out fetches more
+// data than zoom-in, so the ceiling has to be well clear of any real value.
+const MAX_WAIT = Number(process.env.MAX_WAIT ?? 120000)
 const QUIET = 300 // content considered back once loading stays false this long
 
 interface StepMetric {
   timeToContentMs: number // how long a loading indicator was shown post-zoom
   loadingSeen: boolean // did a refetch/re-render loading state appear at all
   redrawGapMs: number // longest rAF gap = cost of the redraw frame
+  /** false once the view clamps at the contig edge — a no-op, not a measurement */
+  applied: boolean
+  /** true if MAX_WAIT expired with content still not back: value is a lower bound */
+  censored: boolean
 }
 
 async function zoomStep(): Promise<StepMetric> {
-  const t0 = await page.evaluate(() => {
+  const { t0, applied } = await page.evaluate(factor => {
     const w = window as unknown as {
       __frames: number[]
       JBrowseSession: { views: unknown[] }
     }
     w.__frames = []
-    const v = w.JBrowseSession.views[0] as { bpPerPx: number; zoomTo: (n: number) => void }
+    const v = w.JBrowseSession.views[0] as {
+      bpPerPx: number
+      zoomTo: (n: number) => void
+    }
+    const before = v.bpPerPx
     const t = performance.now()
-    v.zoomTo(v.bpPerPx * 0.5) // zoom in 2x: strict subset of loaded data
-    return t
-  })
+    v.zoomTo(before * factor)
+    // zoomTo clamps at the assembly's widest bpPerPx. An unchanged value means
+    // the view was already as wide as the contig allows and nothing moved, so
+    // there is nothing to time — distinguish that from "content came back
+    // instantly", which is the same 0ms otherwise.
+    return { t0: t, applied: v.bpPerPx !== before }
+  }, FACTOR)
+
+  if (!applied) {
+    return {
+      timeToContentMs: Number.NaN,
+      loadingSeen: false,
+      redrawGapMs: Number.NaN,
+      applied: false,
+      censored: false,
+    }
+  }
 
   // sample loading state until it has been false for QUIET ms (or timeout)
   let lastLoadingTrue = 0
   let loadingSeen = false
+  let censored = false
   const start = Date.now()
   for (;;) {
     const loading = await page.evaluate(LOADING_FN)
@@ -127,6 +172,9 @@ async function zoomStep(): Promise<StepMetric> {
       break
     }
     if (elapsed >= MAX_WAIT) {
+      // never observed QUIET ms of settled content, so the true time-to-content
+      // is greater than this, not equal to it
+      censored = loadingSeen
       break
     }
     await new Promise(r => setTimeout(r, 20))
@@ -146,6 +194,8 @@ async function zoomStep(): Promise<StepMetric> {
     timeToContentMs: loadingSeen ? lastLoadingTrue : 0,
     loadingSeen,
     redrawGapMs,
+    applied: true,
+    censored,
   }
 }
 
@@ -155,17 +205,33 @@ const median = (a: number[]) => {
   return s.length ? (s.length % 2 ? s[m]! : (s[m - 1]! + s[m]!) / 2) : Number.NaN
 }
 
-await zoomStep() // warmup
+// Warmup only when zooming in. Zooming out has roughly three usable steps before
+// the 250 kb contig clamps the view, so spending one on a warmup would leave too
+// few — and the page is already quiesced from the initial render anyway.
+if (DIRECTION === 'in') {
+  await zoomStep()
+}
 const steps: StepMetric[] = []
 for (let i = 0; i < STEPS; i++) {
-  steps.push(await zoomStep())
+  const s = await zoomStep()
+  if (!s.applied) {
+    break // view clamped at the contig edge; further steps would be no-ops
+  }
+  steps.push(s)
 }
 
 if (screenshotPath) {
   await page.screenshot({ path: screenshotPath })
 }
 
+const censoredSteps = steps.filter(s => s.censored).length
 const summary = {
+  mode: DIRECTION,
+  maxWaitMs: MAX_WAIT,
+  stepsMeasured: steps.length,
+  stepsCensored: censoredSteps,
+  // when any step is censored the median is a LOWER BOUND, not a value
+  censored: censoredSteps > 0,
   zoomTimeToContentMs: median(steps.map(s => s.timeToContentMs)),
   zoomRedrawGapMs: median(steps.map(s => s.redrawGapMs)),
   loadingEverSeen: steps.some(s => s.loadingSeen),

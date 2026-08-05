@@ -18,32 +18,59 @@ for (const read of ['shortread', 'longread']) {
   }
 }
 
+// in  — the new view is a subset of loaded data, so only the old renderer
+//       refetches. The GPU branch's best case.
+// out — the new view needs data neither build has, so BOTH refetch. Isolates
+//       redraw cost from fetch cost, and is the harder case for the branch.
+const DIRECTIONS = ['in', 'out'] as const
+type Direction = (typeof DIRECTIONS)[number]
+
 interface Result {
   zoomTimeToContentMs: number
   zoomRedrawGapMs: number
   loadingEverSeen: boolean
+  stepsMeasured: number
+  stepsCensored: number
+  censored: boolean
+  maxWaitMs: number
 }
 
-function run(build: (typeof builds)[number], track: string): Result {
+function run(
+  build: (typeof builds)[number],
+  track: string,
+  zoom: Direction,
+): Result {
   const url = `http://localhost:${build.port}/?loc=${LOC}&assembly=hg19mod&tracks=${track}${build.extra}`
   const out = execFileSync('node', ['scripts/render/interaction.ts', url], {
     encoding: 'utf8',
     stdio: ['ignore', 'pipe', 'ignore'],
-    env: { ...process.env, DISPLAY: process.env.DISPLAY || ':0' },
+    env: { ...process.env, DISPLAY: process.env.DISPLAY || ':0', ZOOM: zoom },
   })
   return JSON.parse(out.trim().split('\n').pop()!) as Result
 }
 
-const results: Record<string, Record<string, Result>> = {}
+// A censored cell is a lower bound, so render it as ">=N" rather than as a
+// number that reads like a measurement. No measured step at all (the view was
+// already at the contig edge) is "n/a", not 0 — 0 means "content never went
+// away", which is the opposite conclusion.
+const cell = (r: Result) =>
+  Number.isFinite(r.zoomTimeToContentMs)
+    ? `${r.censored ? '≥' : ''}${r.zoomTimeToContentMs.toFixed(0)}ms`
+    : 'n/a'
+
+const results: Record<string, Record<Direction, Record<string, Result>>> = {}
 for (const c of cases) {
-  results[c.id] = {}
-  for (const b of builds) {
-    process.stdout.write(`${c.id} / ${b.name}: `)
-    const r = run(b, c.track)
-    results[c.id]![b.name] = r
-    process.stdout.write(
-      `time-to-content ${r.zoomTimeToContentMs.toFixed(0)}ms (loading=${r.loadingEverSeen})\n`,
-    )
+  results[c.id] = { in: {}, out: {} }
+  for (const dir of DIRECTIONS) {
+    for (const b of builds) {
+      process.stdout.write(`${c.id} / ${b.name} / zoom-${dir}: `)
+      const r = run(b, c.track, dir)
+      results[c.id]![dir][b.name] = r
+      process.stdout.write(
+        `time-to-content ${cell(r)} (loading=${r.loadingEverSeen}, steps=${r.stepsMeasured}` +
+          `${r.stepsCensored ? `, censored=${r.stepsCensored}` : ''})\n`,
+      )
+    }
   }
 }
 
@@ -53,16 +80,30 @@ fs.writeFileSync(
   JSON.stringify({ loc: LOC, results }, null, 2),
 )
 
+const MAX_WAIT_NOTE = `${results[cases[0]!.id]!.in[builds[0]!.name]!.maxWaitMs} ms`
+
 let md = `# Zoom interaction benchmark\n\n`
-md += `Region \`${LOC}\`, zoom IN by 2x (subset of already-loaded reads). `
-md += `**time-to-content** = ms a loading indicator ("Downloading alignments...") is shown after a zoom before correct content returns; median of 5 zooms. `
-md += `redraw = longest frame (ms) of the GPU redraw.\n\n`
-md += `| case | webgl-poc time-to-content | release-4.3.0 time-to-content | webgl-poc redraw frame |\n`
+md += `Region \`${LOC}\`. **time-to-content** = ms a loading indicator ("Downloading alignments...") is shown after a zoom before correct content returns; median over the measured steps. `
+md += `redraw = longest frame (ms) of the GPU redraw. A \`≥\` prefix marks a censored value: the step was still loading at MAX_WAIT (${MAX_WAIT_NOTE}), so the true figure is larger.\n\n`
+
+md += `## Zoom IN — only the old renderer refetches\n\n`
+md += `The new view is a strict subset of already-loaded reads, so the GPU branch re-projects without going to the network. This is its best case.\n\n`
+md += `| case | webgl-poc | release-4.3.0 | webgl-poc redraw frame |\n`
 md += `|---|---:|---:|---:|\n`
 for (const c of cases) {
-  const w = results[c.id]!['webgl-poc']!
-  const r = results[c.id]!['release-4.3.0']!
-  md += `| ${c.id} | ${w.zoomTimeToContentMs.toFixed(0)}ms | ${r.zoomTimeToContentMs.toFixed(0)}ms | ${w.zoomRedrawGapMs.toFixed(0)}ms |\n`
+  const w = results[c.id]!.in['webgl-poc']!
+  const r = results[c.id]!.in['release-4.3.0']!
+  md += `| ${c.id} | ${cell(w)} | ${cell(r)} | ${w.zoomRedrawGapMs.toFixed(0)}ms |\n`
+}
+
+md += `\n## Zoom OUT — both refetch\n\n`
+md += `The new view needs data neither build has loaded, so both must fetch. What remains of the gap here is render cost rather than avoided fetching. Steps stop early when the view clamps at the 250 kb contig.\n\n`
+md += `| case | webgl-poc | release-4.3.0 | webgl-poc redraw frame | steps |\n`
+md += `|---|---:|---:|---:|---:|\n`
+for (const c of cases) {
+  const w = results[c.id]!.out['webgl-poc']!
+  const r = results[c.id]!.out['release-4.3.0']!
+  md += `| ${c.id} | ${cell(w)} | ${cell(r)} | ${w.zoomRedrawGapMs.toFixed(0)}ms | ${w.stepsMeasured} |\n`
 }
 fs.writeFileSync('results/interaction.md', md)
 console.log('\n' + md)
