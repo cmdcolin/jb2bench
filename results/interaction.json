@@ -1,0 +1,401 @@
+{
+  "loc": "chr22_mask:124000-143000",
+  "results": {
+    "20x-shortread": {
+      "webgl-poc": {
+        "zoomTimeToContentMs": 0,
+        "zoomRedrawGapMs": 16.799999999999272,
+        "loadingEverSeen": false,
+        "steps": [
+          {
+            "timeToContentMs": 0,
+            "loadingSeen": false,
+            "redrawGapMs": 16.799999999999727
+          },
+          {
+            "timeToContentMs": 0,
+            "loadingSeen": false,
+            "redrawGapMs": 16.700000000000273
+          },
+          {
+            "timeToContentMs": 0,
+            "loadingSeen": false,
+            "redrawGapMs": 16.799999999999272
+          },
+          {
+            "timeToContentMs": 0,
+            "loadingSeen": false,
+            "redrawGapMs": 16.799999999999272
+          },
+          {
+            "timeToContentMs": 0,
+            "loadingSeen": false,
+            "redrawGapMs": 16.700000000000728
+          }
+        ]
+      },
+      "release-4.3.0": {
+        "zoomTimeToContentMs": 1074,
+        "zoomRedrawGapMs": 16.800000000000182,
+        "loadingEverSeen": true,
+        "steps": [
+          {
+            "timeToContentMs": 1112,
+            "loadingSeen": true,
+            "redrawGapMs": 16.800000000000182
+          },
+          {
+            "timeToContentMs": 1074,
+            "loadingSeen": true,
+            "redrawGapMs": 16.800000000000182
+          },
+          {
+            "timeToContentMs": 1086,
+            "loadingSeen": true,
+            "redrawGapMs": 16.80000000000109
+          },
+          {
+            "timeToContentMs": 1062,
+            "loadingSeen": true,
+            "redrawGapMs": 16.799999999999272
+          },
+          {
+            "timeToContentMs": 1064,
+            "loadingSeen": true,
+            "redrawGapMs": 16.80000000000109
+          }
+        ]
+      }
+    },
+    "200x-shortread": {
+      "webgl-poc": {
+        "zoomTimeToContentMs": 0,
+        "zoomRedrawGapMs": 16.799999999999272,
+        "loadingEverSeen": false,
+        "steps": [
+          {
+            "timeToContentMs": 0,
+            "loadingSeen": false,
+            "redrawGapMs": 16.799999999999727
+          },
+          {
+            "timeToContentMs": 0,
+            "loadingSeen": false,
+            "redrawGapMs": 16.700000000000273
+          },
+          {
+            "timeToContentMs": 0,
+            "loadingSeen": false,
+            "redrawGapMs": 16.799999999999727
+          },
+          {
+            "timeToContentMs": 0,
+            "loadingSeen": false,
+            "redrawGapMs": 16.699999999999818
+          },
+          {
+            "timeToContentMs": 0,
+            "loadingSeen": false,
+            "redrawGapMs": 16.799999999999272
+          }
+        ]
+      },
+      "release-4.3.0": {
+        "zoomTimeToContentMs": 1106,
+        "zoomRedrawGapMs": 16.800000000000182,
+        "loadingEverSeen": true,
+        "steps": [
+          {
+            "timeToContentMs": 1152,
+            "loadingSeen": true,
+            "redrawGapMs": 16.800000000000182
+          },
+          {
+            "timeToContentMs": 1123,
+            "loadingSeen": true,
+            "redrawGapMs": 16.800000000000182
+          },
+          {
+            "timeToContentMs": 1076,
+            "loadingSeen": true,
+            "redrawGapMs": 16.800000000000182
+          },
+          {
+            "timeToContentMs": 1106,
+            "loadingSeen": true,
+            "redrawGapMs": 16.799999999999272
+          },
+          {
+            "timeToContentMs": 1058,
+            "loadingSeen": true,
+            "redrawGapMs": 16.80000000000109
+          }
+        ]
+      }
+    },
+    "1000x-shortread": {
+      "webgl-poc": {
+        "zoomTimeToContentMs": 0,
+        "zoomRedrawGapMs": 16.799999999999272,
+        "loadingEverSeen": false,
+        "steps": [
+          {
+            "timeToContentMs": 0,
+            "loadingSeen": false,
+            "redrawGapMs": 16.700000000000728
+          },
+          {
+            "timeToContentMs": 0,
+            "loadingSeen": false,
+            "redrawGapMs": 16.700000000000728
+          },
+          {
+            "timeToContentMs": 0,
+            "loadingSeen": false,
+            "redrawGapMs": 16.80000000000109
+          },
+          {
+            "timeToContentMs": 0,
+            "loadingSeen": false,
+            "redrawGapMs": 16.80000000000109
+          },
+          {
+            "timeToContentMs": 0,
+            "loadingSeen": false,
+            "redrawGapMs": 16.799999999999272
+          }
+        ]
+      },
+      "release-4.3.0": {
+        "zoomTimeToContentMs": 1760,
+        "zoomRedrawGapMs": 16.80000000000109,
+        "loadingEverSeen": true,
+        "steps": [
+          {
+            "timeToContentMs": 3544,
+            "loadingSeen": true,
+            "redrawGapMs": 16.80000000000109
+          },
+          {
+            "timeToContentMs": 1823,
+            "loadingSeen": true,
+            "redrawGapMs": 16.80000000000109
+          },
+          {
+            "timeToContentMs": 1565,
+            "loadingSeen": true,
+            "redrawGapMs": 16.80000000000109
+          },
+          {
+            "timeToContentMs": 1760,
+            "loadingSeen": true,
+            "redrawGapMs": 16.80000000000291
+          },
+          {
+            "timeToContentMs": 1589,
+            "loadingSeen": true,
+            "redrawGapMs": 16.799999999999272
+          }
+        ]
+      }
+    },
+    "20x-longread": {
+      "webgl-poc": {
+        "zoomTimeToContentMs": 0,
+        "zoomRedrawGapMs": 16.800000000000182,
+        "loadingEverSeen": false,
+        "steps": [
+          {
+            "timeToContentMs": 0,
+            "loadingSeen": false,
+            "redrawGapMs": 16.800000000000182
+          },
+          {
+            "timeToContentMs": 0,
+            "loadingSeen": false,
+            "redrawGapMs": 16.700000000000273
+          },
+          {
+            "timeToContentMs": 0,
+            "loadingSeen": false,
+            "redrawGapMs": 16.800000000000182
+          },
+          {
+            "timeToContentMs": 0,
+            "loadingSeen": false,
+            "redrawGapMs": 16.800000000000182
+          },
+          {
+            "timeToContentMs": 0,
+            "loadingSeen": false,
+            "redrawGapMs": 16.800000000000182
+          }
+        ]
+      },
+      "release-4.3.0": {
+        "zoomTimeToContentMs": 1150,
+        "zoomRedrawGapMs": 16.80000000000109,
+        "loadingEverSeen": true,
+        "steps": [
+          {
+            "timeToContentMs": 1249,
+            "loadingSeen": true,
+            "redrawGapMs": 16.800000000000182
+          },
+          {
+            "timeToContentMs": 1141,
+            "loadingSeen": true,
+            "redrawGapMs": 16.800000000000182
+          },
+          {
+            "timeToContentMs": 1177,
+            "loadingSeen": true,
+            "redrawGapMs": 16.80000000000109
+          },
+          {
+            "timeToContentMs": 1150,
+            "loadingSeen": true,
+            "redrawGapMs": 16.80000000000109
+          },
+          {
+            "timeToContentMs": 1118,
+            "loadingSeen": true,
+            "redrawGapMs": 16.80000000000109
+          }
+        ]
+      }
+    },
+    "200x-longread": {
+      "webgl-poc": {
+        "zoomTimeToContentMs": 0,
+        "zoomRedrawGapMs": 16.800000000000182,
+        "loadingEverSeen": false,
+        "steps": [
+          {
+            "timeToContentMs": 0,
+            "loadingSeen": false,
+            "redrawGapMs": 16.799999999999272
+          },
+          {
+            "timeToContentMs": 0,
+            "loadingSeen": false,
+            "redrawGapMs": 50
+          },
+          {
+            "timeToContentMs": 0,
+            "loadingSeen": false,
+            "redrawGapMs": 16.700000000000728
+          },
+          {
+            "timeToContentMs": 0,
+            "loadingSeen": false,
+            "redrawGapMs": 33.399999999999636
+          },
+          {
+            "timeToContentMs": 0,
+            "loadingSeen": false,
+            "redrawGapMs": 16.800000000000182
+          }
+        ]
+      },
+      "release-4.3.0": {
+        "zoomTimeToContentMs": 2786,
+        "zoomRedrawGapMs": 16.80000000000291,
+        "loadingEverSeen": true,
+        "steps": [
+          {
+            "timeToContentMs": 5489,
+            "loadingSeen": true,
+            "redrawGapMs": 16.80000000000109
+          },
+          {
+            "timeToContentMs": 3393,
+            "loadingSeen": true,
+            "redrawGapMs": 16.80000000000291
+          },
+          {
+            "timeToContentMs": 2735,
+            "loadingSeen": true,
+            "redrawGapMs": 16.80000000000291
+          },
+          {
+            "timeToContentMs": 2786,
+            "loadingSeen": true,
+            "redrawGapMs": 16.799999999999272
+          },
+          {
+            "timeToContentMs": 2762,
+            "loadingSeen": true,
+            "redrawGapMs": 16.80000000000291
+          }
+        ]
+      }
+    },
+    "1000x-longread": {
+      "webgl-poc": {
+        "zoomTimeToContentMs": 0,
+        "zoomRedrawGapMs": 116.69999999999891,
+        "loadingEverSeen": false,
+        "steps": [
+          {
+            "timeToContentMs": 0,
+            "loadingSeen": false,
+            "redrawGapMs": 116.69999999999891
+          },
+          {
+            "timeToContentMs": 0,
+            "loadingSeen": false,
+            "redrawGapMs": 116.69999999999891
+          },
+          {
+            "timeToContentMs": 0,
+            "loadingSeen": false,
+            "redrawGapMs": 116.69999999999891
+          },
+          {
+            "timeToContentMs": 0,
+            "loadingSeen": false,
+            "redrawGapMs": 116.79999999999927
+          },
+          {
+            "timeToContentMs": 0,
+            "loadingSeen": false,
+            "redrawGapMs": 150
+          }
+        ]
+      },
+      "release-4.3.0": {
+        "zoomTimeToContentMs": 15008,
+        "zoomRedrawGapMs": 16.80000000000291,
+        "loadingEverSeen": true,
+        "steps": [
+          {
+            "timeToContentMs": 15019,
+            "loadingSeen": true,
+            "redrawGapMs": 16.80000000000291
+          },
+          {
+            "timeToContentMs": 15006,
+            "loadingSeen": true,
+            "redrawGapMs": 16.80000000000291
+          },
+          {
+            "timeToContentMs": 15018,
+            "loadingSeen": true,
+            "redrawGapMs": 33.39999999999418
+          },
+          {
+            "timeToContentMs": 15008,
+            "loadingSeen": true,
+            "redrawGapMs": 33.30000000000291
+          },
+          {
+            "timeToContentMs": 15004,
+            "loadingSeen": true,
+            "redrawGapMs": 16.80000000000291
+          }
+        ]
+      }
+    }
+  }
+}

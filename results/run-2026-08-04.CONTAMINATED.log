@@ -1,0 +1,17 @@
+20x-shortread / current: 1788 1786 1784 1887 1889 1893 => median 1838ms
+20x-shortread / release-4.3.0: 2482 2286 2281 2292 FAIL 2456 => median 2292ms
+20x-shortread / release-4.1.15: 2641 2488 2678 3201 2821 2496 => median 2660ms
+200x-shortread / current: 2380 2283 2556 2700 2447 2775 => median 2502ms
+200x-shortread / release-4.3.0: 3297 3572 2792 2921 3474 3347 => median 3322ms
+200x-shortread / release-4.1.15: 3321 3132 3251 3119 3106 3085 => median 3126ms
+1000x-shortread / current: 4544 4714 4576 4811 4671 5383 => median 4693ms
+1000x-shortread / release-4.3.0: 7183 7841 10140 8847 11079 11266 => median 9494ms
+1000x-shortread / release-4.1.15: 8922 6621 8340 8066 8035 7169 => median 8051ms
+20x-longread / current: 2282 2306 2468 2605 2414 3009 => median 2441ms
+20x-longread / release-4.3.0: 4803 4254 6235 6335 4832 5241 => median 5037ms
+20x-longread / release-4.1.15: 3173 4611 4142 3040 2805 2979 => median 3107ms
+200x-longread / current: 4133 3828 4033 3993 3379 3572 => median 3911ms
+200x-longread / release-4.3.0: 12235 18899 FAIL 24960 27056 16616 => median 18899ms
+200x-longread / release-4.1.15: 7516 7369 7412 6413 8113 8409 => median 7464ms
+1000x-longread / current: 16755 9364 8139 8213 13154 8730 => median 9047ms
+1000x-longread / release-4.3.0: 

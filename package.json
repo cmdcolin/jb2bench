@@ -1,0 +1,15 @@
+{
+  "name": "jb2bench",
+  "private": true,
+  "type": "module",
+  "dependencies": {
+    "http-server": "^14.1.0",
+    "puppeteer": "^24.39.0",
+    "tablemark": "^4.1.0"
+  },
+  "devDependencies": {
+    "@types/node": "^25.9.3",
+    "@webgpu/types": "^0.1.71",
+    "source-map": "^0.7.6"
+  }
+}

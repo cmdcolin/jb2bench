@@ -1,0 +1,30 @@
+# Simulated alignments — ~750 MB, and reproducible. Regenerate with
+# shell/generate_alignments.sh (needs wgsim, pbsim, minimap2, samtools), then
+# shell/load_alignments.sh to wire them into every build under builds/.
+*.bam
+*.bam.bai
+*.cram
+*.cram.crai
+*.bw
+
+# jbrowse-web builds under test. Each is a deployed build plus symlinked copies
+# of the alignment data; stage them per README ("Builds compared").
+builds/
+
+node_modules/
+
+# V8 CPU profiles from flameprofile.ts / interaction-profile.ts, ~600 KB each.
+# The conclusions drawn from them are in flame/*.md, which are tracked.
+*.cpuprofile
+
+# Puppeteer verify/probe output
+screenshots/
+
+# Top-level logs from building and generating; results/*.log is tracked, since
+# those are the raw per-run numbers behind the tables.
+/build_webgl.log
+/gen_alignments.log
+
+# Derived flamegraph intermediates (from *.cpuprofile, which is ignored)
+flame/*.folded
+flame/*.svg

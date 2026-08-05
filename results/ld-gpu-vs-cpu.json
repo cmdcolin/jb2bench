@@ -1,0 +1,46 @@
+{
+  "numSamples": 1000,
+  "adapter": {
+    "vendor": "amd",
+    "architecture": "gcn-4",
+    "description": ""
+  },
+  "maxComputeWorkgroupsPerDimension": 65535,
+  "rows": [
+    {
+      "n": 100,
+      "numCells": 4950,
+      "workUnits": 4950000,
+      "gpuMs": 2.699999988079071,
+      "cpuMs": 68.80000001192093
+    },
+    {
+      "n": 250,
+      "numCells": 31125,
+      "workUnits": 31125000,
+      "gpuMs": 12,
+      "cpuMs": 293.5
+    },
+    {
+      "n": 500,
+      "numCells": 124750,
+      "workUnits": 124750000,
+      "gpuMs": 61.89999997615814,
+      "cpuMs": 796.3999999761581
+    },
+    {
+      "n": 1000,
+      "numCells": 499500,
+      "workUnits": 499500000,
+      "gpuMs": 283.69999998807907,
+      "cpuMs": 3227.699999988079
+    },
+    {
+      "n": 2000,
+      "numCells": 1999000,
+      "workUnits": 1999000000,
+      "gpuMs": 1235.800000011921,
+      "cpuMs": 9141.700000047684
+    }
+  ]
+}
