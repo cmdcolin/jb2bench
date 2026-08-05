@@ -1,0 +1,71 @@
+started Wed Aug  5 09:18:05 AM EDT 2026
+new: port 8000 is serving builds/current
+baseline: port 8001 is serving builds/release-4.3.0
+20x-shortread / current / pan: time-to-content 336ms (loading=true, steps=5, load=6.1→5.7) [chr22_mask:105,001..124,001 → chr22_mask:86,000..105,000 → chr22_mask:66,999..85,999 → chr22_mask:47,998..66,998 → chr22_mask:28,997..47,997]
+20x-shortread / release-4.3.0 / pan: time-to-content 639ms (loading=true, steps=5, load=5.7→6.3) [chr22_mask:105,001..124,001 → chr22_mask:86,000..105,000 → chr22_mask:66,999..85,999 → chr22_mask:47,998..66,998 → chr22_mask:28,997..47,997]
+200x-shortread / current / pan: time-to-content 697ms (loading=true, steps=5, load=6.3→6.2) [chr22_mask:105,001..124,001 → chr22_mask:86,000..105,000 → chr22_mask:66,999..85,999 → chr22_mask:47,998..66,998 → chr22_mask:28,997..47,997]
+200x-shortread / release-4.3.0 / pan: time-to-content 1310ms (loading=true, steps=5, load=6.2→6.5) [chr22_mask:105,001..124,001 → chr22_mask:86,000..105,000 → chr22_mask:66,999..85,999 → chr22_mask:47,998..66,998 → chr22_mask:28,997..47,997]
+1000x-shortread / current / pan: time-to-content 1895ms (loading=true, steps=5, load=6.5→6.3) [chr22_mask:105,001..124,001 → chr22_mask:86,000..105,000 → chr22_mask:66,999..85,999 → chr22_mask:47,998..66,998 → chr22_mask:28,997..47,997]
+1000x-shortread / release-4.3.0 / pan: time-to-content 6608ms (loading=true, steps=5, load=6.3→7.5) [chr22_mask:105,001..124,001 → chr22_mask:86,000..105,000 → chr22_mask:66,999..85,999 → chr22_mask:47,998..66,998 → chr22_mask:28,997..47,997]
+20x-longread / current / pan: time-to-content 361ms (loading=true, steps=5, load=7.5→8.7) [chr22_mask:105,001..124,001 → chr22_mask:86,000..105,000 → chr22_mask:66,999..85,999 → chr22_mask:47,998..66,998 → chr22_mask:28,997..47,997]
+20x-longread / release-4.3.0 / pan: time-to-content 1251ms (loading=true, steps=5, load=8.7→8.8) [chr22_mask:105,001..124,001 → chr22_mask:86,000..105,000 → chr22_mask:66,999..85,999 → chr22_mask:47,998..66,998 → chr22_mask:28,997..47,997]
+200x-longread / current / pan: time-to-content 739ms (loading=true, steps=5, load=8.8→7.9) [chr22_mask:105,001..124,001 → chr22_mask:86,000..105,000 → chr22_mask:66,999..85,999 → chr22_mask:47,998..66,998 → chr22_mask:28,997..47,997]
+200x-longread / release-4.3.0 / pan: time-to-content 3182ms (loading=true, steps=5, load=7.9→5.9) [chr22_mask:105,001..124,001 → chr22_mask:86,000..105,000 → chr22_mask:66,999..85,999 → chr22_mask:47,998..66,998 → chr22_mask:28,997..47,997]
+1000x-longread / current / pan: time-to-content 3972ms (loading=true, steps=5, load=5.9→4.5) [chr22_mask:105,001..124,001 → chr22_mask:86,000..105,000 → chr22_mask:66,999..85,999 → chr22_mask:47,998..66,998 → chr22_mask:28,997..47,997]
+1000x-longread / release-4.3.0 / pan: time-to-content 16115ms (loading=true, steps=5, load=4.5→9.0) [chr22_mask:105,001..124,001 → chr22_mask:86,000..105,000 → chr22_mask:66,999..85,999 → chr22_mask:47,998..66,998 → chr22_mask:28,997..47,997]
+
+# Zoom interaction benchmark
+
+Region `chr22_mask:124000-143000`. **time-to-content** = ms a loading indicator ("Downloading alignments...") is shown after a zoom before correct content returns; median over the measured steps. redraw = longest frame (ms) of the GPU redraw. A `≥` prefix marks a censored value: the step was still loading at MAX_WAIT (120000 ms), so the true figure is larger.
+
+Measured — in: unknown, out: unknown, pan: 2026-08-05 13:18. Comparisons *within* a section are same-run; comparisons across sections may not be.
+
+## Zoom IN — only the old renderer refetches
+
+The new view is a strict subset of already-loaded reads, so the GPU branch re-projects without going to the network. This is its best case.
+
+| case | current | release-4.3.0 | current redraw frame |
+|---|---:|---:|---:|
+| 20x-shortread | 0ms | 1059ms | 17ms |
+| 200x-shortread | 0ms | 1085ms | 17ms |
+| 1000x-shortread | 0ms | 1717ms | 17ms |
+| 20x-longread | 0ms | 1178ms | 17ms |
+| 200x-longread | 0ms | 2984ms | 17ms |
+| 1000x-longread | 0ms | 15321ms | 50ms |
+
+## Zoom OUT — mostly refused, not measured
+
+Zooming out was meant to be the case where BOTH builds refetch, isolating render cost from avoided fetching. It largely does not work: past a byte threshold JBrowse declines the fetch and renders "Requested too much data (N Mb). Zoom in to see features or force load" instead of reads.
+
+That path is fast and paints nothing, so it previously scored as a ~90ms success — the best-looking number in the table was a refusal to draw. `_bail_` marks a cell where no step drew anything; `(n bail)` marks partial refusal, with the median taken only over steps that did draw.
+
+The honest reading: for anything heavier than 20x shortread, this comparison has no render timing in it. Panning at constant zoom is the way to test refetch against refetch without crossing the cap.
+
+| case | current | release-4.3.0 | current redraw frame | drew/attempted |
+|---|---:|---:|---:|---:|
+| 20x-shortread | 0ms (1 bail) | 1970ms | 17ms | 3/4 |
+| 200x-shortread | 0ms (3 bail) | _bail_ | 17ms | 1/4 |
+| 1000x-shortread | 0ms (3 bail) | _bail_ | 17ms | 1/4 |
+| 20x-longread | 0ms (3 bail) | _bail_ | 17ms | 1/4 |
+| 200x-longread | 0ms (3 bail) | _bail_ | 17ms | 1/4 |
+| 1000x-longread | 0ms (3 bail) | _bail_ | 83ms | 1/4 |
+
+## PAN at constant zoom — both builds refetch
+
+One full viewport sideways per step, `bpPerPx` unchanged. The region is new to both builds so neither can serve it from what it holds, and the bytes per step are the same as the initial render's, so the density cap that turns zoom-out into a refusal test is never approached. This is the refetch-vs-refetch comparison zoom-out was supposed to be.
+
+Both architectures pay the fetch here, so this is the branch's *hardest* case — the opposite end from zoom-in. Any remaining gap is render cost, not avoided network.
+
+A 19 kb window gets about five viewport-widths before it runs out of the 250 kb `chr22_mask`; steps beyond that are not attempted rather than clamped into a mostly-empty view.
+
+| case | current | release-4.3.0 | ratio | current redraw frame | steps |
+|---|---:|---:|---:|---:|---:|
+| 20x-shortread | 336ms | 639ms | 1.90× | 17ms | 5/5 |
+| 200x-shortread | 697ms | 1310ms | 1.88× | 17ms | 5/5 |
+| 1000x-shortread | 1895ms | 6608ms | 3.49× | 150ms | 5/5 |
+| 20x-longread | 361ms | 1251ms | 3.47× | 17ms | 5/5 |
+| 200x-longread | 739ms | 3182ms | 4.31× | 33ms | 5/5 |
+| 1000x-longread | 3972ms | 16115ms | 4.06× | 233ms | 5/5 |
+
+Wrote results/interaction.{json,md}
+finished Wed Aug  5 09:23:11 AM EDT 2026

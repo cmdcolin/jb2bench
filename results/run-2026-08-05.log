@@ -1,0 +1,39 @@
+started Wed Aug  5 08:59:48 AM EDT 2026
+port 8000 is serving builds/current
+port 8001 is serving builds/release-4.3.0
+port 8002 is serving builds/release-4.1.15
+20x-shortread / current: 1888 1831 1788 1790 1788 1785 => median 1789ms
+20x-shortread / release-4.3.0: 2385 2525 2405 2467 2378 2387 => median 2396ms
+20x-shortread / release-4.1.15: 2380 2385 2279 2381 2383 2380 => median 2381ms
+200x-shortread / current: 2204 2210 2114 2103 2086 2191 => median 2153ms
+200x-shortread / release-4.3.0: 2791 2778 2779 2780 2879 2776 => median 2780ms
+200x-shortread / release-4.1.15: 2786 2783 2786 2903 3643 3085 => median 2845ms
+1000x-shortread / current: 3878 3591 3726 3814 3770 3798 => median 3784ms
+1000x-shortread / release-4.3.0: 5095 5289 5084 4778 5071 5083 => median 5084ms
+1000x-shortread / release-4.1.15: 5285 5805 5690 5087 5206 5374 => median 5330ms
+20x-longread / current: 1884 1920 1893 2009 1929 1894 => median 1907ms
+20x-longread / release-4.3.0: 2598 2688 2626 2696 2691 2584 => median 2657ms
+20x-longread / release-4.1.15: 2586 2809 2697 2600 2588 2680 => median 2640ms
+200x-longread / current: 3002 2892 2917 2895 2983 2897 => median 2907ms
+200x-longread / release-4.3.0: 6488 6180 6485 6415 6289 6190 => median 6352ms
+200x-longread / release-4.1.15: 6581 6297 6592 6682 6280 6390 => median 6486ms
+1000x-longread / current: 8721 8032 7427 8502 7612 9196 => median 8267ms
+1000x-longread / release-4.3.0: 31113 31581 49812 38524 37700 31772 => median 34736ms
+1000x-longread / release-4.1.15: 25284 27197 25295 24689 25090 24074 => median 25187ms
+
+# Alignments render benchmark
+
+Region `chr22_mask:124000-143000` (19kb). In-page navigation→render-complete time, median of 6 runs (ms). Speedup = release-4.3.0 median ÷ current median.
+
+| case | current | release-4.3.0 | release-4.1.15 | speedup vs release-4.3.0 |
+|---|---:|---:|---:|---:|
+| 20x-shortread | 1789 ±38 | 2396 ±54 | 2381 ±38 | 1.34× |
+| 200x-shortread | 2153 ±51 | 2780 ±37 | 2845 ±308 | 1.29× |
+| 1000x-shortread | 3784 ±89 | 5084 ±150 | 5330 ±257 | 1.34× |
+| 20x-longread | 1907 ±42 | 2657 ±46 | 2640 ±80 | 1.39× |
+| 200x-longread | 2907 ±45 | 6352 ±129 | 6486 ±155 | 2.19× |
+| 1000x-longread | 8267 ±621 | 34736 ±6557 | 25187 ±959 | 4.20× |
+
+Wrote results/alignments.json and results/alignments.md
+finished Wed Aug  5 09:18:05 AM EDT 2026
+load over run: min 3.83 median 6.36 max 31.92 (n=110)

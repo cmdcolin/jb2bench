@@ -1,5 +1,17 @@
 # 1000x-shortread regression — flamegraph diagnosis
 
+> **The regression this document diagnoses no longer reproduces.** Measured
+> 2026-08-05 against `builds/current` (jbrowse-components HEAD), 1000x-shortread
+> renders in **3784 ms vs release-4.3.0's 5084 ms — a 1.34× win**, where the
+> Jun-13 `webgl-poc` build measured here was 7137 ms vs 4581 ms, a 0.64× loss.
+>
+> Nothing has identified *what* fixed it, and no profile has been captured
+> against the current build. So treat what follows as an accurate account of a
+> problem that was real in June, and as the hypothesis to check first if the
+> regression ever returns — not as a description of the code as it stands. The
+> other hotspot named below, `_computeTags`, was separately fixed by
+> `b4da28ba7a` (2026-07-02).
+
 Case: `chr22_mask:124000-143000` (19kb), track `1000x.shortread.bam`, the only
 case where `webgl-poc` is slower than release-4.3.0 (7137ms vs 4581ms, 0.64×).
 

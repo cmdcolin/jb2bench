@@ -13,24 +13,30 @@
 // loading state at high frequency. We also record the redraw frame cost (max rAF
 // gap). Hardware-GPU headless.
 //
-// TWO DIRECTIONS, set by ZOOM=in|out (default in):
+// THREE MODES, set by MODE=in|out|pan (default in; ZOOM= is the legacy name):
 //
 //   in  — zoom IN by 2x per step. The new view is a strict subset of loaded
 //         data, so the GPU branch never refetches and this isolates the
 //         cache-redraw path. This is the asymmetric case: it is the branch's
 //         best showing, because only the old renderer has to go back to the
 //         network.
-//   out — zoom OUT by 2x per step. The new view needs data outside what is
-//         loaded, so BOTH architectures must refetch. This is the harder,
-//         fairer case: it isolates redraw cost from fetch cost, and answers
-//         "when both have to fetch, what is left of the advantage?".
+//   out — zoom OUT by 2x per step. Intended as the case where BOTH refetch.
+//         It does not work: widening multiplies the bytes requested, and past
+//         a threshold JBrowse declines the fetch entirely (see BAILED_FN). For
+//         anything heavier than 20x shortread this mode measures refusals.
+//   pan — scroll sideways by one full viewport at CONSTANT bpPerPx. This is the
+//         honest "both refetch" test: the region is new to both builds so
+//         neither can serve it from cache, while the byte count per step is
+//         identical to the initial render's and so never crosses the cap that
+//         defeats zoom-out.
 //
-// Zoom-out is self-limiting: `chr22_mask` is only 250 kb, so a 19 kb window can
-// widen about three times before the view clamps at the contig. A clamped step
-// is a no-op, not a measurement, so we detect it (bpPerPx did not change) and
-// stop rather than reporting zeros that look like instant content.
+// Both out and pan are self-limiting: `chr22_mask` is only 250 kb. Zoom-out
+// widens about three times before the view clamps at the contig; pan gets about
+// five viewport-widths from the benchmark locus before it runs out of contig. A
+// step that could not be applied in full is a no-op, not a measurement, so we
+// detect it and stop rather than reporting zeros that look like instant content.
 //
-// Usage: interaction.ts <url> [screenshotPath]     (ZOOM=in|out, MAX_WAIT=ms)
+// Usage: interaction.ts <url> [screenshotPath]     (MODE=in|out|pan, MAX_WAIT=ms)
 // Prints JSON with per-step time-to-content and redraw cost.
 import puppeteer from 'puppeteer'
 import fs from 'fs'
@@ -45,9 +51,30 @@ if (screenshotPath) {
   fs.mkdirSync(path.dirname(screenshotPath), { recursive: true })
 }
 
-const DIRECTION = process.env.ZOOM === 'out' ? 'out' : 'in'
-const FACTOR = DIRECTION === 'out' ? 2 : 0.5
-const STEPS = 5 // steps attempted (zoom-out stops early when the view clamps)
+const MODES = ['in', 'out', 'pan'] as const
+type Mode = (typeof MODES)[number]
+const requested = process.env.MODE ?? process.env.ZOOM ?? 'in'
+if (!(MODES as readonly string[]).includes(requested)) {
+  throw new Error(`MODE must be one of ${MODES.join('|')}, got "${requested}"`)
+}
+const MODE = requested as Mode
+const FACTOR = MODE === 'out' ? 2 : 0.5 // zoom modes only
+const STEPS = 5 // attempted; out and pan stop early when they run out of contig
+
+// Pan LEFT by default. A pan is only a fair refetch-vs-refetch test if every
+// step carries the same data volume, and the two ends of chr22_mask do not:
+// pbsim's long reads run off the contig, so long-read depth tapers at both
+// edges. Measured mean depth per 19 kb window on 1000x.longread:
+//
+//   5k    29k   48k   67k   86k  105k  124k  143k  162k  181k  200k  219k
+//   320   927  1193  1218  1179  1185  1178  1163  1161  1178   938   500
+//
+// From the benchmark locus at 124k, panning right lands on 938 and 500 for its
+// last two steps — two of five steps on thinned data, in both builds. Panning
+// left keeps four of five inside the uniform plateau and only grazes the taper
+// at 29k. Short reads are flat across the whole contig either way (~1186).
+// PAN_DIR=right restores the old path.
+const PAN_SIGN = process.env.PAN_DIR === 'right' ? 1 : -1
 
 const browser = await puppeteer.launch({
   headless: process.env.HEADLESS !== '0',
@@ -121,43 +148,91 @@ const QUIET = 300 // content considered back once loading stays false this long
 // scores as content-returned-in-90ms and reads as a good result. Verified
 // directly: release-4.3.0 on 200x.shortread bails one zoom-out step in, with 0
 // painted pixels, while 20x.shortread renders every step.
+//
+// The other way to score fast by drawing nothing is to land somewhere with no
+// reads. That is not a risk on this corpus — read starts are uniform across all
+// 250 kb of chr22_mask in every track (checked with samtools; the thinnest,
+// 20x.longread, is ~14 reads per 25 kb bin of ~45 kb reads) — and each step
+// records the locus it ended on, so a run log can be audited for it. A corpus
+// with patchy coverage would need a real painted-content check here.
 const BAILED_FN = () =>
   /Requested too much|Zoom in to see features|force load/i.test(
     document.body.innerText,
   )
 
 interface StepMetric {
-  timeToContentMs: number // how long a loading indicator was shown post-zoom
+  timeToContentMs: number // how long a loading indicator was shown post-step
   loadingSeen: boolean // did a refetch/re-render loading state appear at all
   redrawGapMs: number // longest rAF gap = cost of the redraw frame
-  /** false once the view clamps at the contig edge — a no-op, not a measurement */
+  /** false once the view runs out of contig — a no-op, not a measurement */
   applied: boolean
   /** true if MAX_WAIT expired with content still not back: value is a lower bound */
   censored: boolean
   /** true if the track refused the fetch and drew no reads — NOT a render timing */
   bailed: boolean
+  /** where the view ended up, so a run log can be checked for actual movement */
+  locus: string
 }
 
-async function zoomStep(): Promise<StepMetric> {
-  const { t0, applied } = await page.evaluate(factor => {
-    const w = window as unknown as {
-      __frames: number[]
-      JBrowseSession: { views: unknown[] }
-    }
-    w.__frames = []
-    const v = w.JBrowseSession.views[0] as {
-      bpPerPx: number
-      zoomTo: (n: number) => void
-    }
-    const before = v.bpPerPx
-    const t = performance.now()
-    v.zoomTo(before * factor)
-    // zoomTo clamps at the assembly's widest bpPerPx. An unchanged value means
-    // the view was already as wide as the contig allows and nothing moved, so
-    // there is nothing to time — distinguish that from "content came back
-    // instantly", which is the same 0ms otherwise.
-    return { t0: t, applied: v.bpPerPx !== before }
-  }, FACTOR)
+async function interactStep(): Promise<StepMetric> {
+  const { t0, applied, locus } = await page.evaluate(
+    ({ mode, factor, sign }) => {
+      const w = window as unknown as {
+        __frames: number[]
+        JBrowseSession: { views: unknown[] }
+      }
+      w.__frames = []
+      const v = w.JBrowseSession.views[0] as {
+        bpPerPx: number
+        width: number
+        offsetPx: number
+        displayedRegionsTotalPx: number
+        visibleLocStrings?: string
+        zoomTo: (n: number) => void
+        horizontalScroll: (px: number) => number
+      }
+      const where = () =>
+        v.visibleLocStrings ??
+        // fallback for builds without the getter: this corpus is one contig
+        // displayed from bp 0, so offsetPx * bpPerPx is the left edge in bp
+        `${Math.round(v.offsetPx * v.bpPerPx)}-${Math.round((v.offsetPx + v.width) * v.bpPerPx)}`
+
+      if (mode === 'pan') {
+        // One full viewport per step, so the new region is disjoint from the
+        // old one and neither build can serve any of it from what it already
+        // holds. bpPerPx is untouched, so the byte count per step matches the
+        // initial render's and the density cap is never approached.
+        const target = v.offsetPx + sign * v.width
+        // maxOffset lets the view scroll until only ~200px of genome is left on
+        // screen. Panning into that would measure a mostly-empty viewport and
+        // score as a fast render for the same reason a bail does, so require
+        // the whole new viewport to land inside the contig.
+        if (target < 0 || target + v.width > v.displayedRegionsTotalPx) {
+          return { t0: 0, applied: false, locus: where() }
+        }
+        const before = v.offsetPx
+        const t = performance.now()
+        v.horizontalScroll(sign * v.width)
+        // read the offset back rather than trusting the return value, so this
+        // does not depend on horizontalScroll's contract across builds
+        return {
+          t0: t,
+          applied: Math.abs(v.offsetPx - target) < 1 && v.offsetPx !== before,
+          locus: where(),
+        }
+      }
+
+      const before = v.bpPerPx
+      const t = performance.now()
+      v.zoomTo(before * factor)
+      // zoomTo clamps at the assembly's widest bpPerPx. An unchanged value means
+      // the view was already as wide as the contig allows and nothing moved, so
+      // there is nothing to time — distinguish that from "content came back
+      // instantly", which is the same 0ms otherwise.
+      return { t0: t, applied: v.bpPerPx !== before, locus: where() }
+    },
+    { mode: MODE, factor: FACTOR, sign: PAN_SIGN },
+  )
 
   if (!applied) {
     return {
@@ -167,6 +242,7 @@ async function zoomStep(): Promise<StepMetric> {
       applied: false,
       censored: false,
       bailed: false,
+      locus,
     }
   }
 
@@ -213,6 +289,7 @@ async function zoomStep(): Promise<StepMetric> {
     applied: true,
     censored,
     bailed,
+    locus,
   }
 }
 
@@ -222,17 +299,19 @@ const median = (a: number[]) => {
   return s.length ? (s.length % 2 ? s[m]! : (s[m - 1]! + s[m]!) / 2) : Number.NaN
 }
 
-// Warmup only when zooming in. Zooming out has roughly three usable steps before
-// the 250 kb contig clamps the view, so spending one on a warmup would leave too
-// few — and the page is already quiesced from the initial render anyway.
-if (DIRECTION === 'in') {
-  await zoomStep()
+// Warmup only when zooming in. The other two modes consume contig with every
+// step — zoom-out has about three usable steps and pan about five before the
+// view runs out of chr22_mask — so spending one on a warmup would leave too few.
+// The page is already quiesced from the initial render anyway; for pan, the
+// median over five identical steps absorbs a slow first one.
+if (MODE === 'in') {
+  await interactStep()
 }
 const steps: StepMetric[] = []
 for (let i = 0; i < STEPS; i++) {
-  const s = await zoomStep()
+  const s = await interactStep()
   if (!s.applied) {
-    break // view clamped at the contig edge; further steps would be no-ops
+    break // out of contig; further steps would be no-ops
   }
   steps.push(s)
 }
@@ -247,7 +326,7 @@ if (screenshotPath) {
 const drew = steps.filter(s => !s.bailed)
 const censoredSteps = drew.filter(s => s.censored).length
 const summary = {
-  mode: DIRECTION,
+  mode: MODE,
   maxWaitMs: MAX_WAIT,
   stepsAttempted: steps.length,
   stepsMeasured: drew.length,

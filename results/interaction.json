@@ -1,9 +1,18 @@
 {
   "loc": "chr22_mask:124000-143000",
+  "builds": {
+    "new": "current",
+    "baseline": "release-4.3.0"
+  },
+  "measuredAt": {
+    "in": "2026-08-05",
+    "out": "2026-08-05",
+    "pan": "2026-08-05"
+  },
   "results": {
     "20x-shortread": {
       "in": {
-        "webgl-poc": {
+        "new": {
           "mode": "in",
           "maxWaitMs": 120000,
           "stepsAttempted": 5,
@@ -13,40 +22,17 @@
           "censored": false,
           "allBailed": false,
           "zoomTimeToContentMs": 0,
-          "zoomRedrawGapMs": 16.800000000000182,
+          "zoomRedrawGapMs": 16.700000000000728,
           "loadingEverSeen": false,
           "steps": [
             {
               "timeToContentMs": 0,
               "loadingSeen": false,
-              "redrawGapMs": 16.700000000000273,
-              "applied": true,
-              "censored": false,
-              "bailed": false
-            },
-            {
-              "timeToContentMs": 0,
-              "loadingSeen": false,
               "redrawGapMs": 16.800000000000182,
               "applied": true,
               "censored": false,
-              "bailed": false
-            },
-            {
-              "timeToContentMs": 0,
-              "loadingSeen": false,
-              "redrawGapMs": 16.800000000000182,
-              "applied": true,
-              "censored": false,
-              "bailed": false
-            },
-            {
-              "timeToContentMs": 0,
-              "loadingSeen": false,
-              "redrawGapMs": 16.800000000000182,
-              "applied": true,
-              "censored": false,
-              "bailed": false
+              "bailed": false,
+              "locus": "chr22_mask:131,127..135,877"
             },
             {
               "timeToContentMs": 0,
@@ -54,11 +40,39 @@
               "redrawGapMs": 16.700000000000728,
               "applied": true,
               "censored": false,
-              "bailed": false
+              "bailed": false,
+              "locus": "chr22_mask:132,315..134,689"
+            },
+            {
+              "timeToContentMs": 0,
+              "loadingSeen": false,
+              "redrawGapMs": 16.700000000000728,
+              "applied": true,
+              "censored": false,
+              "bailed": false,
+              "locus": "chr22_mask:132,909..134,095"
+            },
+            {
+              "timeToContentMs": 0,
+              "loadingSeen": false,
+              "redrawGapMs": 16.700000000000728,
+              "applied": true,
+              "censored": false,
+              "bailed": false,
+              "locus": "chr22_mask:133,206..133,798"
+            },
+            {
+              "timeToContentMs": 0,
+              "loadingSeen": false,
+              "redrawGapMs": 16.700000000000728,
+              "applied": true,
+              "censored": false,
+              "bailed": false,
+              "locus": "chr22_mask:133,354..133,650"
             }
           ]
         },
-        "release-4.3.0": {
+        "baseline": {
           "mode": "in",
           "maxWaitMs": 120000,
           "stepsAttempted": 5,
@@ -67,55 +81,60 @@
           "stepsCensored": 0,
           "censored": false,
           "allBailed": false,
-          "zoomTimeToContentMs": 1064,
+          "zoomTimeToContentMs": 1059,
           "zoomRedrawGapMs": 16.800000000000182,
           "loadingEverSeen": true,
           "steps": [
             {
-              "timeToContentMs": 1104,
+              "timeToContentMs": 1111,
               "loadingSeen": true,
               "redrawGapMs": 16.800000000000182,
               "applied": true,
               "censored": false,
-              "bailed": false
+              "bailed": false,
+              "locus": "chr22_mask:131,127..135,877"
             },
             {
-              "timeToContentMs": 1074,
+              "timeToContentMs": 1059,
               "loadingSeen": true,
               "redrawGapMs": 16.800000000000182,
               "applied": true,
               "censored": false,
-              "bailed": false
+              "bailed": false,
+              "locus": "chr22_mask:132,315..134,689"
             },
             {
-              "timeToContentMs": 1064,
-              "loadingSeen": true,
-              "redrawGapMs": 16.799999999999272,
-              "applied": true,
-              "censored": false,
-              "bailed": false
-            },
-            {
-              "timeToContentMs": 1063,
-              "loadingSeen": true,
-              "redrawGapMs": 16.799999999999272,
-              "applied": true,
-              "censored": false,
-              "bailed": false
-            },
-            {
-              "timeToContentMs": 1056,
+              "timeToContentMs": 1052,
               "loadingSeen": true,
               "redrawGapMs": 16.80000000000109,
               "applied": true,
               "censored": false,
-              "bailed": false
+              "bailed": false,
+              "locus": "chr22_mask:132,909..134,095"
+            },
+            {
+              "timeToContentMs": 1052,
+              "loadingSeen": true,
+              "redrawGapMs": 16.80000000000109,
+              "applied": true,
+              "censored": false,
+              "bailed": false,
+              "locus": "chr22_mask:133,206..133,798"
+            },
+            {
+              "timeToContentMs": 1059,
+              "loadingSeen": true,
+              "redrawGapMs": 16.799999999999272,
+              "applied": true,
+              "censored": false,
+              "bailed": false,
+              "locus": "chr22_mask:133,354..133,650"
             }
           ]
         }
       },
       "out": {
-        "webgl-poc": {
+        "new": {
           "mode": "out",
           "maxWaitMs": 120000,
           "stepsAttempted": 4,
@@ -125,32 +144,26 @@
           "censored": false,
           "allBailed": false,
           "zoomTimeToContentMs": 0,
-          "zoomRedrawGapMs": 16.700000000000273,
+          "zoomRedrawGapMs": 16.800000000000182,
           "loadingEverSeen": true,
           "steps": [
             {
               "timeToContentMs": 0,
               "loadingSeen": false,
-              "redrawGapMs": 16.800000000000182,
+              "redrawGapMs": 16.799999999999727,
               "applied": true,
               "censored": false,
-              "bailed": false
+              "bailed": false,
+              "locus": "chr22_mask:114,502..152,503"
             },
             {
-              "timeToContentMs": 758,
+              "timeToContentMs": 777,
               "loadingSeen": true,
-              "redrawGapMs": 16.700000000000273,
+              "redrawGapMs": 16.800000000000182,
               "applied": true,
               "censored": false,
-              "bailed": false
-            },
-            {
-              "timeToContentMs": 0,
-              "loadingSeen": false,
-              "redrawGapMs": 16.700000000000273,
-              "applied": true,
-              "censored": false,
-              "bailed": false
+              "bailed": false,
+              "locus": "chr22_mask:95,501..171,504"
             },
             {
               "timeToContentMs": 0,
@@ -158,11 +171,21 @@
               "redrawGapMs": 16.800000000000182,
               "applied": true,
               "censored": false,
-              "bailed": true
+              "bailed": false,
+              "locus": "chr22_mask:57,499..209,506"
+            },
+            {
+              "timeToContentMs": 0,
+              "loadingSeen": false,
+              "redrawGapMs": 16.700000000000273,
+              "applied": true,
+              "censored": false,
+              "bailed": true,
+              "locus": "chr22_mask:1..250,001"
             }
           ]
         },
-        "release-4.3.0": {
+        "baseline": {
           "mode": "out",
           "maxWaitMs": 120000,
           "stepsAttempted": 4,
@@ -171,49 +194,183 @@
           "stepsCensored": 0,
           "censored": false,
           "allBailed": false,
-          "zoomTimeToContentMs": 1968,
-          "zoomRedrawGapMs": 125.05000000000018,
+          "zoomTimeToContentMs": 1970,
+          "zoomRedrawGapMs": 133.35000000000036,
           "loadingEverSeen": true,
           "steps": [
             {
-              "timeToContentMs": 1372,
+              "timeToContentMs": 1443,
               "loadingSeen": true,
               "redrawGapMs": 50,
               "applied": true,
               "censored": false,
-              "bailed": false
+              "bailed": false,
+              "locus": "chr22_mask:114,516..152,517"
             },
             {
-              "timeToContentMs": 1837,
+              "timeToContentMs": 1825,
               "loadingSeen": true,
-              "redrawGapMs": 100.10000000000036,
+              "redrawGapMs": 83.30000000000018,
               "applied": true,
               "censored": false,
-              "bailed": false
+              "bailed": false,
+              "locus": "chr22_mask:95,545..171,548"
             },
             {
-              "timeToContentMs": 2329,
+              "timeToContentMs": 2449,
               "loadingSeen": true,
-              "redrawGapMs": 150,
+              "redrawGapMs": 183.40000000000055,
               "applied": true,
               "censored": false,
-              "bailed": false
+              "bailed": false,
+              "locus": "chr22_mask:57,543..209,550"
             },
             {
-              "timeToContentMs": 2099,
+              "timeToContentMs": 2115,
               "loadingSeen": true,
-              "redrawGapMs": 350,
+              "redrawGapMs": 316.5,
               "applied": true,
               "censored": false,
-              "bailed": false
+              "bailed": false,
+              "locus": "chr22_mask:1..250,001"
             }
           ]
+        }
+      },
+      "pan": {
+        "new": {
+          "mode": "pan",
+          "maxWaitMs": 120000,
+          "stepsAttempted": 5,
+          "stepsMeasured": 5,
+          "stepsBailed": 0,
+          "stepsCensored": 0,
+          "censored": false,
+          "allBailed": false,
+          "zoomTimeToContentMs": 336,
+          "zoomRedrawGapMs": 16.800000000000182,
+          "loadingEverSeen": true,
+          "steps": [
+            {
+              "timeToContentMs": 0,
+              "loadingSeen": false,
+              "redrawGapMs": 16.700000000000273,
+              "applied": true,
+              "censored": false,
+              "bailed": false,
+              "locus": "chr22_mask:105,001..124,001"
+            },
+            {
+              "timeToContentMs": 458,
+              "loadingSeen": true,
+              "redrawGapMs": 16.800000000000182,
+              "applied": true,
+              "censored": false,
+              "bailed": false,
+              "locus": "chr22_mask:86,000..105,000"
+            },
+            {
+              "timeToContentMs": 325,
+              "loadingSeen": true,
+              "redrawGapMs": 16.800000000000182,
+              "applied": true,
+              "censored": false,
+              "bailed": false,
+              "locus": "chr22_mask:66,999..85,999"
+            },
+            {
+              "timeToContentMs": 337,
+              "loadingSeen": true,
+              "redrawGapMs": 16.800000000000182,
+              "applied": true,
+              "censored": false,
+              "bailed": false,
+              "locus": "chr22_mask:47,998..66,998"
+            },
+            {
+              "timeToContentMs": 336,
+              "loadingSeen": true,
+              "redrawGapMs": 16.800000000000182,
+              "applied": true,
+              "censored": false,
+              "bailed": false,
+              "locus": "chr22_mask:28,997..47,997"
+            }
+          ],
+          "load": {
+            "before": 6.14,
+            "after": 5.73
+          }
+        },
+        "baseline": {
+          "mode": "pan",
+          "maxWaitMs": 120000,
+          "stepsAttempted": 5,
+          "stepsMeasured": 5,
+          "stepsBailed": 0,
+          "stepsCensored": 0,
+          "censored": false,
+          "allBailed": false,
+          "zoomTimeToContentMs": 639,
+          "zoomRedrawGapMs": 16.800000000000182,
+          "loadingEverSeen": true,
+          "steps": [
+            {
+              "timeToContentMs": 707,
+              "loadingSeen": true,
+              "redrawGapMs": 33.40000000000009,
+              "applied": true,
+              "censored": false,
+              "bailed": false,
+              "locus": "chr22_mask:105,001..124,001"
+            },
+            {
+              "timeToContentMs": 660,
+              "loadingSeen": true,
+              "redrawGapMs": 16.800000000000182,
+              "applied": true,
+              "censored": false,
+              "bailed": false,
+              "locus": "chr22_mask:86,000..105,000"
+            },
+            {
+              "timeToContentMs": 283,
+              "loadingSeen": true,
+              "redrawGapMs": 16.800000000000182,
+              "applied": true,
+              "censored": false,
+              "bailed": false,
+              "locus": "chr22_mask:66,999..85,999"
+            },
+            {
+              "timeToContentMs": 639,
+              "loadingSeen": true,
+              "redrawGapMs": 16.800000000000182,
+              "applied": true,
+              "censored": false,
+              "bailed": false,
+              "locus": "chr22_mask:47,998..66,998"
+            },
+            {
+              "timeToContentMs": 375,
+              "loadingSeen": true,
+              "redrawGapMs": 16.800000000000182,
+              "applied": true,
+              "censored": false,
+              "bailed": false,
+              "locus": "chr22_mask:28,997..47,997"
+            }
+          ],
+          "load": {
+            "before": 5.73,
+            "after": 6.35
+          }
         }
       }
     },
     "200x-shortread": {
       "in": {
-        "webgl-poc": {
+        "new": {
           "mode": "in",
           "maxWaitMs": 120000,
           "stepsAttempted": 5,
@@ -223,7 +380,7 @@
           "censored": false,
           "allBailed": false,
           "zoomTimeToContentMs": 0,
-          "zoomRedrawGapMs": 16.799999999999727,
+          "zoomRedrawGapMs": 16.800000000000182,
           "loadingEverSeen": false,
           "steps": [
             {
@@ -232,23 +389,8 @@
               "redrawGapMs": 16.800000000000182,
               "applied": true,
               "censored": false,
-              "bailed": false
-            },
-            {
-              "timeToContentMs": 0,
-              "loadingSeen": false,
-              "redrawGapMs": 16.799999999999727,
-              "applied": true,
-              "censored": false,
-              "bailed": false
-            },
-            {
-              "timeToContentMs": 0,
-              "loadingSeen": false,
-              "redrawGapMs": 16.700000000000273,
-              "applied": true,
-              "censored": false,
-              "bailed": false
+              "bailed": false,
+              "locus": "chr22_mask:131,127..135,877"
             },
             {
               "timeToContentMs": 0,
@@ -256,7 +398,26 @@
               "redrawGapMs": 16.800000000000182,
               "applied": true,
               "censored": false,
-              "bailed": false
+              "bailed": false,
+              "locus": "chr22_mask:132,315..134,689"
+            },
+            {
+              "timeToContentMs": 0,
+              "loadingSeen": false,
+              "redrawGapMs": 16.800000000000182,
+              "applied": true,
+              "censored": false,
+              "bailed": false,
+              "locus": "chr22_mask:132,909..134,095"
+            },
+            {
+              "timeToContentMs": 0,
+              "loadingSeen": false,
+              "redrawGapMs": 16.800000000000182,
+              "applied": true,
+              "censored": false,
+              "bailed": false,
+              "locus": "chr22_mask:133,206..133,798"
             },
             {
               "timeToContentMs": 0,
@@ -264,11 +425,12 @@
               "redrawGapMs": 16.700000000000728,
               "applied": true,
               "censored": false,
-              "bailed": false
+              "bailed": false,
+              "locus": "chr22_mask:133,354..133,650"
             }
           ]
         },
-        "release-4.3.0": {
+        "baseline": {
           "mode": "in",
           "maxWaitMs": 120000,
           "stepsAttempted": 5,
@@ -277,55 +439,60 @@
           "stepsCensored": 0,
           "censored": false,
           "allBailed": false,
-          "zoomTimeToContentMs": 1142,
-          "zoomRedrawGapMs": 16.80000000000109,
+          "zoomTimeToContentMs": 1085,
+          "zoomRedrawGapMs": 16.800000000000182,
           "loadingEverSeen": true,
           "steps": [
             {
-              "timeToContentMs": 1382,
+              "timeToContentMs": 1197,
               "loadingSeen": true,
               "redrawGapMs": 16.800000000000182,
               "applied": true,
               "censored": false,
-              "bailed": false
+              "bailed": false,
+              "locus": "chr22_mask:131,127..135,877"
             },
             {
-              "timeToContentMs": 1142,
+              "timeToContentMs": 1085,
               "loadingSeen": true,
               "redrawGapMs": 16.800000000000182,
               "applied": true,
               "censored": false,
-              "bailed": false
+              "bailed": false,
+              "locus": "chr22_mask:132,315..134,689"
             },
             {
-              "timeToContentMs": 1145,
+              "timeToContentMs": 1055,
+              "loadingSeen": true,
+              "redrawGapMs": 16.799999999999272,
+              "applied": true,
+              "censored": false,
+              "bailed": false,
+              "locus": "chr22_mask:132,909..134,095"
+            },
+            {
+              "timeToContentMs": 1058,
               "loadingSeen": true,
               "redrawGapMs": 16.80000000000109,
               "applied": true,
               "censored": false,
-              "bailed": false
+              "bailed": false,
+              "locus": "chr22_mask:133,206..133,798"
             },
             {
-              "timeToContentMs": 1119,
+              "timeToContentMs": 1087,
               "loadingSeen": true,
-              "redrawGapMs": 16.80000000000109,
+              "redrawGapMs": 16.799999999999272,
               "applied": true,
               "censored": false,
-              "bailed": false
-            },
-            {
-              "timeToContentMs": 1097,
-              "loadingSeen": true,
-              "redrawGapMs": 16.80000000000109,
-              "applied": true,
-              "censored": false,
-              "bailed": false
+              "bailed": false,
+              "locus": "chr22_mask:133,354..133,650"
             }
           ]
         }
       },
       "out": {
-        "webgl-poc": {
+        "new": {
           "mode": "out",
           "maxWaitMs": 120000,
           "stepsAttempted": 4,
@@ -344,23 +511,17 @@
               "redrawGapMs": 16.700000000000273,
               "applied": true,
               "censored": false,
-              "bailed": false
+              "bailed": false,
+              "locus": "chr22_mask:114,502..152,503"
             },
             {
-              "timeToContentMs": 589,
+              "timeToContentMs": 591,
               "loadingSeen": true,
-              "redrawGapMs": 16.800000000000182,
+              "redrawGapMs": 16.799999999999727,
               "applied": true,
               "censored": false,
-              "bailed": true
-            },
-            {
-              "timeToContentMs": 0,
-              "loadingSeen": false,
-              "redrawGapMs": 16.800000000000182,
-              "applied": true,
-              "censored": false,
-              "bailed": true
+              "bailed": true,
+              "locus": "chr22_mask:95,501..171,504"
             },
             {
               "timeToContentMs": 0,
@@ -368,11 +529,21 @@
               "redrawGapMs": 16.700000000000728,
               "applied": true,
               "censored": false,
-              "bailed": true
+              "bailed": true,
+              "locus": "chr22_mask:57,499..209,506"
+            },
+            {
+              "timeToContentMs": 0,
+              "loadingSeen": false,
+              "redrawGapMs": 16.799999999999272,
+              "applied": true,
+              "censored": false,
+              "bailed": true,
+              "locus": "chr22_mask:1..250,001"
             }
           ]
         },
-        "release-4.3.0": {
+        "baseline": {
           "mode": "out",
           "maxWaitMs": 120000,
           "stepsAttempted": 4,
@@ -386,44 +557,178 @@
           "loadingEverSeen": false,
           "steps": [
             {
-              "timeToContentMs": 90,
+              "timeToContentMs": 137,
               "loadingSeen": true,
-              "redrawGapMs": 16.799999999999727,
+              "redrawGapMs": 16.800000000000182,
               "applied": true,
               "censored": false,
-              "bailed": true
+              "bailed": true,
+              "locus": "chr22_mask:114,516..152,517"
             },
             {
-              "timeToContentMs": 91,
+              "timeToContentMs": 100,
               "loadingSeen": true,
-              "redrawGapMs": 16.799999999999727,
+              "redrawGapMs": 16.800000000000182,
               "applied": true,
               "censored": false,
-              "bailed": true
+              "bailed": true,
+              "locus": "chr22_mask:95,545..171,548"
             },
             {
-              "timeToContentMs": 116,
+              "timeToContentMs": 111,
+              "loadingSeen": true,
+              "redrawGapMs": 16.800000000000182,
+              "applied": true,
+              "censored": false,
+              "bailed": true,
+              "locus": "chr22_mask:57,543..209,550"
+            },
+            {
+              "timeToContentMs": 121,
+              "loadingSeen": true,
+              "redrawGapMs": 16.800000000000182,
+              "applied": true,
+              "censored": false,
+              "bailed": true,
+              "locus": "chr22_mask:1..250,001"
+            }
+          ]
+        }
+      },
+      "pan": {
+        "new": {
+          "mode": "pan",
+          "maxWaitMs": 120000,
+          "stepsAttempted": 5,
+          "stepsMeasured": 5,
+          "stepsBailed": 0,
+          "stepsCensored": 0,
+          "censored": false,
+          "allBailed": false,
+          "zoomTimeToContentMs": 697,
+          "zoomRedrawGapMs": 16.800000000000182,
+          "loadingEverSeen": true,
+          "steps": [
+            {
+              "timeToContentMs": 506,
+              "loadingSeen": true,
+              "redrawGapMs": 16.700000000000273,
+              "applied": true,
+              "censored": false,
+              "bailed": false,
+              "locus": "chr22_mask:105,001..124,001"
+            },
+            {
+              "timeToContentMs": 632,
+              "loadingSeen": true,
+              "redrawGapMs": 33.400000000000546,
+              "applied": true,
+              "censored": false,
+              "bailed": false,
+              "locus": "chr22_mask:86,000..105,000"
+            },
+            {
+              "timeToContentMs": 697,
+              "loadingSeen": true,
+              "redrawGapMs": 16.800000000000182,
+              "applied": true,
+              "censored": false,
+              "bailed": false,
+              "locus": "chr22_mask:66,999..85,999"
+            },
+            {
+              "timeToContentMs": 701,
+              "loadingSeen": true,
+              "redrawGapMs": 33.30000000000018,
+              "applied": true,
+              "censored": false,
+              "bailed": false,
+              "locus": "chr22_mask:47,998..66,998"
+            },
+            {
+              "timeToContentMs": 715,
+              "loadingSeen": true,
+              "redrawGapMs": 16.800000000000182,
+              "applied": true,
+              "censored": false,
+              "bailed": false,
+              "locus": "chr22_mask:28,997..47,997"
+            }
+          ],
+          "load": {
+            "before": 6.35,
+            "after": 6.21
+          }
+        },
+        "baseline": {
+          "mode": "pan",
+          "maxWaitMs": 120000,
+          "stepsAttempted": 5,
+          "stepsMeasured": 5,
+          "stepsBailed": 0,
+          "stepsCensored": 0,
+          "censored": false,
+          "allBailed": false,
+          "zoomTimeToContentMs": 1310,
+          "zoomRedrawGapMs": 16.80000000000109,
+          "loadingEverSeen": true,
+          "steps": [
+            {
+              "timeToContentMs": 1339,
               "loadingSeen": true,
               "redrawGapMs": 16.799999999999272,
               "applied": true,
               "censored": false,
-              "bailed": true
+              "bailed": false,
+              "locus": "chr22_mask:105,001..124,001"
             },
             {
-              "timeToContentMs": 114,
+              "timeToContentMs": 722,
               "loadingSeen": true,
-              "redrawGapMs": 16.699999999999818,
+              "redrawGapMs": 16.800000000000182,
               "applied": true,
               "censored": false,
-              "bailed": true
+              "bailed": false,
+              "locus": "chr22_mask:86,000..105,000"
+            },
+            {
+              "timeToContentMs": 1810,
+              "loadingSeen": true,
+              "redrawGapMs": 33.400000000000546,
+              "applied": true,
+              "censored": false,
+              "bailed": false,
+              "locus": "chr22_mask:66,999..85,999"
+            },
+            {
+              "timeToContentMs": 1310,
+              "loadingSeen": true,
+              "redrawGapMs": 16.80000000000109,
+              "applied": true,
+              "censored": false,
+              "bailed": false,
+              "locus": "chr22_mask:47,998..66,998"
+            },
+            {
+              "timeToContentMs": 1291,
+              "loadingSeen": true,
+              "redrawGapMs": 33.399999999999636,
+              "applied": true,
+              "censored": false,
+              "bailed": false,
+              "locus": "chr22_mask:28,997..47,997"
             }
-          ]
+          ],
+          "load": {
+            "before": 6.21,
+            "after": 6.52
+          }
         }
       }
     },
     "1000x-shortread": {
       "in": {
-        "webgl-poc": {
+        "new": {
           "mode": "in",
           "maxWaitMs": 120000,
           "stepsAttempted": 5,
@@ -433,16 +738,44 @@
           "censored": false,
           "allBailed": false,
           "zoomTimeToContentMs": 0,
-          "zoomRedrawGapMs": 16.800000000000182,
+          "zoomRedrawGapMs": 16.799999999999272,
           "loadingEverSeen": false,
           "steps": [
             {
               "timeToContentMs": 0,
               "loadingSeen": false,
-              "redrawGapMs": 16.699999999999818,
+              "redrawGapMs": 16.800000000000182,
               "applied": true,
               "censored": false,
-              "bailed": false
+              "bailed": false,
+              "locus": "chr22_mask:131,127..135,877"
+            },
+            {
+              "timeToContentMs": 0,
+              "loadingSeen": false,
+              "redrawGapMs": 16.800000000000182,
+              "applied": true,
+              "censored": false,
+              "bailed": false,
+              "locus": "chr22_mask:132,315..134,689"
+            },
+            {
+              "timeToContentMs": 0,
+              "loadingSeen": false,
+              "redrawGapMs": 16.700000000000728,
+              "applied": true,
+              "censored": false,
+              "bailed": false,
+              "locus": "chr22_mask:132,909..134,095"
+            },
+            {
+              "timeToContentMs": 0,
+              "loadingSeen": false,
+              "redrawGapMs": 16.700000000000728,
+              "applied": true,
+              "censored": false,
+              "bailed": false,
+              "locus": "chr22_mask:133,206..133,798"
             },
             {
               "timeToContentMs": 0,
@@ -450,35 +783,12 @@
               "redrawGapMs": 16.799999999999272,
               "applied": true,
               "censored": false,
-              "bailed": false
-            },
-            {
-              "timeToContentMs": 0,
-              "loadingSeen": false,
-              "redrawGapMs": 16.800000000000182,
-              "applied": true,
-              "censored": false,
-              "bailed": false
-            },
-            {
-              "timeToContentMs": 0,
-              "loadingSeen": false,
-              "redrawGapMs": 16.800000000000182,
-              "applied": true,
-              "censored": false,
-              "bailed": false
-            },
-            {
-              "timeToContentMs": 0,
-              "loadingSeen": false,
-              "redrawGapMs": 16.800000000000182,
-              "applied": true,
-              "censored": false,
-              "bailed": false
+              "bailed": false,
+              "locus": "chr22_mask:133,354..133,650"
             }
           ]
         },
-        "release-4.3.0": {
+        "baseline": {
           "mode": "in",
           "maxWaitMs": 120000,
           "stepsAttempted": 5,
@@ -487,55 +797,60 @@
           "stepsCensored": 0,
           "censored": false,
           "allBailed": false,
-          "zoomTimeToContentMs": 1676,
+          "zoomTimeToContentMs": 1717,
           "zoomRedrawGapMs": 16.80000000000109,
           "loadingEverSeen": true,
           "steps": [
             {
-              "timeToContentMs": 2926,
+              "timeToContentMs": 3047,
+              "loadingSeen": true,
+              "redrawGapMs": 33.30000000000109,
+              "applied": true,
+              "censored": false,
+              "bailed": false,
+              "locus": "chr22_mask:131,127..135,877"
+            },
+            {
+              "timeToContentMs": 1940,
               "loadingSeen": true,
               "redrawGapMs": 16.80000000000109,
               "applied": true,
               "censored": false,
-              "bailed": false
+              "bailed": false,
+              "locus": "chr22_mask:132,315..134,689"
             },
             {
-              "timeToContentMs": 1676,
-              "loadingSeen": true,
-              "redrawGapMs": 16.80000000000109,
-              "applied": true,
-              "censored": false,
-              "bailed": false
-            },
-            {
-              "timeToContentMs": 1790,
+              "timeToContentMs": 1616,
               "loadingSeen": true,
               "redrawGapMs": 16.799999999999272,
               "applied": true,
               "censored": false,
-              "bailed": false
+              "bailed": false,
+              "locus": "chr22_mask:132,909..134,095"
             },
             {
-              "timeToContentMs": 1537,
+              "timeToContentMs": 1531,
               "loadingSeen": true,
               "redrawGapMs": 16.80000000000291,
               "applied": true,
               "censored": false,
-              "bailed": false
+              "bailed": false,
+              "locus": "chr22_mask:133,206..133,798"
             },
             {
-              "timeToContentMs": 1526,
+              "timeToContentMs": 1717,
               "loadingSeen": true,
               "redrawGapMs": 16.799999999999272,
               "applied": true,
               "censored": false,
-              "bailed": false
+              "bailed": false,
+              "locus": "chr22_mask:133,354..133,650"
             }
           ]
         }
       },
       "out": {
-        "webgl-poc": {
+        "new": {
           "mode": "out",
           "maxWaitMs": 120000,
           "stepsAttempted": 4,
@@ -545,24 +860,26 @@
           "censored": false,
           "allBailed": false,
           "zoomTimeToContentMs": 0,
-          "zoomRedrawGapMs": 16.700000000000728,
+          "zoomRedrawGapMs": 16.799999999999272,
           "loadingEverSeen": false,
           "steps": [
             {
               "timeToContentMs": 0,
               "loadingSeen": false,
-              "redrawGapMs": 16.700000000000728,
+              "redrawGapMs": 16.799999999999272,
               "applied": true,
               "censored": false,
-              "bailed": false
+              "bailed": false,
+              "locus": "chr22_mask:114,502..152,503"
             },
             {
-              "timeToContentMs": 587,
+              "timeToContentMs": 590,
               "loadingSeen": true,
               "redrawGapMs": 16.800000000000182,
               "applied": true,
               "censored": false,
-              "bailed": true
+              "bailed": true,
+              "locus": "chr22_mask:95,501..171,504"
             },
             {
               "timeToContentMs": 0,
@@ -570,19 +887,21 @@
               "redrawGapMs": 16.800000000000182,
               "applied": true,
               "censored": false,
-              "bailed": true
+              "bailed": true,
+              "locus": "chr22_mask:57,499..209,506"
             },
             {
               "timeToContentMs": 0,
               "loadingSeen": false,
-              "redrawGapMs": 16.700000000000728,
+              "redrawGapMs": 16.800000000000182,
               "applied": true,
               "censored": false,
-              "bailed": true
+              "bailed": true,
+              "locus": "chr22_mask:1..250,001"
             }
           ]
         },
-        "release-4.3.0": {
+        "baseline": {
           "mode": "out",
           "maxWaitMs": 120000,
           "stepsAttempted": 4,
@@ -596,44 +915,178 @@
           "loadingEverSeen": false,
           "steps": [
             {
-              "timeToContentMs": 90,
+              "timeToContentMs": 128,
               "loadingSeen": true,
               "redrawGapMs": 16.800000000000182,
               "applied": true,
               "censored": false,
-              "bailed": true
+              "bailed": true,
+              "locus": "chr22_mask:114,516..152,517"
             },
             {
-              "timeToContentMs": 116,
+              "timeToContentMs": 105,
               "loadingSeen": true,
               "redrawGapMs": 16.800000000000182,
               "applied": true,
               "censored": false,
-              "bailed": true
+              "bailed": true,
+              "locus": "chr22_mask:95,545..171,548"
             },
             {
-              "timeToContentMs": 99,
+              "timeToContentMs": 117,
               "loadingSeen": true,
-              "redrawGapMs": 16.700000000000728,
+              "redrawGapMs": 16.800000000000182,
               "applied": true,
               "censored": false,
-              "bailed": true
+              "bailed": true,
+              "locus": "chr22_mask:57,543..209,550"
             },
             {
-              "timeToContentMs": 112,
+              "timeToContentMs": 122,
               "loadingSeen": true,
-              "redrawGapMs": 16.799999999999272,
+              "redrawGapMs": 16.800000000000182,
               "applied": true,
               "censored": false,
-              "bailed": true
+              "bailed": true,
+              "locus": "chr22_mask:1..250,001"
             }
           ]
+        }
+      },
+      "pan": {
+        "new": {
+          "mode": "pan",
+          "maxWaitMs": 120000,
+          "stepsAttempted": 5,
+          "stepsMeasured": 5,
+          "stepsBailed": 0,
+          "stepsCensored": 0,
+          "censored": false,
+          "allBailed": false,
+          "zoomTimeToContentMs": 1895,
+          "zoomRedrawGapMs": 150,
+          "loadingEverSeen": true,
+          "steps": [
+            {
+              "timeToContentMs": 1830,
+              "loadingSeen": true,
+              "redrawGapMs": 133.29999999999927,
+              "applied": true,
+              "censored": false,
+              "bailed": false,
+              "locus": "chr22_mask:105,001..124,001"
+            },
+            {
+              "timeToContentMs": 1943,
+              "loadingSeen": true,
+              "redrawGapMs": 183.29999999999927,
+              "applied": true,
+              "censored": false,
+              "bailed": false,
+              "locus": "chr22_mask:86,000..105,000"
+            },
+            {
+              "timeToContentMs": 1833,
+              "loadingSeen": true,
+              "redrawGapMs": 150,
+              "applied": true,
+              "censored": false,
+              "bailed": false,
+              "locus": "chr22_mask:66,999..85,999"
+            },
+            {
+              "timeToContentMs": 1895,
+              "loadingSeen": true,
+              "redrawGapMs": 150,
+              "applied": true,
+              "censored": false,
+              "bailed": false,
+              "locus": "chr22_mask:47,998..66,998"
+            },
+            {
+              "timeToContentMs": 2092,
+              "loadingSeen": true,
+              "redrawGapMs": 200,
+              "applied": true,
+              "censored": false,
+              "bailed": false,
+              "locus": "chr22_mask:28,997..47,997"
+            }
+          ],
+          "load": {
+            "before": 6.52,
+            "after": 6.33
+          }
+        },
+        "baseline": {
+          "mode": "pan",
+          "maxWaitMs": 120000,
+          "stepsAttempted": 5,
+          "stepsMeasured": 5,
+          "stepsBailed": 0,
+          "stepsCensored": 0,
+          "censored": false,
+          "allBailed": false,
+          "zoomTimeToContentMs": 6608,
+          "zoomRedrawGapMs": 83.40000000000146,
+          "loadingEverSeen": true,
+          "steps": [
+            {
+              "timeToContentMs": 6910,
+              "loadingSeen": true,
+              "redrawGapMs": 83.39999999999964,
+              "applied": true,
+              "censored": false,
+              "bailed": false,
+              "locus": "chr22_mask:105,001..124,001"
+            },
+            {
+              "timeToContentMs": 4746,
+              "loadingSeen": true,
+              "redrawGapMs": 133.29999999999927,
+              "applied": true,
+              "censored": false,
+              "bailed": false,
+              "locus": "chr22_mask:86,000..105,000"
+            },
+            {
+              "timeToContentMs": 6931,
+              "loadingSeen": true,
+              "redrawGapMs": 116.59999999999854,
+              "applied": true,
+              "censored": false,
+              "bailed": false,
+              "locus": "chr22_mask:66,999..85,999"
+            },
+            {
+              "timeToContentMs": 4363,
+              "loadingSeen": true,
+              "redrawGapMs": 83.40000000000146,
+              "applied": true,
+              "censored": false,
+              "bailed": false,
+              "locus": "chr22_mask:47,998..66,998"
+            },
+            {
+              "timeToContentMs": 6608,
+              "loadingSeen": true,
+              "redrawGapMs": 83.30000000000291,
+              "applied": true,
+              "censored": false,
+              "bailed": false,
+              "locus": "chr22_mask:28,997..47,997"
+            }
+          ],
+          "load": {
+            "before": 6.33,
+            "after": 7.5
+          }
         }
       }
     },
     "20x-longread": {
       "in": {
-        "webgl-poc": {
+        "new": {
           "mode": "in",
           "maxWaitMs": 120000,
           "stepsAttempted": 5,
@@ -643,7 +1096,7 @@
           "censored": false,
           "allBailed": false,
           "zoomTimeToContentMs": 0,
-          "zoomRedrawGapMs": 16.799999999999727,
+          "zoomRedrawGapMs": 16.800000000000182,
           "loadingEverSeen": false,
           "steps": [
             {
@@ -652,31 +1105,8 @@
               "redrawGapMs": 16.800000000000182,
               "applied": true,
               "censored": false,
-              "bailed": false
-            },
-            {
-              "timeToContentMs": 0,
-              "loadingSeen": false,
-              "redrawGapMs": 16.700000000000273,
-              "applied": true,
-              "censored": false,
-              "bailed": false
-            },
-            {
-              "timeToContentMs": 0,
-              "loadingSeen": false,
-              "redrawGapMs": 16.799999999999727,
-              "applied": true,
-              "censored": false,
-              "bailed": false
-            },
-            {
-              "timeToContentMs": 0,
-              "loadingSeen": false,
-              "redrawGapMs": 16.700000000000273,
-              "applied": true,
-              "censored": false,
-              "bailed": false
+              "bailed": false,
+              "locus": "chr22_mask:131,127..135,877"
             },
             {
               "timeToContentMs": 0,
@@ -684,11 +1114,39 @@
               "redrawGapMs": 16.800000000000182,
               "applied": true,
               "censored": false,
-              "bailed": false
+              "bailed": false,
+              "locus": "chr22_mask:132,315..134,689"
+            },
+            {
+              "timeToContentMs": 0,
+              "loadingSeen": false,
+              "redrawGapMs": 33.30000000000018,
+              "applied": true,
+              "censored": false,
+              "bailed": false,
+              "locus": "chr22_mask:132,909..134,095"
+            },
+            {
+              "timeToContentMs": 0,
+              "loadingSeen": false,
+              "redrawGapMs": 16.700000000000273,
+              "applied": true,
+              "censored": false,
+              "bailed": false,
+              "locus": "chr22_mask:133,206..133,798"
+            },
+            {
+              "timeToContentMs": 0,
+              "loadingSeen": false,
+              "redrawGapMs": 16.800000000000182,
+              "applied": true,
+              "censored": false,
+              "bailed": false,
+              "locus": "chr22_mask:133,354..133,650"
             }
           ]
         },
-        "release-4.3.0": {
+        "baseline": {
           "mode": "in",
           "maxWaitMs": 120000,
           "stepsAttempted": 5,
@@ -697,55 +1155,60 @@
           "stepsCensored": 0,
           "censored": false,
           "allBailed": false,
-          "zoomTimeToContentMs": 1171,
-          "zoomRedrawGapMs": 16.800000000000182,
+          "zoomTimeToContentMs": 1178,
+          "zoomRedrawGapMs": 16.80000000000109,
           "loadingEverSeen": true,
           "steps": [
             {
-              "timeToContentMs": 1254,
+              "timeToContentMs": 1249,
               "loadingSeen": true,
               "redrawGapMs": 16.800000000000182,
               "applied": true,
               "censored": false,
-              "bailed": false
+              "bailed": false,
+              "locus": "chr22_mask:131,127..135,877"
             },
             {
-              "timeToContentMs": 1171,
+              "timeToContentMs": 1178,
               "loadingSeen": true,
               "redrawGapMs": 16.800000000000182,
               "applied": true,
               "censored": false,
-              "bailed": false
+              "bailed": false,
+              "locus": "chr22_mask:132,315..134,689"
             },
             {
-              "timeToContentMs": 1191,
+              "timeToContentMs": 1184,
               "loadingSeen": true,
               "redrawGapMs": 16.80000000000109,
               "applied": true,
               "censored": false,
-              "bailed": false
+              "bailed": false,
+              "locus": "chr22_mask:132,909..134,095"
             },
             {
-              "timeToContentMs": 1164,
-              "loadingSeen": true,
-              "redrawGapMs": 16.799999999999272,
-              "applied": true,
-              "censored": false,
-              "bailed": false
-            },
-            {
-              "timeToContentMs": 1164,
+              "timeToContentMs": 1167,
               "loadingSeen": true,
               "redrawGapMs": 16.80000000000109,
               "applied": true,
               "censored": false,
-              "bailed": false
+              "bailed": false,
+              "locus": "chr22_mask:133,206..133,798"
+            },
+            {
+              "timeToContentMs": 1158,
+              "loadingSeen": true,
+              "redrawGapMs": 16.80000000000109,
+              "applied": true,
+              "censored": false,
+              "bailed": false,
+              "locus": "chr22_mask:133,354..133,650"
             }
           ]
         }
       },
       "out": {
-        "webgl-poc": {
+        "new": {
           "mode": "out",
           "maxWaitMs": 120000,
           "stepsAttempted": 4,
@@ -755,24 +1218,35 @@
           "censored": false,
           "allBailed": false,
           "zoomTimeToContentMs": 0,
-          "zoomRedrawGapMs": 16.800000000000182,
+          "zoomRedrawGapMs": 16.700000000000273,
           "loadingEverSeen": false,
           "steps": [
             {
               "timeToContentMs": 0,
               "loadingSeen": false,
-              "redrawGapMs": 16.800000000000182,
+              "redrawGapMs": 16.700000000000273,
               "applied": true,
               "censored": false,
-              "bailed": false
+              "bailed": false,
+              "locus": "chr22_mask:114,502..152,503"
             },
             {
-              "timeToContentMs": 591,
+              "timeToContentMs": 572,
               "loadingSeen": true,
               "redrawGapMs": 16.800000000000182,
               "applied": true,
               "censored": false,
-              "bailed": true
+              "bailed": true,
+              "locus": "chr22_mask:95,501..171,504"
+            },
+            {
+              "timeToContentMs": 0,
+              "loadingSeen": false,
+              "redrawGapMs": 16.799999999999727,
+              "applied": true,
+              "censored": false,
+              "bailed": true,
+              "locus": "chr22_mask:57,499..209,506"
             },
             {
               "timeToContentMs": 0,
@@ -780,19 +1254,12 @@
               "redrawGapMs": 16.800000000000182,
               "applied": true,
               "censored": false,
-              "bailed": true
-            },
-            {
-              "timeToContentMs": 0,
-              "loadingSeen": false,
-              "redrawGapMs": 16.799999999999272,
-              "applied": true,
-              "censored": false,
-              "bailed": true
+              "bailed": true,
+              "locus": "chr22_mask:1..250,001"
             }
           ]
         },
-        "release-4.3.0": {
+        "baseline": {
           "mode": "out",
           "maxWaitMs": 120000,
           "stepsAttempted": 4,
@@ -806,20 +1273,22 @@
           "loadingEverSeen": false,
           "steps": [
             {
-              "timeToContentMs": 89,
+              "timeToContentMs": 118,
               "loadingSeen": true,
-              "redrawGapMs": 16.799999999999727,
+              "redrawGapMs": 16.800000000000182,
               "applied": true,
               "censored": false,
-              "bailed": true
+              "bailed": true,
+              "locus": "chr22_mask:114,516..152,517"
             },
             {
-              "timeToContentMs": 89,
+              "timeToContentMs": 88,
               "loadingSeen": true,
               "redrawGapMs": 16.799999999999727,
               "applied": true,
               "censored": false,
-              "bailed": true
+              "bailed": true,
+              "locus": "chr22_mask:95,545..171,548"
             },
             {
               "timeToContentMs": 90,
@@ -827,23 +1296,155 @@
               "redrawGapMs": 16.800000000000182,
               "applied": true,
               "censored": false,
-              "bailed": true
+              "bailed": true,
+              "locus": "chr22_mask:57,543..209,550"
             },
             {
-              "timeToContentMs": 112,
+              "timeToContentMs": 118,
               "loadingSeen": true,
               "redrawGapMs": 16.700000000000728,
               "applied": true,
               "censored": false,
-              "bailed": true
+              "bailed": true,
+              "locus": "chr22_mask:1..250,001"
             }
           ]
+        }
+      },
+      "pan": {
+        "new": {
+          "mode": "pan",
+          "maxWaitMs": 120000,
+          "stepsAttempted": 5,
+          "stepsMeasured": 5,
+          "stepsBailed": 0,
+          "stepsCensored": 0,
+          "censored": false,
+          "allBailed": false,
+          "zoomTimeToContentMs": 361,
+          "zoomRedrawGapMs": 16.800000000000182,
+          "loadingEverSeen": true,
+          "steps": [
+            {
+              "timeToContentMs": 0,
+              "loadingSeen": false,
+              "redrawGapMs": 16.800000000000182,
+              "applied": true,
+              "censored": false,
+              "bailed": false,
+              "locus": "chr22_mask:105,001..124,001"
+            },
+            {
+              "timeToContentMs": 570,
+              "loadingSeen": true,
+              "redrawGapMs": 16.799999999999727,
+              "applied": true,
+              "censored": false,
+              "bailed": false,
+              "locus": "chr22_mask:86,000..105,000"
+            },
+            {
+              "timeToContentMs": 380,
+              "loadingSeen": true,
+              "redrawGapMs": 16.800000000000182,
+              "applied": true,
+              "censored": false,
+              "bailed": false,
+              "locus": "chr22_mask:66,999..85,999"
+            },
+            {
+              "timeToContentMs": 361,
+              "loadingSeen": true,
+              "redrawGapMs": 16.800000000000182,
+              "applied": true,
+              "censored": false,
+              "bailed": false,
+              "locus": "chr22_mask:47,998..66,998"
+            },
+            {
+              "timeToContentMs": 339,
+              "loadingSeen": true,
+              "redrawGapMs": 16.800000000000182,
+              "applied": true,
+              "censored": false,
+              "bailed": false,
+              "locus": "chr22_mask:28,997..47,997"
+            }
+          ],
+          "load": {
+            "before": 7.5,
+            "after": 8.74
+          }
+        },
+        "baseline": {
+          "mode": "pan",
+          "maxWaitMs": 120000,
+          "stepsAttempted": 5,
+          "stepsMeasured": 5,
+          "stepsBailed": 0,
+          "stepsCensored": 0,
+          "censored": false,
+          "allBailed": false,
+          "zoomTimeToContentMs": 1251,
+          "zoomRedrawGapMs": 66.80000000000109,
+          "loadingEverSeen": true,
+          "steps": [
+            {
+              "timeToContentMs": 1369,
+              "loadingSeen": true,
+              "redrawGapMs": 83.30000000000018,
+              "applied": true,
+              "censored": false,
+              "bailed": false,
+              "locus": "chr22_mask:105,001..124,001"
+            },
+            {
+              "timeToContentMs": 723,
+              "loadingSeen": true,
+              "redrawGapMs": 16.800000000000182,
+              "applied": true,
+              "censored": false,
+              "bailed": false,
+              "locus": "chr22_mask:86,000..105,000"
+            },
+            {
+              "timeToContentMs": 1251,
+              "loadingSeen": true,
+              "redrawGapMs": 33.399999999999636,
+              "applied": true,
+              "censored": false,
+              "bailed": false,
+              "locus": "chr22_mask:66,999..85,999"
+            },
+            {
+              "timeToContentMs": 723,
+              "loadingSeen": true,
+              "redrawGapMs": 66.80000000000109,
+              "applied": true,
+              "censored": false,
+              "bailed": false,
+              "locus": "chr22_mask:47,998..66,998"
+            },
+            {
+              "timeToContentMs": 1324,
+              "loadingSeen": true,
+              "redrawGapMs": 100,
+              "applied": true,
+              "censored": false,
+              "bailed": false,
+              "locus": "chr22_mask:28,997..47,997"
+            }
+          ],
+          "load": {
+            "before": 8.74,
+            "after": 8.8
+          }
         }
       }
     },
     "200x-longread": {
       "in": {
-        "webgl-poc": {
+        "new": {
           "mode": "in",
           "maxWaitMs": 120000,
           "stepsAttempted": 5,
@@ -859,18 +1460,11 @@
             {
               "timeToContentMs": 0,
               "loadingSeen": false,
-              "redrawGapMs": 16.700000000000273,
-              "applied": true,
-              "censored": false,
-              "bailed": false
-            },
-            {
-              "timeToContentMs": 0,
-              "loadingSeen": false,
               "redrawGapMs": 16.700000000000728,
               "applied": true,
               "censored": false,
-              "bailed": false
+              "bailed": false,
+              "locus": "chr22_mask:131,127..135,877"
             },
             {
               "timeToContentMs": 0,
@@ -878,7 +1472,8 @@
               "redrawGapMs": 16.800000000000182,
               "applied": true,
               "censored": false,
-              "bailed": false
+              "bailed": false,
+              "locus": "chr22_mask:132,315..134,689"
             },
             {
               "timeToContentMs": 0,
@@ -886,19 +1481,30 @@
               "redrawGapMs": 16.700000000000728,
               "applied": true,
               "censored": false,
-              "bailed": false
+              "bailed": false,
+              "locus": "chr22_mask:132,909..134,095"
             },
             {
               "timeToContentMs": 0,
               "loadingSeen": false,
-              "redrawGapMs": 16.800000000000182,
+              "redrawGapMs": 16.699999999999818,
               "applied": true,
               "censored": false,
-              "bailed": false
+              "bailed": false,
+              "locus": "chr22_mask:133,206..133,798"
+            },
+            {
+              "timeToContentMs": 0,
+              "loadingSeen": false,
+              "redrawGapMs": 16.700000000000728,
+              "applied": true,
+              "censored": false,
+              "bailed": false,
+              "locus": "chr22_mask:133,354..133,650"
             }
           ]
         },
-        "release-4.3.0": {
+        "baseline": {
           "mode": "in",
           "maxWaitMs": 120000,
           "stepsAttempted": 5,
@@ -907,55 +1513,60 @@
           "stepsCensored": 0,
           "censored": false,
           "allBailed": false,
-          "zoomTimeToContentMs": 3024,
+          "zoomTimeToContentMs": 2984,
           "zoomRedrawGapMs": 16.80000000000291,
           "loadingEverSeen": true,
           "steps": [
             {
-              "timeToContentMs": 5993,
+              "timeToContentMs": 5743,
+              "loadingSeen": true,
+              "redrawGapMs": 33.29999999999927,
+              "applied": true,
+              "censored": false,
+              "bailed": false,
+              "locus": "chr22_mask:131,127..135,877"
+            },
+            {
+              "timeToContentMs": 3910,
               "loadingSeen": true,
               "redrawGapMs": 16.80000000000291,
               "applied": true,
               "censored": false,
-              "bailed": false
+              "bailed": false,
+              "locus": "chr22_mask:132,315..134,689"
             },
             {
-              "timeToContentMs": 3708,
+              "timeToContentMs": 2984,
               "loadingSeen": true,
               "redrawGapMs": 16.80000000000291,
               "applied": true,
               "censored": false,
-              "bailed": false
+              "bailed": false,
+              "locus": "chr22_mask:132,909..134,095"
             },
             {
-              "timeToContentMs": 2951,
+              "timeToContentMs": 2863,
               "loadingSeen": true,
               "redrawGapMs": 16.80000000000291,
               "applied": true,
               "censored": false,
-              "bailed": false
+              "bailed": false,
+              "locus": "chr22_mask:133,206..133,798"
             },
             {
-              "timeToContentMs": 3015,
-              "loadingSeen": true,
-              "redrawGapMs": 16.799999999999272,
-              "applied": true,
-              "censored": false,
-              "bailed": false
-            },
-            {
-              "timeToContentMs": 3024,
+              "timeToContentMs": 2852,
               "loadingSeen": true,
               "redrawGapMs": 16.80000000000291,
               "applied": true,
               "censored": false,
-              "bailed": false
+              "bailed": false,
+              "locus": "chr22_mask:133,354..133,650"
             }
           ]
         }
       },
       "out": {
-        "webgl-poc": {
+        "new": {
           "mode": "out",
           "maxWaitMs": 120000,
           "stepsAttempted": 4,
@@ -965,32 +1576,26 @@
           "censored": false,
           "allBailed": false,
           "zoomTimeToContentMs": 0,
-          "zoomRedrawGapMs": 16.799999999999727,
+          "zoomRedrawGapMs": 16.700000000000273,
           "loadingEverSeen": false,
           "steps": [
             {
               "timeToContentMs": 0,
               "loadingSeen": false,
-              "redrawGapMs": 16.799999999999727,
+              "redrawGapMs": 16.700000000000273,
               "applied": true,
               "censored": false,
-              "bailed": false
+              "bailed": false,
+              "locus": "chr22_mask:114,502..152,503"
             },
             {
-              "timeToContentMs": 592,
+              "timeToContentMs": 586,
               "loadingSeen": true,
-              "redrawGapMs": 16.799999999999727,
+              "redrawGapMs": 16.700000000000728,
               "applied": true,
               "censored": false,
-              "bailed": true
-            },
-            {
-              "timeToContentMs": 0,
-              "loadingSeen": false,
-              "redrawGapMs": 16.699999999999818,
-              "applied": true,
-              "censored": false,
-              "bailed": true
+              "bailed": true,
+              "locus": "chr22_mask:95,501..171,504"
             },
             {
               "timeToContentMs": 0,
@@ -998,11 +1603,21 @@
               "redrawGapMs": 16.700000000000728,
               "applied": true,
               "censored": false,
-              "bailed": true
+              "bailed": true,
+              "locus": "chr22_mask:57,499..209,506"
+            },
+            {
+              "timeToContentMs": 0,
+              "loadingSeen": false,
+              "redrawGapMs": 16.700000000000728,
+              "applied": true,
+              "censored": false,
+              "bailed": true,
+              "locus": "chr22_mask:1..250,001"
             }
           ]
         },
-        "release-4.3.0": {
+        "baseline": {
           "mode": "out",
           "maxWaitMs": 120000,
           "stepsAttempted": 4,
@@ -1016,44 +1631,178 @@
           "loadingEverSeen": false,
           "steps": [
             {
-              "timeToContentMs": 119,
+              "timeToContentMs": 103,
               "loadingSeen": true,
-              "redrawGapMs": 16.800000000000182,
+              "redrawGapMs": 16.700000000000728,
               "applied": true,
               "censored": false,
-              "bailed": true
+              "bailed": true,
+              "locus": "chr22_mask:114,516..152,517"
             },
             {
-              "timeToContentMs": 88,
+              "timeToContentMs": 81,
               "loadingSeen": true,
-              "redrawGapMs": 16.800000000000182,
+              "redrawGapMs": 16.799999999999272,
               "applied": true,
               "censored": false,
-              "bailed": true
+              "bailed": true,
+              "locus": "chr22_mask:95,545..171,548"
             },
             {
-              "timeToContentMs": 89,
+              "timeToContentMs": 109,
               "loadingSeen": true,
               "redrawGapMs": 16.800000000000182,
               "applied": true,
               "censored": false,
-              "bailed": true
+              "bailed": true,
+              "locus": "chr22_mask:57,543..209,550"
             },
             {
-              "timeToContentMs": 112,
+              "timeToContentMs": 116,
               "loadingSeen": true,
-              "redrawGapMs": 16.800000000000182,
+              "redrawGapMs": 16.80000000000109,
               "applied": true,
               "censored": false,
-              "bailed": true
+              "bailed": true,
+              "locus": "chr22_mask:1..250,001"
             }
           ]
+        }
+      },
+      "pan": {
+        "new": {
+          "mode": "pan",
+          "maxWaitMs": 120000,
+          "stepsAttempted": 5,
+          "stepsMeasured": 5,
+          "stepsBailed": 0,
+          "stepsCensored": 0,
+          "censored": false,
+          "allBailed": false,
+          "zoomTimeToContentMs": 739,
+          "zoomRedrawGapMs": 33.30000000000018,
+          "loadingEverSeen": true,
+          "steps": [
+            {
+              "timeToContentMs": 739,
+              "loadingSeen": true,
+              "redrawGapMs": 16.799999999999727,
+              "applied": true,
+              "censored": false,
+              "bailed": false,
+              "locus": "chr22_mask:105,001..124,001"
+            },
+            {
+              "timeToContentMs": 907,
+              "loadingSeen": true,
+              "redrawGapMs": 50.099999999999454,
+              "applied": true,
+              "censored": false,
+              "bailed": false,
+              "locus": "chr22_mask:86,000..105,000"
+            },
+            {
+              "timeToContentMs": 756,
+              "loadingSeen": true,
+              "redrawGapMs": 33.30000000000018,
+              "applied": true,
+              "censored": false,
+              "bailed": false,
+              "locus": "chr22_mask:66,999..85,999"
+            },
+            {
+              "timeToContentMs": 739,
+              "loadingSeen": true,
+              "redrawGapMs": 50,
+              "applied": true,
+              "censored": false,
+              "bailed": false,
+              "locus": "chr22_mask:47,998..66,998"
+            },
+            {
+              "timeToContentMs": 635,
+              "loadingSeen": true,
+              "redrawGapMs": 16.80000000000109,
+              "applied": true,
+              "censored": false,
+              "bailed": false,
+              "locus": "chr22_mask:28,997..47,997"
+            }
+          ],
+          "load": {
+            "before": 8.8,
+            "after": 7.91
+          }
+        },
+        "baseline": {
+          "mode": "pan",
+          "maxWaitMs": 120000,
+          "stepsAttempted": 5,
+          "stepsMeasured": 5,
+          "stepsBailed": 0,
+          "stepsCensored": 0,
+          "censored": false,
+          "allBailed": false,
+          "zoomTimeToContentMs": 3182,
+          "zoomRedrawGapMs": 33.29999999999927,
+          "loadingEverSeen": true,
+          "steps": [
+            {
+              "timeToContentMs": 5849,
+              "loadingSeen": true,
+              "redrawGapMs": 50,
+              "applied": true,
+              "censored": false,
+              "bailed": false,
+              "locus": "chr22_mask:105,001..124,001"
+            },
+            {
+              "timeToContentMs": 3182,
+              "loadingSeen": true,
+              "redrawGapMs": 33.29999999999927,
+              "applied": true,
+              "censored": false,
+              "bailed": false,
+              "locus": "chr22_mask:86,000..105,000"
+            },
+            {
+              "timeToContentMs": 4080,
+              "loadingSeen": true,
+              "redrawGapMs": 16.80000000000291,
+              "applied": true,
+              "censored": false,
+              "bailed": false,
+              "locus": "chr22_mask:66,999..85,999"
+            },
+            {
+              "timeToContentMs": 2502,
+              "loadingSeen": true,
+              "redrawGapMs": 33.29999999999927,
+              "applied": true,
+              "censored": false,
+              "bailed": false,
+              "locus": "chr22_mask:47,998..66,998"
+            },
+            {
+              "timeToContentMs": 2132,
+              "loadingSeen": true,
+              "redrawGapMs": 16.80000000000291,
+              "applied": true,
+              "censored": false,
+              "bailed": false,
+              "locus": "chr22_mask:28,997..47,997"
+            }
+          ],
+          "load": {
+            "before": 7.91,
+            "after": 5.93
+          }
         }
       }
     },
     "1000x-longread": {
       "in": {
-        "webgl-poc": {
+        "new": {
           "mode": "in",
           "maxWaitMs": 120000,
           "stepsAttempted": 5,
@@ -1069,10 +1818,11 @@
             {
               "timeToContentMs": 0,
               "loadingSeen": false,
-              "redrawGapMs": 33.399999999999636,
+              "redrawGapMs": 66.60000000000036,
               "applied": true,
               "censored": false,
-              "bailed": false
+              "bailed": false,
+              "locus": "chr22_mask:131,127..135,877"
             },
             {
               "timeToContentMs": 0,
@@ -1080,23 +1830,8 @@
               "redrawGapMs": 50,
               "applied": true,
               "censored": false,
-              "bailed": false
-            },
-            {
-              "timeToContentMs": 0,
-              "loadingSeen": false,
-              "redrawGapMs": 50.100000000000364,
-              "applied": true,
-              "censored": false,
-              "bailed": false
-            },
-            {
-              "timeToContentMs": 0,
-              "loadingSeen": false,
-              "redrawGapMs": 66.70000000000073,
-              "applied": true,
-              "censored": false,
-              "bailed": false
+              "bailed": false,
+              "locus": "chr22_mask:132,315..134,689"
             },
             {
               "timeToContentMs": 0,
@@ -1104,11 +1839,30 @@
               "redrawGapMs": 33.29999999999927,
               "applied": true,
               "censored": false,
-              "bailed": false
+              "bailed": false,
+              "locus": "chr22_mask:132,909..134,095"
+            },
+            {
+              "timeToContentMs": 0,
+              "loadingSeen": false,
+              "redrawGapMs": 50,
+              "applied": true,
+              "censored": false,
+              "bailed": false,
+              "locus": "chr22_mask:133,206..133,798"
+            },
+            {
+              "timeToContentMs": 0,
+              "loadingSeen": false,
+              "redrawGapMs": 50.099999999998545,
+              "applied": true,
+              "censored": false,
+              "bailed": false,
+              "locus": "chr22_mask:133,354..133,650"
             }
           ]
         },
-        "release-4.3.0": {
+        "baseline": {
           "mode": "in",
           "maxWaitMs": 120000,
           "stepsAttempted": 5,
@@ -1117,55 +1871,60 @@
           "stepsCensored": 0,
           "censored": false,
           "allBailed": false,
-          "zoomTimeToContentMs": 13913,
-          "zoomRedrawGapMs": 16.80000000000291,
+          "zoomTimeToContentMs": 15321,
+          "zoomRedrawGapMs": 33.19999999999709,
           "loadingEverSeen": true,
           "steps": [
             {
-              "timeToContentMs": 25486,
+              "timeToContentMs": 24098,
+              "loadingSeen": true,
+              "redrawGapMs": 33.19999999999709,
+              "applied": true,
+              "censored": false,
+              "bailed": false,
+              "locus": "chr22_mask:131,127..135,877"
+            },
+            {
+              "timeToContentMs": 29166,
+              "loadingSeen": true,
+              "redrawGapMs": 83.29999999998836,
+              "applied": true,
+              "censored": false,
+              "bailed": false,
+              "locus": "chr22_mask:132,315..134,689"
+            },
+            {
+              "timeToContentMs": 15321,
               "loadingSeen": true,
               "redrawGapMs": 16.80000000000291,
               "applied": true,
               "censored": false,
-              "bailed": false
+              "bailed": false,
+              "locus": "chr22_mask:132,909..134,095"
             },
             {
-              "timeToContentMs": 13913,
+              "timeToContentMs": 14785,
               "loadingSeen": true,
-              "redrawGapMs": 16.80000000000291,
+              "redrawGapMs": 1833.199999999997,
               "applied": true,
               "censored": false,
-              "bailed": false
+              "bailed": false,
+              "locus": "chr22_mask:133,206..133,798"
             },
             {
-              "timeToContentMs": 12990,
+              "timeToContentMs": 13984,
               "loadingSeen": true,
-              "redrawGapMs": 16.80000000000291,
+              "redrawGapMs": 16.800000000017462,
               "applied": true,
               "censored": false,
-              "bailed": false
-            },
-            {
-              "timeToContentMs": 14149,
-              "loadingSeen": true,
-              "redrawGapMs": 16.80000000000291,
-              "applied": true,
-              "censored": false,
-              "bailed": false
-            },
-            {
-              "timeToContentMs": 13665,
-              "loadingSeen": true,
-              "redrawGapMs": 1849.9000000000087,
-              "applied": true,
-              "censored": false,
-              "bailed": false
+              "bailed": false,
+              "locus": "chr22_mask:133,354..133,650"
             }
           ]
         }
       },
       "out": {
-        "webgl-poc": {
+        "new": {
           "mode": "out",
           "maxWaitMs": 120000,
           "stepsAttempted": 4,
@@ -1175,24 +1934,26 @@
           "censored": false,
           "allBailed": false,
           "zoomTimeToContentMs": 0,
-          "zoomRedrawGapMs": 50,
+          "zoomRedrawGapMs": 83.30000000000018,
           "loadingEverSeen": false,
           "steps": [
             {
               "timeToContentMs": 0,
               "loadingSeen": false,
-              "redrawGapMs": 50,
+              "redrawGapMs": 83.30000000000018,
               "applied": true,
               "censored": false,
-              "bailed": false
+              "bailed": false,
+              "locus": "chr22_mask:114,502..152,503"
             },
             {
-              "timeToContentMs": 591,
+              "timeToContentMs": 586,
               "loadingSeen": true,
-              "redrawGapMs": 66.69999999999982,
+              "redrawGapMs": 66.60000000000036,
               "applied": true,
               "censored": false,
-              "bailed": true
+              "bailed": true,
+              "locus": "chr22_mask:95,501..171,504"
             },
             {
               "timeToContentMs": 0,
@@ -1200,19 +1961,21 @@
               "redrawGapMs": 16.700000000000728,
               "applied": true,
               "censored": false,
-              "bailed": true
+              "bailed": true,
+              "locus": "chr22_mask:57,499..209,506"
             },
             {
               "timeToContentMs": 0,
               "loadingSeen": false,
-              "redrawGapMs": 16.799999999999272,
+              "redrawGapMs": 16.700000000000728,
               "applied": true,
               "censored": false,
-              "bailed": true
+              "bailed": true,
+              "locus": "chr22_mask:1..250,001"
             }
           ]
         },
-        "release-4.3.0": {
+        "baseline": {
           "mode": "out",
           "maxWaitMs": 120000,
           "stepsAttempted": 4,
@@ -1226,38 +1989,172 @@
           "loadingEverSeen": false,
           "steps": [
             {
-              "timeToContentMs": 90,
+              "timeToContentMs": 104,
               "loadingSeen": true,
-              "redrawGapMs": 16.799999999999272,
+              "redrawGapMs": 33.26800000000003,
               "applied": true,
               "censored": false,
-              "bailed": true
+              "bailed": true,
+              "locus": "chr22_mask:114,516..152,517"
             },
             {
-              "timeToContentMs": 90,
+              "timeToContentMs": 88,
               "loadingSeen": true,
               "redrawGapMs": 16.80000000000291,
               "applied": true,
               "censored": false,
-              "bailed": true
+              "bailed": true,
+              "locus": "chr22_mask:95,545..171,548"
             },
             {
-              "timeToContentMs": 89,
+              "timeToContentMs": 120,
               "loadingSeen": true,
-              "redrawGapMs": 16.80000000000291,
+              "redrawGapMs": 16.700000000000728,
               "applied": true,
               "censored": false,
-              "bailed": true
+              "bailed": true,
+              "locus": "chr22_mask:57,543..209,550"
             },
             {
-              "timeToContentMs": 112,
+              "timeToContentMs": 93,
               "loadingSeen": true,
-              "redrawGapMs": 16.799999999999272,
+              "redrawGapMs": 33.30000000000291,
               "applied": true,
               "censored": false,
-              "bailed": true
+              "bailed": true,
+              "locus": "chr22_mask:1..250,001"
             }
           ]
+        }
+      },
+      "pan": {
+        "new": {
+          "mode": "pan",
+          "maxWaitMs": 120000,
+          "stepsAttempted": 5,
+          "stepsMeasured": 5,
+          "stepsBailed": 0,
+          "stepsCensored": 0,
+          "censored": false,
+          "allBailed": false,
+          "zoomTimeToContentMs": 3972,
+          "zoomRedrawGapMs": 233.29999999999927,
+          "loadingEverSeen": true,
+          "steps": [
+            {
+              "timeToContentMs": 4624,
+              "loadingSeen": true,
+              "redrawGapMs": 216.70000000000073,
+              "applied": true,
+              "censored": false,
+              "bailed": false,
+              "locus": "chr22_mask:105,001..124,001"
+            },
+            {
+              "timeToContentMs": 4101,
+              "loadingSeen": true,
+              "redrawGapMs": 300,
+              "applied": true,
+              "censored": false,
+              "bailed": false,
+              "locus": "chr22_mask:86,000..105,000"
+            },
+            {
+              "timeToContentMs": 3972,
+              "loadingSeen": true,
+              "redrawGapMs": 233.29999999999927,
+              "applied": true,
+              "censored": false,
+              "bailed": false,
+              "locus": "chr22_mask:66,999..85,999"
+            },
+            {
+              "timeToContentMs": 3162,
+              "loadingSeen": true,
+              "redrawGapMs": 233.40000000000146,
+              "applied": true,
+              "censored": false,
+              "bailed": false,
+              "locus": "chr22_mask:47,998..66,998"
+            },
+            {
+              "timeToContentMs": 2774,
+              "loadingSeen": true,
+              "redrawGapMs": 216.59999999999854,
+              "applied": true,
+              "censored": false,
+              "bailed": false,
+              "locus": "chr22_mask:28,997..47,997"
+            }
+          ],
+          "load": {
+            "before": 5.93,
+            "after": 4.45
+          }
+        },
+        "baseline": {
+          "mode": "pan",
+          "maxWaitMs": 120000,
+          "stepsAttempted": 5,
+          "stepsMeasured": 5,
+          "stepsBailed": 0,
+          "stepsCensored": 0,
+          "censored": false,
+          "allBailed": false,
+          "zoomTimeToContentMs": 16115,
+          "zoomRedrawGapMs": 50,
+          "loadingEverSeen": true,
+          "steps": [
+            {
+              "timeToContentMs": 26990,
+              "loadingSeen": true,
+              "redrawGapMs": 66.80000000000291,
+              "applied": true,
+              "censored": false,
+              "bailed": false,
+              "locus": "chr22_mask:105,001..124,001"
+            },
+            {
+              "timeToContentMs": 16115,
+              "loadingSeen": true,
+              "redrawGapMs": 50,
+              "applied": true,
+              "censored": false,
+              "bailed": false,
+              "locus": "chr22_mask:86,000..105,000"
+            },
+            {
+              "timeToContentMs": 20711,
+              "loadingSeen": true,
+              "redrawGapMs": 50,
+              "applied": true,
+              "censored": false,
+              "bailed": false,
+              "locus": "chr22_mask:66,999..85,999"
+            },
+            {
+              "timeToContentMs": 9968,
+              "loadingSeen": true,
+              "redrawGapMs": 33.29999999998836,
+              "applied": true,
+              "censored": false,
+              "bailed": false,
+              "locus": "chr22_mask:47,998..66,998"
+            },
+            {
+              "timeToContentMs": 13728,
+              "loadingSeen": true,
+              "redrawGapMs": 33.39999999999418,
+              "applied": true,
+              "censored": false,
+              "bailed": false,
+              "locus": "chr22_mask:28,997..47,997"
+            }
+          ],
+          "load": {
+            "before": 4.45,
+            "after": 8.96
+          }
         }
       }
     }

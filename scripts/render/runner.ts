@@ -4,6 +4,8 @@
 // and writes a markdown comparison table + raw JSON to results/.
 import { execFileSync } from 'child_process'
 import fs from 'fs'
+import { resolveBuild } from './servedbuild.ts'
+import { loadavg, outliers, peak, type LoadWindow } from './loadavg.ts'
 
 const RUNS = 6
 const WARMUP = 1
@@ -12,18 +14,60 @@ const LOC = 'chr22_mask:124000-143000' // 19kb, matches historical jb2profile
 // renderer pinned to webgl2 for the new branch: WebGPU works but emits Dawn
 // validation errors on this Intel/Vulkan stack, so webgl2 is the credible path
 // (and the realistic fallback most users hit). Releases ignore the param.
-const builds = [
-  { name: 'current', port: 8000, extra: '&renderer=webgl' },
-  { name: 'release-4.3.0', port: 8001, extra: '' },
-  { name: 'release-4.1.15', port: 8002, extra: '' },
+//
+// Column headers come from what the ports are actually serving, not from a
+// hardcoded guess — see servedbuild.ts for why. The first entry is the build
+// under test, whatever it turns out to be, and the speedup column is against it.
+const ports = [
+  { port: 8000, extra: '&renderer=webgl' },
+  { port: 8001, extra: '' },
+  { port: 8002, extra: '' },
 ]
+const builds = await Promise.all(
+  ports.map(async p => ({ ...p, name: await resolveBuild(p.port) })),
+)
+for (const b of builds) {
+  console.log(`port ${b.port} is serving builds/${b.name}`)
+}
+const UNDER_TEST = builds[0]!.name
 
-const cases: { id: string; track: string }[] = []
+const allCases: { id: string; track: string }[] = []
 for (const read of ['shortread', 'longread']) {
   for (const cov of ['20x', '200x', '1000x']) {
-    cases.push({ id: `${cov}-${read}`, track: `${cov}.${read}.bam` })
+    allCases.push({ id: `${cov}-${read}`, track: `${cov}.${read}.bam` })
   }
 }
+
+// CASES=1000x-longread re-measures one row without spending 20 minutes on the
+// other five. Rows not selected keep their previous values, so the table is not
+// blanked — but that means a filtered run mixes vintages, which the report says.
+// This exists because contamination lands per-cell: the 2026-08-05 run was fine
+// everywhere except the 1000x-longread row, which sat inside a load spike of 16
+// to 32 and had to be redone on its own.
+// CASES=none measures nothing and just regenerates the report from the recorded
+// JSON, for when the presentation changes but the numbers do not.
+const selected = process.env.CASES?.split(',')
+const cases =
+  process.env.CASES === 'none'
+    ? []
+    : selected
+      ? allCases.filter(c => selected.includes(c.id))
+      : allCases
+if (!cases.length && process.env.CASES !== 'none') {
+  throw new Error(
+    `CASES matched nothing; known: ${allCases.map(c => c.id).join(',')}`,
+  )
+}
+
+// Above this 1-minute load average a row is not comparable to one measured on a
+// quiet box, and the report says so instead of printing a speedup. A clean run
+// on this machine sits at 1.45-2.90; the ceiling is deliberately close to that
+// rather than to the load at which numbers become obviously absurd, because the
+// damage starts long before it is obvious. On 2026-08-05 the 1000x-longread row
+// was attempted twice, at peak loads of 31.9 and 35.4, and release-4.1.15 landed
+// at 25187ms and then 56452ms for the same work -- a 2.2x spread between two
+// measurements of one unchanged build, which is what an unusable row looks like.
+const LOAD_CEILING = 4.0
 
 const median = (a: number[]) => {
   const s = [...a].sort((x, y) => x - y)
@@ -67,13 +111,34 @@ interface Cell {
   mean: number
   stddev: number
   runs: number[]
+  /**
+   * Load average either side of this cell, so contamination stays attributable.
+   * Optional because results recorded before this instrumentation existed —
+   * including the 2026-08-05 run this was written in response to — have none.
+   */
+  load?: LoadWindow
 }
-const results: Record<string, Record<string, Cell>> = {}
+// Rows not selected this run keep whatever the last run recorded.
+interface Saved {
+  results?: Record<string, Record<string, Cell>>
+  measuredAt?: Record<string, string>
+}
+const prior: Saved = fs.existsSync('results/alignments.json')
+  ? (JSON.parse(fs.readFileSync('results/alignments.json', 'utf8')) as Saved)
+  : {}
+
+const stamp = new Date().toISOString().slice(0, 10)
+const measuredAt = { ...prior.measuredAt }
+
+const results: Record<string, Record<string, Cell>> = { ...prior.results }
+const measured: { key: string; load: LoadWindow; value: Cell }[] = []
 
 for (const c of cases) {
   results[c.id] = {}
+  measuredAt[c.id] = stamp
   for (const b of builds) {
     process.stdout.write(`${c.id} / ${b.name}: `)
+    const before = loadavg()
     for (let i = 0; i < WARMUP; i++) {
       runOnce(b, c.track)
     }
@@ -84,37 +149,78 @@ for (const c of cases) {
       process.stdout.write(Number.isFinite(v) ? `${v.toFixed(0)} ` : 'FAIL ')
     }
     const ok = runs.filter(Number.isFinite)
-    results[c.id]![b.name] = {
+    const load = { before, after: loadavg() }
+    const cell: Cell = {
       median: ok.length ? median(ok) : Number.NaN,
       mean: ok.length ? mean(ok) : Number.NaN,
       stddev: ok.length ? stddev(ok) : Number.NaN,
       runs,
+      load,
     }
+    results[c.id]![b.name] = cell
+    measured.push({ key: `${c.id} / ${b.name}`, load, value: cell })
     process.stdout.write(
-      `=> median ${results[c.id]![b.name]!.median.toFixed(0)}ms\n`,
+      `=> median ${cell.median.toFixed(0)}ms ` +
+        `(load ${load.before.toFixed(1)}→${load.after.toFixed(1)})\n`,
     )
+  }
+}
+
+// A run whose median load looks fine can still contain one badly contaminated
+// cell, and that cell is invisible in any per-run summary. Name it instead.
+const { medianLoad, suspect } = outliers(measured)
+if (suspect.length) {
+  console.log(
+    `\nWARNING: ${suspect.length} cell(s) measured at more than 2x the run's ` +
+      `median load (${medianLoad.toFixed(1)}). Treat these as unverified:`,
+  )
+  for (const s of suspect) {
+    console.log(`  ${s.key} — load peaked at ${peak(s.load).toFixed(1)}`)
   }
 }
 
 fs.mkdirSync('results', { recursive: true })
 fs.writeFileSync(
   'results/alignments.json',
-  JSON.stringify({ loc: LOC, runs: RUNS, builds, results }, null, 2),
+  JSON.stringify({ loc: LOC, runs: RUNS, builds, measuredAt, results }, null, 2),
 )
 
-const baseline = 'release-4.3.0'
+// second port is the comparison baseline, named by what it actually serves —
+// hardcoding 'release-4.3.0' here would index an undefined cell if the ports
+// were ever restaged, which is the failure this whole resolution step exists for
+const baseline = builds[1]!.name
 let md = `# Alignments render benchmark\n\n`
 md += `Region \`${LOC}\` (19kb). In-page navigation→render-complete time, median of ${RUNS} runs (ms). `
-md += `Speedup = ${baseline} median ÷ current median.\n\n`
-md += `| case | ${builds.map(b => b.name).join(' | ')} | speedup vs ${baseline} |\n`
-md += `|---|${builds.map(() => '---:').join('|')}|---:|\n`
-for (const c of cases) {
+md += `Speedup = ${baseline} median ÷ ${UNDER_TEST} median.\n\n`
+
+// Rows can be re-measured independently (CASES=), so the table can hold numbers
+// from different runs. Date each row rather than letting the page imply one
+// sitting, and carry the load it was taken under, since that is what decides
+// whether a row is worth believing.
+md += `\`measured\` is when each row was taken and \`load\` the highest 1-minute load average recorded across its cells. This machine is shared: a row measured under load is not comparable to one measured idle, so any row above ${LOAD_CEILING.toFixed(1)} reports **unusable** in place of a speedup rather than a number that looks like a result. \`?\` means the row predates per-cell load recording.\n\n`
+md += `| case | ${builds.map(b => b.name).join(' | ')} | speedup vs ${baseline} | measured | load |\n`
+md += `|---|${builds.map(() => '---:').join('|')}|---:|---|---:|\n`
+const unusable: string[] = []
+for (const c of allCases) {
   const row = builds.map(b => {
     const cell = results[c.id]![b.name]!
     return `${cell.median.toFixed(0)} ±${cell.stddev.toFixed(0)}`
   })
-  const sp = results[c.id]![baseline]!.median / results[c.id]!['current']!.median
-  md += `| ${c.id} | ${row.join(' | ')} | ${sp.toFixed(2)}× |\n`
+  const sp =
+    results[c.id]![baseline]!.median / results[c.id]![UNDER_TEST]!.median
+  const rowLoad = Math.max(
+    ...builds.map(b =>
+      peak(results[c.id]![b.name]!.load ?? { before: 0, after: 0 }),
+    ),
+  )
+  const over = rowLoad > LOAD_CEILING
+  if (over) {
+    unusable.push(c.id)
+  }
+  md += `| ${c.id} | ${row.join(' | ')} | ${over ? '**unusable**' : `${sp.toFixed(2)}×`} | ${measuredAt[c.id] ?? 'unknown'} | ${rowLoad ? rowLoad.toFixed(1) : '?'} |\n`
+}
+if (unusable.length) {
+  md += `\n> **${unusable.join(', ')}** ${unusable.length === 1 ? 'was' : 'were'} measured on a machine under heavy external load and the timings are not usable. The medians are left in the table because they are what was measured, not because they mean anything; re-run with \`CASES=${unusable.join(',')}\` on an idle box. Judge that the box is idle from \`uptime\` before starting, not from the load at the moment the run begins — on 2026-08-05 a run that started at load 3.15 was at 35 by the time it finished.\n`
 }
 fs.writeFileSync('results/alignments.md', md)
 console.log('\n' + md)

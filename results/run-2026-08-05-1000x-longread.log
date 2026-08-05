@@ -1,0 +1,28 @@
+starting at load 3.15 6.48 8.19 — Wed Aug  5 09:31:20 AM EDT 2026
+port 8000 is serving builds/current
+port 8001 is serving builds/release-4.3.0
+port 8002 is serving builds/release-4.1.15
+1000x-longread / current: 6922 8129 7198 7656 7200 7499 => median 7350ms (load 3.1→5.0)
+1000x-longread / release-4.3.0: 25129 37230 39450 23087 35111 40549 => median 36171ms (load 5.0→16.9)
+1000x-longread / release-4.1.15: 60045 70648 58900 53949 52464 54004 => median 56452ms (load 16.9→35.4)
+
+WARNING: 1 cell(s) measured at more than 2x the run's median load (16.9). Treat these as unverified:
+  1000x-longread / release-4.1.15 — load peaked at 35.4
+
+# Alignments render benchmark
+
+Region `chr22_mask:124000-143000` (19kb). In-page navigation→render-complete time, median of 6 runs (ms). Speedup = release-4.3.0 median ÷ current median.
+
+`measured` is when each row was taken and `load` the highest 1-minute load average recorded across its cells; this machine is shared, and a row measured under heavy load is not comparable to one measured idle.
+
+| case | current | release-4.3.0 | release-4.1.15 | speedup vs release-4.3.0 | measured | load |
+|---|---:|---:|---:|---:|---|---:|
+| 20x-shortread | 1789 ±38 | 2396 ±54 | 2381 ±38 | 1.34× | 2026-08-05 | ? |
+| 200x-shortread | 2153 ±51 | 2780 ±37 | 2845 ±308 | 1.29× | 2026-08-05 | ? |
+| 1000x-shortread | 3784 ±89 | 5084 ±150 | 5330 ±257 | 1.34× | 2026-08-05 | ? |
+| 20x-longread | 1907 ±42 | 2657 ±46 | 2640 ±80 | 1.39× | 2026-08-05 | ? |
+| 200x-longread | 2907 ±45 | 6352 ±129 | 6486 ±155 | 2.19× | 2026-08-05 | ? |
+| 1000x-longread | 7350 ±389 | 36171 ±6832 | 56452 ±6155 | 4.92× | 2026-08-05 | 35.4 |
+
+Wrote results/alignments.json and results/alignments.md
+finished Wed Aug  5 09:45:14 AM EDT 2026
