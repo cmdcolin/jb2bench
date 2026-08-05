@@ -125,12 +125,34 @@ so Emotion stops re-serializing.
 
 Both are worth re-profiling against a fresh build first (§2).
 
-### A benchmark that is missing
+### Zoom-out — implemented, never run
 
-Pan and zoom-*out*, where both architectures must refetch. The current zoom
-benchmark only zooms in, so the GPU branch never refetches and scores 0 ms. A
-both-refetch case would isolate redraw cost from fetch cost and make the
-comparison harder on the branch, which is worth having on the record.
+**Added in `a4f2746`; no numbers exist for it yet.** `ZOOM=out` zooms out
+instead of in, so the new view needs data neither build has and *both* must
+refetch — isolating redraw cost from avoided fetching, which the zoom-in case
+cannot do because the GPU branch never goes to the network there.
+
+```bash
+# needs an idle machine: builds/webgl-poc on 8000, builds/release-4.3.0 on 8001
+node scripts/render/runner-interaction.ts   # runs both directions, writes both tables
+```
+
+Expect roughly three usable zoom-out steps before the 250 kb contig clamps the
+view; the runner reports `steps` per row so a short row is visible rather than
+silent. Pan is still not covered.
+
+### The recorded 1000x-longread zoom figure is censored
+
+`results/interaction.md` reports 15008 ms for `1000x-longread` on
+release-4.3.0. That is not a measurement: all five steps landed within 19 ms of
+the old `MAX_WAIT` of 15000 ms, i.e. the harness gave up while content was still
+loading, whereas every other row varies naturally (e.g. 1112/1074/1086/1062/1064).
+The true value is unbounded above 15 s.
+
+The cap is now 120 s and tunable via `MAX_WAIT`, and censored steps are flagged
+and rendered as `≥N`. **But the table still holds the old censored number** —
+regenerating it needs the same idle-machine run as above. Until then, treat
+"1–15 s" anywhere it appears as a lower bound.
 
 ## 5. Smaller items
 

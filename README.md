@@ -85,15 +85,27 @@ regression (1000x-shortread), diagnosed in `flame/FINDINGS.md`.
 the architecture shows up.
 
 The old block renderer binds rendered output to a specific bpPerPx, so **every
-zoom refetches and re-renders** — "Downloading alignments…", 1–15 s depending on
-data weight. The GPU branch re-projects already-loaded reads at the new zoom
-with no refetch: content is never lost, and the only cost is a single ~17–117 ms
-redraw frame.
+zoom refetches and re-renders** — "Downloading alignments…", from ~1 s up to
+more than 15 s depending on data weight. The GPU branch re-projects
+already-loaded reads at the new zoom with no refetch: content is never lost, and
+the only cost is a single ~17–117 ms redraw frame.
 
 The metric is **time-to-content**: milliseconds a loading indicator is shown
-after a zoom-in before correct content returns. Driven through
-`window.JBrowseSession` (both builds expose it), always zooming *in*, so the new
-view stays a subset of already-loaded data.
+after a zoom before correct content returns, driven through
+`window.JBrowseSession` (both builds expose it). `ZOOM` selects the direction,
+and the two directions ask different questions:
+
+- **in** (default) — the new view is a strict subset of loaded data, so only the
+  old renderer refetches. This is the branch's best case by construction.
+- **out** — the new view needs data neither build has, so **both** refetch. This
+  isolates redraw cost from avoided fetching, and is the harder, fairer case.
+  It stops early when the view clamps at the 250 kb contig.
+
+> The `1000x-longread` figure in `results/interaction.md` (15008 ms) is
+> **censored**, not measured: all five steps landed within 19 ms of the old
+> 15000 ms `MAX_WAIT`, meaning the harness gave up while content was still
+> loading. The true value is unbounded above 15 s. The cap is now 120 s and
+> censored steps are flagged, but that table has not been regenerated yet.
 
 ### Per-frame interaction cost
 
