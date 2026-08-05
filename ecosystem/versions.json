@@ -1,0 +1,84 @@
+{
+  "comment": [
+    "Pinned refs for the parser-library comparison. 'old' is the version JBrowse 2",
+    "depended on at the time of the 2023 Genome Biology paper (Diesh et al. 2023);",
+    "the pin was read out of jbrowse-components at the last commit before",
+    "2023-08-15. 'new' is the current release. Both sides are cloned from GitHub at",
+    "these tags and built from source with the same toolchain, so the measured",
+    "difference is library code and not a change of transpiler target or module",
+    "format.",
+    "",
+    "jbrowse-components pins at 2023-08-12 (rev 6fb9daa575):",
+    "  plugins/alignments: @gmod/bam ^2.0.0, @gmod/cram ^1.7.1",
+    "  plugins/wiggle:     @gmod/bbi ^4.0.0",
+    "  core:               @gmod/bgzf-filehandle ^1.4.3"
+  ],
+  "libraries": [
+    {
+      "name": "bam-js",
+      "package": "@gmod/bam",
+      "repo": "https://github.com/GMOD/bam-js",
+      "old": {
+        "tag": "v2.0.0",
+        "sha": "ca48ec9830"
+      },
+      "new": {
+        "tag": "v7.8.1",
+        "sha": "01eae40f9a"
+      }
+    },
+    {
+      "name": "cram-js",
+      "package": "@gmod/cram",
+      "repo": "https://github.com/GMOD/cram-js",
+      "old": {
+        "tag": "v1.7.1",
+        "sha": "4373143b3a",
+        "extraDeps": [
+          "generic-filehandle@^3.0.0"
+        ],
+        "extraDepsReason": [
+          "v1.7.1 imports generic-filehandle without declaring it, in either",
+          "dependencies or devDependencies. Under npm's flat node_modules it",
+          "resolved anyway, hoisted out of a transitive dep; pnpm's strict layout",
+          "does not hoist, so the import fails. ^3.0.0 is the range",
+          "jbrowse-components itself pinned at the time (rev 6fb9daa575), so this",
+          "restores what a 2023 install actually resolved."
+        ]
+      },
+      "new": {
+        "tag": "v10.4.0",
+        "sha": "d0d6938296"
+      }
+    },
+    {
+      "name": "bgzf-filehandle",
+      "package": "@gmod/bgzf-filehandle",
+      "repo": "https://github.com/GMOD/bgzf-filehandle",
+      "old": {
+        "tag": "v1.4.3",
+        "sha": "0be710d821"
+      },
+      "new": {
+        "tag": "v6.3.2",
+        "sha": "a24bd8902f"
+      }
+    },
+    {
+      "name": "bbi-js",
+      "package": "@gmod/bbi",
+      "repo": "https://github.com/GMOD/bbi-js",
+      "old": {
+        "tag": "v4.0.0",
+        "sha": "a4b7c4c911"
+      },
+      "new": {
+        "tag": "v10.0.2",
+        "sha": "b7e0478585"
+      }
+    }
+  ],
+  "pinDate": "2023-08-15",
+  "pinDateProse": "15 August 2023",
+  "pinRev": "6fb9daa575"
+}

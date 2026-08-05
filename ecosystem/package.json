@@ -1,0 +1,15 @@
+{
+  "name": "jb2bench-ecosystem",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "setup": "./setup.sh",
+    "verify": "vitest run equivalence.test.ts",
+    "bench": "vitest bench --run",
+    "report": "node --experimental-strip-types report.ts"
+  },
+  "devDependencies": {
+    "typescript": "^5.9.3",
+    "vitest": "^4.1.8"
+  }
+}

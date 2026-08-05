@@ -28,3 +28,8 @@ screenshots/
 # Derived flamegraph intermediates (from *.cpuprofile, which is ignored)
 flame/*.folded
 flame/*.svg
+
+# The eight library versions ecosystem/ compares: each is a clone of a GMOD repo
+# at a tag pinned in ecosystem/versions.json, carrying its own .git and its own
+# node_modules. ecosystem/setup.sh rebuilds them in a few minutes.
+ecosystem/.libs/

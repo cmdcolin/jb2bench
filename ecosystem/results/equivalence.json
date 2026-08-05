@@ -1,0 +1,301 @@
+{
+  "region": "chr22_mask:124000-143000",
+  "deltas": [
+    {
+      "kind": "bam",
+      "case": "20x shortread",
+      "old": 3079,
+      "new": 3081,
+      "gained": 2,
+      "lostBoundary": 0,
+      "lostInterior": 0,
+      "exampleGained": [
+        "chr22_mask_138461_138940_6:0:0_9:1:0_e226|138460|138460|69",
+        "chr22_mask_140881_141403_3:0:0_6:0:0_3e739|140880|140880|133"
+      ],
+      "exampleLostBoundary": []
+    },
+    {
+      "kind": "bam",
+      "case": "20x longread",
+      "old": 36,
+      "new": 36,
+      "gained": 0,
+      "lostBoundary": 0,
+      "lostInterior": 0,
+      "exampleGained": [],
+      "exampleLostBoundary": []
+    },
+    {
+      "kind": "bam",
+      "case": "200x shortread",
+      "old": 31126,
+      "new": 31134,
+      "gained": 8,
+      "lostBoundary": 0,
+      "lostInterior": 0,
+      "exampleGained": [
+        "chr22_mask_127231_127727_1:0:0_8:0:0_6a0f|127230|127230|133",
+        "chr22_mask_127671_128145_4:0:0_11:0:0_e5c50|127670|127670|69"
+      ],
+      "exampleLostBoundary": []
+    },
+    {
+      "kind": "bam",
+      "case": "200x longread",
+      "old": 335,
+      "new": 335,
+      "gained": 0,
+      "lostBoundary": 0,
+      "lostInterior": 0,
+      "exampleGained": [],
+      "exampleLostBoundary": []
+    },
+    {
+      "kind": "bam",
+      "case": "1000x shortread",
+      "old": 153652,
+      "new": 153686,
+      "gained": 34,
+      "lostBoundary": 0,
+      "lostInterior": 0,
+      "exampleGained": [
+        "chr22_mask_124403_124897_10:0:0_4:0:0_3b93f|124747|124747|165",
+        "chr22_mask_124882_125313_4:0:0_8:0:0_9d269|124881|124881|69"
+      ],
+      "exampleLostBoundary": []
+    },
+    {
+      "kind": "bam",
+      "case": "1000x longread",
+      "old": 1683,
+      "new": 1683,
+      "gained": 0,
+      "lostBoundary": 0,
+      "lostInterior": 0,
+      "exampleGained": [],
+      "exampleLostBoundary": []
+    },
+    {
+      "kind": "cram",
+      "case": "20x shortread",
+      "old": 3079,
+      "new": 3081,
+      "gained": 2,
+      "lostBoundary": 0,
+      "lostInterior": 0,
+      "exampleGained": [
+        "chr22_mask_138461_138940_6:0:0_9:1:0_e226|138460|69",
+        "chr22_mask_140881_141403_3:0:0_6:0:0_3e739|140880|133"
+      ],
+      "exampleLostBoundary": []
+    },
+    {
+      "kind": "cram",
+      "case": "20x longread",
+      "old": 36,
+      "new": 36,
+      "gained": 0,
+      "lostBoundary": 0,
+      "lostInterior": 0,
+      "exampleGained": [],
+      "exampleLostBoundary": []
+    },
+    {
+      "kind": "cram",
+      "case": "200x shortread",
+      "old": 31126,
+      "new": 31131,
+      "gained": 8,
+      "lostBoundary": 3,
+      "lostInterior": 0,
+      "exampleGained": [
+        "chr22_mask_127231_127727_1:0:0_8:0:0_6a0f|127230|133",
+        "chr22_mask_127671_128145_4:0:0_11:0:0_e5c50|127670|69"
+      ],
+      "exampleLostBoundary": [
+        "chr22_mask_123498_124000_2:0:0_1:1:0_cf6f4|123850|83",
+        "chr22_mask_123852_124334_4:1:0_2:0:0_21a44|123851|99"
+      ]
+    },
+    {
+      "kind": "cram",
+      "case": "200x longread",
+      "old": 331,
+      "new": 335,
+      "gained": 4,
+      "lostBoundary": 0,
+      "lostInterior": 0,
+      "exampleGained": [
+        "S1_4146|81975|16",
+        "S1_1797|99385|0"
+      ],
+      "exampleLostBoundary": []
+    },
+    {
+      "kind": "cram",
+      "case": "1000x shortread",
+      "old": 153652,
+      "new": 153669,
+      "gained": 34,
+      "lostBoundary": 17,
+      "lostInterior": 0,
+      "exampleGained": [
+        "chr22_mask_124403_124897_10:0:0_4:0:0_3b93f|124747|165",
+        "chr22_mask_124882_125313_4:0:0_8:0:0_9d269|124881|69"
+      ],
+      "exampleLostBoundary": [
+        "chr22_mask_123851_124411_4:1:0_4:0:0_160d3|123850|1187",
+        "chr22_mask_123851_124311_5:1:0_5:0:0_40a88|123850|163"
+      ]
+    },
+    {
+      "kind": "cram",
+      "case": "1000x longread",
+      "old": 1667,
+      "new": 1683,
+      "gained": 16,
+      "lostBoundary": 0,
+      "lostInterior": 0,
+      "exampleGained": [
+        "S1_4796|74729|16",
+        "S1_838|83778|16"
+      ],
+      "exampleLostBoundary": []
+    },
+    {
+      "kind": "cram-lengthOnRef",
+      "case": "20x shortread",
+      "old": 3079,
+      "new": 3079,
+      "compared": 3079
+    },
+    {
+      "kind": "cram-lengthOnRef",
+      "case": "20x longread",
+      "old": 0,
+      "new": 36,
+      "compared": 36
+    },
+    {
+      "kind": "cram-lengthOnRef",
+      "case": "200x shortread",
+      "old": 31123,
+      "new": 31123,
+      "compared": 31123
+    },
+    {
+      "kind": "cram-lengthOnRef",
+      "case": "200x longread",
+      "old": 1,
+      "new": 331,
+      "compared": 331
+    },
+    {
+      "kind": "cram-lengthOnRef",
+      "case": "1000x shortread",
+      "old": 153635,
+      "new": 153635,
+      "compared": 153635
+    },
+    {
+      "kind": "cram-lengthOnRef",
+      "case": "1000x longread",
+      "old": 5,
+      "new": 1667,
+      "compared": 1667
+    },
+    {
+      "kind": "bigwig",
+      "case": "20x shortread",
+      "old": 4901,
+      "new": 4901,
+      "gained": 0,
+      "lostBoundary": 0,
+      "lostInterior": 0,
+      "exampleGained": [],
+      "exampleLostBoundary": []
+    },
+    {
+      "kind": "bigwig",
+      "case": "20x longread",
+      "old": 13168,
+      "new": 13167,
+      "gained": 0,
+      "lostBoundary": 1,
+      "lostInterior": 0,
+      "exampleGained": [],
+      "exampleLostBoundary": [
+        "123999|124000|33"
+      ]
+    },
+    {
+      "kind": "bigwig",
+      "case": "200x shortread",
+      "old": 14555,
+      "new": 14555,
+      "gained": 0,
+      "lostBoundary": 0,
+      "lostInterior": 0,
+      "exampleGained": [],
+      "exampleLostBoundary": []
+    },
+    {
+      "kind": "bigwig",
+      "case": "200x longread",
+      "old": 17676,
+      "new": 17675,
+      "gained": 0,
+      "lostBoundary": 1,
+      "lostInterior": 0,
+      "exampleGained": [],
+      "exampleLostBoundary": [
+        "123999|124000|242"
+      ]
+    },
+    {
+      "kind": "bigwig",
+      "case": "1000x shortread",
+      "old": 17047,
+      "new": 17046,
+      "gained": 0,
+      "lostBoundary": 1,
+      "lostInterior": 0,
+      "exampleGained": [],
+      "exampleLostBoundary": [
+        "123999|124000|1208"
+      ]
+    },
+    {
+      "kind": "bigwig",
+      "case": "1000x longread",
+      "old": 18495,
+      "new": 18494,
+      "gained": 0,
+      "lostBoundary": 1,
+      "lostInterior": 0,
+      "exampleGained": [],
+      "exampleLostBoundary": [
+        "123999|124000|1303"
+      ]
+    },
+    {
+      "kind": "bgzf",
+      "case": "20x.shortread.bam",
+      "old": 15353393,
+      "new": 15353393,
+      "gained": 0,
+      "lostBoundary": 0,
+      "lostInterior": 0
+    },
+    {
+      "kind": "bgzf",
+      "case": "20x.longread.bam",
+      "old": 12242345,
+      "new": 12242345,
+      "gained": 0,
+      "lostBoundary": 0,
+      "lostInterior": 0
+    }
+  ]
+}

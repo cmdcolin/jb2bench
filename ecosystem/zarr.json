@@ -1,0 +1,24 @@
+{
+  "comment": [
+    "The one ecosystem result that is not a parse: a multi-sample signal track",
+    "read as N BigWigs against the same values packed into one chunked array.",
+    "It is network-bound rather than CPU-bound, so it has no place in the",
+    "in-process vitest matrix and is measured by its own harness:",
+    "",
+    "  node scripts/measure_signal_latency.ts \\",
+    "    --samples 1000g_cnv_build/samples.tsv \\",
+    "    --region chr17:36,080,000-36,270,000 \\",
+    "    --zarr https://jbrowse.org/code/jb2/main/test_data/1000g_cnv/qm2_cn_1kb.zarr",
+    "",
+    "in GMOD/jbrowse-components, which counts every request and byte by wrapping",
+    "fetch. Paste its output here; report.ts carries these numbers into the",
+    "generated LaTeX so the paper never holds a hand-typed copy of them.",
+    "The numbers below are also the ones stated in that repo's",
+    "website/docs/tutorials/population_cnv.md."
+  ],
+  "region": "chr17:36,080,000-36,270,000",
+  "samples": 2504,
+  "panel": "1000 Genomes",
+  "bigwigs": { "requests": 15048, "megabytes": 48.39, "seconds": 24.5 },
+  "zarr": { "requests": 3, "megabytes": 0.22, "seconds": 0.2 }
+}
