@@ -128,14 +128,27 @@ To close it: add a fixture — run an ONT 5mCG model output through, or synthesi
 MM/ML onto the existing long-read BAM — plus a URL/session setting
 `colorBy: { type: 'modifications' }`.
 
-### Sub-frame timing, which blocks `rowsweep.ts`
+### `rowsweep.ts` now runs; what it needs is a quiet machine
 
-`scripts/render/rowsweep.ts` is written but **has never been run**, on purpose.
-Its instrument is the vsync-paced rAF frame gap, so every row count whose work
-fits inside one frame reports the same 16.7 ms floor and the sweep looks flat
-regardless of what is true. It needs either vsync disabled or GPU timestamp
-queries before its output means anything. Running it as-is would produce a
-confident, meaningless table.
+Superseded 2026-08-11. The three blockers named here — no fixture, a URL form no
+runner uses, and a vsync-paced instrument that floors at 16.7 ms — are fixed, and
+the README section has the commands. Disabling vsync does move the instrument:
+at 100 rows, paced gave a 23.3 ms median with 20% of frames under 16 ms, and
+unpaced gave 14.2 ms with 60% under. That comparison was taken at load 65, so
+read the direction and not the values.
+
+**No output has been kept as a result.** Every validation run sat at load 50–65
+against the 1.5–2.9 a clean run wants, and per-frame numbers are exactly what
+contention destroys — the same 100-row cell gave frame medians of 10.4, 14.2 and
+17.4 ms in three runs minutes apart. The sweep is a comparison across its own
+cells, so it is more robust than an absolute, and the runner now interleaves row
+counts and alternates their order pass to pass to keep load from correlating with
+row count. It is still not enough on a box at load 50.
+
+Two things would make the frame column stand on its own rather than on the flags:
+GPU timestamp queries around the draw, which measure the GPU's own work instead of
+the callback interval, and a `%` of frames over a fixed budget reported per pass
+rather than pooled, so one contended pass is visible instead of averaged in.
 
 ### The corpus tapers at both ends
 

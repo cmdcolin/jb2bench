@@ -14,6 +14,12 @@ data/*.bw
 # from a seeded RNG, so every machine gets byte-identical files.
 data/variants.*.vcf
 
+# The row-sweep corpus: the same callset at six sample counts, bgzipped and
+# tabix indexed so the browser can range-request it. Regenerate with
+# shell/generate_rowsweep.sh (node, bgzip, tabix), then shell/load_rowsweep.js
+# to register the tracks in a staged build.
+data/rowsweep/
+
 # jbrowse-web builds under test. Each is a deployed build plus symlinked copies
 # of the alignment data; stage them per README ("Builds compared").
 builds/

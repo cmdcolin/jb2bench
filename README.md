@@ -312,15 +312,36 @@ where igv.js mounts a widget — both are real architectural differences and bot
 are inside the number, which is why the light rows and the heavy rows say
 different things.
 
-### Row sweep — written, not yet run
+### Row sweep — runnable, no run of record yet
 
 `scripts/render/rowsweep.ts` sweeps row count on a multi-sample variant matrix,
 recording ready time and rAF frame gaps as rows are added with region and
-variant count fixed. **It has not been run**, deliberately: its frame instrument
-is the same vsync-paced rAF gap the throttling table uses, so until sub-frame
-timing lands (disable vsync, or read GPU timestamp queries) every row that fits
-inside one frame reports the 16.7 ms floor and the sweep looks flat regardless
-of what is true.
+variant count fixed.
+
+```bash
+bash shell/generate_rowsweep.sh                  # fixture: 100…2504 samples, one variant set
+node shell/load_rowsweep.js builds/current       # symlink + register the tracks
+npx http-server builds/current -p 8000 -s --cors &
+node scripts/render/rowsweep.ts                  # ~6 sizes x 3 passes
+```
+
+Three things it needed before it could say anything, all now in place. Its
+**fixture** did not exist: it opened `mapt_<n>` on hg19, which no build here
+serves. `shell/generate_rowsweep.sh` now emits the same 317-variant callset over
+the standard `chr22_mask:124000-143000` window at six sample counts, so the only
+thing varying across cells is rows. Its **URL form** was a `session=spec-…`
+object no runner here uses; it now opens tracks the way `runner.ts` does. And
+its **instrument** was the vsync-paced rAF gap, which floors at 16.7 ms:
+`--disable-gpu-vsync --disable-frame-rate-limit` are now passed by default, with
+`--vsync=on` to get the paced instrument back for comparison.
+
+What it still needs is **an idle box**. Validation runs on 2026-08-11 sat at load
+50–65, where the frame column measures contention rather than rendering: at 100
+rows the frame median moved 10.4 → 17.4 ms across runs minutes apart. Ratios
+across row counts are the robust part, and the runner now interleaves the sizes
+and alternates their order pass to pass so that drift cannot align with row
+count — but no output has been kept as a result, on purpose. Check
+`pgrep -c claude` before believing anything it prints.
 
 ## Builds compared
 
