@@ -1,0 +1,127 @@
+{
+  "version": "5.2.1",
+  "rounds": 5,
+  "inner": 7,
+  "rows": [
+    {
+      "case": "200 genes sparse",
+      "genes": 200,
+      "shape": "sparse",
+      "mode": "parse",
+      "eager": 6.0393,
+      "lazy": 5.1026,
+      "ratio": 1.1835730803903892,
+      "identical": true
+    },
+    {
+      "case": "200 genes sparse",
+      "genes": 200,
+      "shape": "sparse",
+      "mode": "reads",
+      "eager": 6.288,
+      "lazy": 6.4241,
+      "ratio": 0.9788141529552778,
+      "identical": true
+    },
+    {
+      "case": "1000 genes sparse",
+      "genes": 1000,
+      "shape": "sparse",
+      "mode": "parse",
+      "eager": 43.0333,
+      "lazy": 28.6848,
+      "ratio": 1.5002126561802767,
+      "identical": true
+    },
+    {
+      "case": "1000 genes sparse",
+      "genes": 1000,
+      "shape": "sparse",
+      "mode": "reads",
+      "eager": 32.5695,
+      "lazy": 29.9895,
+      "ratio": 1.0860301105386885,
+      "identical": true
+    },
+    {
+      "case": "5000 genes sparse",
+      "genes": 5000,
+      "shape": "sparse",
+      "mode": "parse",
+      "eager": 166.0845,
+      "lazy": 130.0232,
+      "ratio": 1.2773451199478245,
+      "identical": true
+    },
+    {
+      "case": "5000 genes sparse",
+      "genes": 5000,
+      "shape": "sparse",
+      "mode": "reads",
+      "eager": 179.0224,
+      "lazy": 153.8463,
+      "ratio": 1.1636444945377302,
+      "identical": true
+    },
+    {
+      "case": "200 genes rich",
+      "genes": 200,
+      "shape": "rich",
+      "mode": "parse",
+      "eager": 20.2195,
+      "lazy": 9.6956,
+      "ratio": 2.0854305045587687,
+      "identical": true
+    },
+    {
+      "case": "200 genes rich",
+      "genes": 200,
+      "shape": "rich",
+      "mode": "reads",
+      "eager": 21.0951,
+      "lazy": 18.5809,
+      "ratio": 1.1353109913943888,
+      "identical": true
+    },
+    {
+      "case": "1000 genes rich",
+      "genes": 1000,
+      "shape": "rich",
+      "mode": "parse",
+      "eager": 107.0548,
+      "lazy": 56.299,
+      "ratio": 1.9015399918293399,
+      "identical": true
+    },
+    {
+      "case": "1000 genes rich",
+      "genes": 1000,
+      "shape": "rich",
+      "mode": "reads",
+      "eager": 98.7123,
+      "lazy": 94.7417,
+      "ratio": 1.0419097398505621,
+      "identical": true
+    },
+    {
+      "case": "5000 genes rich",
+      "genes": 5000,
+      "shape": "rich",
+      "mode": "parse",
+      "eager": 572.3278,
+      "lazy": 260.6898,
+      "ratio": 2.1954361083556013,
+      "identical": true
+    },
+    {
+      "case": "5000 genes rich",
+      "genes": 5000,
+      "shape": "rich",
+      "mode": "reads",
+      "eager": 494.8923,
+      "lazy": 428.6015,
+      "ratio": 1.1546676808177292,
+      "identical": true
+    }
+  ]
+}

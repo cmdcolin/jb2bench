@@ -9,6 +9,15 @@ data/*.cram
 data/*.cram.crai
 data/*.bw
 
+# Gene/transcript/exon GFF3 for the ecosystem GFF3 benchmark, ~60 MB.
+# Regenerate with shell/generate_gff3.sh, which needs nothing but node — the
+# records come from a seeded RNG, so every machine gets byte-identical files.
+# Generated rather than cut from a real annotation for a second reason too:
+# concatenating a real GFF3 to size it up does not work, because ids repeat
+# across the copies and every duplicate child attaches to the first parent
+# carrying its id, deepening the tree instead of lengthening the file.
+data/features.*.gff3
+
 # Multi-sample VCFs for the ecosystem VCF benchmark, ~37 MB. Regenerate with
 # shell/generate_variants.sh, which needs nothing but node — the records come
 # from a seeded RNG, so every machine gets byte-identical files.

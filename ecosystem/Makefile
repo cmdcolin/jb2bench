@@ -7,7 +7,7 @@
 # libraries that return different records is not a comparison, so the gate runs
 # first and a failure stops the run.
 
-.PHONY: all bench setup install typecheck verify time report scan clean distclean
+.PHONY: all bench setup install typecheck verify time report scan gff3 clean distclean
 
 all: bench
 
@@ -43,6 +43,15 @@ report:
 # shows to be a 1.09x gain. See the header of scan.ts.
 scan: install setup
 	node --experimental-strip-types scan.ts
+
+# gff-nostream eager vs lazy attribute parsing. Out of `time` for the same
+# reason `scan` is, and more so: the eager parser's garbage is still on the heap
+# when the lazy arm runs, so sharing a process charges the lazy arm for it. In
+# one process this comparison reported 9.6x where process isolation says 2.2x.
+# Needs no cloned builds — both arms call different functions of the installed
+# release — but it does need ../shell/generate_gff3.sh to have run.
+gff3: install
+	node --experimental-strip-types gff3-lazy.ts
 
 bench: verify time report
 

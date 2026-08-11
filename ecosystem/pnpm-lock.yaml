@@ -8,6 +8,9 @@ importers:
 
   .:
     devDependencies:
+      gff-nostream:
+        specifier: 5.2.1
+        version: 5.2.1
       typescript:
         specifier: ^5.9.3
         version: 5.9.3
@@ -195,6 +198,9 @@ packages:
     resolution: {integrity: sha512-5xoDfX+fL7faATnagmWPpbFtwh/R77WmMMqqHGS65C3vvB0YHrgF+B1YmZ3441tMj5n63k0212XNoJwzlhffQw==}
     engines: {node: ^8.16.0 || ^10.6.0 || >=11.0.0}
     os: [darwin]
+
+  gff-nostream@5.2.1:
+    resolution: {integrity: sha512-ZeGFf3DE4+md6vNz6JRVd915I9C0btqf1Tv5yEDkGYE1OHOikJkD9CKxZ4Ykit8bWcfoDeTC4Szn8ck5+yea8w==}
 
   lightningcss-android-arm64@1.33.0:
     resolution: {integrity: sha512-gEpRTalKdosp4Bb8qWtc2iOgE5SeIHlpS1up9bFq2wAyYhl1UdTObYiHe98zEM9SQvSoqQZ1IQD0JNpg3Ml5pg==}
@@ -547,6 +553,8 @@ snapshots:
 
   fsevents@2.3.3:
     optional: true
+
+  gff-nostream@5.2.1: {}
 
   lightningcss-android-arm64@1.33.0:
     optional: true

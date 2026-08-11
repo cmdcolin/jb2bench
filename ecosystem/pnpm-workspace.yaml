@@ -1,0 +1,2 @@
+minimumReleaseAgeExclude:
+  - gff-nostream@5.2.1

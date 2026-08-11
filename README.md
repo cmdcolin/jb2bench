@@ -6,8 +6,8 @@ Benchmarks for JBrowse 2, at two layers:
   interaction, comparing the `webgl-poc` branch (GPU/WebGL2 renderer) against
   released versions (old block renderer). That is what this directory measures.
 - **The parser libraries underneath it** — `@gmod/bam`, `cram-js`,
-  `bgzf-filehandle`, `@gmod/bbi`, `@gmod/vcf`, comparing the versions JBrowse 2
-  shipped at the 2023 paper against current releases. That lives in
+  `bgzf-filehandle`, `@gmod/bbi`, `@gmod/vcf`, `gff-nostream`, comparing the
+  versions JBrowse 2 shipped at the 2023 paper against current releases. That lives in
   [`ecosystem/`](ecosystem/README.md) and has its own README.
 
 Both layers read the same corpus in `data/`, so the parse numbers and the render
@@ -48,6 +48,7 @@ Every number lives in a file; nothing is summarized only here.
 | [`results/crosstool.md`](results/crosstool.md) | how does the render time compare against igv.js? |
 | [`ecosystem/README.md`](ecosystem/README.md) | how much faster did the parser libraries get since 2023? |
 | [`ecosystem/results/vcf-scan.md`](ecosystem/results/vcf-scan.md) | what did the @gmod/vcf 7.2.0 genotype-scan rewrite buy? |
+| [`ecosystem/results/gff3-lazy.md`](ecosystem/results/gff3-lazy.md) | is deferring GFF3 attribute parsing worth it, and to whom? |
 
 ## The corpus
 

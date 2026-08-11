@@ -14,6 +14,7 @@ the same reason the render benchmarks do.
 ```bash
 make bench     # the whole thing
 make scan      # only the @gmod/vcf genotype-scan before/after
+make gff3      # only the gff-nostream eager-vs-lazy attribute comparison
 ```
 
 `make bench` clones and builds every library version named in `versions.json` (a
@@ -29,6 +30,7 @@ is also runnable alone:
 | `make time` | the timings | `results/bench.json` |
 | `make report` | markdown + LaTeX from the JSON; measures nothing | `README.md`, `results/ecosystem.md`, `results/paper/*.tex` |
 | `make scan` | the `@gmod/vcf` v7.1.1 → v7.2.0 scan, one process per side | `results/vcf-scan.{md,json}` |
+| `make gff3` | `gff-nostream` eager vs lazy attributes, one process per side | `results/gff3-lazy.{md,json}` |
 | `make clean` | drop `results/` | |
 | `make distclean` | also drop `.libs/` and `node_modules/` | |
 
@@ -134,7 +136,9 @@ The three genotype readings answer three different questions:
 - **`results/vcf-scan.md`** (`make scan`) — v7.1.1 against v7.2.0 through the
   identical `processGenotypes` API, isolating the scan rewrite alone.
 
-### The scan benchmark runs one process per side
+### Two benchmarks run one process per side
+
+`make scan` and `make gff3` both do, for related reasons.
 
 `make bench` loads both library builds into one V8, so every call site they share
 goes megamorphic and both sides get slower — not equally. Across a 6x–45x gap
@@ -144,6 +148,22 @@ regression, and the same code with one process per side is **1.09x faster**.
 `make scan` therefore spawns an arm per side, alternates them so machine drift
 lands on both, and carries a checksum of the reported genotype ranges across the
 process boundary so a timing is never printed for two sides that disagree.
+
+`make gff3` needs the same isolation for a different leak, and a bigger one. Its
+eager arm allocates an object and a string per attribute per feature, and that
+garbage is still on the heap when the lazy arm runs, so the lazy arm is charged
+GC for work the eager arm did. In one process the parse comparison reported
+**9.6x**; with a process per arm it is **2.2x**. Heap does not wash out with
+alternation the way call-site shape does.
+
+That benchmark also carries the other way to get a comparison wrong, which cost
+more than the process sharing did: **its corpus is generated, because scaling a
+GFF3 fixture by concatenating a real file does not work.** GFF3 ids are not
+unique across copies, so duplicated children all attach to the first parent
+carrying their id — 12 copies of a GENCODE excerpt gave 233 subfeatures per
+top-level feature against 27 in the generated corpus and 12 in real TAIR10. Deep
+trees flatter whichever side avoids per-subfeature work, and that fixture
+reported 3.03x end-to-end where a realistic one says 1.29x.
 
 ## Corpus
 
