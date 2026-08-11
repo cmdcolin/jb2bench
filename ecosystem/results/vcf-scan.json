@@ -1,0 +1,60 @@
+{
+  "rounds": 7,
+  "inner": 9,
+  "results": [
+    {
+      "case": "100 samples gtonly",
+      "samples": 100,
+      "shape": "gtonly",
+      "old": 1.342,
+      "new": 1.3114,
+      "ratio": 1.0233338416958977,
+      "identical": true
+    },
+    {
+      "case": "1000 samples gtonly",
+      "samples": 1000,
+      "shape": "gtonly",
+      "old": 7.3791,
+      "new": 6.8498,
+      "ratio": 1.0772723291190984,
+      "identical": true
+    },
+    {
+      "case": "3000 samples gtonly",
+      "samples": 3000,
+      "shape": "gtonly",
+      "old": 19.7304,
+      "new": 18.1525,
+      "ratio": 1.0869246660239635,
+      "identical": true
+    },
+    {
+      "case": "100 samples wide",
+      "samples": 100,
+      "shape": "wide",
+      "old": 3.4799,
+      "new": 1.6073,
+      "ratio": 2.1650594164126176,
+      "identical": true
+    },
+    {
+      "case": "1000 samples wide",
+      "samples": 1000,
+      "shape": "wide",
+      "old": 29.292,
+      "new": 9.7559,
+      "ratio": 3.002490800438709,
+      "identical": true
+    },
+    {
+      "case": "3000 samples wide",
+      "samples": 3000,
+      "shape": "wide",
+      "old": 86.1978,
+      "new": 29.888,
+      "ratio": 2.884027034261242,
+      "identical": true
+    }
+  ]
+}

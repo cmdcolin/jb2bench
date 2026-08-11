@@ -11,11 +11,19 @@
     "jbrowse-components pins at 2023-08-12 (rev 6fb9daa575):",
     "  plugins/alignments: @gmod/bam ^2.0.0, @gmod/cram ^1.7.1",
     "  plugins/wiggle:     @gmod/bbi ^4.0.0",
-    "  core:               @gmod/bgzf-filehandle ^1.4.3"
+    "  plugins/variants:   @gmod/vcf ^5.0.9",
+    "  core:               @gmod/bgzf-filehandle ^1.4.3",
+    "",
+    "vcf-js appears twice, on two different axes. 'vcf-js' is the 2023-vs-current",
+    "comparison every other entry makes. 'vcf-js-scan' is a single-release",
+    "before/after, v7.1.1 against v7.2.0, isolating the genotype-scan rewrite that",
+    "landed in 7.2.0 — a change whose whole effect is inside the per-sample loop",
+    "and would otherwise be invisible inside a two-major-version gap."
   ],
   "libraries": [
     {
       "name": "bam-js",
+      "rowPrefix": "bam ",
       "package": "@gmod/bam",
       "repo": "https://github.com/GMOD/bam-js",
       "old": {
@@ -29,6 +37,7 @@
     },
     {
       "name": "cram-js",
+      "rowPrefix": "cram ",
       "package": "@gmod/cram",
       "repo": "https://github.com/GMOD/cram-js",
       "old": {
@@ -53,6 +62,7 @@
     },
     {
       "name": "bgzf-filehandle",
+      "rowPrefix": "bgzf ",
       "package": "@gmod/bgzf-filehandle",
       "repo": "https://github.com/GMOD/bgzf-filehandle",
       "old": {
@@ -66,6 +76,7 @@
     },
     {
       "name": "bbi-js",
+      "rowPrefix": "bigwig ",
       "package": "@gmod/bbi",
       "repo": "https://github.com/GMOD/bbi-js",
       "old": {
@@ -75,6 +86,34 @@
       "new": {
         "tag": "v10.0.2",
         "sha": "b7e0478585"
+      }
+    },
+    {
+      "name": "vcf-js",
+      "rowPrefix": "vcf ",
+      "package": "@gmod/vcf",
+      "repo": "https://github.com/GMOD/vcf-js",
+      "old": {
+        "tag": "v5.0.9",
+        "sha": "06916457f6"
+      },
+      "new": {
+        "tag": "v7.2.0",
+        "sha": "162d85e781"
+      }
+    },
+    {
+      "name": "vcf-js-scan",
+      "package": "@gmod/vcf",
+      "repo": "https://github.com/GMOD/vcf-js",
+      "axis": "scan",
+      "old": {
+        "tag": "v7.1.1",
+        "sha": "19daaa0b18"
+      },
+      "new": {
+        "tag": "v7.2.0",
+        "sha": "162d85e781"
       }
     }
   ],

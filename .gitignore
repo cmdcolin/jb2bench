@@ -9,6 +9,11 @@ data/*.cram
 data/*.cram.crai
 data/*.bw
 
+# Multi-sample VCFs for the ecosystem VCF benchmark, ~37 MB. Regenerate with
+# shell/generate_variants.sh, which needs nothing but node — the records come
+# from a seeded RNG, so every machine gets byte-identical files.
+data/variants.*.vcf
+
 # jbrowse-web builds under test. Each is a deployed build plus symlinked copies
 # of the alignment data; stage them per README ("Builds compared").
 builds/

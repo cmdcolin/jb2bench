@@ -7,7 +7,7 @@
 # libraries that return different records is not a comparison, so the gate runs
 # first and a failure stops the run.
 
-.PHONY: all bench setup install typecheck verify time report clean distclean
+.PHONY: all bench setup install typecheck verify time report scan clean distclean
 
 all: bench
 
@@ -35,6 +35,14 @@ time: install setup
 
 report:
 	node --experimental-strip-types report.ts
+
+# The @gmod/vcf v7.1.1 -> v7.2.0 genotype-scan before/after, kept out of `time`
+# because it needs one process per side. vitest runs both sides of a comparison
+# in one V8, which is fine for the 6x-45x gaps `time` measures and wrong for a
+# few percent: in-process, one case reported a regression that process isolation
+# shows to be a 1.09x gain. See the header of scan.ts.
+scan: install setup
+	node --experimental-strip-types scan.ts
 
 bench: verify time report
 

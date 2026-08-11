@@ -16,6 +16,16 @@ export default defineConfig({
     fileParallelism: false,
     maxWorkers: 1,
     benchmark: {
+      // Only this directory's own benches. `.libs/` holds full clones of the
+      // libraries under test, and several of them ship `*.bench.ts` of their
+      // own — vcf-js has benchmark/parse.bench.ts and a
+      // master-vs-current.bench.ts that imports build outputs (esm_branch1/,
+      // esm_branch2/) which exist only in that repo's own two-branch workflow
+      // and not in a tag clone. Collected by the default glob, those add 60+
+      // groups of someone else's benchmark to results/bench.json and fail the
+      // run outright. The default exclude covers node_modules and dist, neither
+      // of which `.libs/` is.
+      include: ['*.bench.ts'],
       outputJson: 'results/bench.json',
       reporters: ['default'],
     },

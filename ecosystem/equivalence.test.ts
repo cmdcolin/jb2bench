@@ -31,6 +31,10 @@ import {
   unzip as oldNodeUnzip,
 } from './.libs/bgzf-filehandle/old/esm/unzip.js'
 import { unzip as newUnzip } from './.libs/bgzf-filehandle/new/esm/unzip.js'
+import OldVcf from './.libs/vcf-js/old/esm/index.js'
+import NewVcf from './.libs/vcf-js/new/esm/index.js'
+import PrevVcf from './.libs/vcf-js-scan/old/esm/index.js'
+import ScanVcf from './.libs/vcf-js-scan/new/esm/index.js'
 
 import {
   BAM_CASES,
@@ -41,7 +45,9 @@ import {
   OLD_CRAM_OPTS,
   REF,
   START,
+  VCF_CASES,
   seqFetch,
+  vcfParts,
 } from './lib/corpus.ts'
 
 interface Item {
@@ -259,6 +265,85 @@ test('bgzf decompresses to the same bytes', async () => {
       lostInterior: 0,
     })
   }
+})
+
+// VCF is a stricter gate than the alignment ones, and can afford to be: there
+// is no window-boundary convention to forgive, because every line handed to the
+// parser is a record it must parse. So the sides have to agree on the genotype
+// of every sample at every site, exactly.
+//
+// Both readings are checked. GENOTYPES() against v5.0.9's SAMPLES[k].GT is the
+// pair the headline benchmark times, and it is the one that could silently
+// diverge, since the two arrive at the genotype by different code. The
+// processGenotypes pair is checked as ranges resolved to strings, which is what
+// catches the 7.2.0 change of offset base: the ranges are into the whole line
+// now rather than into a sliced-out `rest`, so a consumer resolving them against
+// the wrong string would produce garbage here rather than in production.
+test.each(VCF_CASES)('vcf $label agrees', ({ label, file, samples }) => {
+  const { header, lines } = vcfParts(file)
+  const oldParser = new (OldVcf as any)({ header })
+  const newParser = new (NewVcf as any)({ header })
+  const prevParser = new (PrevVcf as any)({ header })
+  const scanParser = new (ScanVcf as any)({ header })
+
+  let compared = 0
+  let genotypeDiffs = 0
+  let scanDiffs = 0
+
+  for (const [i, line] of lines.entries()) {
+    // v5.0.9 renders GT as a one-element array of the genotype string
+    const oldSamples = oldParser.parseLine(line).SAMPLES
+    const current = newParser.parseLine(line).GENOTYPES()
+
+    for (const name in oldSamples) {
+      const was = oldSamples[name].GT?.[0] ?? ''
+      const now = current[name] ?? ''
+      if (was !== now) {
+        if (genotypeDiffs < 3) {
+          console.log(`vcf ${label} line ${i} ${name}: 5.0.9=${was} 7.2.0=${now}`)
+        }
+        genotypeDiffs++
+      }
+      compared++
+    }
+
+    // and the two 7.x scans, resolved through whatever string each reports
+    const collect = (parser: any) => {
+      const out: string[] = []
+      parser
+        .parseLine(line)
+        .processGenotypes((str: string, a: number, b: number) =>
+          out.push(str.slice(a, b)),
+        )
+      return out
+    }
+    const before = collect(prevParser)
+    const after = collect(scanParser)
+    if (before.join(',') !== after.join(',')) {
+      scanDiffs++
+    }
+  }
+
+  console.log(
+    `vcf ${label}: ${lines.length} sites x ${samples} samples, ` +
+      `${compared} genotypes compared, ` +
+      `${genotypeDiffs === 0 ? 'identical' : `DIFFS=${genotypeDiffs}`}, ` +
+      `scan ${scanDiffs === 0 ? 'identical' : `DIFFS=${scanDiffs}`}`,
+  )
+
+  deltas.push({
+    kind: 'vcf',
+    case: label,
+    old: compared,
+    new: compared,
+    gained: 0,
+    lostBoundary: 0,
+    lostInterior: genotypeDiffs + scanDiffs,
+  })
+
+  expect(compared).toBe(lines.length * samples)
+  expect(genotypeDiffs).toBe(0)
+  expect(scanDiffs).toBe(0)
 })
 
 test('write the equivalence report last', () => {

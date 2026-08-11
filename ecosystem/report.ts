@@ -104,6 +104,22 @@ for (const g of unpaired) {
   mdRows.push(`| ${g.name} | (${g.benches.length} benches, not a pair) | | | |`)
 }
 
+// A library named in versions.json with no rows in bench.json was added after
+// the last `make time`. Derived rather than written into the template as prose:
+// prose would have to be deleted by hand once the gap closed, and would not be,
+// so the docs would go on claiming a gap that no longer existed. This line
+// removes itself on the next full run.
+const missingLibs = versions.libraries.filter(
+  (l: any) => l.rowPrefix && !rows.some(r => r.name.startsWith(l.rowPrefix)),
+)
+const staleNote = missingLibs.length
+  ? `\n> **${missingLibs.map((l: any) => `\`${l.package}\``).join(' and ')} ` +
+    `${missingLibs.length === 1 ? 'is' : 'are'} missing from this table.** ` +
+    `${missingLibs.length === 1 ? 'It was' : 'They were'} added to ` +
+    '`versions.json` after the last `make time`; re-run it (or `make bench`) to ' +
+    'fill the rows in.\n'
+  : ''
+
 let equivalence = '\n(no equivalence.json; run `make verify` first)\n'
 if (equivalenceData) {
   const changed = equivalenceData.deltas.filter(
@@ -156,7 +172,7 @@ paper; \`new\` is the current release.
 | case | 2023 | current | speedup | time cut |
 | --- | --- | --- | --- | --- |
 ${mdRows.join('\n')}
-
+${staleNote}
 ## Do both sides return the same thing?
 
 Checked by \`equivalence.test.ts\`, which runs before these timings and fails if
@@ -333,12 +349,25 @@ const bigwigDropped = (() => {
   return `\`${start}-${end}\``
 })()
 
+// Entries carrying an `axis` are not on the 2023-vs-current axis this table is
+// about — `vcf-js-scan` is a single-release before/after — so they are listed
+// under it rather than in it, where a reader would take them for a 2023 pin.
 const versionsTable = [
   '| library | 2023 | current |',
   '| --- | --- | --- |',
-  ...versions.libraries.map(
-    (l: any) => `| \`${l.package}\` | ${l.old.tag} | ${l.new.tag} |`,
-  ),
+  ...versions.libraries
+    .filter((l: any) => !l.axis)
+    .map((l: any) => `| \`${l.package}\` | ${l.old.tag} | ${l.new.tag} |`),
+  '',
+  ...versions.libraries
+    .filter((l: any) => l.axis === 'scan')
+    .map(
+      (l: any) =>
+        `Plus one narrower pair, on its own axis: \`${l.package}\` ` +
+        `${l.old.tag} against ${l.new.tag}, which isolates the genotype-scan ` +
+        `rewrite. Measured by \`make scan\`, reported in ` +
+        '[`results/vcf-scan.md`](results/vcf-scan.md).',
+    ),
 ].join('\n')
 
 const zarrTable = [
@@ -352,6 +381,7 @@ const speedupTable = [
   '| case | 2023 | current | speedup |',
   '| --- | --- | --- | --- |',
   ...rows.map(r => `| ${r.name} | ${fmt(r.old.mean)} ms | ${fmt(r.new.mean)} ms | ${r.ratio.toFixed(2)}x |`),
+  staleNote,
 ].join('\n')
 
 const bindings = new Map<string, string>([

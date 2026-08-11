@@ -6,13 +6,50 @@ layer underneath it: the GMOD parser libraries JBrowse depends on, comparing the
 versions JBrowse 2 shipped at the time of the 2023 paper against the current
 releases.
 
+## How to run it
+
+Nothing here needs a build, a server or a GPU. It does need an idle machine, for
+the same reason the render benchmarks do.
+
 ```bash
-make bench
+make bench     # the whole thing
+make scan      # only the @gmod/vcf genotype-scan before/after
 ```
 
-That clones and builds eight library versions (a few minutes, once), runs the
-equivalence gate, runs the timings, and writes `results/ecosystem.md` plus the
-LaTeX the paper reads.
+`make bench` clones and builds every library version named in `versions.json` (a
+few minutes, the first time), runs the equivalence gate, runs the timings, and
+writes `results/ecosystem.md` plus the LaTeX the paper reads. Each of its steps
+is also runnable alone:
+
+| command | what it does | writes |
+| --- | --- | --- |
+| `./setup.sh` | clone + build every version in `versions.json` | `.libs/`, `.libs/manifest.txt` |
+| `./setup.sh --force` | re-clone and rebuild all of them | same |
+| `make verify` | the equivalence gate — do both sides return the same records? | `results/equivalence.json` |
+| `make time` | the timings | `results/bench.json` |
+| `make report` | markdown + LaTeX from the JSON; measures nothing | `README.md`, `results/ecosystem.md`, `results/paper/*.tex` |
+| `make scan` | the `@gmod/vcf` v7.1.1 → v7.2.0 scan, one process per side | `results/vcf-scan.{md,json}` |
+| `make clean` | drop `results/` | |
+| `make distclean` | also drop `.libs/` and `node_modules/` | |
+
+`make bench` is `verify` then `time` then `report`, and the dependency on
+`verify` is deliberate: a timing comparison between two libraries that return
+different records is not a comparison, so the gate runs first and a failure stops
+the run.
+
+**`README.md` here is generated. Edit `README.template.md`.** `make report` is
+what regenerates it, and since it measures nothing it is the cheap way to change
+the prose around a number without re-measuring the number.
+
+The corpus has to exist first. The alignment cases read the files
+`../shell/generate_alignments.sh` writes; the VCF cases read
+`../shell/generate_variants.sh`, which needs nothing but node and takes a couple
+of seconds.
+
+`make scan` is deliberately not part of `make bench` — it runs one process per
+side rather than both in one vitest process, which matters only for comparisons
+in the few-percent range. The number that forced that split is
+[below](#the-scan-benchmark-runs-one-process-per-side).
 
 ## What is compared
 
@@ -22,6 +59,9 @@ LaTeX the paper reads.
 | `@gmod/cram` | v1.7.1 | v10.4.0 |
 | `@gmod/bgzf-filehandle` | v1.4.3 | v6.3.2 |
 | `@gmod/bbi` | v4.0.0 | v10.0.2 |
+| `@gmod/vcf` | v5.0.9 | v7.2.0 |
+
+Plus one narrower pair, on its own axis: `@gmod/vcf` v7.1.1 against v7.2.0, which isolates the genotype-scan rewrite. Measured by `make scan`, reported in [`results/vcf-scan.md`](results/vcf-scan.md).
 
 The 2023 column is not a guess. It is the pin read out of `jbrowse-components`
 at its last commit before 2023-08-15 (rev `6fb9daa575`), which is the tree
@@ -59,6 +99,9 @@ the JBrowse 2 paper describes. Exact tags and commit SHAs are in
 | cram 1000x shortread | 3419 ms | 606 ms | 5.64x |
 | cram 1000x longread | 15907 ms | 1280 ms | 12.43x |
 
+> **`@gmod/vcf` is missing from this table.** It was added to `versions.json` after the last `make time`; re-run it (or `make bench`) to fill the rows in.
+
+
 The gains are largest where the data is largest: 1000x long read BAM falls from
 20.4 s to 2.8 s, and the same case in CRAM from
 15.9 s to 1.3 s.
@@ -69,13 +112,57 @@ BigWig is the exception: 1.07x to 1.32x faster at
 case may be too small to be informative rather than a regression, but it is
 reported as measured.
 
+### The VCF cases, and why there are two shapes
+
+`@gmod/vcf` is measured on two FORMAT layouts because they take different paths
+through the genotype scan, and reporting one would misdescribe the other.
+
+- **`gtonly`** — `FORMAT=GT`, the 1000 Genomes phase 3 shape. Nothing sits
+  between one sample's genotype and the next.
+- **`wide`** — `FORMAT=GT:AD:DP:GQ:PL`, a joint-called cohort. GT is first and
+  every other field has to be stepped over to reach the next sample.
+
+The three genotype readings answer three different questions:
+
+- **`vcf genotypes`** — every sample's GT, through the cheapest call each version
+  offers. v5.0.9 had only `SAMPLES`, which parses *every* FORMAT field of every
+  sample to reach one; v7.2.0 has `GENOTYPES()`. That the new call is cheaper
+  partly because the API grew is the point, not a confound — it is what a
+  JBrowse upgrade actually buys.
+- **`vcf SAMPLES`** — the same whole-record parse on both sides, so the API
+  change is not doing the work.
+- **`results/vcf-scan.md`** (`make scan`) — v7.1.1 against v7.2.0 through the
+  identical `processGenotypes` API, isolating the scan rewrite alone.
+
+### The scan benchmark runs one process per side
+
+`make bench` loads both library builds into one V8, so every call site they share
+goes megamorphic and both sides get slower — not equally. Across a 6x–45x gap
+that is noise. At a few percent it inverts the answer: run in-process, the
+3000-sample GT-only scan case reported the new release at **0.88x**, a
+regression, and the same code with one process per side is **1.09x faster**.
+`make scan` therefore spawns an arm per side, alternates them so machine drift
+lands on both, and carries a checksum of the reported genotype ranges across the
+process boundary so a timing is never printed for two sides that disagree.
+
 ## Corpus
 
-The same files and the same window as the render benchmarks: simulated
-alignments over a 250 kb slice of hg19 chr22, at 20x / 200x / 1000x, short reads
-(wgsim) and long (pbsim), window `chr22_mask:124000-143000` (19 kb). They are
-regenerated by `../shell/generate_alignments.sh`. Using one corpus for both
-layers means the parse numbers and the render numbers describe the same bytes.
+The alignment cases use the same files and the same window as the render
+benchmarks: simulated alignments over a 250 kb slice of hg19 chr22, at 20x /
+200x / 1000x, short reads (wgsim) and long (pbsim), window
+`chr22_mask:124000-143000` (19 kb). They are regenerated by
+`../shell/generate_alignments.sh`. Using one corpus for both layers means the
+parse numbers and the render numbers describe the same bytes.
+
+The VCF cases need genotypes, which the alignment files do not carry, so they get
+their own corpus over the same contig and window: 317 variants across
+`chr22_mask:124000-143000`, at 100 / 1000 / 3000 samples, in both FORMAT shapes.
+`../shell/generate_variants.sh` writes them, and unlike the alignments it needs
+no external tools — the records come from a seeded RNG, so every machine gets
+byte-identical files. The allele-frequency spectrum, the 1.5% missing rate and
+the one-site-in-25 multiallelic rate are there because the scan's cost depends on
+how many *distinct* genotype strings a site carries; a file of all `0|0` would
+memoize perfectly and measure nothing.
 
 ## What makes it reproducible
 

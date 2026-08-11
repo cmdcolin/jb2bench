@@ -6,8 +6,8 @@ Benchmarks for JBrowse 2, at two layers:
   interaction, comparing the `webgl-poc` branch (GPU/WebGL2 renderer) against
   released versions (old block renderer). That is what this directory measures.
 - **The parser libraries underneath it** — `@gmod/bam`, `cram-js`,
-  `bgzf-filehandle`, `@gmod/bbi`, comparing the versions JBrowse 2 shipped at
-  the 2023 paper against current releases. That lives in
+  `bgzf-filehandle`, `@gmod/bbi`, `@gmod/vcf`, comparing the versions JBrowse 2
+  shipped at the 2023 paper against current releases. That lives in
   [`ecosystem/`](ecosystem/README.md) and has its own README.
 
 Both layers read the same corpus in `data/`, so the parse numbers and the render
@@ -24,7 +24,7 @@ numbers describe the same bytes.
 | `scripts/crosstool/` | the igv.js comparison: paint-quiescence profiler and matrix |
 | `crosstool/` | the igv.js harness page, plus symlinks to `data/` and the igv bundle |
 | `scripts/probe.ts`, `scripts/gpucheck.ts` | dev helpers: render testids, GPU backend |
-| `shell/` | regenerate the corpus, load it into the builds |
+| `shell/` | regenerate the corpus (alignments and variants), load it into the builds |
 | `builds/` | the jbrowse-web builds under test (untracked, staged by hand) |
 | `results/` | every measured table, plus the raw JSON and run logs behind it |
 | `flame/` | CPU profiles and the findings drawn from them |
@@ -47,6 +47,7 @@ Every number lives in a file; nothing is summarized only here.
 | [`flame/WORKER_FINDINGS.md`](flame/WORKER_FINDINGS.md) | which worker-side plugin optimizations are worth doing? |
 | [`results/crosstool.md`](results/crosstool.md) | how does the render time compare against igv.js? |
 | [`ecosystem/README.md`](ecosystem/README.md) | how much faster did the parser libraries get since 2023? |
+| [`ecosystem/results/vcf-scan.md`](ecosystem/results/vcf-scan.md) | what did the @gmod/vcf 7.2.0 genotype-scan rewrite buy? |
 
 ## The corpus
 
@@ -471,11 +472,39 @@ JSON — for when the prose around the numbers changes but the numbers do not.
 Without it, correcting a sentence in a generated file means either re-measuring
 for an hour or hand-editing a file the next run overwrites.
 
-For the parser-library benchmarks, which need no build and no server:
+For the parser-library benchmarks, which need no build, no server and no GPU:
 
 ```bash
-cd ecosystem && make bench
+cd ecosystem
+
+make bench     # the whole thing: setup + equivalence gate + timings + report
+make scan      # only the @gmod/vcf v7.1.1 -> v7.2.0 genotype-scan before/after
 ```
+
+`make bench` is four steps and each is runnable alone, which is what you want
+when only one of them is what you are iterating on:
+
+```bash
+./setup.sh          # clone + build every version in versions.json (minutes, once)
+./setup.sh --force  # re-clone and rebuild them all
+make verify         # the equivalence gate: do both sides return the same records?
+make time           # the timings           -> results/bench.json
+make report         # markdown + LaTeX from the JSON, measures nothing
+```
+
+`make report` is the `MODES=none` of this directory: it regenerates
+`ecosystem/README.md`, `results/ecosystem.md` and `results/paper/*.tex` from the
+JSON already on disk, so prose around a number can change without re-measuring.
+**`ecosystem/README.md` is generated — edit `ecosystem/README.template.md`.**
+
+`make scan` is separate from `make bench` because it runs one process per side
+rather than both in one vitest process. That matters only for comparisons in the
+few-percent range, which is what it measures; the reasoning and the number that
+forced it are in `ecosystem/README.md`.
+
+These are CPU benchmarks on the same box as everything else, so the idleness
+warnings above apply to them too — `make time` and `make scan` will both report
+whatever the machine was doing at the time.
 
 `pnpm typecheck` typechecks everything under `scripts/`. It is clean; keep it
 that way, since these scripts are run straight from source with
@@ -486,12 +515,18 @@ that way, since these scripts are run straight from source with
 ```bash
 ./shell/generate_alignments.sh   # needs wgsim, pbsim, minimap2, samtools
 ./shell/load_alignments.sh       # adds assembly + tracks to every builds/*
+./shell/generate_variants.sh     # needs nothing but node
 ```
 
 `generate_alignments.sh` works inside `data/` and rewrites everything there from
 `hg19mod.fa`. `load_alignments.sh` copies the assembly into each build and
 symlinks the alignments, so `builds/` stays small and every build serves the
 same bytes.
+
+`generate_variants.sh` writes the multi-sample VCFs the ecosystem VCF benchmark
+reads, over the same contig and window. It needs no external tools — the records
+come from a seeded RNG — so it is the one part of the corpus any checkout can
+reproduce byte-for-byte in a couple of seconds.
 
 ## Caveats worth attaching to any external claim
 
