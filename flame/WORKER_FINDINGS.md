@@ -252,8 +252,53 @@ they run in parallel, so the wall-clock contribution is ~88 ms.
 Worth keeping in mind for any future profile here: a thread that is not attached
 looks exactly like a thread that is cheap.
 
-**Still no modBAM fixture.** `shell/generate_alignments.sh` (pbsim/wgsim) emits
-no MM/ML tags, so the modification color mode cannot be traced at all. To
-benchmark it, add a fixture — an ONT 5mCG model output, or MM/ML synthesized
-onto the existing longread BAM — and a session that sets
-`colorBy: { type: 'modifications' }`.
+**~~Still no modBAM fixture~~ — built, and it immediately found the largest
+cost in this file.**
+
+`shell/generate_modbam.sh` stamps MM/ML onto the existing long-read alignments
+via `shell/add_modifications.js`: CpG-context 5mC, bimodal probabilities,
+seeded. Long-read only, since 5mC calling is an ONT/PacBio workflow. The tracks
+carry `displayDefaults.colorBy = { type: 'modifications' }`, so a profile enters
+the modification path with no interaction.
+
+The encoding is checked rather than assumed — a delta encoding is exactly the
+kind of thing that is off by one and still produces a file every tool accepts.
+`shell/verify_modifications.js` decodes MM back against the read sequence
+without reusing the generator's logic and asserts every named position is a CpG
+C: **841,420 calls, 0 bad** on the 200x fixture. htslib agrees independently —
+`samtools mpileup --output-mods` reports `[+m…]` calls, and puts forward-strand
+calls on the reference C with the reverse-strand reads' calls on the paired G,
+which is the signature of correct strand handling. (MM indexes the ORIGINAL
+read; BAM stores SEQ flipped to the reference strand, so a reverse-mapped read
+must be scanned as `revcomp(SEQ)`. Getting that wrong is invisible in the file.)
+
+### What the modification path costs
+
+`200x.longread.mod.bam`, the standard window, RPC worker, 3489 ms busy:
+
+| self | % of busy | frame |
+| ---: | ---: | --- |
+| 1142 ms | **32.6%** | `features/modCoverage/readBaseCounts.ts` — `computeReadBaseCounts` |
+| 512 ms | 14.6% | `features/modification/extract.ts` — `extractModifications` |
+| 149 ms | 4.3% | `packages/modifications-utils/getModPositions.ts` |
+| 61 ms | 1.7% | `shared/getMaxProbModAtEachPosition.ts` |
+| 59 ms | 1.7% | `shared/buildTooltipData.ts` (modifications) |
+
+So **over half the worker** is the modification path when it is on, and one
+function is a third of it — on a fixture of only 1037 reads. For comparison the
+dedupe, the largest thing this file has found until now, was 12.5%.
+
+`computeReadBaseCounts` builds the modifiable/detectable denominator by walking
+each read's CIGAR and, for every base of every `M`/`=`/`X` operation, probing
+`positions.has(pos)` — a `Set<number>` of the modified columns. Its comment is
+right that restricting to those columns keeps the *map writes* rare; the walk
+and the per-base Set probe are not restricted, and at ~50 kb reads × 1037 reads
+that is tens of millions of probes.
+
+The obvious lever, unmeasured: `positions` is a set of genomic coordinates over
+a known region, so a `Uint8Array` bitmap indexed by `pos - regionStart` replaces
+a hash probe per base with an array index. Worth doing the same way the dedupe
+was — measure it, do not assume it.
+
+Note this also retires the old file's "the two committed mod-path optimizations
+cannot be benchmarked here". They can now.

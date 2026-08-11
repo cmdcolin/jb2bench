@@ -59,6 +59,16 @@ except the reference is untracked and regenerable — roughly 750 MB.
   Tracked; it is the input everything else is derived from.
 - `*.bam` / `*.cram` (+ indexes) — simulated alignments at 20x / 200x / 1000x
   coverage, short reads (wgsim) and long reads (pbsim).
+- `*.longread.mod.bam` (+ indexes) — the long-read alignments with MM/ML
+  base-modification tags stamped on: CpG-context 5mC, bimodal probabilities,
+  seeded. Built by `shell/generate_modbam.sh` from the plain files, so a
+  mod-vs-plain comparison differs by the tags and nothing else, and checked by
+  `shell/verify_modifications.js`, which decodes MM back against each read
+  independently of the generator. 20x and 200x only — the tags grow a long read
+  by roughly a quarter, and 200x already carries 841k modification calls.
+  Until 2026-08-11 there was no modBAM here at all, so the base-modification
+  path was exercised by nothing; the first profile of it found one function
+  taking a third of the RPC worker (`flame/WORKER_FINDINGS.md`).
 - `*.bw` — BigWig coverage tracks at the same coverages. Unused by the
   alignments benchmark, but they are the corpus the GenomeSpy harness reads,
   since signal is the only workload a tool with no alignment track can share
@@ -70,11 +80,6 @@ except the reference is untracked and regenerable — roughly 750 MB.
 
 The benchmark window throughout is `chr22_mask:124000-143000` (19 kb), which
 matches the historical jb2profile region.
-
-A gap worth knowing: **there is no modBAM fixture.** `generate_alignments.sh`
-emits no MM/ML tags and `hg19mod.fa` is a masked reference, so the base
-modification code path is never exercised by anything here — see the end of
-`flame/WORKER_FINDINGS.md`.
 
 ## The benchmarks
 
