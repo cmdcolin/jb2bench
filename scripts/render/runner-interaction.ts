@@ -142,6 +142,7 @@ const cell = (r: Result) => {
 interface Saved {
   results?: Record<string, Record<Mode, Partial<Record<Role, Result>>>>
   measuredAt?: Partial<Record<Mode, string>>
+  builds?: Partial<Record<Role, string>>
 }
 const prior: Saved = fs.existsSync('results/interaction.json')
   ? (JSON.parse(fs.readFileSync('results/interaction.json', 'utf8')) as Saved)
@@ -203,9 +204,23 @@ fs.writeFileSync(
   JSON.stringify(
     {
       loc: LOC,
-      // record what each role actually was, so the JSON stays interpretable
-      // even if the ports get pointed at different builds later
-      builds: Object.fromEntries(builds.map(b => [b.role, b.name])),
+      // Record what each role actually was, so the JSON stays interpretable
+      // even if the ports get pointed at different builds later.
+      //
+      // Only roles measured *this* run may overwrite a recorded name. A
+      // MODES=none run measures nothing and exists to re-render prose, but it
+      // still resolves the ports, so without this guard it relabels last week's
+      // numbers with today's build names — and adds a `published` entry for a
+      // column that was never measured. That happened on 2026-08-11 and had to
+      // be reverted: the 2026-08-05 measurements were briefly attributed to a
+      // build that did not exist when they were taken. This is the same failure
+      // servedbuild.ts was written to prevent, arriving from the other side.
+      builds: {
+        ...prior.builds,
+        ...(MODES.length
+          ? Object.fromEntries(builds.map(b => [b.role, b.name]))
+          : {}),
+      },
       measuredAt,
       results,
     },
