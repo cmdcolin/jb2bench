@@ -93,7 +93,23 @@ frames (14 ms), and 93 ms spread thinly enough not to classify — the largest
 single one of those is 12 ms. The areas are first-match-wins over the frame's
 resolved path, so nothing is counted twice.
 
-## The one real lead: a dup guard that costs 15% of the worker
+## The one real lead: a dup guard that cost 15% of the worker — now fixed
+
+> **Done, 2026-08-11.** Keyed on the record's number instead of its id string.
+> Paired arms, alternating, one profile each per round: the dedupe plus the
+> `id()` it drove went from a median **12.5% of busy worker time to 5.9%**, with
+> no overlap between the arms across four rounds (old 11.6/12.5/13.4/11.2, new
+> 5.9/5.5/4.7/5.9). Isolated on 153,677 real fileOffsets from the fixture, the
+> dedupe itself is **3.19x** (178.7 → 63.2 ms).
+>
+> Note the 15.0% in the heading came from the single unpaired profile below; the
+> paired median is 12.5%, and that is the figure to quote. The residual 5.9% is
+> mostly `buildBaseFeatureData`, which needs the id string per feature for the
+> payload and was not touched.
+>
+> The guard was kept rather than deleted, and the section below says why — the
+> investigation that priced it also established it is not currently catching
+> anything.
 
 `filterChainFeatures` calls `dedupeById(features)` on every alignment render,
 and its own comment says why it is unconditional: it "applies in both pileup and
@@ -109,11 +125,31 @@ builds a fresh template literal. That is the 171 ms and the 75 ms, and a fair
 share of the 195 ms of GC behind them: **246 ms, 15% of busy worker time, to
 detect duplicates that are usually not there.**
 
-The shape of the fix is visible from the identity itself: within one call every
+**Is the guard catching anything?** Asked while pricing it, and the answer is
+no. `@gmod/bam`'s `blocksForRange` runs `optimizeChunks`, which absorbs a chunk
+already covered by its neighbour; a sweep of ~4800 index queries across the six
+fixtures found **zero overlapping chunk pairs**, including where the 5 MB merge
+cap fires — the only branch that looked like it could push an overlapping chunk,
+and it does fire here (spans reach 90 MB on 1000x.longread). Fetching the
+benchmark window on all six found **zero duplicate fileOffsets**, at up to
+153,677 records.
+
+The motivation that is genuinely gone is older than the comment's: block
+rendering fetched adjacent overlapping regions, so a feature spanning a boundary
+arrived twice. There are no blocks now, and one call means one region from one
+adapter.
+
+It was kept rather than deleted, because at the numeric price it is nearly free,
+because the failure it prevents is silent — a doubled coverage depth, not a
+crash — and because the class is not hypothetical: `@gmod/bam` hit it in its own
+mate path ("their records came back twice") and still keeps a `readIds` set
+there, keyed on `fileOffset`. Which is where the fix came from too.
+
+The shape of that fix was visible from the identity itself: within one call every
 feature comes from one adapter, so the `${adapter.id}-` prefix is constant and
 the whole key is carried by the numeric `fileOffset`. A `Set<number>` over that
-would do the same job with no string allocation. Two things to check before
-doing it, neither of which this profile answers:
+does the same job with no string allocation. Three things checked before doing
+it, none of which this profile answers:
 
 - `filterChainFeatures` is typed over `Feature`, not over the BAM feature, and
   the CRAM path reaches it too — but both already have a number behind the
@@ -127,11 +163,13 @@ doing it, neither of which this profile answers:
   and the `${adapter.id}-` half of the key distinguishes nothing.
 - The same function builds a second `Set` of `id()` strings (`keptIds`) further
   down, but only on the non-default filtered paths, so it is not in this trace.
-  Whatever identity the dedupe moves to, that one should move with it.
+  It moved to the same key, since the reasoning is identical.
 
-This is the item the old version of this file was looking for and did not have:
+This was the item the old version of this file was looking for and did not have:
 a cost that is large, in our code rather than a dependency, and paid on the
-default path rather than an opt-in mode.
+default path rather than an opt-in mode. It is worth noting how it was found —
+not by looking for it, but by re-profiling to check somebody else's stale
+verdicts, two of which turned out to be right.
 
 ## Verdicts on the previously profile-gated items
 
