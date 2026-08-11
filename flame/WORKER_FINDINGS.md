@@ -292,13 +292,29 @@ dedupe, the largest thing this file has found until now, was 12.5%.
 each read's CIGAR and, for every base of every `M`/`=`/`X` operation, probing
 `positions.has(pos)` — a `Set<number>` of the modified columns. Its comment is
 right that restricting to those columns keeps the *map writes* rare; the walk
-and the per-base Set probe are not restricted, and at ~50 kb reads × 1037 reads
+and the per-base Set probe are not restricted, and at ~49 kb mean read length
 that is tens of millions of probes.
 
-The obvious lever, unmeasured: `positions` is a set of genomic coordinates over
-a known region, so a `Uint8Array` bitmap indexed by `pos - regionStart` replaces
-a hash probe per base with an array index. Worth doing the same way the dedupe
-was — measure it, do not assume it.
+> **Fixed, 2026-08-11.** A `Uint8Array` over `[minPos, maxPos]` instead of the
+> Set, with each operation clamped to that span so the loop needs no bounds
+> test. Isolated on the real reads and columns: **402 ms → 158 ms, 2.54x**,
+> identical counts. In a paired profile: **33.2% → 20.8% of busy worker time**,
+> four alternating rounds, no overlap between the arms.
+>
+> The benchmark misled twice before settling, in opposite directions, and both
+> are worth knowing here:
+>
+> - The first harness put the clamp at 2.29x and the pair at 3.44x. It modelled
+>   the modified columns as confined to the 19 kb view while using reads that
+>   overhang it — but those overhanging reads are exactly what *contribute*
+>   columns out there, so the span always tracks the read extent (145 kb here),
+>   never the view. This is the same failure as the concatenated-GFF3 fixture in
+>   `ecosystem/results/gff3-lazy.md`: a corpus whose shape flatters one arm.
+> - Corrected, the clamp measured 1.01x as a way of skipping distant bases, so
+>   it was removed — and that made it **slower**, 2.20x against 2.54x. Its real
+>   value is that a clamped loop knows every position is in range and drops the
+>   per-base bounds test. Two different reasons to keep the same four lines, and
+>   only the second one is true.
 
 Note this also retires the old file's "the two committed mod-path optimizations
 cannot be benchmarked here". They can now.
