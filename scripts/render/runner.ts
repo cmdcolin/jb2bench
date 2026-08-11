@@ -18,10 +18,20 @@ const LOC = 'chr22_mask:124000-143000' // 19kb, matches historical jb2profile
 // Column headers come from what the ports are actually serving, not from a
 // hardcoded guess — see servedbuild.ts for why. The first entry is the build
 // under test, whatever it turns out to be, and the speedup column is against it.
+// 8004 is the version the 2023 paper describes. The other baselines answer
+// "what did this release change"; that one answers "what has changed since the
+// version people have read about", which is the question a reader of the 2023
+// paper is actually asking. Three years of change land in that column and not
+// only the renderer, so it is a cumulative comparison and the report has to say
+// so — it is not a second isolation of the same variable.
+//
+// profile.ts already caps a run at WAIT_TIMEOUT (120 s), so a 2023 build that
+// cannot finish 1000x longread fails that cell instead of hanging the matrix.
 const ports = [
   { port: 8000, extra: '&renderer=webgl' },
   { port: 8001, extra: '' },
   { port: 8002, extra: '' },
+  { port: 8004, extra: '' },
 ]
 const builds = await Promise.all(
   ports.map(async p => ({ ...p, name: await resolveBuild(p.port) })),

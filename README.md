@@ -482,6 +482,23 @@ carries a comment saying it matches the historical `jb2profile`.
 Not yet run: this is harness work, done on a box at load 4–7. The measurement is
 owed on an idle one, same rule as everything else here.
 
+**It is wired into the cold-load runner** (`scripts/render/runner.ts`, port
+8004) and will appear as a fourth column in `results/alignments.md` on the next
+run. It is **not** wired into `runner-interaction.ts`, which is a two-role
+comparison (`new` / `baseline`) rather than a port list; adding a third role
+there is a real change to that file's shape, not a one-line addition.
+
+**Read that column as cumulative, not as a second isolation.** Three years of
+change separate 2.4.0 from HEAD, and almost none of it is the renderer. 4.3.0 is
+the column that isolates this release; 2.4.0 is the column that tells a reader of
+the 2023 paper what the intervening period bought them. The two answer different
+questions and the report should not present them as one gradient.
+
+Expect cells to fail rather than to be slow. `profile.ts` caps a run at 120 s, so
+a 2023 build that cannot finish 1000x longread will error that cell — which is
+itself a result, and should be printed the way igv.js's censored rows are rather
+than quietly dropped.
+
 **Port 8000 means "whichever new build you are testing."** The runners no longer
 guess which one that is: each fetches the served `index.html`, matches its
 content-hashed bundle against `builds/*/index.html`, and labels the column with
@@ -592,6 +609,7 @@ npx puppeteer browsers install chrome
 npx http-server builds/current          -p 8000 -s --cors &
 npx http-server builds/release-4.3.0    -p 8001 -s --cors &
 npx http-server builds/release-4.1.15   -p 8002 -s --cors &
+npx http-server builds/release-2.4.0    -p 8004 -s --cors &   # the 2023 paper's version
 
 # sanity-check the renderer is hardware, not SwiftShader
 node scripts/gpucheck.ts headless
