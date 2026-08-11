@@ -111,6 +111,10 @@ resolved path, so nothing is counted twice.
 > investigation that priced it also established it is not currently catching
 > anything.
 
+> **Also fixed since this was written:** the profiler only ever attached to one
+> worker, so the bgzf pool was invisible. It now recurses, and the gap section
+> at the end carries what the pool costs.
+
 `filterChainFeatures` calls `dedupeById(features)` on every alignment render,
 and its own comment says why it is unconditional: it "applies in both pileup and
 chain mode (it short-circuits to a plain dedupe when both are kept, the
@@ -218,16 +222,35 @@ hottest main-thread frames are `RpcClient.handler` (56 ms), `sortLayout.ts`
 
 ## Gaps to close before the next pass
 
-**The bgzf pool workers are not in this profile, so decompression is
-understated.** `@gmod/bgzf-filehandle/src/workerPool.ts` frames appear in the
-RPC worker (`decompressRange`, 19 ms) — that is the *client* side posting work
-to the pool. The pool's own workers do the inflating, and only one worker target
-was attached and saved (`worker1-8656…`). Whether that is because
-`Target.setAutoAttach` from the page session does not reach workers spawned by
-another worker, or because they start after the attach, is not yet established.
-Until it is, read the 7.3% as "bgzf cost on the RPC thread", not as the total
-cost of decompression. The 94 ms of `concatUint8Array` *is* on the RPC thread
-and is real.
+**~~The bgzf pool workers are not in this profile~~ — fixed, and measured.**
+The table above still covers the RPC thread only, so its 7.3% is bgzf cost *on
+that thread*; here is what was missing.
+
+It was the first of the two guesses: `Target.setAutoAttach` on the page session
+reaches the page's own workers and stops. The bgzf pool is spawned *by* the RPC
+worker, so those threads are children of a worker target and were never
+attached — the profiler captured one worker and reported success.
+`flameprofile.ts` now re-arms `setAutoAttach` on every session it attaches, so
+the walk recurses to any depth. The same run that captured 1 worker captures 6
+threads.
+
+What the pool actually costs, on the `1000x.shortread` render:
+
+| thread | busy | idle | hottest |
+| --- | ---: | ---: | --- |
+| main | 814 ms | 3819 ms | |
+| RPC worker | 1415 ms | 876 ms | |
+| bgzf pool ×4 | 83/92/88/89 ms | ~1985 ms each | `wasm-function[3]`, `decompress_all` |
+
+So the pool is **352 ms of aggregate CPU across four threads**, against 1415 ms
+on the RPC worker — real, and enough that "decompression" across all worker
+threads is roughly a quarter of worker CPU rather than the 7.3% the RPC thread
+alone shows. It is not the hidden giant the June file's "irreducible bgzf/WASM
+decompression" prediction implied, though: each pool thread is ~96% idle, and
+they run in parallel, so the wall-clock contribution is ~88 ms.
+
+Worth keeping in mind for any future profile here: a thread that is not attached
+looks exactly like a thread that is cheap.
 
 **Still no modBAM fixture.** `shell/generate_alignments.sh` (pbsim/wgsim) emits
 no MM/ML tags, so the modification color mode cannot be traced at all. To

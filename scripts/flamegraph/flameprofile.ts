@@ -46,30 +46,50 @@ async function arm(session: CDPSession) {
 await arm(client)
 profilers.push({ id: 'main', session: client })
 
-await client.send('Target.setAutoAttach', {
-  autoAttach: true,
-  waitForDebuggerOnStart: true,
-  flatten: true,
-})
-client.on('Target.attachedToTarget', event => {
-  const { sessionId, targetInfo } = event
-  const session = connection.session(sessionId)
-  void (async () => {
-    if (
-      session &&
-      (targetInfo.type === 'worker' || targetInfo.type === 'shared_worker')
-    ) {
-      try {
-        await arm(session)
-        const tag = (targetInfo.url || 'worker').split('/').pop()
-        profilers.push({ id: `worker${profilers.length}-${tag}`, session })
-      } catch (e) {
-        console.error('worker arm failed:', e instanceof Error ? e.message : e)
+// Attach RECURSIVELY, not just to the page's own workers.
+//
+// JBrowse inflates BGZF on a pool of workers that the RPC worker spawns itself,
+// so those are children of a worker target rather than of the page.
+// `Target.setAutoAttach` on the page session alone never reaches them: it
+// attached one worker and stopped, and the profile then understated
+// decompression by whatever the pool did — silently, since a missing thread
+// looks exactly like a cheap one. Every newly attached session therefore arms
+// its own autoAttach, so the walk continues to any depth.
+//
+// The listener is registered before the `setAutoAttach` that can fire it, or a
+// worker that starts immediately is missed.
+async function watch(session: CDPSession) {
+  session.on('Target.attachedToTarget', event => {
+    const { sessionId, targetInfo } = event
+    const child = connection.session(sessionId)
+    void (async () => {
+      if (
+        child &&
+        (targetInfo.type === 'worker' || targetInfo.type === 'shared_worker')
+      ) {
+        try {
+          await arm(child)
+          const tag = (targetInfo.url || 'worker').split('/').pop()
+          profilers.push({
+            id: `worker${profilers.length}-${tag}`,
+            session: child,
+          })
+          await watch(child)
+        } catch (e) {
+          console.error('worker arm failed:', e instanceof Error ? e.message : e)
+        }
       }
-    }
-    await session?.send('Runtime.runIfWaitingForDebugger').catch(() => {})
-  })()
-})
+      await child?.send('Runtime.runIfWaitingForDebugger').catch(() => {})
+    })()
+  })
+  await session.send('Target.setAutoAttach', {
+    autoAttach: true,
+    waitForDebuggerOnStart: true,
+    flatten: true,
+  })
+}
+
+await watch(client)
 
 const t0 = Date.now()
 await page.goto(url, { waitUntil: 'load' })

@@ -726,8 +726,11 @@ reproduce byte-for-byte in a couple of seconds.
   re-profiled on 2026-08-11 against a current build, which confirmed the
   `_computeTags` fix had landed (586 ms → gone), kept two of its three verdicts
   with measurements behind them, and corrected a third claim that had been
-  reasoned forward from the stale trace. Its own caveat now is narrower: the
-  bgzf worker-pool threads are not captured, so decompression is understated.
+  reasoned forward from the stale trace. Its "bgzf pool not captured" caveat is
+  closed too — `flameprofile.ts` attached to the page's own workers and stopped,
+  missing the pool the RPC worker spawns; it now recurses, and the pool is
+  measured. A thread that is not attached looks exactly like a thread that is
+  cheap, which is worth remembering before trusting any per-thread number here.
 - **One machine, one locus.** Everything is a single workstation at
   `chr22_mask:124000-143000`, and the per-frame numbers come from a light 1 kb
   locus. Heavier loci that mount more overlays churn more per frame.
