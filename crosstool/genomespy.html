@@ -1,0 +1,101 @@
+<!doctype html>
+<!--
+  GenomeSpy harness for the cross-tool comparison.
+
+  Same shape as index.html (the igv.js harness): everything that varies between
+  runs is a URL parameter, so the runner can drive this page exactly as it drives
+  a JBrowse build.
+
+    ?track=1000x.shortread.bw     file in ./data
+    ?loc=chr22_mask:124000-143000 the shared benchmark window
+    ?ppb=N                        pixelsPerBin; omit for GenomeSpy's default
+
+  The workload is BigWig signal, not BAM alignments, and that is forced rather
+  than chosen. GenomeSpy has no alignment track, so the only way to put it on the
+  same bench as igv.js and JBrowse is a format all three read natively over HTTP
+  range requests with no server and no preprocessing. The corpus already carries
+  one BigWig per coverage beside every BAM, so this reads the same reads at the
+  same depths over the same window.
+
+  Read the resulting numbers as a signal-rendering comparison and nothing wider.
+  A tool that declines to draw alignments is not slower at drawing alignments; it
+  is out of scope for that workload, and the design-space table rather than a
+  timing run is the honest answer there.
+-->
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>GenomeSpy harness</title>
+    <style>
+      html,
+      body {
+        margin: 0;
+        padding: 0;
+        font-family: sans-serif;
+      }
+      #gs {
+        width: 1280px;
+        height: 600px;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="gs"></div>
+    <script type="module">
+      import { embed } from './genomespy/index.es.js'
+
+      const params = new URLSearchParams(location.search)
+      const track = params.get('track') ?? '20x.shortread.bw'
+      const locus = params.get('loc') ?? 'chr22_mask:124000-143000'
+      const ppb = params.get('ppb')
+
+      // "chr22_mask:124000-143000" -> ["chr22_mask", 124000, 143000]. The
+      // corpus is one contig, so the size is a constant read from the .fai
+      // rather than fetched; if the fixture ever grows a second contig this
+      // has to become a chrom.sizes URL instead.
+      const [chrom, range] = locus.split(':')
+      const [start, end] = range.split('-').map(Number)
+
+      const spec = {
+        // Root `genome` rather than the `genomes`/`assembly` pair: the pair is
+        // the current spelling, but it postdates the 0.82.0 pinned here, which
+        // is the version the paper's design-space table was read from. Keep the
+        // two in step -- a bench that measures a different build from the one
+        // the prose describes is worse than no bench.
+        genomes: { hg19mod: { contigs: [{ name: 'chr22_mask', size: 250001 }] } },
+        data: {
+          lazy: {
+            type: 'bigwig',
+            url: `./data/${track}`,
+            ...(ppb ? { pixelsPerBin: Number(ppb) } : {}),
+          },
+        },
+        mark: 'rect',
+        encoding: {
+          x: {
+            chrom: 'chrom',
+            pos: 'start',
+            type: 'locus',
+            scale: {
+              assembly: 'hg19mod',
+              domain: [{ chrom, pos: start }, { chrom, pos: end }],
+            },
+          },
+          x2: { chrom: 'chrom', pos: 'end' },
+          y: { field: 'score', type: 'quantitative' },
+        },
+      }
+
+      window.__gsState = { ready: false, error: null }
+      embed(document.getElementById('gs'), spec)
+        .then(api => {
+          window.gsApi = api
+          window.__gsState.ready = true
+        })
+        .catch(e => {
+          window.__gsState.error = String(e)
+          console.error(e)
+        })
+    </script>
+  </body>
+</html>

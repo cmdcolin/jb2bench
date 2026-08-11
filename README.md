@@ -22,7 +22,7 @@ numbers describe the same bytes.
 | `scripts/flamegraph/` | CPU-profile capture and the flamegraph toolkit |
 | `scripts/ld/` | the WebGPU LD compute-shader benchmarks (unrelated to render) |
 | `scripts/crosstool/` | the igv.js comparison: paint-quiescence profiler and matrix |
-| `crosstool/` | the igv.js harness page, plus symlinks to `data/` and the igv bundle |
+| `crosstool/` | the igv.js and GenomeSpy harness pages, plus symlinks to `data/` and the tool bundles |
 | `scripts/probe.ts`, `scripts/gpucheck.ts` | dev helpers: render testids, GPU backend |
 | `shell/` | regenerate the corpus (alignments and variants), load it into the builds |
 | `builds/` | the jbrowse-web builds under test (untracked, staged by hand) |
@@ -278,6 +278,54 @@ TOOLS=igv-h600ctl,igv-h300 CASES=200x-shortread node scripts/crosstool/runner.ts
 node scripts/crosstool/zoomrunner.ts             # → results/crosstool-zoom.{md,json}
 ```
 
+#### igv.js is now version-selectable
+
+`crosstool/index.html` takes `?igv=2.12.1` and loads
+`crosstool/igv-2.12.1.esm.js` by dynamic import; anything else, or nothing, gets
+the pinned 3.8.5 symlinked out of `node_modules`. 2.12.1 is vendored as a file
+rather than installed because two majors of one package cannot both be a
+dependency.
+
+The reason to want it is that the 2023 paper timed **igv.js v2.12.1**, so a
+number measured here is only commensurable with the published one if the same
+igv can be put back on the bench. Both versions were checked to load and report
+`__igvState.ready` with no page errors (3.8.5 had drawn no canvas by the 7 s
+mark where 2.12.1 had drawn eight — a timing difference, not a failure, and
+irrelevant to a runner that measures paint quiescence rather than counting
+canvases).
+
+#### GenomeSpy: harness scaffolded, not yet working
+
+`crosstool/genomespy.html` is a GenomeSpy harness on the same URL-driven pattern,
+with `@genome-spy/core` pinned to **0.82.0** — the version the paper's
+design-space table was source-verified against, deliberately not `latest`.
+
+The workload has to be **BigWig signal, not BAM**: GenomeSpy has no alignment
+track, so the only common ground with igv.js and JBrowse is a format all three
+read natively over range requests with no server and no preprocessing.
+`crosstool/data/` already carries one `.bw` per coverage beside every BAM, so no
+new fixture is needed. Any result from it is a signal-rendering comparison and
+nothing wider — a tool that declines to draw alignments is not *slow* at drawing
+alignments, and the design-space table stays the honest answer there.
+
+**It does not render yet.** `embed()` resolves and a 1280x600 canvas appears, but
+the console carries `Error: Genome hg19mod has not been loaded yet. Call
+ensureAssembly("hg19mod") before accessing it.` Three spec forms were tried —
+root `genome: {name, contigs}`, root `genomes` map with root `assembly`, and the
+`genomes` map with a per-channel `scale.assembly` — and all three raise it. Note
+that the published JSON schema on the CDN is 0.84.0's while the pin is 0.82.0,
+so the schema is not a reliable guide here. Finishing this means reading
+0.82.0's genome-loading path in its own source, which is how every other
+GenomeSpy claim in the paper was settled.
+
+#### Still absent: HiGlass
+
+HiGlass reads neither indexed BAM nor BigWig without either a datafetcher plugin
+or preprocessed tiles, so including it means preprocessing the corpus into its
+tile format — a different question from "same bytes, same window, same machine",
+and the one reason the cross-tool comparison was originally scoped to igv.js
+alone.
+
 ### The zoom result is not what it looks like
 
 `results/crosstool-zoom.md` says igv.js settles a 2x zoom-in in ~340 ms against
@@ -358,6 +406,44 @@ symlinks into `data/`, staged by hand and wired up with
 | `webgl-poc-fixed` | the branch plus the tooltip-clear-on-zoom fix `ce1e168b71`, measured perf-neutral |
 | `release-4.3.0` | last release, old block renderer — the baseline every speedup is against |
 | `release-4.1.15` | older release, for the release-over-release trend |
+| `release-2.4.0` | **the version the 2023 Genome Biology paper describes** — see below |
+
+### `release-2.4.0`, the published baseline
+
+Added 2026-08-11. Every other baseline here is a recent predecessor, which
+answers "what did this release change" and not "what has changed since the
+version people have read about". The 2023 paper archived its own source as
+JBrowse v2.4.0 (Zenodo `10.5281/zenodo.7710472`) and benchmarked "jb2 parallel
+(v2.4.0)", so v2.4.0 is the version in the literature and the right thing to
+measure against.
+
+No build from source is needed, which is worth knowing before anyone tries:
+the release still ships a prebuilt web bundle.
+
+```bash
+curl -L -o /tmp/jb-web-2.4.0.zip \
+  https://github.com/GMOD/jbrowse-components/releases/download/v2.4.0/jbrowse-web-v2.4.0.zip
+mkdir -p builds/release-2.4.0 && unzip -q -o /tmp/jb-web-2.4.0.zip -d builds/release-2.4.0
+./shell/load_alignments.sh        # wires the assembly + 12 alignment tracks
+```
+
+**A 2026 `jbrowse` CLI config does load in the 2023 build** — this was the risk
+and it was checked rather than assumed. Serving `builds/release-2.4.0` and
+opening `?loc=chr22_mask:124000-143000&assembly=hg19mod&tracks=20x.shortread.bam`
+in headless Chrome renders the ruler and the track with six canvases and zero
+console or page errors. The build stamps `main.05f7e6e1.js`, unique against
+every other `builds/*`, so `servedbuild.ts` resolves its name correctly and no
+runner change was required.
+
+**The corpus already matches the 2023 paper's**, which is why this comparison is
+worth anything: that paper generated reads over `chr22:25,000,000-25,250,000` on
+hg19 with `pbsim --depth 1000 --hmm_model data/R103.model --length-mean 50000`
+and `wgsim -1 150 -2 150 -N 1000000`, and `shell/generate_alignments.sh` uses the
+same 250 kb slice and the same two invocations. `runner.ts`'s 19 kb window
+carries a comment saying it matches the historical `jb2profile`.
+
+Not yet run: this is harness work, done on a box at load 4–7. The measurement is
+owed on an idle one, same rule as everything else here.
 
 **Port 8000 means "whichever new build you are testing."** The runners no longer
 guess which one that is: each fetches the served `index.html`, matches its

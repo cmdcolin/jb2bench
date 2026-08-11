@@ -11,6 +11,14 @@
     ?loc=chr22_mask:124000-143000 the shared benchmark window
     ?depth=N                      igv's samplingDepth; omit for igv's default
     ?height=N                     track height in px (default 600)
+    ?igv=2.12.1                   igv build to load; omit for the pinned 3.8.5
+
+  igv is selectable because the 2023 JBrowse 2 paper timed igv.js v2.12.1, and a
+  number measured here is only comparable to that one if the same igv can be put
+  back on the bench. 3.8.5 is the current pin and stays the default; 2.12.1 is
+  vendored beside this file rather than installed, because two majors of the same
+  package cannot both be a dependency. Load it with a dynamic import so the
+  version is a URL parameter like everything else that varies between runs.
 
   height matters because igv draws packed rows until it runs out of canvas,
   while JBrowse uploads and draws every read it holds and lets the rasterizer
@@ -42,9 +50,14 @@
   <body>
     <div id="igv"></div>
     <script type="module">
-      import igv from './igv.esm.js'
-
       const params = new URLSearchParams(location.search)
+      const igvVersion = params.get('igv')
+      const igvModule =
+        igvVersion && igvVersion !== '3.8.5'
+          ? `./igv-${igvVersion}.esm.js`
+          : './igv.esm.js'
+      const igv = (await import(igvModule)).default
+
       const track = params.get('track') ?? '20x.shortread.bam'
       const locus = params.get('loc') ?? 'chr22_mask:124000-143000'
       const depth = params.get('depth')
@@ -85,7 +98,7 @@
         ],
       }
 
-      window.__igvState = { ready: false, error: null }
+      window.__igvState = { ready: false, error: null, version: igvVersion ?? '3.8.5' }
       igv
         .createBrowser(document.getElementById('igv'), options)
         .then(browser => {
