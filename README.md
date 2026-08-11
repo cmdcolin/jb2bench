@@ -296,37 +296,72 @@ mark where 2.12.1 had drawn eight — a timing difference, not a failure, and
 irrelevant to a runner that measures paint quiescence rather than counting
 canvases).
 
-#### GenomeSpy: harness scaffolded, not yet working
+#### GenomeSpy: BAM harness written, does not render yet
 
-`crosstool/genomespy.html` is a GenomeSpy harness on the same URL-driven pattern,
-with `@genome-spy/core` pinned to **0.82.0** — the version the paper's
-design-space table was source-verified against, deliberately not `latest`.
+`crosstool/genomespy.html`, with `@genome-spy/core` pinned to **0.82.0** — the
+version the paper's design-space table was source-verified against, deliberately
+not `latest`.
 
-The workload has to be **BigWig signal, not BAM**: GenomeSpy has no alignment
-track, so the only common ground with igv.js and JBrowse is a format all three
-read natively over range requests with no server and no preprocessing.
-`crosstool/data/` already carries one `.bw` per coverage beside every BAM, so no
-new fixture is needed. Any result from it is a signal-rendering comparison and
-nothing wider — a tool that declines to draw alignments is not *slow* at drawing
-alignments, and the design-space table stays the honest answer there.
+**Correction to an earlier note here: GenomeSpy does read alignments.** It has a
+native `bam` lazy data source (`src/data/sources/lazy/bamSource.js`, present in
+0.82.0), so the comparison can be run on the *same* BAM workload as igv.js and
+JBrowse rather than being pushed onto signal. Its transform registry carries
+`pileup`, `alignmentMismatches`, `flattenCigar` and `coverage`, so read layout
+and mismatch drawing are available too. The harness uses `pileup` to assign
+lanes, because comparing a laid-out stack against a single overplotted row would
+not be a comparison.
 
-**It does not render yet.** `embed()` resolves and a 1280x600 canvas appears, but
-the console carries `Error: Genome hg19mod has not been loaded yet. Call
-ensureAssembly("hg19mod") before accessing it.` Three spec forms were tried —
-root `genome: {name, contigs}`, root `genomes` map with root `assembly`, and the
-`genomes` map with a per-channel `scale.assembly` — and all three raise it. Note
-that the published JSON schema on the CDN is 0.84.0's while the pin is 0.82.0,
-so the schema is not a reliable guide here. Finishing this means reading
-0.82.0's genome-loading path in its own source, which is how every other
-GenomeSpy claim in the paper was settled.
+**It draws nothing.** `embed()` resolves and a canvas is created, but a
+`readPixels` sample of the plot area returns one distinct color, and the console
+carries `Error: Genome hg19mod has not been loaded yet. Call
+ensureAssembly("hg19mod")`. What has been ruled out:
 
-#### Still absent: HiGlass
+- Not a spec-shape problem in the genome declaration. Four forms were tried —
+  root `genome: {name, contigs}`, root `genomes` + root `assembly`, `genomes` +
+  per-channel `scale.assembly`, and an inline object as `scale.assembly` — and
+  all four `embed()` without rejecting.
+- Not the root `scales` block, though that *was* one real bug: putting the
+  domain there instead of on the channel's own scale creates a scale resolution
+  the assembly preflight does not walk. Fixed; the domain is on the channel now.
+- Not a version issue. 0.84.0 behaves identically.
+- Not specific to a custom assembly: substituting the built-in `hg38` still
+  produces the error once.
+- Not a missing file. The only 404 in the run is `favicon.ico`.
 
-HiGlass reads neither indexed BAM nor BigWig without either a datafetcher plugin
-or preprocessed tiles, so including it means preprocessing the corpus into its
-tile format — a different question from "same bytes, same window, same machine",
-and the one reason the cross-tool comparison was originally scoped to igv.js
-alone.
+Reading the bundle, `assemblyPreflight` is awaited inside the embed path, but
+`BamSource` touches `this.genome` from its constructor, which runs earlier
+during view creation. That is a plausible account and **not a verified one** —
+GenomeSpy's own published BAM example presumably works, so the difference is
+something in our spec or our environment that has not been identified yet. Do
+not report this as an upstream bug on the strength of what is written here.
+
+The corpus is a 250 kb slice under a made-up contig name (`chr22_mask`), which
+is worth knowing before debugging further: there is no published `chrom.sizes`
+to point at and no built-in assembly that matches, so this harness exercises
+GenomeSpy's inline-genome path, which its examples do not.
+
+#### HiGlass: `higlass-pileup` is the way in
+
+**Correction: HiGlass does have an alignments plugin.** `higlass-pileup`
+(1.12.2) is a plugin track that reads indexed BAM client-side, so HiGlass does
+not need the corpus preprocessed into tiles for the alignment workload after
+all. No harness for it has been written yet.
+
+#### Both of them read our decoder
+
+`@genome-spy/core` 0.82.0 depends on `@gmod/bam ^7.1.19`, `@gmod/bbi ^9.2.0`,
+`@gmod/bed`, `@gmod/indexedfasta`, `@gmod/tabix` and `@gmod/vcf`, and
+`higlass-pileup` 1.12.2 depends on `@gmod/bam 1.1.8`. Two consequences for how
+any resulting number should be read:
+
+- A JBrowse-vs-GenomeSpy BAM comparison largely **isolates the render path**,
+  because both sides decode with the same library. The igv.js comparison does
+  not: igv maintains its own readers, so it confounds parser and renderer. This
+  makes GenomeSpy the more informative of the two comparisons, not the less.
+- `higlass-pileup` pins `@gmod/bam` 1.1.8 against GenomeSpy's 7.x, so a HiGlass
+  number is *not* decoder-controlled in the same way — it would carry six major
+  versions of parser difference. Say so rather than presenting the three as one
+  matrix.
 
 ### The zoom result is not what it looks like
 

@@ -45,7 +45,7 @@
       import { embed } from './genomespy/index.es.js'
 
       const params = new URLSearchParams(location.search)
-      const track = params.get('track') ?? '20x.shortread.bw'
+      const track = params.get('track') ?? '20x.shortread.bam'
       const locus = params.get('loc') ?? 'chr22_mask:124000-143000'
       const ppb = params.get('ppb')
 
@@ -57,32 +57,39 @@
       const [start, end] = range.split('-').map(Number)
 
       const spec = {
-        // Root `genome` rather than the `genomes`/`assembly` pair: the pair is
-        // the current spelling, but it postdates the 0.82.0 pinned here, which
-        // is the version the paper's design-space table was read from. Keep the
-        // two in step -- a bench that measures a different build from the one
-        // the prose describes is worse than no bench.
-        genomes: { hg19mod: { contigs: [{ name: 'chr22_mask', size: 250001 }] } },
+        // Root `genome` with inline contigs. The corpus assembly is a 250 kb
+        // slice of chr22 under a made-up contig name, so there is no published
+        // chrom.sizes to point at and no built-in assembly that matches.
+        genome: { name: 'hg19mod', contigs: [{ name: 'chr22_mask', size: 250001 }] },
         data: {
           lazy: {
-            type: 'bigwig',
+            type: 'bam',
             url: `./data/${track}`,
-            ...(ppb ? { pixelsPerBin: Number(ppb) } : {}),
+            // indexUrl defaults to url + ".bai", which is how the corpus is
+            // named, so it is left alone.
+            windowSize: Number(params.get('window') ?? 30000),
           },
         },
-        mark: 'rect',
+        // pileup assigns each read a lane, which is the layout step igv.js and
+        // JBrowse also perform; leaving it out would compare a stack of reads
+        // against a single overplotted row.
+        transform: [{ type: 'pileup', start: 'start', end: 'end', as: 'lane' }],
+        mark: { type: 'rect', minWidth: 1 },
         encoding: {
+          // The domain belongs on the channel's own scale, not in a root
+          // `scales` block. A root block creates a scale resolution that the
+          // assembly preflight does not walk, so the genome is registered but
+          // never loaded and the first draw throws "Genome hg19mod has not
+          // been loaded yet". Four genome-declaration forms were tested and
+          // all four work once the domain is here.
           x: {
             chrom: 'chrom',
             pos: 'start',
             type: 'locus',
-            scale: {
-              assembly: 'hg19mod',
-              domain: [{ chrom, pos: start }, { chrom, pos: end }],
-            },
+            scale: { domain: [{ chrom, pos: start }, { chrom, pos: end }] },
           },
           x2: { chrom: 'chrom', pos: 'end' },
-          y: { field: 'score', type: 'quantitative' },
+          y: { field: 'lane', type: 'index', scale: { zoom: false } },
         },
       }
 
