@@ -116,8 +116,15 @@ would do the same job with no string allocation. Two things to check before
 doing it, neither of which this profile answers:
 
 - `filterChainFeatures` is typed over `Feature`, not over the BAM feature, and
-  the CRAM path reaches it too. A numeric offset is not on the `Feature`
-  interface, so this needs a real accessor rather than a cast.
+  the CRAM path reaches it too — but both already have a number behind the
+  string. `BamSlightlyLazyFeature.id()` is `` `${adapter.id}-${fileOffset}` ``
+  (`fileOffset` off the `BamRecord` it extends) and
+  `CramSlightlyLazyFeature.id()` is `` `${adapter.id}-${record.uniqueId}` ``. So
+  this wants a numeric accessor declared once and implemented on both, not a
+  cast and not a change to `Feature` itself.
+- The constant prefix really is constant: `fetchFeaturesFromAdapter` takes a
+  single `adapterConfig`, so every feature in one call comes from one adapter
+  and the `${adapter.id}-` half of the key distinguishes nothing.
 - The same function builds a second `Set` of `id()` strings (`keptIds`) further
   down, but only on the non-default filtered paths, so it is not in this trace.
   Whatever identity the dedupe moves to, that one should move with it.
