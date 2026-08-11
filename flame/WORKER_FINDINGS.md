@@ -220,6 +220,31 @@ hottest main-thread frames are `RpcClient.handler` (56 ms), `sortLayout.ts`
 (52 ms across three frames) and the two `packGpu.ts` packers (29 ms). Whatever
 `FINDINGS.md` diagnosed on the main thread, this case does not reproduce it.
 
+## What the worker wins are worth in wall clock
+
+Both alignments fixes above are large fractions of *worker CPU*. Initial render
+is fetch-dominated — the README says so about the whole benchmark — so the
+end-to-end effect is much smaller, and here it is, measured rather than
+asserted. Paired arms, alternating, on an idle box (the same comparison at load
+14-70 returned 0.58-2.15x on identical work and was discarded):
+
+| track | before | after | speedup | rounds |
+| --- | ---: | ---: | --- | --- |
+| `200x.longread.mod.bam` (dedupe + modCoverage) | 4678 ms | 4169 ms | **1.11x** | 1.04-1.13x, load 1.0-1.4 |
+| `1000x.shortread.bam` (dedupe only) | 3446 ms | 3291 ms | **not distinguishable** | 0.95-1.16x over 7 rounds |
+
+So: ~0.5 s off a 4.7 s modBAM render, and **nothing measurable** on the plain
+pileup. The second row is a null result and is recorded as one — it was run
+twice (medians 1.03x and 1.04x) and the arms overlap both times, with rounds on
+either side of 1.0.
+
+That is the honest scale of these changes at the level a user experiences, and
+it is worth keeping next to the worker percentages so neither gets quoted alone.
+The worker numbers are not wrong — the CPU really did drop by those fractions —
+but on this workload the worker is not what the wall clock is waiting for. The
+place they would matter more is a machine slower than this one, a deeper track,
+or anything that makes the same worker do the work repeatedly rather than once.
+
 ## Gaps to close before the next pass
 
 **~~The bgzf pool workers are not in this profile~~ — fixed, and measured.**
