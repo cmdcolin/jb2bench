@@ -1,89 +1,191 @@
 # Worker-side hotspot analysis — decides the "profile-gated" plugin refactors
 
 Follow-up to `FINDINGS.md` (which diagnosed the *main-thread* `placeRect`
-regression). This one looks only at the **RPC worker** CPU profile for the same
-heaviest case (`1000x.shortread.bam`, `chr22_mask:124000-143000`, ~1M reads,
-`webgl-poc` June build) to decide whether three candidate
-`plugins/alignments` optimizations are worth doing.
+regression). This one looks at the **RPC worker** CPU profile for the heaviest
+case (`1000x.shortread.bam`, `chr22_mask:124000-143000`, ~1M reads) to decide
+whether candidate `plugins/alignments` optimizations are worth doing.
 
-## ⚠️ The captured profiles are STALE (build = Jun 13)
+**Rewritten 2026-08-11 against a build of that day's `main`** (plus three
+GFF3/GTF parsing commits in flight at the time, which touch no alignments code
+and appear nowhere in this trace). The previous version of this file was
+captured against a Jun 13 build and said so at the top: its verdicts were
+"still true because those code paths weren't touched," reasoned rather than
+measured, and its headline cost had already been fixed in July. Everything
+below is now measured. Two of the three old verdicts survive and are stated
+more strongly; one claim about what the worker is *dominated by* was wrong and
+is corrected.
 
-The single biggest non-idle worker cost below, `_computeTags` (586ms / 9%,
-full-record tag parse triggered by `.tags`), was **already fixed after this
-build**: commit `b4da28ba7a` (2026-07-02, "targeted SA/MM/ML tag reads, skip
-full-record tag parse") switched `extractFeatureArrays`' tag reads to
-BamRecord's targeted `getTag`, which decodes only the requested tag. So the
-top of this profile no longer reflects current source. Anything worker-side
-below `_computeTags` is small enough that, with that cost removed, the worker is
-dominated by irreducible bgzf/WASM decompression. **A fresh build is required to
-re-profile current code** (and a modBAM fixture to profile the mod path at all —
-see gap below). Treat the verdicts here as "still true because those code paths
-weren't touched," not as fresh measurements.
+## How this was captured, including two things that had to be fixed first
 
-Source: `flame/webgl-worker.folded` (leaf self-time, minified frames resolved by
-name where @gmod/bam / plugin getters keep their names).
+```bash
+# build products/jbrowse-web from the jbrowse-components checkout, then
+cp -r products/jbrowse-web/build builds/aug11-current
+jbrowse add-assembly --load copy data/hg19mod.fa --out builds/aug11-current --force --name hg19mod
+# add the 12 alignment tracks as in shell/load_alignments.sh, then raise the limit (below)
+npx http-server builds/aug11-current -p 8000 -s --cors &
+node --experimental-strip-types scripts/flamegraph/flameprofile.ts \
+  "http://localhost:8000/?loc=chr22_mask:124000-143000&assembly=hg19mod&tracks=1000x.shortread.bam" \
+  aug11-1000short
+node --experimental-strip-types scripts/flamegraph/resolve.ts \
+  flame/aug11-1000short.worker1-*.cpuprofile builds/aug11-current/static/js 120
+```
 
-## Top worker self-time (excluding idle 3.65M, GC 260k)
+Frames resolve through the build's sourcemaps, so the names below are original
+source, not minified.
 
-| self (µs) | frame | where |
-|---:|---|---|
-| 586154 | `_computeTags` | @gmod/bam BamRecord — parse ALL tags on first `.tags` access |
-| 280830 | (anonymous) | bgzf/decode chunk |
-| 164398 | `wasm-function[3]` | decompression |
-| 98452  | `getReadIndex` | @gmod/bam |
-| 60115  | `get` | `BamSlightlyLazyFeature.get(field)` switch dispatch |
-| 57662  | `get name` | @gmod/bam BamRecord |
-| 52778  | `getReadFeatures`-family (`pe`) | @gmod/bam |
-| 46640  | `get next_segment_position` | `BamSlightlyLazyFeature` string getter |
-| 46132  | `readBamFeatures` | @gmod/bam |
-| 39709  | `_findTag` | @gmod/bam |
+**`fetchSizeLimit` blocks this window outright.** At 1000x coverage the 19 kb
+benchmark window is a 28.1 MB fetch, and `BamAdapter`/`CramAdapter` default
+`fetchSizeLimit` to 5 MB. The track renders "Requested too much data (28.1 Mb).
+Zoom in to see features, or force load" and *never fetches*, so a profile of it
+contains no BAM work at all. The fixture raises the slot to 1e9 on all 12
+tracks. Anyone reproducing this on a fresh build must do the same or they will
+profile an empty browser — the run does not fail, it succeeds at measuring
+nothing.
 
-`extractFeatureArrays` / `buildBaseReadArrays` together were ~180k (≈3%) — small.
+**The render-complete detector was stale and failed silently.** It waited on
+`[data-testid$="-done"]`, and JBrowse's ADR-065 (2026-08-10) stopped mutating
+`data-testid` on first paint, moving readiness to the `data-display-drawn`
+attribute published beside it. Against any build after that date the old probe
+matches nothing, `ready` never goes true, and the run dies on its 120 s timeout
+with no profile written. `scripts/flamegraph/flameprofile.ts` now waits on
+`[data-display-drawn="true"]` for every `[data-display-drawn]` element, *and* on
+`[data-display-phase="loading"]` being absent — `drawn` flips on FIRST paint, so
+waiting on it alone would stop the profiler partway through the fetch it is
+trying to measure.
 
-## Verdicts on the profile-gated items
+Render elapsed: 5176 ms. Profile: 19,234 main-thread samples, 10,165 worker.
 
-- **`BamSlightlyLazyFeature.get(field)` switch dispatch — NOT WORTH IT.** `get`
-  is 60k self (~1% of the busy worker) and `extractFeatureArrays` ~180k. The
-  BamAdapter CLAUDE.md already called this "a deliberate refactor, not a
-  drive-by"; the profile confirms it isn't where the time goes. Skip.
+## Top worker self-time
+
+Sampled at 200 µs. Total 2745 ms wall in the profile, of which 936 ms (34%) is
+idle. The percentages below are against the **1641 ms of busy time** covered by
+the 120 hottest frames (94% of sampled time).
+
+| self | frame | where |
+| ---: | --- | --- |
+| 171 ms | `dedupeById` | `RenderAlignmentDataRPC/executeRenderAlignmentData.ts:99` |
+| 94 ms | `concatUint8Array` | `@gmod/bgzf-filehandle/src/util.ts` |
+| 75 ms | `id()` | `BamAdapter/BamSlightlyLazyFeature.ts:81` (two frames, 41 + 34) |
+| 65 ms | `post` | `packages/core/src/rpc/RpcServer.ts:117` |
+| 60 ms | `readBamFeatures` | `@gmod/bam/src/bamFile.ts:911` |
+| 49 ms | `forEachMismatchNumeric` | `@gmod/bam/src/mismatches.ts:208` |
+| 47 ms | (anon) | `alignments/src/shared/extractFeatureArrays.ts:54` |
+| 45 ms | (anon) | `alignments/src/shared/computeFrequenciesAndThresholds.ts:17` |
+| 34 ms | (anon) | `alignments/src/features/mismatch/extract.ts:3` |
+| 33 ms | `buildBaseFeatureData` | `alignments/src/shared/buildBaseFeatureData.ts:25` |
+| 32 ms | `get name` | `@gmod/bam/src/record.ts:481` |
+| 32 ms | `getTagAlt` | `@gmod/bam/src/record.ts:533` |
+
+By area, summed rather than eyeballed:
+
+| self | % of busy | area |
+| ---: | ---: | --- |
+| 417 ms | 25.4% | `@gmod/bam` record decode (all of `record.ts`, `bamFile.ts`, `mismatches.ts`) |
+| 290 ms | 17.7% | alignments feature extraction (`shared/`, `features/`) |
+| **246 ms** | **15.0%** | **`dedupeById` + the `id()` strings it consumes** |
+| 195 ms | 11.9% | garbage collector |
+| 178 ms | 10.8% | RPC plumbing (`RpcServer.post`, chunk loading) |
+| 119 ms | 7.3% | bgzf decompression *on this thread* — see the gap below |
+| 58 ms | 3.5% | coverage (`alignments-core`) |
+
+The remaining 138 ms is range-cache/IO (31 ms), other `RenderAlignmentDataRPC`
+frames (14 ms), and 93 ms spread thinly enough not to classify — the largest
+single one of those is 12 ms. The areas are first-match-wins over the frame's
+resolved path, so nothing is counted twice.
+
+## The one real lead: a dup guard that costs 15% of the worker
+
+`filterChainFeatures` calls `dedupeById(features)` on every alignment render,
+and its own comment says why it is unconditional: it "applies in both pileup and
+chain mode (it short-circuits to a plain dedupe when both are kept, the
+default)". The guard exists for a rare case — "only when overlapping BAM index
+chunks re-decode one read" — and in the common case returns the input array
+untouched.
+
+What it costs to find that out, at ~1M reads, is a `Set<string>` of one million
+strings. `BamSlightlyLazyFeature.id()` is
+`` `${this.adapter.id}-${this.fileOffset}` ``, so each membership test also
+builds a fresh template literal. That is the 171 ms and the 75 ms, and a fair
+share of the 195 ms of GC behind them: **246 ms, 15% of busy worker time, to
+detect duplicates that are usually not there.**
+
+The shape of the fix is visible from the identity itself: within one call every
+feature comes from one adapter, so the `${adapter.id}-` prefix is constant and
+the whole key is carried by the numeric `fileOffset`. A `Set<number>` over that
+would do the same job with no string allocation. Two things to check before
+doing it, neither of which this profile answers:
+
+- `filterChainFeatures` is typed over `Feature`, not over the BAM feature, and
+  the CRAM path reaches it too. A numeric offset is not on the `Feature`
+  interface, so this needs a real accessor rather than a cast.
+- The same function builds a second `Set` of `id()` strings (`keptIds`) further
+  down, but only on the non-default filtered paths, so it is not in this trace.
+  Whatever identity the dedupe moves to, that one should move with it.
+
+This is the item the old version of this file was looking for and did not have:
+a cost that is large, in our code rather than a dependency, and paid on the
+default path rather than an opt-in mode.
+
+## Verdicts on the previously profile-gated items
+
+- **`BamSlightlyLazyFeature.get(field)` switch dispatch — still NOT WORTH IT,
+  now measured.** It is 21 ms, **1.3% of busy**, summed across the five frames
+  that resolve to `BamSlightlyLazyFeature.ts:145`. The June profile put it at
+  ~1% and the BamAdapter CLAUDE.md called a rewrite "a deliberate refactor, not
+  a drive-by"; two months of changes later it is still ~1%. Skip.
 
 - **`computeMismatchFrequencies` / `computePositionFrequencies` Map counting —
-  NOT WORTH IT.** They don't appear in the top self-time frames at all on the
-  heaviest case. A typed-array rewrite would add complexity for no measurable
-  gain. Skip.
+  NOT WORTH IT, and now visible rather than absent.** The frequency work is
+  62 ms, **3.8% of busy**, over five frames in
+  `computeFrequenciesAndThresholds.ts` (the counting loop at :17 is 45 ms of
+  it). A typed-array rewrite could not return more than that, and only if it
+  were free. Skip.
 
-- **The committed mod-path optimizations (dead `localeCompare` sort, per-type
-  color memoize) — CANNOT be benchmarked here.** The test BAMs carry **no MM/ML
-  tags** (`samtools view 200x.longread.bam | grep -c MM:Z` → 0; `hg19mod.fa` is a
-  *masked* reference, not modBAM). So this profile never enters
-  `extractModifications`. Those two commits are justified by removed-redundant-
-  work reasoning, not by this trace. To profile them, jb2bench needs a modBAM
-  fixture (see gap below).
+- **The mod-path optimizations — still CANNOT be benchmarked here.** The fixture
+  BAMs carry no MM/ML tags, so `extractModifications` is never entered. Unchanged
+  from the June write-up; see the gap below.
 
-## The one real worker lead: tag decoding (`_computeTags`)
+## What changed since the June profile
 
-`_computeTags` alone is the biggest non-idle cost (9%), driven by `.tags`
-access, plus `_findTag` (39k) and the paired-read string getters (`get name`
-57k, `get next_segment_position` 46k). @gmod/bam parses **all** of a record's
-tags on the first tag access and caches them; the pileup path touches a tag per
-read (SA for supplementary chaining, MM for mods, the color/sort tag), so every
-record pays the full parse.
+**`_computeTags` is gone, confirmed.** It was the single biggest non-idle cost
+in June (586 ms, 9%), caused by @gmod/bam parsing *all* of a record's tags on
+first `.tags` access. The old file predicted commit `b4da28ba7a` (2026-07-02,
+targeted `getTag` reads) had fixed it but could not show it. It does not appear
+anywhere in the 120 hottest frames now. What appears instead is exactly the
+replacement: the targeted tag readers (`getTagAlt`, `getTagRaw`,
+`decodeTagValue`, `tagValueEnd`) sum to 89 ms over seven frames, and `_findTag`
+to 54 ms over two — **143 ms against 586 ms**, for tag reads that now decode
+only what was asked for.
 
-Directions (in rough order of value, none a drive-by):
-- Whether the plainest pileup (no tag-color / no sort-tag / no mods / no SA
-  arcs) can avoid tag access entirely for a record — narrow, needs tier
-  analysis, since SA is currently read unconditionally in
-  `extractFeatureArrays`.
-- `get next_segment_position` builds a `refName:pos` string per paired read; if
-  the pileup path doesn't consume it, don't compute it in the hot loop.
-- Lazy per-tag parsing in @gmod/bam itself (external repo) would help every JB2
-  consumer, not just this one.
+**The old file's follow-on claim was wrong.** It reasoned that with
+`_computeTags` removed "the worker is dominated by irreducible bgzf/WASM
+decompression". It is not: bgzf is 119 ms, **7.3%** of busy time on this thread.
+The worker is dominated by BAM record decode (25%) and our own feature
+extraction and dedupe (33% between them). Two things moved underneath that
+prediction — the tag fix removed a cost that was inflating the denominator, and
+inflation moved to a shared bgzf worker pool (see the gap). Reasoning forward
+from a stale profile got the direction right and the destination wrong.
 
-## Data gap to close before the next mod-path pass
+**The main thread is no longer the story for this case.** It is 82% idle. The
+hottest main-thread frames are `RpcClient.handler` (56 ms), `sortLayout.ts`
+(52 ms across three frames) and the two `packGpu.ts` packers (29 ms). Whatever
+`FINDINGS.md` diagnosed on the main thread, this case does not reproduce it.
 
-jb2bench has no modBAM. `shell/generate_alignments.sh` (pbsim/wgsim) doesn't emit
-MM/ML. To benchmark the modification color mode add a fixture — e.g. run an ONT
-5mCG model output through, or synthesize MM/ML tags onto the existing longread
-BAM — and a URL/session that sets `colorBy: { type: 'modifications' }`. Only then
-does the `extractModifications` path (and the two committed opts) show up in a
-trace.
+## Gaps to close before the next pass
+
+**The bgzf pool workers are not in this profile, so decompression is
+understated.** `@gmod/bgzf-filehandle/src/workerPool.ts` frames appear in the
+RPC worker (`decompressRange`, 19 ms) — that is the *client* side posting work
+to the pool. The pool's own workers do the inflating, and only one worker target
+was attached and saved (`worker1-8656…`). Whether that is because
+`Target.setAutoAttach` from the page session does not reach workers spawned by
+another worker, or because they start after the attach, is not yet established.
+Until it is, read the 7.3% as "bgzf cost on the RPC thread", not as the total
+cost of decompression. The 94 ms of `concatUint8Array` *is* on the RPC thread
+and is real.
+
+**Still no modBAM fixture.** `shell/generate_alignments.sh` (pbsim/wgsim) emits
+no MM/ML tags, so the modification color mode cannot be traced at all. To
+benchmark it, add a fixture — an ONT 5mCG model output, or MM/ML synthesized
+onto the existing longread BAM — and a session that sets
+`colorBy: { type: 'modifications' }`.

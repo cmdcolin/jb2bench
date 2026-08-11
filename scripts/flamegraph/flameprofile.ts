@@ -73,20 +73,33 @@ client.on('Target.attachedToTarget', event => {
 
 const t0 = Date.now()
 await page.goto(url, { waitUntil: 'load' })
+// Readiness is `data-display-drawn`, NOT a `-done` testid suffix. JBrowse's
+// ADR-065 (2026-08-10) stopped mutating `data-testid` on first paint and moved
+// readiness to the attributes the chrome publishes beside it, so the old
+// `[data-testid$="-done"]` probe matches nothing on any build after that date.
+// It does not fail loudly: `done` stays 0, `ready` stays false, and the run
+// dies on the 120 s timeout with no profile — which is what it did first time
+// against builds/aug11-current.
+//
+// Waiting on `[data-display-phase="loading"]` too, not just drawn: `drawn`
+// flips on FIRST paint, so on its own it would stop the profiler partway
+// through the fetch it is trying to measure.
 await page.waitForFunction(
   () => {
     const w = window as unknown as { __stable?: number; __last?: number }
-    const done = document.querySelectorAll(
-      '[data-testid$="-done"],[data-testid$="_done"]',
+    const displays = document.querySelectorAll('[data-display-drawn]').length
+    const drawn = document.querySelectorAll(
+      '[data-display-drawn="true"]',
     ).length
-    const loading =
+    const fetching =
+      document.querySelectorAll('[data-display-phase="loading"]').length > 0 ||
       document.querySelectorAll('[data-testid="loading-overlay"]').length > 0
-    const ready = done > 0 && !loading
-    if (ready && done === w.__last) {
+    const ready = displays > 0 && drawn === displays && !fetching
+    if (ready && drawn === w.__last) {
       w.__stable = (w.__stable ?? 0) + 1
     } else {
       w.__stable = 0
-      w.__last = done
+      w.__last = drawn
     }
     return ready && (w.__stable ?? 0) >= 5
   },
