@@ -60,8 +60,10 @@ except the reference is untracked and regenerable — roughly 750 MB.
 - `*.bam` / `*.cram` (+ indexes) — simulated alignments at 20x / 200x / 1000x
   coverage, short reads (wgsim) and long reads (pbsim).
 - `*.bw` — BigWig coverage tracks at the same coverages. Unused by the
-  alignments benchmark; kept for future wiggle benchmarks. `test.bw` is a
-  byte-identical copy of `200x.shortread.bw`, kept as a generic fixture name.
+  alignments benchmark, but they are the corpus the GenomeSpy harness reads,
+  since signal is the only workload a tool with no alignment track can share
+  with igv.js and JBrowse. `test.bw` is a byte-identical copy of
+  `200x.shortread.bw`, kept as a generic fixture name.
 - `R103.model` — the pbsim error model for the long-read simulation. Tracked.
 - `hg19_17.chrom.sizes` — chr17's size, left over from the variant-matrix work.
   Nothing in this repo currently reads it.
