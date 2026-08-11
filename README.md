@@ -482,11 +482,21 @@ carries a comment saying it matches the historical `jb2profile`.
 Not yet run: this is harness work, done on a box at load 4–7. The measurement is
 owed on an idle one, same rule as everything else here.
 
-**It is wired into the cold-load runner** (`scripts/render/runner.ts`, port
-8004) and will appear as a fourth column in `results/alignments.md` on the next
-run. It is **not** wired into `runner-interaction.ts`, which is a two-role
-comparison (`new` / `baseline`) rather than a port list; adding a third role
-there is a real change to that file's shape, not a one-line addition.
+**It is wired into both runners** on port 8004 — `runner.ts` (cold load) and
+`runner-interaction.ts` (zoom, zoom-out, pan) — and appears as an extra column
+in `results/alignments.md` and all three tables of `results/interaction.md` on
+the next run.
+
+In the interaction runner the role is **optional**: if nothing is served on
+8004 it logs `published: port 8004 not served, skipping (optional)` and emits
+the old two-column tables. The other roles stay required, because a missing
+baseline is a broken run rather than a smaller one. Both paths were checked with
+`MODES=none`, which rebuilds the report from recorded JSON without measuring;
+with 8004 up, unmeasured cells print `—` rather than an empty column.
+
+Zoom is where this column is most worth having. Cold load is fetch-dominated
+and compresses three years into a small ratio, whereas zoom-in is the case the
+architecture actually changed.
 
 **Read that column as cumulative, not as a second isolation.** Three years of
 change separate 2.4.0 from HEAD, and almost none of it is the renderer. 4.3.0 is
@@ -619,6 +629,17 @@ node scripts/render/runner.ts             # → results/alignments.{md,json}
 node scripts/render/runner-interaction.ts # → results/interaction.{md,json}
 ```
 
+**A build you made yourself needs its `fetchSizeLimit` raised, or it measures
+nothing.** `shell/load_alignments.sh` wires the tracks with adapter defaults,
+and `BamAdapter`/`CramAdapter` default `fetchSizeLimit` to 5 MB — but the 19 kb
+benchmark window over 1000x coverage is a 28.1 MB fetch. The track then renders
+"Requested too much data (28.1 Mb). Zoom in to see features, or force load" and
+never fetches at all. Nothing errors; the page loads, the chrome paints, and the
+run happily measures an empty browser. Set the slot to something large on every
+track in the build's `config.json` before profiling or timing anything at 1000x.
+This is the same family of failure as "a config that 404s photographs
+perfectly" — see `flame/WORKER_FINDINGS.md`, which hit it.
+
 Both matrices take upwards of 20 minutes, and a single contaminated row does not
 justify redoing the other five, so each can be run in part. Rows or modes left
 out keep their recorded values and their original date, and the report says which
@@ -698,10 +719,15 @@ reproduce byte-for-byte in a couple of seconds.
 - **Part of the long-read initial-render win is not the renderer.** Some of it
   comes from the branch's intentional SNP downsampling, which changes what is
   drawn, not just how fast it is drawn.
-- **Several findings are against a Jun-13 build.** `flame/FINDINGS.md` and
-  `flame/WORKER_FINDINGS.md` resolve frames against June source, and at least one
-  hotspot they name (`_computeTags`) was fixed afterwards. The class of finding
-  is stable; the specific attribution needs a re-profile against a fresh build.
+- **`flame/FINDINGS.md` is still against a Jun-13 build.** It resolves frames
+  against June source. The class of finding is stable; the specific attribution
+  needs a re-profile against a fresh build.
+  `flame/WORKER_FINDINGS.md` **was** in this position and no longer is — it was
+  re-profiled on 2026-08-11 against a current build, which confirmed the
+  `_computeTags` fix had landed (586 ms → gone), kept two of its three verdicts
+  with measurements behind them, and corrected a third claim that had been
+  reasoned forward from the stale trace. Its own caveat now is narrower: the
+  bgzf worker-pool threads are not captured, so decompression is understated.
 - **One machine, one locus.** Everything is a single workstation at
   `chr22_mask:124000-143000`, and the per-frame numbers come from a light 1 kb
   locus. Heavier loci that mount more overlays churn more per frame.

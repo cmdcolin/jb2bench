@@ -12,23 +12,44 @@ const LOC = 'chr22_mask:124000-143000'
 
 // Column headers come from what the ports are actually serving, not from a
 // hardcoded guess — see servedbuild.ts for why.
-const ROLES = ['new', 'baseline'] as const
+// `published` is the version the 2023 paper describes, and it is **optional**:
+// the three-server setup in the README predates it, and a run that omits port
+// 8004 should still produce the two-column tables rather than aborting. Every
+// other role is required, because a missing baseline is a broken run.
+//
+// Zoom is where this column is most worth having. Cold load is fetch-dominated
+// and compresses three years of change into a small ratio; zoom-in is the case
+// the architecture actually changed, so the published-version column is the one
+// a reader of the 2023 paper can act on.
+const ROLES = ['new', 'baseline', 'published'] as const
 type Role = (typeof ROLES)[number]
+const OPTIONAL_ROLES: readonly Role[] = ['published']
 const ports: Record<Role, { port: number; extra: string }> = {
   new: { port: 8000, extra: '&renderer=webgl' },
   baseline: { port: 8001, extra: '' },
+  published: { port: 8004, extra: '' },
 }
 
-const builds = await Promise.all(
-  ROLES.map(async role => ({
-    role,
-    name: await resolveBuild(ports[role].port),
-    ...ports[role],
-  })),
+const resolved = await Promise.all(
+  ROLES.map(async role => {
+    try {
+      return { role, name: await resolveBuild(ports[role].port), ...ports[role] }
+    } catch (e) {
+      if (OPTIONAL_ROLES.includes(role)) {
+        console.log(
+          `${role}: port ${ports[role].port} not served, skipping (optional)`,
+        )
+        return undefined
+      }
+      throw e
+    }
+  }),
 )
+const builds = resolved.filter(b => b !== undefined)
 for (const b of builds) {
   console.log(`${b.role}: port ${b.port} is serving builds/${b.name}`)
 }
+const hasPublished = builds.some(b => b.role === 'published')
 const cases: { id: string; track: string }[] = []
 for (const read of ['shortread', 'longread']) {
   for (const cov of ['20x', '200x', '1000x']) {
@@ -195,6 +216,14 @@ fs.writeFileSync(
 
 const NEW = builds.find(b => b.role === 'new')!.name
 const BASE = builds.find(b => b.role === 'baseline')!.name
+const PUB = builds.find(b => b.role === 'published')?.name
+
+// The published column is emitted only when port 8004 was served, so the header
+// and every row have to agree about how many columns there are. These two keep
+// that in one place instead of repeating the conditional at each table.
+const pubHead = hasPublished ? ` ${PUB} |` : ''
+const pubCell = (r: Partial<Record<Role, Result>>) =>
+  hasPublished ? ` ${r.published ? cell(r.published) : '—'} |` : ''
 const MAX_WAIT_NOTE = `${results[cases[0]!.id]!.in.new!.maxWaitMs} ms`
 
 let md = `# Zoom interaction benchmark\n\n`
@@ -209,27 +238,27 @@ md += `Measured — ${when}. Comparisons *within* a section are same-run; compar
 
 md += `## Zoom IN — only the old renderer refetches\n\n`
 md += `The new view is a strict subset of already-loaded reads, so the GPU branch re-projects without going to the network. This is its best case.\n\n`
-md += `| case | ${NEW} | ${BASE} | ${NEW} redraw frame |\n`
-md += `|---|---:|---:|---:|\n`
+md += `| case | ${NEW} | ${BASE} |${pubHead} ${NEW} redraw frame |\n`
+md += `|---|---:|---:|${hasPublished ? '---:|' : ''}---:|\n`
 for (const c of cases) {
   const w = results[c.id]!.in.new!
   const r = results[c.id]!.in.baseline!
-  md += `| ${c.id} | ${cell(w)} | ${cell(r)} | ${w.zoomRedrawGapMs.toFixed(0)}ms |\n`
+  md += `| ${c.id} | ${cell(w)} | ${cell(r)} |${pubCell(results[c.id]!.in)} ${w.zoomRedrawGapMs.toFixed(0)}ms |\n`
 }
 
 md += `\n## Zoom OUT — mostly refused, not measured\n\n`
 md += `Zooming out was meant to be the case where BOTH builds refetch, isolating render cost from avoided fetching. It largely does not work: past a byte threshold JBrowse declines the fetch and renders "Requested too much data (N Mb). Zoom in to see features or force load" instead of reads.\n\n`
 md += `That path is fast and paints nothing, so it previously scored as a ~90ms success — the best-looking number in the table was a refusal to draw. \`_bail_\` marks a cell where no step drew anything; \`(n bail)\` marks partial refusal, with the median taken only over steps that did draw.\n\n`
 md += `The honest reading: for anything heavier than 20x shortread, this comparison has no render timing in it. The PAN section below is the test this was meant to be.\n\n`
-md += `| case | ${NEW} | ${BASE} | ${NEW} redraw frame | drew/attempted |\n`
-md += `|---|---:|---:|---:|---:|\n`
+md += `| case | ${NEW} | ${BASE} |${pubHead} ${NEW} redraw frame | drew/attempted |\n`
+md += `|---|---:|---:|${hasPublished ? '---:|' : ''}---:|---:|\n`
 for (const c of cases) {
   const w = results[c.id]!.out.new!
   const r = results[c.id]!.out.baseline!
   const gap = Number.isFinite(w.zoomRedrawGapMs)
     ? `${w.zoomRedrawGapMs.toFixed(0)}ms`
     : 'n/a'
-  md += `| ${c.id} | ${cell(w)} | ${cell(r)} | ${gap} | ${w.stepsMeasured}/${w.stepsAttempted} |\n`
+  md += `| ${c.id} | ${cell(w)} | ${cell(r)} |${pubCell(results[c.id]!.out)} ${gap} | ${w.stepsMeasured}/${w.stepsAttempted} |\n`
 }
 
 md += `\n## PAN at constant zoom — both builds refetch\n\n`
@@ -237,8 +266,8 @@ md += `One full viewport sideways per step, \`bpPerPx\` unchanged. The region is
 md += `Both architectures pay the fetch here, so this is the branch's *hardest* case — the opposite end from zoom-in. Any remaining gap is render cost, not avoided network.\n\n`
 md += `A 19 kb window gets about five viewport-widths before it runs out of the 250 kb \`chr22_mask\`; steps beyond that are not attempted rather than clamped into a mostly-empty view.\n\n`
 md += `The pan runs **leftward** from the benchmark locus. pbsim's long reads run off the ends of the contig, so long-read depth tapers there — panning right put two of five windows on thinned data (1000x.longread falls 1178 → 938 → 500 over the last three windows), which reads as a speedup in both builds at once. Leftward keeps four of five inside the plateau. Short-read depth is flat across the whole contig either way, and 20x-shortread indeed measures the same in both directions.\n\n`
-md += `| case | ${NEW} | ${BASE} | ratio | ${NEW} redraw frame | steps |\n`
-md += `|---|---:|---:|---:|---:|---:|\n`
+md += `| case | ${NEW} | ${BASE} | ratio |${pubHead} ${NEW} redraw frame | steps |\n`
+md += `|---|---:|---:|---:|${hasPublished ? '---:|' : ''}---:|---:|\n`
 for (const c of cases) {
   const w = results[c.id]!.pan.new!
   const r = results[c.id]!.pan.baseline!
@@ -257,7 +286,7 @@ for (const c of cases) {
   const gap = Number.isFinite(w.zoomRedrawGapMs)
     ? `${w.zoomRedrawGapMs.toFixed(0)}ms`
     : 'n/a'
-  md += `| ${c.id} | ${cell(w)} | ${cell(r)} | ${ratio} | ${gap} | ${w.stepsMeasured}/${w.stepsAttempted} |\n`
+  md += `| ${c.id} | ${cell(w)} | ${cell(r)} | ${ratio} |${pubCell(results[c.id]!.pan)} ${gap} | ${w.stepsMeasured}/${w.stepsAttempted} |\n`
 }
 fs.writeFileSync('results/interaction.md', md)
 console.log('\n' + md)
