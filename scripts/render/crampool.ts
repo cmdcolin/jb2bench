@@ -28,6 +28,7 @@
  * region and raw bytes per 256 KiB chunk, so panning back over a window
  * measures a cache hit rather than a decode.
  */
+import { readFile } from 'fs/promises'
 import puppeteer from 'puppeteer'
 
 import type { Browser, Page } from 'puppeteer'
@@ -130,28 +131,65 @@ const browser = await puppeteer.launch({
   args: ['--no-sandbox', '--window-size=1280,900'],
 })
 
-const acc: Record<string, number[]> = { pooled: [], plain: [] }
+const pooled: number[][] = []
+const plain: number[][] = []
+const loads: number[] = []
+
 for (let rep = 0; rep < REPS; rep++) {
-  // interleaved, so machine drift lands in both arms and not in the ratio
-  acc.pooled!.push(...(await panSeries(browser, TRACK)))
-  acc.plain!.push(...(await panSeries(browser, `${TRACK}.nopool`)))
+  // ABBA rather than ABAB. Alternating cancels a CONSTANT difference between
+  // the arms' conditions; it does not cancel a machine that is steadily getting
+  // busier, which biases whichever arm runs second in every pair. Reversing the
+  // order on alternate reps cancels that linear drift to first order — and this
+  // box has been drifting all day.
+  const order = rep % 2 === 0 ? ['pooled', 'plain'] : ['plain', 'pooled']
+  for (const arm of order) {
+    const series = await panSeries(
+      browser,
+      arm === 'pooled' ? TRACK : `${TRACK}.nopool`,
+    )
+    ;(arm === 'pooled' ? pooled : plain).push(series)
+  }
+  loads.push(Number((await readFile('/proc/loadavg', 'utf8')).split(' ')[0]))
 }
 await browser.close()
 
-const best = (xs: number[]) => Math.min(...xs)
 const med = (xs: number[]) => {
   const s = [...xs].sort((a, b) => a - b)
-  return s[Math.floor(s.length / 2)]!
+  return s.length % 2
+    ? s[(s.length - 1) / 2]!
+    : (s[s.length / 2 - 1]! + s[s.length / 2]!) / 2
 }
-console.log(`${TRACK}  ${REPS} reps x ${WINDOWS.length - 1} pans each\n`)
+
+// Per-PAIR ratios, not a ratio of aggregates: the two arms of one rep ran
+// adjacent in time under the same conditions, so dividing them first cancels
+// common-mode noise that survives into any pooled statistic. Same window index
+// in each arm, so the two sides are the same amount of work.
+const ratios: number[] = []
+for (let rep = 0; rep < Math.min(pooled.length, plain.length); rep++) {
+  const a = pooled[rep]!
+  const b = plain[rep]!
+  for (let i = 0; i < Math.min(a.length, b.length); i++) {
+    ratios.push(b[i]! / a[i]!)
+  }
+}
+
+const flat = (xss: number[][]) => xss.flat()
 console.log(
-  `pooled      best ${best(acc.pooled!).toFixed(0)}ms  median ${med(acc.pooled!).toFixed(0)}ms  n=${acc.pooled!.length}`,
+  `\n${TRACK}  ${REPS} reps (ABBA) x ${WINDOWS.length - 1} pans per arm`,
 )
 console.log(
-  `in-process  best ${best(acc.plain!).toFixed(0)}ms  median ${med(acc.plain!).toFixed(0)}ms  n=${acc.plain!.length}`,
+  `peak 1-min load during the run: ${Math.max(...loads).toFixed(2)}` +
+    (Math.max(...loads) > 4 ? '   << above 4.0, treat as unusable' : ''),
 )
 console.log(
-  `\nspeedup  best ${(best(acc.plain!) / best(acc.pooled!)).toFixed(2)}x   median ${(
-    med(acc.plain!) / med(acc.pooled!)
-  ).toFixed(2)}x`,
+  `pooled      best ${Math.min(...flat(pooled)).toFixed(0)}ms  median ${med(flat(pooled)).toFixed(0)}ms  n=${flat(pooled).length}`,
+)
+console.log(
+  `in-process  best ${Math.min(...flat(plain)).toFixed(0)}ms  median ${med(flat(plain)).toFixed(0)}ms  n=${flat(plain).length}`,
+)
+const sorted = [...ratios].sort((a, b) => a - b)
+console.log(
+  `\npaired speedup  median ${med(ratios).toFixed(2)}x  ` +
+    `[p25 ${sorted[Math.floor(sorted.length * 0.25)]!.toFixed(2)}x, ` +
+    `p75 ${sorted[Math.floor(sorted.length * 0.75)]!.toFixed(2)}x]  n=${ratios.length} pairs`,
 )

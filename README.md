@@ -40,6 +40,7 @@ Every number lives in a file; nothing is summarized only here.
 | [`results/alignments.md`](results/alignments.md) | how long does a cold initial render take? |
 | [`results/interaction.md`](results/interaction.md) | how long does a zoom make you wait? |
 | [`results/interaction-cpu.md`](results/interaction-cpu.md) | where does per-frame main-thread time go during a zoom? |
+| [`results/crampool.md`](results/crampool.md) | does @gmod/cram's slice worker pool make a pan faster? (no run of record yet) |
 | [`results/ld-gpu-vs-cpu.md`](results/ld-gpu-vs-cpu.md) | is the LD compute shader worth it vs the CPU path? |
 | [`results/ld-dispatch-limit.md`](results/ld-dispatch-limit.md) | where does the LD dispatch break, and how loudly? |
 | [`flame/FINDINGS.md`](flame/FINDINGS.md) | why is 1000x-shortread a regression? |
@@ -211,8 +212,9 @@ setup. The twin is necessary because the decode runs inside an RPC worker where
 no page-side hook reaches, so without that config slot an A/B costs two full
 builds of jbrowse-web.
 
-**No run of record yet** — every attempt so far has been on a box at load
-25–42 from other work, which is far above the 4.0 this repo treats as the
+**No run of record yet**, and the attempts are recorded in
+[`results/crampool.md`](results/crampool.md) — every one has been on a box at load
+35–45 from other work, which is far above the 4.0 this repo treats as the
 threshold for a usable row. The harness is verified to drive the pans and
 collect them; only the timing is waiting on a quiet machine.
 
