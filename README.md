@@ -543,12 +543,45 @@ blocks. The new branch paints a single canvas per display, so block counting no
 longer applies. The first three points below follow from that; the rest are
 lessons from measurements that turned out to be measuring the wrong thing.
 
-- **Render-complete detection is renderer-agnostic.** Instead of counting
-  blocks, `scripts/render/profile.ts` waits for *quiescence*: at least one
-  render-complete marker (`[data-testid$="-done"]` / `[data-testid$="_done"]`),
-  no `loading-overlay`, and a stable marker count across several polls. That
-  matches both the old blocks (`prerendered_canvas … _done`, N per view) and the
-  new single canvas (`pileup-display-done`).
+- **Render-complete detection spans two disjoint contracts, and it says which
+  one it used.** `scripts/render/profile.ts` waits for *quiescence*, but what
+  counts as a render-complete marker depends on the build's vintage. Verified
+  against `builds/` on 2026-08-12:
+
+  | build          | signal                                             |
+  | -------------- | -------------------------------------------------- |
+  | release-4.3.0  | 4 × `[data-testid$="-done"]`, no phase attributes   |
+  | current main   | `[data-display-phase]` + `[data-display-drawn]`     |
+
+  There is **no overlap**, so the old marker-only detector this file used to
+  describe finds nothing on a build from current main and every such row times
+  out at 120 s. The detector now picks the contract inside the poll — sampling
+  it beforehand does not work, since at that moment no display has mounted — and
+  prints `render-complete contract: phase|legacy` on stderr so a row measured
+  under a different contract from its neighbours is visible rather than silently
+  incomparable.
+
+  Guessing wrong does not error, which is why this matters: the unmatched
+  selector makes the wait return immediately, and the build reports a render
+  time near zero. On a baseline column that quietly shrinks every speedup in the
+  table.
+
+- **A positive gate runs before any of it.** Every signal above is negative — no
+  overlay, no unpainted display, no unstable count — so all of them pass on a
+  page whose JavaScript never ran. `profile.ts` first waits for
+  `window.JBrowseSession` to exist with its views initialized, so a 404ed config
+  fails loudly instead of reporting a very fast render of an empty browser. A
+  timeout with no display mounted at all now says so, because that is nearly
+  always a trackId this build's `config.json` does not define.
+
+  That gate is a stand-in for `@jbrowse/capture`'s `waitForSession`, which is the
+  maintained implementation of this problem and has more stages (view phases,
+  quiescence, a paint contract, and a check that the requested trackIds are
+  actually open). It is not imported because that package's `exports` resolves to
+  `./src/index.ts` while its `files` ships only `esm/`: the bare specifier lands
+  on TypeScript inside `node_modules`, which node refuses to strip, and the built
+  output is unreachable through the exports map. If that gets fixed — sibling
+  `@jbrowse/img` has it right — drop the hand-rolled gate and take its stages.
 - **Headless but still hardware-accelerated.** Plain headless Chrome on Linux
   falls back to the SwiftShader software rasterizer, which would unfairly slow
   the branch's GPU path. `--use-angle=gl` makes headless render WebGL2 through
