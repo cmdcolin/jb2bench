@@ -189,6 +189,33 @@ A corpus with patchier coverage would need a real painted-content check instead.
 > than renders until the bail check landed. And the first pan implementation
 > panned rightward into the coverage taper described above.
 
+### CRAM slice worker pool, on vs off
+
+`scripts/render/crampool.ts`. Since 12.1 `@gmod/cram` decodes each slice on a
+pool of workers; nested inside jbrowse's RPC worker that is worth **2.1–3.6x on
+the decode** (see `@gmod/cram`'s `docs/WORKERS.md`, and ADR 0009 there for why
+the pool is per JS context). This asks the different question of whether a
+reader feels it.
+
+**Do not measure it with a cold load.** The first attempt did and got 0.99x on
+200x.shortread.cram, which is the instrument and not the result: a page load
+re-pays app boot, chunk fetch and assembly resolution every run, ~2 s of
+constant work that the decode is only a slice of. This script pans instead —
+app up, assembly resolved, worker warm and its wasm instantiated — across
+non-overlapping 19 kb windows, since jbrowse caches decoded records per region
+and raw bytes per 256 KiB chunk and panning back measures a cache hit.
+
+Needs a build with both arms in it: a CRAM track plus a `.nopool` twin
+differing only in the adapter's `useSliceWorkerPool`. The file header has the
+setup. The twin is necessary because the decode runs inside an RPC worker where
+no page-side hook reaches, so without that config slot an A/B costs two full
+builds of jbrowse-web.
+
+**No run of record yet** — every attempt so far has been on a box at load
+25–42 from other work, which is far above the 4.0 this repo treats as the
+threshold for a usable row. The harness is verified to drive the pans and
+collect them; only the timing is waiting on a quiet machine.
+
 ### Per-frame interaction cost
 
 `scripts/flamegraph/interaction-profile.ts` → `results/interaction-cpu.md`. Not
