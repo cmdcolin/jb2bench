@@ -208,26 +208,43 @@ md += `Speedup = ${baseline} median ÷ ${UNDER_TEST} median.\n\n`
 // sitting, and carry the load it was taken under, since that is what decides
 // whether a row is worth believing.
 md += `\`measured\` is when each row was taken and \`load\` the highest 1-minute load average recorded across its cells. This machine is shared: a row measured under load is not comparable to one measured idle, so any row above ${LOAD_CEILING.toFixed(1)} reports **unusable** in place of a speedup rather than a number that looks like a result. \`?\` means the row predates per-cell load recording.\n\n`
-md += `| case | ${builds.map(b => b.name).join(' | ')} | speedup vs ${baseline} | measured | load |\n`
-md += `|---|${builds.map(() => '---:').join('|')}|---:|---|---:|\n`
+// The published version is the 2023 paper's, resolved from port 8004 rather than
+// by name so a restaged ports table cannot silently point this column at a
+// different build. Its speedup is the one a reader of that paper is asking for;
+// the baseline column answers the narrower "what did this release change".
+const published = builds.find(b => b.port === 8004)?.name
+md += `| case | ${builds.map(b => b.name).join(' | ')} | speedup vs ${baseline} |${published ? ` speedup vs ${published} |` : ''} measured | load |\n`
+md += `|---|${builds.map(() => '---:').join('|')}|---:|${published ? '---:|' : ''}---|---:|\n`
 const unusable: string[] = []
+// A build column can be missing from a row rather than merely stale: adding
+// release-2.4.0 gave every previously-recorded row a cell it never had, and
+// indexing it blind threw before any markdown was written -- so a run that had
+// measured fine produced no table at all. An absent cell prints as an em dash
+// and drops out of the speedup and the row load.
 for (const c of allCases) {
+  const cellOf = (name: string) => results[c.id]?.[name]
   const row = builds.map(b => {
-    const cell = results[c.id]![b.name]!
-    return `${cell.median.toFixed(0)} ±${cell.stddev.toFixed(0)}`
+    const cell = cellOf(b.name)
+    return cell ? `${cell.median.toFixed(0)} ±${cell.stddev.toFixed(0)}` : '—'
   })
-  const sp =
-    results[c.id]![baseline]!.median / results[c.id]![UNDER_TEST]!.median
-  const rowLoad = Math.max(
-    ...builds.map(b =>
-      peak(results[c.id]![b.name]!.load ?? { before: 0, after: 0 }),
-    ),
-  )
+  const base = cellOf(baseline)
+  const test = cellOf(UNDER_TEST)
+  const sp = base && test ? base.median / test.median : Number.NaN
+  const loads = builds
+    .map(b => cellOf(b.name))
+    .filter(cell => cell !== undefined)
+    .map(cell => peak(cell.load ?? { before: 0, after: 0 }))
+  const rowLoad = loads.length ? Math.max(...loads) : 0
   const over = rowLoad > LOAD_CEILING
   if (over) {
     unusable.push(c.id)
   }
-  md += `| ${c.id} | ${row.join(' | ')} | ${over ? '**unusable**' : `${sp.toFixed(2)}×`} | ${measuredAt[c.id] ?? 'unknown'} | ${rowLoad ? rowLoad.toFixed(1) : '?'} |\n`
+  const fmt = (v: number) =>
+    Number.isFinite(v) ? (over ? '**unusable**' : `${v.toFixed(2)}×`) : '—'
+  const pubCell = published
+    ? ` ${fmt(cellOf(published) && test ? cellOf(published)!.median / test.median : Number.NaN)} |`
+    : ''
+  md += `| ${c.id} | ${row.join(' | ')} | ${fmt(sp)} |${pubCell} ${measuredAt[c.id] ?? 'unknown'} | ${rowLoad ? rowLoad.toFixed(1) : '?'} |\n`
 }
 if (unusable.length) {
   md += `\n> **${unusable.join(', ')}** ${unusable.length === 1 ? 'was' : 'were'} measured on a machine under heavy external load and the timings are not usable. The medians are left in the table because they are what was measured, not because they mean anything; re-run with \`CASES=${unusable.join(',')}\` on an idle box. Judge that the box is idle from \`uptime\` before starting, not from the load at the moment the run begins — on 2026-08-05 a run that started at load 3.15 was at 35 by the time it finished.\n`

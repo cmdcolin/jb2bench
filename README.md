@@ -513,8 +513,16 @@ and `wgsim -1 150 -2 150 -N 1000000`, and `shell/generate_alignments.sh` uses th
 same 250 kb slice and the same two invocations. `runner.ts`'s 19 kb window
 carries a comment saying it matches the historical `jb2profile`.
 
-Not yet run: this is harness work, done on a box at load 4–7. The measurement is
-owed on an idle one, same rule as everything else here.
+**First measured 2026-08-13, and every row of it is over the load ceiling.** The
+run was made to a deadline on a box sitting at load 7–28 from unrelated work, so
+`results/alignments.md` marks all four re-measured rows `unusable` and none of
+the absolute milliseconds should be quoted. What survives is the *ratio*: the
+four builds are measured back to back inside each case, so a load spike lands on
+all of them at once rather than on one column. Read against v2.4.0 those ratios
+were 2.0× (1000x-shortread), 2.4× (20x-shortread) and 3.6× (200x-longread).
+
+The cold-load measurement on an idle box is still owed, and it is the one worth
+having, since a contaminated row can only be re-run and not repaired.
 
 **It is wired into both runners** on port 8004 — `runner.ts` (cold load) and
 `runner-interaction.ts` (zoom, zoom-out, pan) — and appears as an extra column
@@ -594,6 +602,25 @@ lessons from measurements that turned out to be measuring the wrong thing.
   selector makes the wait return immediately, and the build reports a render
   time near zero. On a baseline column that quietly shrinks every speedup in the
   table.
+
+- **The loading-indicator wording is version-dependent too, and missing it reads
+  as a perfect score.** `scripts/render/interaction.ts` decides that content is
+  back when no loading indicator is on screen, so an indicator it does not
+  recognize is indistinguishable from an interaction that never blocked. The
+  detector matched `/Downloading|Loading alignments|Rendering/`; release-2.4.0
+  labels a refetching block plain **`Loading`** and its worker step
+  **`Serializing results`**, neither of which that pattern catches. Measured on
+  2026-08-13, the 2023 build therefore scored **0 ms on every zoom-in case** —
+  the same as the GPU branch, and the strongest-looking result in the table was
+  the instrument failing. With the pattern widened, the same cell reads 3366 ms
+  on 200x-longread.
+
+  The direction of the error is what makes it dangerous: an unrecognized
+  indicator can only ever make a build look *faster*, and it lands hardest on
+  the oldest build in the matrix, which is the one whose wording is least likely
+  to match. Widening was checked against the other columns rather than assumed
+  safe — at rest `builds/current` carries no `Loading` text at all and a zoom-in
+  adds no blocks to it, so its 0 ms rests on its own evidence and did not move.
 
 - **A positive gate runs before any of it.** Every signal above is negative — no
   overlay, no unpainted display, no unstable count — so all of them pass on a
@@ -694,6 +721,17 @@ node scripts/gpucheck.ts headless
 # run the matrices from the repo root (paths in the runners are root-relative)
 node scripts/render/runner.ts             # → results/alignments.{md,json}
 node scripts/render/runner-interaction.ts # → results/interaction.{md,json}
+
+# both runners narrow the same two ways, for when a full sweep is unaffordable:
+# CASES= picks rows, MODES= picks interactions, and either =none rebuilds the
+# report from recorded JSON without measuring. Unselected cells keep their last
+# value, so a filtered run mixes vintages and the tables date each row.
+CASES=200x-longread node scripts/render/runner.ts
+MODES=in CASES=20x-shortread,200x-longread node scripts/render/runner-interaction.ts
+
+# the shareable summary page, generated from both JSONs so it cannot drift from
+# what was measured. Reads nothing else and measures nothing.
+node scripts/render/report.ts > results/report.html
 ```
 
 **A build you made yourself needs its `fetchSizeLimit` raised, or it measures

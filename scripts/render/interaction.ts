@@ -123,14 +123,28 @@ await page.evaluate(() => {
   requestAnimationFrame(tick)
 })
 
-// loading detector: true while the track shows a loading indicator. Covers the
-// shared loading-overlay testid and the alignments "Downloading..." block
-// message, so it works on both the old block renderer and the new branch.
+// loading detector: true while the track shows a loading indicator.
+//
+// The message set is VERSION-DEPENDENT, and getting it wrong is silent and
+// one-directional: an unmatched indicator reads as "content was never missing",
+// i.e. a perfect score. builds/release-2.4.0 -- the 2023 paper's version --
+// labels a refetching block plain "Loading" and its worker step "Serializing
+// results", neither of which the original /Downloading|Loading
+// alignments|Rendering/ matched. It therefore scored 0 ms on every zoom-in
+// case, identical to the GPU branch, which is the instrument and not the result.
+//
+// Verified on 2026-08-13 that widening this does not corrupt the other columns:
+// at rest builds/current carries no "Loading" text at all and a zoom-in adds no
+// blocks, so its 0 ms stands on its own evidence rather than on the regex
+// missing something.
 const LOADING_FN = () => {
   const overlay =
     document.querySelectorAll('[data-testid="loading-overlay"]').length > 0
   const txt = document.body.innerText
-  const msg = /Downloading|Loading alignments|Rendering/i.test(txt)
+  const msg =
+    /Downloading|Loading alignments|Rendering|Serializing results|\bLoading\b/i.test(
+      txt,
+    )
   return overlay || msg
 }
 

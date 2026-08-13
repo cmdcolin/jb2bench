@@ -50,11 +50,29 @@ for (const b of builds) {
   console.log(`${b.role}: port ${b.port} is serving builds/${b.name}`)
 }
 const hasPublished = builds.some(b => b.role === 'published')
-const cases: { id: string; track: string }[] = []
+const allCases: { id: string; track: string }[] = []
 for (const read of ['shortread', 'longread']) {
   for (const cov of ['20x', '200x', '1000x']) {
-    cases.push({ id: `${cov}-${read}`, track: `${cov}.${read}.bam` })
+    allCases.push({ id: `${cov}-${read}`, track: `${cov}.${read}.bam` })
   }
+}
+
+// CASES=20x-shortread,200x-longread re-measures a subset, the same way MODES
+// narrows by mode -- the heavy long-read cells cost minutes each, so a full
+// sweep is not always affordable. Cases not selected keep their recorded values,
+// which means a filtered run mixes vintages; the report dates each mode for
+// exactly that reason.
+const selectedCases = process.env.CASES?.split(',')
+const cases =
+  process.env.CASES === 'none'
+    ? []
+    : selectedCases
+      ? allCases.filter(c => selectedCases.includes(c.id))
+      : allCases
+if (!cases.length && process.env.CASES !== 'none') {
+  throw new Error(
+    `CASES matched nothing; known: ${allCases.map(c => c.id).join(',')}`,
+  )
 }
 
 // in  — the new view is a subset of loaded data, so only the old renderer
@@ -156,13 +174,17 @@ for (const m of MODES) {
 
 const results: Record<string, Record<Mode, Partial<Record<Role, Result>>>> = {}
 const measured: { key: string; load: LoadWindow; value: Result }[] = []
-for (const c of cases) {
+// Seeded for every case, not only the measured ones, so a CASES-filtered run
+// still renders full tables from what was recorded before.
+for (const c of allCases) {
   results[c.id] = {
     in: {},
     out: {},
     pan: {},
     ...prior.results?.[c.id],
   }
+}
+for (const c of cases) {
   for (const mode of MODES) {
     for (const b of builds) {
       const what = mode === 'pan' ? 'pan' : `zoom-${mode}`
@@ -239,7 +261,13 @@ const PUB = builds.find(b => b.role === 'published')?.name
 const pubHead = hasPublished ? ` ${PUB} |` : ''
 const pubCell = (r: Partial<Record<Role, Result>>) =>
   hasPublished ? ` ${r.published ? cell(r.published) : '—'} |` : ''
-const MAX_WAIT_NOTE = `${results[cases[0]!.id]!.in.new!.maxWaitMs} ms`
+// Read from whatever was actually recorded: a CASES/MODES-filtered run need not
+// have measured the first case's zoom-in this time round.
+const MAX_WAIT_NOTE = `${
+  Object.values(results)
+    .flatMap(byMode => Object.values(byMode).flatMap(byRole => Object.values(byRole)))
+    .find(r => r?.maxWaitMs)?.maxWaitMs ?? 120000
+} ms`
 
 let md = `# Zoom interaction benchmark\n\n`
 md += `Region \`${LOC}\`. **time-to-content** = ms a loading indicator ("Downloading alignments...") is shown after a zoom before correct content returns; median over the measured steps. `
@@ -255,7 +283,7 @@ md += `## Zoom IN — only the old renderer refetches\n\n`
 md += `The new view is a strict subset of already-loaded reads, so the GPU branch re-projects without going to the network. This is its best case.\n\n`
 md += `| case | ${NEW} | ${BASE} |${pubHead} ${NEW} redraw frame |\n`
 md += `|---|---:|---:|${hasPublished ? '---:|' : ''}---:|\n`
-for (const c of cases) {
+for (const c of allCases) {
   const w = results[c.id]!.in.new!
   const r = results[c.id]!.in.baseline!
   md += `| ${c.id} | ${cell(w)} | ${cell(r)} |${pubCell(results[c.id]!.in)} ${w.zoomRedrawGapMs.toFixed(0)}ms |\n`
@@ -267,7 +295,7 @@ md += `That path is fast and paints nothing, so it previously scored as a ~90ms 
 md += `The honest reading: for anything heavier than 20x shortread, this comparison has no render timing in it. The PAN section below is the test this was meant to be.\n\n`
 md += `| case | ${NEW} | ${BASE} |${pubHead} ${NEW} redraw frame | drew/attempted |\n`
 md += `|---|---:|---:|${hasPublished ? '---:|' : ''}---:|---:|\n`
-for (const c of cases) {
+for (const c of allCases) {
   const w = results[c.id]!.out.new!
   const r = results[c.id]!.out.baseline!
   const gap = Number.isFinite(w.zoomRedrawGapMs)
@@ -283,7 +311,7 @@ md += `A 19 kb window gets about five viewport-widths before it runs out of the 
 md += `The pan runs **leftward** from the benchmark locus. pbsim's long reads run off the ends of the contig, so long-read depth tapers there — panning right put two of five windows on thinned data (1000x.longread falls 1178 → 938 → 500 over the last three windows), which reads as a speedup in both builds at once. Leftward keeps four of five inside the plateau. Short-read depth is flat across the whole contig either way, and 20x-shortread indeed measures the same in both directions.\n\n`
 md += `| case | ${NEW} | ${BASE} | ratio |${pubHead} ${NEW} redraw frame | steps |\n`
 md += `|---|---:|---:|---:|${hasPublished ? '---:|' : ''}---:|---:|\n`
-for (const c of cases) {
+for (const c of allCases) {
   const w = results[c.id]!.pan.new!
   const r = results[c.id]!.pan.baseline!
   // a ratio is only meaningful between two cells that are both real timings
