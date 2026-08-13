@@ -133,19 +133,26 @@ await page.evaluate(() => {
 // alignments|Rendering/ matched. It therefore scored 0 ms on every zoom-in
 // case, identical to the GPU branch, which is the instrument and not the result.
 //
-// Verified on 2026-08-13 that widening this does not corrupt the other columns:
-// at rest builds/current carries no "Loading" text at all and a zoom-in adds no
-// blocks, so its 0 ms stands on its own evidence rather than on the regex
-// missing something.
-const LOADING_FN = () => {
+// Widening it is not free either, and the second failure is as loud as the first
+// one is quiet: something on a release-4.3.0 page matches a bare "Loading"
+// permanently, so with the wide pattern every step ran to MAX_WAIT and a single
+// cell spent eight minutes reporting five censored values. Both errors come from
+// one assumption -- that a fixed word list describes every build's UI.
+//
+// So the pattern is CHOSEN PER BUILD, by a rule that needs no version table: an
+// indicator already showing while the page sits at rest is not an indicator. The
+// wide pattern is sampled once after the initial render goes quiescent, and a
+// build it already matches there falls back to the narrow one. That keeps
+// 2.4.0's "Loading" blocks visible without letting 4.3.0's permanent match
+// swallow the run, and it degrades safely on a build nobody has tried yet.
+const LOADING_FN = (wide: boolean) => {
   const overlay =
     document.querySelectorAll('[data-testid="loading-overlay"]').length > 0
   const txt = document.body.innerText
-  const msg =
-    /Downloading|Loading alignments|Rendering|Serializing results|\bLoading\b/i.test(
-      txt,
-    )
-  return overlay || msg
+  const re = wide
+    ? /Downloading|Loading alignments|Rendering|Serializing results|\bLoading\b/i
+    : /Downloading|Loading alignments|Rendering/i
+  return overlay || re.test(txt)
 }
 
 // A step that is still loading when this expires is reported as CENSORED, not as
@@ -155,6 +162,14 @@ const LOADING_FN = () => {
 // data than zoom-in, so the ceiling has to be well clear of any real value.
 const MAX_WAIT = Number(process.env.MAX_WAIT ?? 120000)
 const QUIET = 300 // content considered back once loading stays false this long
+
+// Decide the pattern here, with the page rendered and idle. Printed on stderr
+// for the same reason the render-complete contract is: a cell measured under a
+// different detector from its neighbours should be visible, not silent.
+const WIDE_OK = !(await page.evaluate(LOADING_FN, true))
+console.error(
+  `loading detector: ${WIDE_OK ? 'wide' : 'narrow (wide matches this build at rest)'}`,
+)
 
 // Past a byte threshold JBrowse refuses the fetch and renders "Requested too
 // much data (N Mb). Zoom in to see features or force load" instead of reads.
@@ -266,7 +281,7 @@ async function interactStep(): Promise<StepMetric> {
   let censored = false
   const start = Date.now()
   for (;;) {
-    const loading = await page.evaluate(LOADING_FN)
+    const loading = await page.evaluate(LOADING_FN, WIDE_OK)
     const elapsed = Date.now() - start
     if (loading) {
       loadingSeen = true
