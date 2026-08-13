@@ -1,0 +1,409 @@
+<title>JBrowse 2 Since v2.4.0</title>
+<style>
+  :root {
+    --bg: #f4f7f7;
+    --surface: #ffffff;
+    --ink: #0e1719;
+    --muted: #59706f;
+    --line: #d9e3e2;
+    --accent: #0b6b64;
+    --accent-soft: #e2f0ee;
+    --pub: #9d5325;
+    --pub-soft: #f6e9e0;
+    --warn: #8a6206;
+    --warn-soft: #faf0d8;
+    --good: #26694a;
+    --shadow: 0 1px 2px rgba(14, 23, 25, 0.06), 0 8px 24px rgba(14, 23, 25, 0.05);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme='light']) {
+      --bg: #0b1112;
+      --surface: #121b1c;
+      --ink: #e6efee;
+      --muted: #8ea3a1;
+      --line: #243234;
+      --accent: #4fbcae;
+      --accent-soft: #14312e;
+      --pub: #d68a5a;
+      --pub-soft: #2e2019;
+      --warn: #d8ab3f;
+      --warn-soft: #2c2413;
+      --good: #63b78c;
+      --shadow: 0 1px 2px rgba(0, 0, 0, 0.4), 0 8px 24px rgba(0, 0, 0, 0.3);
+    }
+  }
+  :root[data-theme='dark'] {
+    --bg: #0b1112;
+    --surface: #121b1c;
+    --ink: #e6efee;
+    --muted: #8ea3a1;
+    --line: #243234;
+    --accent: #4fbcae;
+    --accent-soft: #14312e;
+    --pub: #d68a5a;
+    --pub-soft: #2e2019;
+    --warn: #d8ab3f;
+    --warn-soft: #2c2413;
+    --good: #63b78c;
+    --shadow: 0 1px 2px rgba(0, 0, 0, 0.4), 0 8px 24px rgba(0, 0, 0, 0.3);
+  }
+
+  body {
+    background: var(--bg);
+    color: var(--ink);
+    font-family: system-ui, -apple-system, 'Segoe UI', sans-serif;
+    line-height: 1.6;
+    margin: 0;
+    padding: clamp(1.5rem, 4vw, 3.5rem) clamp(1rem, 4vw, 2rem) 5rem;
+  }
+  .wrap {
+    max-width: 68rem;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    gap: 2.75rem;
+  }
+  .prose { max-width: 40rem; }
+
+  h1, h2, h3 { font-family: Georgia, 'Iowan Old Style', 'Times New Roman', serif; font-weight: 600; text-wrap: balance; margin: 0; }
+  h1 { font-size: clamp(2rem, 5vw, 3rem); line-height: 1.12; letter-spacing: -0.01em; }
+  h2 { font-size: 1.6rem; line-height: 1.2; }
+  h3 { font-size: 1.1rem; }
+  p { margin: 0; }
+  .eyebrow {
+    font-size: 0.72rem; letter-spacing: 0.14em; text-transform: uppercase;
+    color: var(--accent); font-weight: 600; margin: 0 0 0.9rem;
+  }
+  .lede { font-size: 1.12rem; color: var(--muted); margin-top: 1rem; }
+
+  header { border-bottom: 1px solid var(--line); padding-bottom: 2.25rem; }
+
+  .tiles { display: grid; grid-template-columns: repeat(auto-fit, minmax(13rem, 1fr)); gap: 1rem; }
+  .tile {
+    background: var(--surface); border: 1px solid var(--line); border-radius: 3px;
+    padding: 1.15rem 1.25rem; box-shadow: var(--shadow);
+    display: flex; flex-direction: column; gap: 0.3rem;
+  }
+  .tile .k { font-size: 0.72rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); font-weight: 600; }
+  .tile .v {
+    font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+    font-size: 2rem; font-variant-numeric: tabular-nums; line-height: 1.1; color: var(--accent);
+  }
+  .tile .n { font-size: 0.85rem; color: var(--muted); }
+
+  section { display: flex; flex-direction: column; gap: 1.15rem; }
+
+  .scroll { overflow-x: auto; border: 1px solid var(--line); border-radius: 3px; background: var(--surface); box-shadow: var(--shadow); }
+  table { border-collapse: collapse; width: 100%; font-size: 0.9rem; }
+  caption { text-align: left; padding: 0.9rem 1rem 0; color: var(--muted); font-size: 0.85rem; }
+  th, td { padding: 0.55rem 0.85rem; border-bottom: 1px solid var(--line); text-align: left; white-space: nowrap; }
+  thead th {
+    font-size: 0.7rem; letter-spacing: 0.08em; text-transform: uppercase;
+    color: var(--muted); font-weight: 600; border-bottom: 1px solid var(--line);
+  }
+  tbody th { font-weight: 500; font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.85rem; }
+  tbody tr:last-child th, tbody tr:last-child td { border-bottom: 0; }
+  .num { text-align: right; font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-variant-numeric: tabular-nums; }
+  .strong { color: var(--accent); font-weight: 600; }
+  .pub { color: var(--pub); }
+  .meta { color: var(--muted); font-size: 0.82rem; }
+  .ratio { background: var(--accent-soft); color: var(--accent); border-radius: 2px; padding: 0.12rem 0.42rem; font-weight: 600; }
+  .ratio.none { background: transparent; color: var(--muted); font-weight: 400; }
+  .instant { background: var(--accent-soft); color: var(--accent); border-radius: 2px; padding: 0.12rem 0.42rem; font-weight: 600; }
+  .bail { color: var(--muted); font-style: italic; }
+  .load { border-radius: 2px; padding: 0.12rem 0.42rem; }
+  .load.hot { background: var(--warn-soft); color: var(--warn); font-weight: 600; }
+  .load.ok { color: var(--muted); }
+
+  .panel {
+    background: var(--surface); border: 1px solid var(--line); border-left: 3px solid var(--warn);
+    border-radius: 3px; padding: 1.25rem 1.4rem; display: flex; flex-direction: column; gap: 0.7rem;
+    box-shadow: var(--shadow);
+  }
+  .panel.accent { border-left-color: var(--accent); }
+  .panel h3 { font-family: system-ui, sans-serif; font-size: 0.78rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--warn); }
+  .panel.accent h3 { color: var(--accent); }
+  .panel p, .panel li { font-size: 0.92rem; color: var(--muted); }
+  .panel ul { margin: 0; padding-left: 1.1rem; display: flex; flex-direction: column; gap: 0.45rem; }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.88em; background: var(--accent-soft); color: var(--accent); padding: 0.08em 0.32em; border-radius: 2px; }
+  footer { border-top: 1px solid var(--line); padding-top: 1.5rem; color: var(--muted); font-size: 0.85rem; }
+</style>
+
+<div class="wrap">
+  <header>
+    <p class="eyebrow">JBrowse 2 render benchmarks · 2026-08-13</p>
+    <h1>What three years bought a reader of the 2023 paper</h1>
+    <p class="lede prose">
+      Every speedup in this repository has been measured against a recent release, which
+      answers &ldquo;what did this release change.&rdquo; This run adds the column that answers a
+      different question: how much faster is JBrowse 2 today than
+      <strong>v2.4.0</strong> &mdash; the version archived and benchmarked in the 2023
+      <em>Genome Biology</em> paper, and the one people have actually read about.
+    </p>
+  </header>
+
+  <div class="tiles">
+    <div class="tile">
+      <span class="k">Cold render vs v2.4.0</span>
+      <span class="v">1.8–3.6×</span>
+      <span class="n">across 5 measured cases</span>
+    </div>
+    <div class="tile">
+      <span class="k">Zoom wait, current</span>
+      <span class="v">none</span>
+      <span class="n">no loading state on any case</span>
+    </div>
+    <div class="tile">
+      <span class="k">Region</span>
+      <span class="v" style="font-size:1.35rem">19 kb</span>
+      <span class="n">chr22_mask:124000-143000</span>
+    </div>
+    <div class="tile">
+      <span class="k">Runs per cell</span>
+      <span class="v" style="font-size:1.35rem">6 + warmup</span>
+      <span class="n">median reported</span>
+    </div>
+  </div>
+
+  <section>
+    <h2>End-to-end: cold load to rendered reads</h2>
+    <p class="prose">
+      In-page navigation&rarr;render-complete time, median of 6 runs after a warmup.
+      This is the <em>fetch-dominated</em> measurement &mdash; every build here parses in a worker
+      and pulls the same bytes over the same HTTP range requests &mdash; so it understates the
+      renderer difference rather than flattering it.
+    </p>
+    <div class="scroll">
+      <table>
+        <caption>Milliseconds, lower is better. <strong>current</strong> is <code>jbrowse-components</code> HEAD.</caption>
+        <thead>
+          <tr>
+            <th scope="col">case</th>
+            <th scope="col" class="num">current</th>
+            <th scope="col" class="num">4.3.0</th>
+            <th scope="col" class="num">4.1.15</th>
+            <th scope="col" class="num">2.4.0 <span style="font-weight:400">(paper)</span></th>
+            <th scope="col" class="num">vs 4.3.0</th>
+            <th scope="col" class="num">vs 2.4.0</th>
+            <th scope="col">measured</th>
+            <th scope="col" class="num">load</th>
+          </tr>
+        </thead>
+        <tbody><tr>
+    <th scope="row">20x-shortread</th>
+    <td class="num strong">1734</td>
+    <td class="num">2482</td>
+    <td class="num">3603</td>
+    <td class="num pub">4147</td>
+    <td class="num">1.43×</td>
+    <td class="num"><span class="ratio">2.39×</span></td>
+    <td class="meta">2026-08-13</td>
+    <td class="num meta"><span class="load hot">23.2</span></td>
+  </tr><tr>
+    <th scope="row">200x-shortread</th>
+    <td class="num strong">2803</td>
+    <td class="num">3195</td>
+    <td class="num">3376</td>
+    <td class="num pub">5198</td>
+    <td class="num">1.14×</td>
+    <td class="num"><span class="ratio">1.85×</span></td>
+    <td class="meta">2026-08-13</td>
+    <td class="num meta"><span class="load hot">16.8</span></td>
+  </tr><tr>
+    <th scope="row">1000x-shortread</th>
+    <td class="num strong">5402</td>
+    <td class="num">5411</td>
+    <td class="num">5085</td>
+    <td class="num pub">10912</td>
+    <td class="num">1.00×</td>
+    <td class="num"><span class="ratio">2.02×</span></td>
+    <td class="meta">2026-08-13</td>
+    <td class="num meta"><span class="load hot">21.4</span></td>
+  </tr><tr>
+    <th scope="row">20x-longread</th>
+    <td class="num strong">1881</td>
+    <td class="num">2885</td>
+    <td class="num">2761</td>
+    <td class="num pub">3315</td>
+    <td class="num">1.53×</td>
+    <td class="num"><span class="ratio">1.76×</span></td>
+    <td class="meta">2026-08-13</td>
+    <td class="num meta"><span class="load hot">14.7</span></td>
+  </tr><tr>
+    <th scope="row">200x-longread</th>
+    <td class="num strong">3402</td>
+    <td class="num">9784</td>
+    <td class="num">11364</td>
+    <td class="num pub">12106</td>
+    <td class="num">2.88×</td>
+    <td class="num"><span class="ratio">3.56×</span></td>
+    <td class="meta">2026-08-13</td>
+    <td class="num meta"><span class="load hot">27.7</span></td>
+  </tr><tr>
+    <th scope="row">1000x-longread</th>
+    <td class="num strong">7350</td>
+    <td class="num">36171</td>
+    <td class="num">56452</td>
+    <td class="num pub">—</td>
+    <td class="num">4.92×</td>
+    <td class="num"><span class="ratio none">—</span></td>
+    <td class="meta">2026-08-05</td>
+    <td class="num meta"><span class="load hot">35.4</span></td>
+  </tr></tbody>
+      </table>
+    </div>
+  </section>
+
+  <section>
+    <h2>Interactivity: what a zoom costs you</h2>
+    <p class="prose">
+      <strong>Time-to-content</strong> is the milliseconds a loading indicator sits on the track
+      after an interaction before correct content is back. The old block renderer binds rendered
+      output to a specific <code>bpPerPx</code>, so every zoom refetches and re-renders; the current
+      renderer re-projects reads it already holds.
+    </p>
+    <div class="scroll">
+      <table>
+        <caption>Zoom in &mdash; the new view is a subset of loaded data, so only the block renderers refetch.</caption>
+        <thead>
+          <tr>
+            <th scope="col">case</th>
+            <th scope="col" class="num">current</th>
+            <th scope="col" class="num">4.3.0</th>
+            <th scope="col" class="num">2.4.0 <span style="font-weight:400">(paper)</span></th>
+            <th scope="col" class="num">current redraw frame</th>
+          </tr>
+        </thead>
+        <tbody><tr>
+    <th scope="row">20x-shortread</th>
+    <td class="num strong"><span class="instant">none</span></td>
+    <td class="num">1059</td>
+    <td class="num pub">—</td>
+    <td class="num meta">17 ms</td>
+  </tr><tr>
+    <th scope="row">200x-shortread</th>
+    <td class="num strong"><span class="instant">none</span></td>
+    <td class="num">1085</td>
+    <td class="num pub">—</td>
+    <td class="num meta">17 ms</td>
+  </tr><tr>
+    <th scope="row">1000x-shortread</th>
+    <td class="num strong"><span class="instant">none</span></td>
+    <td class="num">1717</td>
+    <td class="num pub">—</td>
+    <td class="num meta">17 ms</td>
+  </tr><tr>
+    <th scope="row">20x-longread</th>
+    <td class="num strong"><span class="instant">none</span></td>
+    <td class="num">1178</td>
+    <td class="num pub">—</td>
+    <td class="num meta">17 ms</td>
+  </tr><tr>
+    <th scope="row">200x-longread</th>
+    <td class="num strong"><span class="instant">none</span></td>
+    <td class="num">2984</td>
+    <td class="num pub">—</td>
+    <td class="num meta">17 ms</td>
+  </tr><tr>
+    <th scope="row">1000x-longread</th>
+    <td class="num strong"><span class="instant">none</span></td>
+    <td class="num">15321</td>
+    <td class="num pub">—</td>
+    <td class="num meta">50 ms</td>
+  </tr></tbody>
+      </table>
+    </div>
+    <div class="scroll">
+      <table>
+        <caption>Pan one viewport sideways at constant zoom &mdash; the region is new to <em>every</em> build, so all of them pay the fetch. This is the hardest case for the current renderer, not the easiest.</caption>
+        <thead>
+          <tr>
+            <th scope="col">case</th>
+            <th scope="col" class="num">current</th>
+            <th scope="col" class="num">4.3.0</th>
+            <th scope="col" class="num">2.4.0 <span style="font-weight:400">(paper)</span></th>
+            <th scope="col" class="num">vs 4.3.0</th>
+          </tr>
+        </thead>
+        <tbody><tr>
+    <th scope="row">20x-shortread</th>
+    <td class="num strong">336</td>
+    <td class="num">639</td>
+    <td class="num pub">—</td>
+    <td class="num"><span class="ratio">1.90×</span></td>
+  </tr><tr>
+    <th scope="row">200x-shortread</th>
+    <td class="num strong">697</td>
+    <td class="num">1310</td>
+    <td class="num pub">—</td>
+    <td class="num"><span class="ratio">1.88×</span></td>
+  </tr><tr>
+    <th scope="row">1000x-shortread</th>
+    <td class="num strong">1895</td>
+    <td class="num">6608</td>
+    <td class="num pub">—</td>
+    <td class="num"><span class="ratio">3.49×</span></td>
+  </tr><tr>
+    <th scope="row">20x-longread</th>
+    <td class="num strong">361</td>
+    <td class="num">1251</td>
+    <td class="num pub">—</td>
+    <td class="num"><span class="ratio">3.47×</span></td>
+  </tr><tr>
+    <th scope="row">200x-longread</th>
+    <td class="num strong">739</td>
+    <td class="num">3182</td>
+    <td class="num pub">—</td>
+    <td class="num"><span class="ratio">4.31×</span></td>
+  </tr><tr>
+    <th scope="row">1000x-longread</th>
+    <td class="num strong">3972</td>
+    <td class="num">16115</td>
+    <td class="num pub">—</td>
+    <td class="num"><span class="ratio">4.06×</span></td>
+  </tr></tbody>
+      </table>
+    </div>
+  </section>
+
+  <section>
+    <h2>Read these with the caveats attached</h2>
+    <div class="panel">
+      <h3>Machine load</h3>
+      <p>
+        This is a shared workstation and these runs were taken while other jobs were on it.
+        Any row whose <span class="load hot">load</span> is above 4.0 is not
+        comparable to one measured on an idle box. Contamination lands per cell, not per run, so a
+        run whose average looks fine can still hold one ruined row &mdash; which is why the load is
+        recorded either side of every cell rather than once per sitting.
+      </p>
+      <p>
+        The builds are measured back to back within each case, so a load spike tends to land on all
+        four columns at once. That makes the <em>ratios</em> considerably more durable than the
+        absolute milliseconds, and the ratios are what these tables are for.
+      </p>
+    </div>
+    <div class="panel accent">
+      <h3>What is and is not being compared</h3>
+      <ul>
+        <li><strong>Cumulative, not isolated.</strong> Three years separate v2.4.0 from HEAD and
+        almost none of it is the renderer. The 4.3.0 column isolates this release; the 2.4.0 column
+        tells a reader of the paper what the intervening period bought them.</li>
+        <li><strong>Same corpus as the paper.</strong> Reads were simulated with the same
+        <code>pbsim</code> and <code>wgsim</code> invocations over the same 250 kb hg19 chr22 slice
+        the 2023 methods describe.</li>
+        <li><strong>Not the paper's own figures.</strong> Those plot a 10 kb region on 2023
+        hardware; this bench uses 19 kb on one 2026 workstation. v2.4.0 is re-measured here rather
+        than quoted, so both columns come off the same machine on the same day.</li>
+        <li><strong>One machine, one locus, one workload family.</strong> Alignment pileups only.</li>
+      </ul>
+    </div>
+  </section>
+
+  <footer>
+    Generated by <code>scripts/render/report.ts</code> from <code>results/alignments.json</code>
+    and <code>results/interaction.json</code>. Cold-load rows dated individually above; zoom and pan
+    measured 2026-08-05, 2026-08-05, 2026-08-05. Browser pinned to Chrome for
+    Testing 148.0.7778.97 via puppeteer 24.43.1.
+  </footer>
+</div>
