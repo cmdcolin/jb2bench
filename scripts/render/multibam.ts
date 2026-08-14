@@ -476,6 +476,13 @@ for (const port of PORTS) {
       // contended pass is visible instead of averaged in.
       frame: stats(slot.gaps.flat()),
       passes: slot.gaps.map(stats),
+      // The raw per-frame gaps, one array per pass, rounded to 0.1 ms. The
+      // summaries above cannot say WHEN a spike happened, and "is the p99 a
+      // thundering herd?" — do the over-budget frames recur on the 500 ms
+      // coarse-update grid, or are they scattered? — is entirely a question
+      // about that. A pass is ~240 numbers, so keeping them costs a few KB and
+      // saves re-running the sweep to ask.
+      gaps: slot.gaps.map(g => g.map(v => Math.round(v * 10) / 10)),
       load: slot.load,
       errors: [...new Set(slot.errors)],
     })
