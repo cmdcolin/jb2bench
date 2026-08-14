@@ -1,0 +1,207 @@
+{
+  "mode": "pan",
+  "loc": "chr22_mask:124000-143000",
+  "frames": 240,
+  "passes": 2,
+  "throttle": 1,
+  "vsync": false,
+  "ports": [
+    8021,
+    8020
+  ],
+  "builds": {
+    "8020": "multibam",
+    "8021": "multibam-base"
+  },
+  "measuredAt": "2026-08-14T14:14:35.122Z",
+  "rows": [
+    {
+      "n": 4,
+      "port": 8021,
+      "build": "multibam-base",
+      "tracks": [
+        "20x.shortread.bam",
+        "200x.shortread.bam",
+        "20x.longread.bam",
+        "200x.longread.bam"
+      ],
+      "readyMs": [
+        4026,
+        4712
+      ],
+      "frame": {
+        "frames": 478,
+        "median": 12.599999994039536,
+        "p90": 16.69999998807907,
+        "p99": 31,
+        "max": 3019.300000011921,
+        "overBudgetPct": 5.2301255230125525
+      },
+      "passes": [
+        {
+          "frames": 239,
+          "median": 13.300000011920929,
+          "p90": 18,
+          "p99": 30.299999982118607,
+          "max": 3019.300000011921,
+          "overBudgetPct": 7.112970711297071
+        },
+        {
+          "frames": 239,
+          "median": 10.599999994039536,
+          "p90": 14.599999994039536,
+          "p99": 31,
+          "max": 2813,
+          "overBudgetPct": 3.3472803347280333
+        }
+      ],
+      "load": {
+        "before": 12.1,
+        "after": 16.4
+      },
+      "errors": []
+    },
+    {
+      "n": 6,
+      "port": 8021,
+      "build": "multibam-base",
+      "tracks": [
+        "20x.shortread.bam",
+        "200x.shortread.bam",
+        "20x.longread.bam",
+        "200x.longread.bam",
+        "20x.longread.mod.bam",
+        "200x.longread.mod.bam"
+      ],
+      "readyMs": [
+        7379,
+        7280
+      ],
+      "frame": {
+        "frames": 478,
+        "median": 15.699999988079071,
+        "p90": 24,
+        "p99": 43.900000005960464,
+        "max": 5400.800000011921,
+        "overBudgetPct": 21.548117154811717
+      },
+      "passes": [
+        {
+          "frames": 239,
+          "median": 16.299999982118607,
+          "p90": 26.099999994039536,
+          "p99": 43.900000005960464,
+          "max": 5400.800000011921,
+          "overBudgetPct": 25.523012552301257
+        },
+        {
+          "frames": 239,
+          "median": 15.300000011920929,
+          "p90": 22.799999982118607,
+          "p99": 32.89999997615814,
+          "max": 5342.199999988079,
+          "overBudgetPct": 17.573221757322177
+        }
+      ],
+      "load": {
+        "before": 13.64,
+        "after": 14.83
+      },
+      "errors": []
+    },
+    {
+      "n": 4,
+      "port": 8020,
+      "build": "multibam",
+      "tracks": [
+        "20x.shortread.bam",
+        "200x.shortread.bam",
+        "20x.longread.bam",
+        "200x.longread.bam"
+      ],
+      "readyMs": [
+        4854,
+        4777
+      ],
+      "frame": {
+        "frames": 478,
+        "median": 4.9000000059604645,
+        "p90": 11,
+        "p99": 24.69999998807907,
+        "max": 3319.399999976158,
+        "overBudgetPct": 2.092050209205021
+      },
+      "passes": [
+        {
+          "frames": 239,
+          "median": 4.700000017881393,
+          "p90": 6.700000017881393,
+          "p99": 17.69999998807907,
+          "max": 3319.399999976158,
+          "overBudgetPct": 1.2552301255230125
+        },
+        {
+          "frames": 239,
+          "median": 5.399999976158142,
+          "p90": 13.5,
+          "p99": 21.799999982118607,
+          "max": 3291.699999988079,
+          "overBudgetPct": 2.928870292887029
+        }
+      ],
+      "load": {
+        "before": 11.63,
+        "after": 14.79
+      },
+      "errors": []
+    },
+    {
+      "n": 6,
+      "port": 8020,
+      "build": "multibam",
+      "tracks": [
+        "20x.shortread.bam",
+        "200x.shortread.bam",
+        "20x.longread.bam",
+        "200x.longread.bam",
+        "20x.longread.mod.bam",
+        "200x.longread.mod.bam"
+      ],
+      "readyMs": [
+        6144,
+        6037
+      ],
+      "frame": {
+        "frames": 478,
+        "median": 4.899999976158142,
+        "p90": 7,
+        "p99": 181.90000000596046,
+        "max": 6167,
+        "overBudgetPct": 1.2552301255230125
+      },
+      "passes": [
+        {
+          "frames": 239,
+          "median": 5.0999999940395355,
+          "p90": 7.0999999940395355,
+          "p99": 17.400000005960464,
+          "max": 6082.4000000059605,
+          "overBudgetPct": 1.2552301255230125
+        },
+        {
+          "frames": 239,
+          "median": 4.600000023841858,
+          "p90": 6.799999982118607,
+          "p99": 17.099999994039536,
+          "max": 6167,
+          "overBudgetPct": 1.2552301255230125
+        }
+      ],
+      "load": {
+        "before": 14.14,
+        "after": 13.64
+      },
+      "errors": []
+    }
+  ]
+}
