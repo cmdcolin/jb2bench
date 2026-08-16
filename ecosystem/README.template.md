@@ -14,6 +14,8 @@ the same reason the render benchmarks do.
 make bench     # the whole thing
 make scan      # only the @gmod/vcf genotype-scan before/after
 make gff3      # only the gff-nostream eager-vs-lazy attribute comparison
+make sweep     # every major line of bam, cram and bbi, not just the endpoints
+make cohort    # 100 BigWigs: what a per-sample signal panel costs to open
 ```
 
 `make bench` clones and builds every library version named in `versions.json` (a
@@ -30,6 +32,9 @@ is also runnable alone:
 | `make report` | markdown + LaTeX from the JSON; measures nothing | `README.md`, `results/ecosystem.md`, `results/paper/*.tex` |
 | `make scan` | the `@gmod/vcf` v7.1.1 → v7.2.0 scan, one process per side | `results/vcf-scan.{md,json}` |
 | `make gff3` | `gff-nostream` eager vs lazy attributes, one process per side | `results/gff3-lazy.{md,json}` |
+| `./setup-sweep.sh` | clone + build every version in `sweep.json` (tens of minutes, once) | `.libs/*/sweep/`, `.libs/sweep-manifest.txt` |
+| `make sweep` | every major line, one process per version | `results/sweep.{md,json}` |
+| `make cohort` | N-BigWig panel: request counts and timings | `results/cohort-bw.{md,json}` |
 | `make clean` | drop `results/` | |
 | `make distclean` | also drop `.libs/` and `node_modules/` | |
 
@@ -97,6 +102,82 @@ The three genotype readings answer three different questions:
 - **`results/vcf-scan.md`** (`make scan`) — v7.1.1 against v7.2.0 through the
   identical `processGenotypes` API, isolating the scan rewrite alone.
 
+## Two axes the two-point table cannot see
+
+The table above is two points per library. Two points give a ratio, and a ratio
+answers "how much faster", which is one of the three questions a reader has. The
+other two get their own benchmarks.
+
+### Where along the way did it happen? — `make sweep`
+
+`sweep.json` names every major line of `@gmod/bam`, `@gmod/cram` and `@gmod/bbi`
+— the newest patch of each, so a major is credited with what it finally became
+rather than with its `.0`. `make sweep` runs all of them over the same window and
+writes [`results/sweep.md`](results/sweep.md).
+
+The question is not rhetorical. Someone on `@gmod/bam` v5 deciding whether an
+upgrade is worth the churn cannot use a 2023-to-current ratio, because almost
+none of it may be ahead of them. A curve tells them; a ratio does not.
+
+**One process per version**, for the reason `make scan` is one process per side
+and more so. A sweep loads N builds into one V8 rather than two, so whatever
+sharing does to their inline caches, it does *unevenly along the axis being
+plotted* — which is the one artefact a curve must not have imposed on it. The
+version order rotates every round, so machine drift cannot line up with position
+on the curve either.
+
+**Versions that will not build are reported, not dropped.** Which majors of a
+library can still be built from source with a current toolchain is a fact about
+the library, and a gap in a curve should look like a gap.
+
+Getting plain node to import the pre-2024 builds took two module hooks
+(`lib/legacy-resolve.mjs`), and both are worth knowing about because vitest had
+been hiding them for every other benchmark here:
+
+- Their emitted ESM uses CommonJS specifiers — extensionless files,
+  directories, and a subpath whose `package.json` main points elsewhere. The
+  hook hands those to node's own CJS resolver, which is the algorithm they were
+  written against, rather than guessing candidate filenames.
+- Their CJS dependencies set `__esModule` with the real export on `.default`.
+  Bundlers unwrap that; node does not, and binds `default` to the whole
+  `module.exports`. So `abortable-promise-cache` arrives as a wrapper object and
+  every pre-2024 `@gmod/bam` and `@gmod/cram` dies on "not a constructor".
+
+Neither hook changes how a current build loads: the first runs only after the
+real resolver has already failed, and the second produces a superset of the
+names node would have found by itself.
+
+### What does it cost at panel scale? — `make cohort`
+
+BigWig is the row of the main table that reports nothing: 1–3 ms, flat to
+slightly negative, and the paragraph above says the case may be too small to be
+informative. That is the right reading, and the reason is structural rather than
+a matter of choosing a bigger file. Most of what a BigWig query costs is
+per-file and paid before any data is touched — the header, the chromosome B+
+tree, then an R-tree descent to find the overlapping blocks. Measured once, it
+is a rounding error. A cohort signal panel pays it once per sample.
+
+`make cohort` therefore holds the library and the window fixed and makes **N the
+axis**: 1, 10 and 100 per-sample BigWigs, written by
+`../shell/generate_cohort_bw.sh` from a seeded generator. It writes
+[`results/cohort-bw.md`](results/cohort-bw.md).
+
+It reports two things that decay differently, and the split is the point:
+
+- **Request shape** — every `read()` call and every byte, counted through a
+  recording filehandle. Exact, identical on every machine, and needing no idle
+  box, so this half does not go stale the way a timing does. It is also the half
+  that transfers to the network, where a read is a range request and a round
+  trip, and round trips are what a panel actually waits on. This is the same
+  quantity as the Zarr comparison below, measured on the library rather than
+  over the wire.
+- **Time** — the CPU and syscall cost of the same work, sequential, one process
+  per version, carrying the usual caveat about this box.
+
+Sequential is deliberate. A browser opens its tracks concurrently, so this is not
+the wall clock a user sees — but what concurrency hides is exactly the per-file
+cost being measured, and it does not change a single request count.
+
 ### Two benchmarks run one process per side
 
 `make scan` and `make gff3` both do, for related reasons.
@@ -144,6 +225,16 @@ byte-identical files. The allele-frequency spectrum, the 1.5% missing rate and
 the one-site-in-25 multiallelic rate are there because the scan's cost depends on
 how many *distinct* genotype strings a site carries; a file of all `0|0` would
 memoize perfectly and measure nothing.
+
+The cohort BigWigs are a third corpus, and the only one where the *file count* is
+the variable rather than the file size: 100 per-sample signal tracks at 100 bp
+bins across the whole 250 kb contig, one BigWig a sample, from
+`../shell/generate_cohort_bw.sh`. Seeded like the VCF corpus, so every machine
+has the same bytes; shaped rather than flat — a per-sample depth scale, and two
+copy-number segments a minority of samples carry — because a BigWig's R-tree and
+its zoom levels are built from the data, and a uniform file would have an index
+shape no real file has. It needs `bedGraphToBigWig`, which
+`generate_alignments.sh` already depends on.
 
 ## What makes it reproducible
 
@@ -284,10 +375,17 @@ paper, run `make bench` here and then `make sync-benchmarks` in the paper repo.
 
 ## Layout
 
-- `versions.json` — the pins, with SHAs, and any deliberate patch
+- `versions.json` — the two-point pins, with SHAs, and any deliberate patch
+- `sweep.json` — the per-major pins for `make sweep`, and the selection rule
 - `zarr.json` — the Zarr measurement, transcribed from its own harness
 - `setup.sh` — clone + build both sides; writes `.libs/manifest.txt`
+- `setup-sweep.sh` — the same for `sweep.json`, tolerant of a version that will
+  no longer build; writes `.libs/sweep-manifest.txt`
 - `equivalence.test.ts` — the gate
 - `bam.bench.ts`, `cram.bench.ts`, `bgzf.bench.ts`, `bbi.bench.ts`
+- `sweep.ts` — the per-major curve, one process per version
+- `cohort-bw.ts` — the N-BigWig panel, request counts and timings
 - `lib/corpus.ts` — corpus, window, and the CRAM `seqFetch`
+- `lib/legacy-resolve.mjs` — the two module hooks that let plain node import the
+  pre-2024 builds
 - `report.ts` — everything under "Generated output"

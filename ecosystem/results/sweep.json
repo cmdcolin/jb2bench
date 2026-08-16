@@ -1,0 +1,273 @@
+{
+  "rounds": 3,
+  "inner": 1,
+  "rule": "newest patch of each major line, npm as of 2026-08-16",
+  "ruleDate": "2026-08-16",
+  "measured": "2026-08-16",
+  "loadPeak": 17.25,
+  "loadMedian": 14.07,
+  "unbuildable": {
+    "bam-js": [],
+    "cram-js": [],
+    "bbi-js": []
+  },
+  "results": [
+    {
+      "library": "bam-js",
+      "package": "@gmod/bam",
+      "case": "20x shortread",
+      "points": [
+        {
+          "tag": "v1.1.18",
+          "major": 1,
+          "ms": 61.371,
+          "records": 3079,
+          "checksum": "700117106"
+        },
+        {
+          "tag": "v2.0.4",
+          "major": 2,
+          "ms": 67.0528,
+          "records": 3079,
+          "checksum": "700117106"
+        },
+        {
+          "tag": "v3.0.3",
+          "major": 3,
+          "ms": 63.3781,
+          "records": 3081,
+          "checksum": "713525628"
+        },
+        {
+          "tag": "v4.0.1",
+          "major": 4,
+          "ms": 57.4579,
+          "records": 3081,
+          "checksum": "713525628"
+        },
+        {
+          "tag": "v5.0.7",
+          "major": 5,
+          "ms": 68.8814,
+          "records": 3081,
+          "checksum": "713525628"
+        },
+        {
+          "tag": "v6.1.1",
+          "major": 6,
+          "ms": 91.4015,
+          "records": 3081,
+          "checksum": "713525628"
+        },
+        {
+          "tag": "v7.9.1",
+          "major": 7,
+          "ms": 17.9481,
+          "records": 3081,
+          "checksum": "713525628"
+        },
+        {
+          "tag": "v8.11.0",
+          "major": 8,
+          "ms": 19.2251,
+          "records": 3081,
+          "checksum": "713525628"
+        }
+      ],
+      "disagree": [
+        "v1.1.18",
+        "v2.0.4"
+      ]
+    },
+    {
+      "library": "cram-js",
+      "package": "@gmod/cram",
+      "case": "20x shortread",
+      "points": [
+        {
+          "tag": "v1.7.4",
+          "major": 1,
+          "ms": 639.1525,
+          "records": 3079,
+          "checksum": "700117106"
+        },
+        {
+          "tag": "v2.0.4",
+          "major": 2,
+          "ms": 505.8213,
+          "records": 3079,
+          "checksum": "700117106"
+        },
+        {
+          "tag": "v3.0.7",
+          "major": 3,
+          "ms": 488.9107,
+          "records": 3079,
+          "checksum": "700117106"
+        },
+        {
+          "tag": "v4.0.10",
+          "major": 4,
+          "ms": 532.0132,
+          "records": 3079,
+          "checksum": "700117106"
+        },
+        {
+          "tag": "v5.1.0",
+          "major": 5,
+          "ms": 488.5054,
+          "records": 3079,
+          "checksum": "700117106"
+        },
+        {
+          "tag": "v6.0.1",
+          "major": 6,
+          "ms": 430.5474,
+          "records": 3081,
+          "checksum": "713525628"
+        },
+        {
+          "tag": "v7.0.3",
+          "major": 7,
+          "ms": 347.5814,
+          "records": 3081,
+          "checksum": "713525628"
+        },
+        {
+          "tag": "v8.7.0",
+          "major": 8,
+          "ms": 94.0916,
+          "records": 3081,
+          "checksum": "713525628"
+        },
+        {
+          "tag": "v9.0.0",
+          "major": 9,
+          "ms": 79.0669,
+          "records": 3081,
+          "checksum": "713525628"
+        },
+        {
+          "tag": "v10.6.1",
+          "major": 10,
+          "ms": 55.6329,
+          "records": 3081,
+          "checksum": "713525628"
+        },
+        {
+          "tag": "v11.4.1",
+          "major": 11,
+          "ms": 67.2429,
+          "records": 3081,
+          "checksum": "713525628"
+        },
+        {
+          "tag": "v12.0.1",
+          "major": 12,
+          "ms": 49.5485,
+          "records": 3081,
+          "checksum": "713525628"
+        },
+        {
+          "tag": "v13.4.1",
+          "major": 13,
+          "ms": 44.5106,
+          "records": 3081,
+          "checksum": "713525628"
+        }
+      ],
+      "disagree": [
+        "v1.7.4",
+        "v2.0.4",
+        "v3.0.7",
+        "v4.0.10",
+        "v5.1.0"
+      ]
+    },
+    {
+      "library": "bbi-js",
+      "package": "@gmod/bbi",
+      "case": "20x shortread",
+      "points": [
+        {
+          "tag": "v1.0.35",
+          "major": 1,
+          "ms": 4.3302,
+          "records": 4901,
+          "checksum": "529781147"
+        },
+        {
+          "tag": "v2.0.5",
+          "major": 2,
+          "ms": 3.4797,
+          "records": 4901,
+          "checksum": "529781147"
+        },
+        {
+          "tag": "v3.0.1",
+          "major": 3,
+          "ms": 2.4301,
+          "records": 4901,
+          "checksum": "529781147"
+        },
+        {
+          "tag": "v4.0.6",
+          "major": 4,
+          "ms": 2.875,
+          "records": 4901,
+          "checksum": "529781147"
+        },
+        {
+          "tag": "v5.0.2",
+          "major": 5,
+          "ms": 2.1256,
+          "records": 4901,
+          "checksum": "529781147"
+        },
+        {
+          "tag": "v6.0.3",
+          "major": 6,
+          "ms": 2.2956,
+          "records": 4901,
+          "checksum": "529781147"
+        },
+        {
+          "tag": "v7.1.0",
+          "major": 7,
+          "ms": 2.8985,
+          "records": 4901,
+          "checksum": "529781147"
+        },
+        {
+          "tag": "v8.1.2",
+          "major": 8,
+          "ms": 3.087,
+          "records": 4901,
+          "checksum": "529781147"
+        },
+        {
+          "tag": "v9.3.3",
+          "major": 9,
+          "ms": 2.5515,
+          "records": 4901,
+          "checksum": "529781147"
+        },
+        {
+          "tag": "v10.0.2",
+          "major": 10,
+          "ms": 2.7353,
+          "records": 4901,
+          "checksum": "529781147"
+        },
+        {
+          "tag": "v11.2.1",
+          "major": 11,
+          "ms": 2.7256,
+          "records": 4901,
+          "checksum": "529781147"
+        }
+      ],
+      "disagree": []
+    }
+  ]
+}

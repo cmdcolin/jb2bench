@@ -54,6 +54,13 @@
       "kind": "cram",
       "pinnedMajor2023": 1,
       "comment": [
+        "v1 through v3 import generic-filehandle without declaring it, the same",
+        "defect versions.json records as extraDeps for v1.7.1 and for the same",
+        "reason: npm's flat node_modules hoisted it out of a transitive dep and",
+        "pnpm does not hoist. ^3.0.0 is the range jbrowse-components pinned at",
+        "the time. v3.0.7 needs it too, which only showed up when the arm failed",
+        "to import — the build succeeds either way.",
+        "",
         "Every major before 8 defaults fetchSizeLimit to 3 MB and throws past it,",
         "which every long-read window in this corpus exceeds. JBrowse 2 never ran",
         "that default — its CramAdapter set 200_000_000 — so the arm passes the",
@@ -64,7 +71,7 @@
       "versions": [
         { "tag": "v1.7.4", "extraDeps": ["generic-filehandle@^3.0.0"] },
         { "tag": "v2.0.4", "extraDeps": ["generic-filehandle@^3.0.0"] },
-        { "tag": "v3.0.7" },
+        { "tag": "v3.0.7", "extraDeps": ["generic-filehandle@^3.0.0"] },
         { "tag": "v4.0.10" },
         { "tag": "v5.1.0" },
         { "tag": "v6.0.1" },

@@ -48,6 +48,8 @@ Every number lives in a file; nothing is summarized only here.
 | [`flame/WORKER_FINDINGS.md`](flame/WORKER_FINDINGS.md) | which worker-side plugin optimizations are worth doing? |
 | [`results/crosstool.md`](results/crosstool.md) | how does the render time compare against igv.js? |
 | [`ecosystem/README.md`](ecosystem/README.md) | how much faster did the parser libraries get since 2023? |
+| [`ecosystem/results/sweep.md`](ecosystem/results/sweep.md) | *where* along the majors did the parsers get faster? |
+| [`ecosystem/results/cohort-bw.md`](ecosystem/results/cohort-bw.md) | what does a 100-sample BigWig panel cost to open? |
 | [`ecosystem/results/vcf-scan.md`](ecosystem/results/vcf-scan.md) | what did the @gmod/vcf 7.2.0 genotype-scan rewrite buy? |
 | [`ecosystem/results/gff3-lazy.md`](ecosystem/results/gff3-lazy.md) | is deferring GFF3 attribute parsing worth it, and to whom? |
 

@@ -398,10 +398,11 @@ const md: string[] = [
   `each arm best-of-${INNER} and the table the median over ${ROUNDS} rounds.`,
   '',
   peak > 4
-    ? `> **Peak 1-minute load during this run was ${peak.toFixed(1)}**, above the 4.0 ` +
-      'this repo treats as the ceiling for a quotable absolute. The ratios between ' +
-      'versions are measured seconds apart and survive it; the milliseconds should ' +
-      'not be quoted.'
+    ? `> **This half is not a run of record. Peak 1-minute load was ` +
+      `${peak.toFixed(1)}**, against the 4.0 this repo treats as the ceiling for a ` +
+      'quotable absolute. Do not quote a millisecond from this table. The request ' +
+      'counts above are unaffected — they are counts, not timings, and they are ' +
+      'the same on an idle box and a loaded one.'
     : `Peak 1-minute load during this run: ${peak.toFixed(1)}.`,
   '',
   `| version | ${SIZES.map(n => `N=${n}`).join(' | ')} |`,
