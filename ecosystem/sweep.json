@@ -22,10 +22,12 @@
     "of a library's majors can still be built at all is itself a result, so it is",
     "reported rather than silently dropped.",
     "",
-    "bgzf-filehandle and vcf-js are deliberately absent for now. Both are",
-    "measurable by the same driver — add a block here with the same shape and",
-    "sweep.ts picks it up — but the three libraries below are the ones whose",
-    "2023-to-current gap the render benchmarks actually sit on top of."
+    "vcf-js and bgzf-filehandle are here too, but they get a curve and no",
+    "request-shape column: neither takes a filehandle the way the other three",
+    "do. @gmod/vcf is handed lines that a reader already decoded, and",
+    "bgzf-filehandle is handed a buffer. So MODE=count reports nothing for them",
+    "and their rows are timings, which means they need an idle box where the",
+    "other three do not."
   ],
   "rule": "newest patch of each major line, npm as of 2026-08-16",
   "ruleDate": "2026-08-16",
@@ -108,6 +110,67 @@
         { "tag": "v9.3.3" },
         { "tag": "v10.0.2" },
         { "tag": "v11.2.1" }
+      ]
+    },
+    {
+      "name": "vcf-js",
+      "package": "@gmod/vcf",
+      "repo": "https://github.com/GMOD/vcf-js",
+      "kind": "vcf",
+      "pinnedMajor2023": 5,
+      "cases": ["1000 samples gtonly", "1000 samples wide", "3000 samples wide"],
+      "comment": [
+        "Measured through parseLine alone, on every version, deliberately. The",
+        "two-point benchmark in vcf.bench.ts asks each side for genotypes",
+        "through the cheapest call it offers — SAMPLES on v5, GENOTYPES() on",
+        "v7 — because that is what a JBrowse upgrade actually buys. A sweep",
+        "cannot do that: the API appears partway along the axis, so the curve",
+        "would carry a step that is a change of question rather than a change",
+        "of speed. parseLine exists on every major and means the same thing on",
+        "each, so the curve is one measurement repeated.",
+        "",
+        "Corpus is the VCF one rather than the alignments: what a VCF parser",
+        "costs scales with samples x variants, not with read depth."
+      ],
+      "versions": [
+        { "tag": "v1.0.4" },
+        { "tag": "v2.0.3" },
+        { "tag": "v3.0.0" },
+        { "tag": "v4.0.4" },
+        { "tag": "v5.0.10" },
+        { "tag": "v6.1.2" },
+        { "tag": "v7.2.0" }
+      ]
+    },
+    {
+      "name": "bgzf-filehandle",
+      "package": "@gmod/bgzf-filehandle",
+      "repo": "https://github.com/GMOD/bgzf-filehandle",
+      "kind": "bgzf",
+      "pinnedMajor2023": 1,
+      "cases": ["20x shortread", "20x longread", "200x shortread"],
+      "comment": [
+        "The browser path on every version, which means a different export name",
+        "on either side of the split. v1.4.3 shipped two decompressors and chose",
+        "between them at import time — `unzip` wraps zlib.gunzip in Node, and",
+        "browsers got `pakoUnzip` — while later versions have one implementation",
+        "everywhere. The arm therefore prefers pakoUnzip and falls back to",
+        "unzip, so every point on the curve is the pure-JS path a genome browser",
+        "actually runs. Sweeping `unzip` instead would compare C++ against",
+        "JavaScript at the version where the split ends and report it as a",
+        "regression.",
+        "",
+        "1000x is left out for the reason bgzf.bench.ts leaves it out: BAM is",
+        "BGZF end to end, so unzipping it would materialize gigabytes per",
+        "iteration and measure the garbage collector."
+      ],
+      "versions": [
+        { "tag": "v1.5.5" },
+        { "tag": "v2.0.4" },
+        { "tag": "v3.0.5" },
+        { "tag": "v4.2.1" },
+        { "tag": "v5.0.2" },
+        { "tag": "v6.6.0" }
       ]
     }
   ]

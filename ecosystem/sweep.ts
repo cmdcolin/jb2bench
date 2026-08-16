@@ -27,9 +27,10 @@
 // and named in the output rather than dropped.
 import { execFileSync } from 'node:child_process'
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs'
+
 import { fileURLToPath } from 'node:url'
 
-import { END, OLD_CRAM_OPTS, REF, START, seqFetch } from './lib/corpus.ts'
+import { END, OLD_CRAM_OPTS, REF, START, seqFetch, vcfParts } from './lib/corpus.ts'
 import { type Counter, countingFile, totals } from './lib/counting-filehandle.ts'
 
 const SELF = fileURLToPath(import.meta.url)
@@ -156,6 +157,51 @@ async function makeQuery(kind: string, mod: any, dir: string, file: string, coun
       const bw = new mod.BigWig(counting ? { filehandle: data.handle } : { path: file })
       return fold((await bw.getFeatures(REF, START, END)).map(bwRec))
     }
+  } else if (kind === 'vcf') {
+    // Read and split once, outside the timed callback: this measures the
+    // parser, and lib/corpus.ts explains why the lines are decoded per line
+    // rather than by splitting one big string — the two hand V8 different
+    // string representations, and the difference is half of what changed in
+    // 7.2.0.
+    const { header, lines } = vcfParts(file)
+    // parseLine on every version, not each version's cheapest genotype call.
+    // The cheap call appears partway along the axis, so sweeping it would put
+    // a step in the curve that is a change of question rather than of speed.
+    const Ctor = mod.default ?? mod.VCF
+    run = async () => {
+      const parser = new Ctor({ header })
+      return fold(
+        lines.map(line => {
+          const v = parser.parseLine(line)
+          return { start: v.POS, end: v.POS, flags: v.ALT?.length ?? 0 }
+        }),
+      )
+    }
+  } else if (kind === 'bgzf') {
+    // The browser path on every version. v1.x shipped two decompressors and
+    // picked between them at import time — `unzip` wrapping zlib.gunzip in
+    // Node, `pakoUnzip` for browsers — so preferring pakoUnzip where it exists
+    // keeps the pure-JS path a genome browser actually runs on every point of
+    // the curve. Sweeping `unzip` would compare C++ against JavaScript at the
+    // version where the split ends, and report it as a regression.
+    const unzipMod = await import(`${dir}/esm/unzip.js`)
+    const unzip = unzipMod.pakoUnzip ?? unzipMod.unzip
+    if (typeof unzip !== 'function') {
+      throw new Error('no unzip export')
+    }
+    // Buffer rather than a Uint8Array wrapper: 1.x declares `unzip(input:
+    // Buffer)` and later versions take a Uint8Array, and Buffer satisfies both.
+    const input = readFileSync(file)
+    run = async () => {
+      const out = await unzip(input)
+      // Length and a cheap fold of the head: enough to catch two versions
+      // returning different bytes, without a hash of hundreds of MB.
+      let h = 0
+      for (let i = 0; i < Math.min(out.length, 4096); i++) {
+        h = (h * 31 + out[i]!) % 1_000_000_007
+      }
+      return { n: out.length, sum: h }
+    }
   } else {
     throw new Error(`unknown kind ${kind}`)
   }
@@ -259,8 +305,13 @@ interface Library {
   package: string
   kind: string
   pinnedMajor2023: number
+  /** overrides CASE_LABELS when this library's corpus is its own */
+  cases?: string[]
   versions: Version[]
+  /** setup-sweep.sh tried these and could not produce a build */
   unbuildable: string[]
+  /** setup-sweep.sh has not been run for these — a missing step, not a defect */
+  notBuilt: string[]
 }
 
 const sweepCfg = JSON.parse(readFileSync(here('sweep.json'), 'utf8'))
@@ -276,30 +327,62 @@ const MODE = process.env.MODE ?? 'both'
 const doCount = MODE !== 'time'
 const doTime = MODE !== 'count'
 
-// The cases. Heavy first, because that is where a parser difference is legible
-// and where the paper's framing puts the weight; the light case is kept as the
-// control that says whether a curve is the parser or is process startup.
+// The default cases. Heavy first, because that is where a parser difference is
+// legible and where the paper's framing puts the weight; the light case is kept
+// as the control that says whether a curve is the parser or is process startup.
+// A library may override them in sweep.json — the VCF corpus is its own, since
+// what a VCF parser costs scales with samples x variants and not with depth.
 const CASE_LABELS = ['20x shortread', '200x shortread', '200x longread']
+
 const caseFile = (kind: string, label: string) => {
+  if (kind === 'vcf') {
+    // "1000 samples gtonly" -> data/variants.1000.gtonly.vcf
+    const [samples, , shape] = label.split(' ')
+    return fileURLToPath(here(`../data/variants.${samples}.${shape}.vcf`))
+  }
   const [cov, read] = label.split(' ')
-  const ext = kind === 'bigwig' ? 'bw' : kind
+  // bgzf decompresses the alignment files themselves — BAM is BGZF end to end.
+  const ext = kind === 'bigwig' ? 'bw' : kind === 'bgzf' ? 'bam' : kind
   return fileURLToPath(here(`../data/${cov}.${read}.${ext}`))
 }
+
+// "setup-sweep.sh tried and failed" and "setup-sweep.sh has not been run for
+// this library yet" both look like a missing directory, and they mean opposite
+// things: the first is a fact about the library worth reporting, the second is a
+// missing step. The manifest is what distinguishes them, so read it rather than
+// inferring from the filesystem — otherwise adding a block to sweep.json makes
+// the report announce that six versions of a library cannot be built.
+const manifest = (() => {
+  try {
+    return readFileSync(fileURLToPath(here('.libs/sweep-manifest.txt')), 'utf8')
+  } catch {
+    return ''
+  }
+})()
+const attempted = new Set(
+  manifest
+    .split('\n')
+    .filter(l => / (ok|unbuildable) /.test(l))
+    .map(l => l.split(' ').slice(0, 2).join(' ')),
+)
 
 const libraries: Library[] = []
 for (const l of sweepCfg.libraries) {
   if (onlyLibs && !onlyLibs.includes(l.name)) continue
   const versions: Version[] = []
   const unbuildable: string[] = []
+  const notBuilt: string[] = []
   for (const v of l.versions) {
     const dir = fileURLToPath(here(`.libs/${l.name}/sweep/${v.tag}`))
     if (existsSync(`${dir}/esm/index.js`)) {
       versions.push({ tag: v.tag, dir })
-    } else {
+    } else if (attempted.has(`${l.name} ${v.tag}`)) {
       unbuildable.push(v.tag)
+    } else {
+      notBuilt.push(v.tag)
     }
   }
-  libraries.push({ ...l, versions, unbuildable })
+  libraries.push({ ...l, versions, unbuildable, notBuilt })
 }
 
 if (libraries.every(l => l.versions.length === 0)) {
@@ -365,7 +448,7 @@ if (MODE === 'verify') {
   let checked = 0
   for (const lib of libraries) {
     if (lib.versions.length === 0) continue
-    const label = (onlyCases ?? CASE_LABELS)[0]!
+    const label = (onlyCases ?? lib.cases ?? CASE_LABELS)[0]!
     const file = caseFile(lib.kind, label)
     if (!existsSync(file)) {
       console.log(`${lib.package}: no corpus at ${file}, skipping`)
@@ -428,8 +511,13 @@ for (const lib of libraries) {
   if (lib.unbuildable.length) {
     console.log(`   unbuildable: ${lib.unbuildable.join(', ')}`)
   }
+  if (lib.notBuilt.length) {
+    console.log(
+      `   not built yet (run ./setup-sweep.sh ${lib.name}): ${lib.notBuilt.join(', ')}`,
+    )
+  }
 
-  for (const label of CASE_LABELS) {
+  for (const label of lib.cases ?? CASE_LABELS) {
     if (onlyCases && !onlyCases.includes(label)) continue
     const file = caseFile(lib.kind, label)
     if (!existsSync(file)) {
@@ -548,6 +636,7 @@ writeFileSync(
       unbuildable: Object.fromEntries(
         libraries.map(l => [l.name, l.unbuildable]),
       ),
+      notBuilt: Object.fromEntries(libraries.map(l => [l.name, l.notBuilt])),
       results,
     },
     null,
@@ -638,6 +727,25 @@ if (unb.length) {
   )
   for (const l of unb) {
     md.push(`- \`${l.package}\`: ${l.unbuildable.join(', ')}`)
+  }
+  md.push('')
+}
+
+const pending = libraries.filter(l => l.notBuilt.length)
+if (pending.length) {
+  md.push(
+    '## Versions not built yet',
+    '',
+    'Named in `sweep.json` but never attempted by `setup-sweep.sh`. This is a',
+    'missing step rather than a fact about the library, and it is listed apart',
+    'from the section above for exactly that reason — a version absent because',
+    'nobody ran setup should not read as a version that cannot be built.',
+    '',
+  )
+  for (const l of pending) {
+    md.push(
+      `- \`${l.package}\`: ${l.notBuilt.join(', ')} — \`./setup-sweep.sh ${l.name}\``,
+    )
   }
   md.push('')
 }

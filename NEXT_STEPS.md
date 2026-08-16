@@ -1,11 +1,17 @@
 # Next steps
 
-Handoff updated 2026-08-05 (afternoon), on top of the pan-benchmark work. The
-previous version of this file sat on commit `b560506`; what it listed as the
-open item — a refetch-against-refetch measurement — is now implemented and run.
+Handoff updated 2026-08-16, on top of the parser-sweep and cross-tool-pan work.
+The previous version sat on 2026-08-05 and several of its items have since
+closed; see §7.
 
-Verified green: `pnpm typecheck` (root) 0 errors. `results/alignments.md` and
-`results/interaction.md` are both from 2026-08-05 and carry their own dates.
+Verified green: `pnpm typecheck` (root and `ecosystem/`) 0 errors. That was not
+true on 2026-08-05 through 2026-08-16 — `b455a3c` added a field to
+`multibam.ts`'s emitted row and not to its type — so if the README claims it is
+clean, check rather than assume.
+
+**Read [`COMPARISONS.md`](COMPARISONS.md) first if the question is "what do we
+compare and what is missing".** This file is what is *blocked*; that one is the
+map of the axes, and the two are deliberately different documents.
 
 Items are ordered by what blocks what, not by size.
 
@@ -50,7 +56,20 @@ between two runs an hour apart.
 
 ## 2. Re-run `make bench` before quoting any ecosystem number
 
-Unchanged from the previous handoff, and still not done.
+Unchanged from the previous two handoffs, and still not done. Two things have
+been added since that make it more urgent rather than less:
+
+- **`@gmod/vcf` still has no rows in the table.** It was added to
+  `versions.json` after the last `make time`, and `results/ecosystem.md` prints
+  a derived warning saying so. The warning removes itself on the next full run.
+- **The "current" pins are stale by up to three majors.** `versions.json` says
+  `@gmod/bam` v7.8.1, `@gmod/cram` v10.4.0, `@gmod/bbi` v10.0.2; npm on
+  2026-08-16 has **8.11.0, 13.4.1 and 11.2.1**. `sweep.json` names the newest of
+  each, so the sweep and the two-point table currently disagree about what
+  "current" means. That is fine as a deliberate choice and bad as an accident —
+  and the CRAM gap is the one that matters, because `results/sweep.md` shows
+  that line still moving after v10. **Deciding this is the author's call**, since
+  it changes a number the paper publishes; nothing here has changed it.
 
 `ecosystem/vitest.config.ts` asked for a single worker as
 `poolOptions: { forks: { singleFork: true } }`. Vitest 4 removed `poolOptions`
@@ -113,20 +132,37 @@ bar, and `results/alignments.md` gets one (±stddev over 6 runs) while
 median of medians would close that gap; it costs roughly 3× the ~12 minutes the
 pan mode takes.
 
+## 4a. The new benchmarks that have run once, or not at all
+
+None of these is blocked on anything but machine time.
+
+- **`results/sweep.md` has request counts for every version and timings for
+  none worth quoting.** `MODE=count make sweep` is complete and load-independent;
+  the timing half was taken at load 8–15 and the report says so in its title.
+  `make sweep` on a quiet box closes it.
+- **`results/cohort-bw.md`, same split.** Counts final, timings provisional. The
+  same cell moved 539 → 49 ms between two runs, which is the argument.
+- **`results/crosstool-pan.md` has run on some cases.** The long-read rows and
+  `1000x-shortread` are the ones the paper's framing actually wants, since its
+  instruction is to weight the heavy cases.
+- **`@gmod/vcf` and `@gmod/bgzf-filehandle` are not in `sweep.json`.** Config
+  only — the file is data-driven and `sweep.ts` picks up a new block of the same
+  shape. Note that neither takes a filehandle the way the other three do, so
+  they get a curve but no request-shape column.
+
 ## 5. Gaps that block specific work
 
-### No modBAM fixture
+### ~~No modBAM fixture~~ — closed 2026-08-11
 
-`shell/generate_alignments.sh` (wgsim/pbsim) emits no MM/ML tags, and
-`data/hg19mod.fa` is a *masked* reference. Nothing in the corpus enters
-`extractModifications`, so the base-modification color path has never been
-profiled here, and the two committed mod-path optimizations (dead
-`localeCompare` sort, per-type color memoize) are justified by
-removed-redundant-work reasoning rather than by any trace in this repo.
+`data/*.longread.mod.bam` carry CpG-context 5mC MM/ML tags stamped onto the
+existing long reads by `shell/generate_modbam.sh`, checked by
+`shell/verify_modifications.js`, which decodes MM back against each read
+independently of the generator. `data/ont.6ma.chr20.bam` (`cd364f4`) adds the
+corpus's first *multi-group* modBAM, from real ONT data rather than synthesized.
 
-To close it: add a fixture — run an ONT 5mCG model output through, or synthesize
-MM/ML onto the existing long-read BAM — plus a URL/session setting
-`colorBy: { type: 'modifications' }`.
+The first profile of that path found one function taking a third of the RPC
+worker — `flame/WORKER_FINDINGS.md`. What is still owed is the same thing §3
+owes: those findings are against a June build and want re-confirming.
 
 ### `rowsweep.ts` now runs; what it needs is a quiet machine
 
@@ -186,6 +222,35 @@ would test something pan does not — a *widening* re-projection rather than a
 lateral one.
 
 ## 7. Resolved since the last handoff
+
+Added 2026-08-16:
+
+- **The parsers are swept, not just sampled at two points.**
+  `ecosystem/sweep.json` + `make sweep` cover every major line of `@gmod/bam`,
+  `@gmod/cram` and `@gmod/bbi` — 32 builds, all of which still build from source
+  with a current toolchain. `make sweep-verify` gates it the way `make verify`
+  gates `make bench`.
+- **Some results here no longer need an idle box.** `MODE=count make sweep` and
+  `make cohort` report reads and bytes rather than milliseconds; those are exact,
+  identical on every machine, and do not decay. Given how much of this file is
+  blocked on a quiet machine, that property is worth more of the repo's effort.
+  It has already produced findings a timing cannot see — `@gmod/cram` v8 cut the
+  200x-longread query from 728 reads over 35 MB to 44 over 17.5 MB, at the same
+  major where the timing curve steps.
+- **The 100-BigWig cohort exists** (`shell/generate_cohort_bw.sh`,
+  `make cohort`), which is where `@gmod/bbi`'s cost becomes legible: the
+  single-file case is 1–3 ms and says nothing, because the cost being measured is
+  per-file and a panel pays it N times.
+- **Cross-tool pan** (`scripts/crosstool/panrunner.ts`), the measurement the
+  paper's TODO called the strongest missing one.
+- **The completion detector is a module with a harness**
+  (`scripts/crosstool/quiescence.ts`, `quiescheck.ts` →
+  `results/quiescence.md`). It has broken more often than anything it measures,
+  and it now gets calibrated rather than asserted. Two claims written into this
+  repo as mechanism were falsified by it within a run — see
+  `COMPARISONS.md` §1.
+
+From the 2026-08-05 handoff:
 
 - **Pan at constant zoom.** Implemented as `MODE=pan` in
   `scripts/render/interaction.ts`, run on all six cases, 5/5 steps and no bails

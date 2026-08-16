@@ -449,9 +449,16 @@ survive that, the milliseconds are not a run of record:
 | 20x-shortread | 362 ms | 594 ms | 1.64× | ~95,000 | 10–48 |
 | 200x-shortread | 538 ms | 5154 ms | 9.58× | ~250,000 | 10–50 |
 
-The draws column is the architecture in one number: igv issues a drawing
-operation per read, JBrowse batches the pileup into a handful of GPU draws. It
-is also why the ratio grows with depth.
+The draws column is the architecture in one number, and it is the sturdiest
+figure here: it repeats to within ~1% across runs, because it depends on the data
+and the code rather than on the machine, so it survives a contaminated run the
+way the parser request counts do. Three to four orders of magnitude separate a
+tool drawing through the 2D canvas API from one batching the pileup into a
+handful of GPU draws.
+
+It is **not** one call per read — about 30 per read at 20x and 8 at 200x, so the
+count grows much more slowly than the read count, and nothing here explains that
+shape. Quote the magnitude, not a per-read rate.
 
 ### The zoom result is not what it looks like
 

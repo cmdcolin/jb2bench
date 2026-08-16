@@ -164,11 +164,20 @@ proved the cheap path: releases ship a prebuilt web bundle, so adding 3.x and
 The parser sweep and the application sweep would then answer the same question
 at two layers.
 
-### 5. Add `@gmod/vcf` and `@gmod/bgzf-filehandle` to the sweep
+### 5. Build the `@gmod/vcf` and `@gmod/bgzf-filehandle` sweeps
 
-Config only — `sweep.json` is data-driven and `sweep.ts` picks up a new block
-with the same shape. Left out of the first pass because the three libraries in
-it are the ones the render benchmarks sit on top of.
+**Added to `sweep.json` and to `sweep.ts`'s arms**; what is left is running
+`./setup-sweep.sh` for them (7 and 6 versions) and then `make sweep`. Both get a
+curve and no request-shape column — neither takes a filehandle the way the other
+three do — so unlike those three they need an idle box.
+
+Each is measured through a narrower call than the two-point benchmark uses, for
+the same reason in both cases: a sweep has to ask one question along its whole
+axis. `@gmod/vcf` goes through `parseLine` rather than each version's cheapest
+genotype call, because that call appears partway along the axis. `bgzf` prefers
+`pakoUnzip` over `unzip`, because v1.x chose between a C++ and a pure-JS
+decompressor at import time and sweeping `unzip` would report the end of that
+split as a regression.
 
 ### 6. Unblock GenomeSpy, or write it up as blocked
 

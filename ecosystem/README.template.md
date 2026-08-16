@@ -112,10 +112,31 @@ other two get their own benchmarks.
 
 ### Where along the way did it happen? — `make sweep`
 
-`sweep.json` names every major line of `@gmod/bam`, `@gmod/cram` and `@gmod/bbi`
-— the newest patch of each, so a major is credited with what it finally became
-rather than with its `.0`. `make sweep` runs all of them over the same window and
-writes [`results/sweep.md`](results/sweep.md).
+`sweep.json` names every major line of `@gmod/bam`, `@gmod/cram`, `@gmod/bbi`,
+`@gmod/vcf` and `@gmod/bgzf-filehandle` — the newest patch of each, so a major is
+credited with what it finally became rather than with its `.0`. `make sweep` runs
+all of them over the same window and writes
+[`results/sweep.md`](results/sweep.md).
+
+The last two get a curve and no request-shape column, because neither takes a
+filehandle the way the other three do: `@gmod/vcf` is handed lines a reader
+already decoded, and `bgzf-filehandle` is handed a buffer. Their rows are
+timings, so unlike the other three they need an idle box.
+
+Two of them are also measured through a deliberately narrower call than the
+two-point benchmark uses, and the reason is the same in both cases — a sweep must
+ask one question along its whole axis:
+
+- **`@gmod/vcf` through `parseLine` alone.** `vcf.bench.ts` asks each side for
+  genotypes through the cheapest call it offers, `SAMPLES` on v5 and
+  `GENOTYPES()` on v7, because that is what a JBrowse upgrade actually buys. On
+  a sweep that API appears partway along the axis, so the curve would carry a
+  step that is a change of question rather than of speed.
+- **`bgzf-filehandle` through `pakoUnzip` where it exists**, falling back to
+  `unzip`. v1.x shipped two decompressors and chose at import time — `unzip`
+  wrapping `zlib.gunzip` in Node, `pakoUnzip` for browsers — so sweeping `unzip`
+  would compare C++ against JavaScript at the version where the split ends and
+  report it as a regression.
 
 The question is not rhetorical. Someone on `@gmod/bam` v5 deciding whether an
 upgrade is worth the churn cannot use a 2023-to-current ratio, because almost
