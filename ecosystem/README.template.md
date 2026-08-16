@@ -33,6 +33,7 @@ is also runnable alone:
 | `make scan` | the `@gmod/vcf` v7.1.1 → v7.2.0 scan, one process per side | `results/vcf-scan.{md,json}` |
 | `make gff3` | `gff-nostream` eager vs lazy attributes, one process per side | `results/gff3-lazy.{md,json}` |
 | `./setup-sweep.sh` | clone + build every version in `sweep.json` (tens of minutes, once) | `.libs/*/sweep/`, `.libs/sweep-manifest.txt` |
+| `make sweep-verify` | the sweep's gate — does every build import, and does the counting instrument change its answer? | |
 | `make sweep` | every major line, one process per version | `results/sweep.{md,json}` |
 | `MODE=count make sweep` | the same, counting reads and bytes instead of timing — needs no idle box | same |
 | `make cohort` | N-BigWig panel: request counts and timings | `results/cohort-bw.{md,json}` |
@@ -130,7 +131,28 @@ on the curve either.
 **Versions that will not build are reported, not dropped.** Which majors of a
 library can still be built from source with a current toolchain is a fact about
 the library, and a gap in a curve should look like a gap. As of 2026-08-16 there
-are none: all 32 still build.
+are none: all 32 still build, and all 32 pass the gate.
+
+**`make sweep-verify` is the gate, and `make sweep` depends on it**, exactly as
+`make bench` depends on `make verify`: a curve drawn through versions that do
+not all answer the same query is not a curve. It checks two things per version.
+That the build imports and returns records — an `esm/index.js` that exists is
+not one that loads, and cram v3.0.7 built perfectly and threw on first import
+from a dependency it never declared. And that reading through the counting
+filehandle returns the identical record set as reading by path, because an
+instrument that perturbs the library shows up as a library difference, which is
+precisely what a sweep is trying to detect. `setup-sweep.sh` now runs the import
+half itself, so that failure lands at build time rather than as one blank row
+minutes into a run.
+
+**The resolved dependency tree of every build is recorded**, not just its
+declared one. Each clone installs with `--no-frozen-lockfile` against ranges
+written years ago, so the transitive tree resolves to whatever is current on the
+day setup runs; two sweeps months apart can differ in a dependency without
+differing in a single pin. Since the point of a sweep is to attribute a
+difference to a version, an unrecorded dependency bump is a rival explanation
+that cannot be ruled out afterwards. `.libs/sweep-manifest.txt` carries a
+`resolved=` line per build.
 
 **`MODE=count` reports request shape instead of time**, and is the mode to reach
 for on a box like this one. It counts every `read` and `readFile` the library
@@ -162,7 +184,12 @@ been hiding them for every other benchmark here:
 
 Neither hook changes how a current build loads: the first runs only after the
 real resolver has already failed, and the second produces a superset of the
-names node would have found by itself.
+names node would have found by itself. The second is also narrower than it
+sounds — node loads a CommonJS package's internals through `require`, so only a
+package's *entry point* reaches the ESM loader at all. Traced on `@gmod/bam`
+v2.0.4 (`SWEEP_TRACE_FACADE=1`), it applies to five: `long`,
+`@gmod/bgzf-filehandle`, `generic-filehandle`, `@gmod/abortable-promise-cache`
+and `quick-lru`.
 
 ### What does it cost at panel scale? — `make cohort`
 

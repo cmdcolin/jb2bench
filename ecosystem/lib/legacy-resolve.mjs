@@ -82,6 +82,9 @@ export async function load(url, context, next) {
     return result
   }
 
+  if (process.env.SWEEP_TRACE_FACADE) {
+    process.stderr.write(`FACADE ${url}\n`)
+  }
   const names = Object.keys(mod).filter(k => IDENT.test(k) && k !== 'default')
 
   // `__esModule` interop, and a deliberate divergence from node. Node's native

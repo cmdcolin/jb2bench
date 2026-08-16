@@ -7,7 +7,7 @@
 # libraries that return different records is not a comparison, so the gate runs
 # first and a failure stops the run.
 
-.PHONY: all bench setup setup-sweep install typecheck verify time report scan gff3 sweep cohort clean distclean
+.PHONY: all bench setup setup-sweep install typecheck verify time report scan gff3 sweep sweep-verify cohort clean distclean
 
 all: bench
 
@@ -64,7 +64,16 @@ gff3: install
 
 setup-sweep: .libs/sweep-manifest.txt
 
-sweep: install setup-sweep
+# The sweep's gate, and `sweep` depends on it for the same reason `bench`
+# depends on `verify`: a curve drawn through versions that do not all answer the
+# same query is not a curve. It checks that each build imports and returns
+# records, and that reading through the counting filehandle gives the identical
+# record set as reading by path — an instrument that perturbs the library would
+# otherwise show up as a library difference, which is what a sweep is for.
+sweep-verify: install setup-sweep
+	MODE=verify node --experimental-strip-types sweep.ts
+
+sweep: sweep-verify
 	node --experimental-strip-types sweep.ts
 
 # The 100-BigWig cohort panel. Reports request counts, which are exact and need

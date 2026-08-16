@@ -37,6 +37,51 @@ done
 mkdir -p "$LIBS"
 : >"$MANIFEST"
 
+# Record what actually got installed, not just what was asked for.
+#
+# Every clone is installed with --no-frozen-lockfile against dependency ranges
+# written years ago, so the transitive tree resolves to whatever is current on
+# the day setup runs. Two sweeps months apart can therefore differ in a
+# dependency without differing in a single pin, and nothing would say so. The
+# main setup.sh records each side's *declared* deps for this reason; declared is
+# not enough here, because the point of a sweep is to attribute a difference to
+# a version, and an unrecorded dependency bump is an alternative explanation
+# that cannot be ruled out after the fact.
+record_manifest() {
+  local name=$1 tag=$2 dir=$3
+  local sha
+  sha=$(cd "$dir" && git rev-parse HEAD)
+  echo "$name $tag ok sha=$sha" >>"$MANIFEST"
+  # Top-level installed packages and their resolved versions, one line, sorted.
+  # Every top-level entry under a pnpm node_modules is a symlink into its
+  # content-addressed store, so a withFileTypes isDirectory() test sees only the
+  # real `@scope` directories and silently drops every unscoped package —
+  # including pako and generic-filehandle, which are the ones that matter here.
+  # Read each package.json instead and let a missing one be the filter.
+  node -e '
+    const { readdirSync, readFileSync, existsSync } = require("fs")
+    const root = process.argv[1] + "/node_modules"
+    if (!existsSync(root)) { console.log(""); process.exit(0) }
+    const out = []
+    const names = []
+    for (const name of readdirSync(root)) {
+      if (name.startsWith(".")) continue
+      if (name.startsWith("@")) {
+        for (const sub of readdirSync(`${root}/${name}`)) names.push(`${name}/${sub}`)
+      } else {
+        names.push(name)
+      }
+    }
+    for (const d of names) {
+      try {
+        const v = JSON.parse(readFileSync(`${root}/${d}/package.json`, "utf8")).version
+        out.push(`${d}@${v}`)
+      } catch {}
+    }
+    console.log(out.sort().join(" "))
+  ' "$dir" | sed 's/^/  resolved=/' >>"$MANIFEST"
+}
+
 libcount=$(node -p "require('./sweep.json').libraries.length")
 built=0
 failed=0
@@ -60,8 +105,7 @@ for i in $(seq 0 $((libcount - 1))); do
     if [ -f "$dir/esm/index.js" ]; then
       echo "== $name $tag already built"
       built=$((built + 1))
-      sha=$(cd "$dir" && git rev-parse HEAD)
-      echo "$name $tag ok sha=$sha" >>"$MANIFEST"
+      record_manifest "$name" "$tag" "$dir"
       continue
     fi
 
@@ -91,16 +135,30 @@ for i in $(seq 0 $((libcount - 1))); do
     # node_modules while still writing their JavaScript.
     (cd "$dir" && pnpm run build:esm >/dev/null 2>&1) || true
 
-    if [ -f "$dir/esm/index.js" ]; then
-      sha=$(cd "$dir" && git rev-parse HEAD)
-      echo "   $name $tag: built"
-      echo "$name $tag ok sha=$sha" >>"$MANIFEST"
-      built=$((built + 1))
-    else
+    if [ ! -f "$dir/esm/index.js" ]; then
       echo "   $name $tag: BUILD PRODUCED NO esm/index.js"
       echo "$name $tag unbuildable reason=no-esm-output" >>"$MANIFEST"
       failed=$((failed + 1))
+      continue
     fi
+
+    # An esm/index.js that exists is not the same as one that imports. cram
+    # v3.0.7 produced a perfectly good build that threw on its first import,
+    # from a dependency it never declared, and that only surfaced minutes into
+    # a sweep as one blank row. Import it here instead.
+    if ! node --experimental-strip-types \
+      --disable-warning=MODULE_TYPELESS_PACKAGE_JSON \
+      --import ./lib/legacy-resolve-register.mjs \
+      -e "import('$PWD/$dir/esm/index.js')" >/dev/null 2>&1; then
+      echo "   $name $tag: BUILT BUT WILL NOT IMPORT"
+      echo "$name $tag unbuildable reason=import-failed" >>"$MANIFEST"
+      failed=$((failed + 1))
+      continue
+    fi
+
+    echo "   $name $tag: built"
+    record_manifest "$name" "$tag" "$dir"
+    built=$((built + 1))
   done
 done
 

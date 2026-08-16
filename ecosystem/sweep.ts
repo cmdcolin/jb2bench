@@ -30,7 +30,7 @@ import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs'
 import { fileURLToPath } from 'node:url'
 
 import { END, OLD_CRAM_OPTS, REF, START, seqFetch } from './lib/corpus.ts'
-import { countingFile, totals } from './lib/counting-filehandle.ts'
+import { type Counter, countingFile, totals } from './lib/counting-filehandle.ts'
 
 const SELF = fileURLToPath(import.meta.url)
 const here = (p: string) => new URL(p, import.meta.url)
@@ -83,17 +83,43 @@ const bwRec = (f: any) => ({
   flags: Math.round(Math.fround(f.score) * 1000) | 0,
 })
 
-async function armMain(kind: string, dir: string, file: string) {
-  const mod = await import(`${dir}/esm/index.js`)
+/**
+ * One definition of the query, for all three arms.
+ *
+ * The timed arm reads by path and the counting arm reads through a wrapped
+ * filehandle, and those were separate code paths until the self-test started
+ * comparing them: two constructions of the same query drift, and a drift here
+ * is indistinguishable from a library difference, which is the one thing this
+ * benchmark exists to measure. Now `counting` picks the constructor argument
+ * and nothing else differs.
+ *
+ * `counters` comes back non-empty only when counting, so the caller can total
+ * reads without knowing which shape it asked for.
+ */
+async function makeQuery(kind: string, mod: any, dir: string, file: string, counting: boolean) {
+  const counters: Counter[] = []
+  const open = async (path: string) => {
+    if (!counting) return { handle: undefined, path }
+    const { handle, counter } = await countingFile(dir, path)
+    counters.push(counter)
+    return { handle, path: undefined }
+  }
 
-  let pass: () => Promise<{ n: number; sum: number }>
+  let run: () => Promise<{ n: number; sum: number }>
 
   if (kind === 'bam') {
     // A fresh BamFile per pass: current releases cache parsed chunks on the
     // instance, so reusing one would measure the cache. bam.bench.ts does the
     // same, for the same reason.
-    pass = async () => {
-      const bam = new mod.BamFile({ bamPath: file })
+    run = async () => {
+      counters.length = 0
+      const data = await open(file)
+      const index = await open(`${file}.bai`)
+      const bam = new mod.BamFile(
+        counting
+          ? { bamFilehandle: data.handle, baiFilehandle: index.handle }
+          : { bamPath: file },
+      )
       await bam.getHeader()
       return fold((await bam.getRecordsForRange(REF, START, END)).map(bamRec))
     }
@@ -103,10 +129,20 @@ async function armMain(kind: string, dir: string, file: string) {
     // window here, and JBrowse's own CramAdapter raised it. Passing an option a
     // later version ignores is harmless; withholding it would make the early
     // majors unmeasurable rather than slow.
-    pass = async () => {
+    run = async () => {
+      counters.length = 0
+      const data = await open(file)
+      const index = await open(`${file}.crai`)
       const cram = new mod.IndexedCramFile({
-        cramPath: file,
-        index: new mod.CraiIndex({ path: `${file}.crai` }),
+        ...(counting
+          ? {
+              cramFilehandle: data.handle,
+              index: new mod.CraiIndex({ filehandle: index.handle }),
+            }
+          : {
+              cramPath: file,
+              index: new mod.CraiIndex({ path: `${file}.crai` }),
+            }),
         seqFetch,
         checkSequenceMD5: false,
         ...OLD_CRAM_OPTS,
@@ -114,20 +150,29 @@ async function armMain(kind: string, dir: string, file: string) {
       return fold((await cram.getRecordsForRange(0, START, END)).map(cramRec))
     }
   } else if (kind === 'bigwig') {
-    pass = async () => {
-      const bw = new mod.BigWig({ path: file })
+    run = async () => {
+      counters.length = 0
+      const data = await open(file)
+      const bw = new mod.BigWig(counting ? { filehandle: data.handle } : { path: file })
       return fold((await bw.getFeatures(REF, START, END)).map(bwRec))
     }
   } else {
     throw new Error(`unknown kind ${kind}`)
   }
 
-  const first = await pass()
-  await pass()
+  return { run, counters }
+}
+
+async function armMain(kind: string, dir: string, file: string) {
+  const mod = await import(`${dir}/esm/index.js`)
+  const { run } = await makeQuery(kind, mod, dir, file, false)
+
+  const first = await run()
+  await run()
   const ts: number[] = []
   for (let i = 0; i < INNER; i++) {
     const t = performance.now()
-    await pass()
+    await run()
     ts.push(performance.now() - t)
   }
   ts.sort((a, b) => a - b)
@@ -146,47 +191,57 @@ async function armMain(kind: string, dir: string, file: string) {
  */
 async function armCount(kind: string, dir: string, file: string) {
   const mod = await import(`${dir}/esm/index.js`)
-  const data = await countingFile(dir, file)
-  let index: Awaited<ReturnType<typeof countingFile>> | undefined
-  let records = 0
-
-  if (kind === 'bam') {
-    index = await countingFile(dir, `${file}.bai`)
-    const bam = new mod.BamFile({
-      bamFilehandle: data.handle,
-      baiFilehandle: index.handle,
-    })
-    await bam.getHeader()
-    records = (await bam.getRecordsForRange(REF, START, END)).length
-  } else if (kind === 'cram') {
-    index = await countingFile(dir, `${file}.crai`)
-    const cram = new mod.IndexedCramFile({
-      cramFilehandle: data.handle,
-      index: new mod.CraiIndex({ filehandle: index.handle }),
-      seqFetch,
-      checkSequenceMD5: false,
-      ...OLD_CRAM_OPTS,
-    })
-    records = (await cram.getRecordsForRange(0, START, END)).length
-  } else {
-    const bw = new mod.BigWig({ filehandle: data.handle })
-    records = (await bw.getFeatures(REF, START, END)).length
-  }
-
+  const { run, counters } = await makeQuery(kind, mod, dir, file, true)
+  const got = await run()
+  const [data, index] = counters
   console.log(
     JSON.stringify({
-      ...totals(index ? [data.counter, index.counter] : [data.counter]),
-      dataReads: data.counter.reads,
-      indexReads: index?.counter.reads ?? 0,
-      records,
-      pattern: data.counter.sizes.slice(0, 12),
+      ...totals(counters),
+      dataReads: data?.reads ?? 0,
+      indexReads: index?.reads ?? 0,
+      records: got.n,
+      checksum: String(got.sum),
+      pattern: data?.sizes.slice(0, 12) ?? [],
+    }),
+  )
+}
+
+/**
+ * Does this build work, and does the counting instrument change its answer?
+ *
+ * Two failures this catches that nothing else did. A build can produce
+ * `esm/index.js` and still be unimportable — cram v3.0.7 did, from an undeclared
+ * dependency — and that only surfaced minutes into a sweep, as one blank row.
+ * And an instrument that wraps the filehandle can change what the library
+ * returns: the first counting filehandle here was hand-written, and under it two
+ * majors of @gmod/bam failed with "Not a BAI file" while their neighbours
+ * passed, which reads as a library defect and was the harness.
+ *
+ * So the self-test runs the query both ways and requires the same records and
+ * the same checksum. A version that disagrees with itself is reported before any
+ * number derived from it is.
+ */
+async function armSelftest(kind: string, dir: string, file: string) {
+  const mod = await import(`${dir}/esm/index.js`)
+  const byPath = await (await makeQuery(kind, mod, dir, file, false)).run()
+  const byHandle = await (await makeQuery(kind, mod, dir, file, true)).run()
+  const agree = byPath.n === byHandle.n && byPath.sum === byHandle.sum
+  console.log(
+    JSON.stringify({
+      ok: agree && byPath.n > 0,
+      pathRecords: byPath.n,
+      handleRecords: byHandle.n,
+      pathChecksum: String(byPath.sum),
+      handleChecksum: String(byHandle.sum),
     }),
   )
 }
 
 if (process.argv[2] === '--arm') {
-  if (process.argv[3] === 'count') {
-    await armCount(process.argv[4]!, process.argv[5]!, process.argv[6]!)
+  const mode = process.argv[3]
+  if (mode === 'count' || mode === 'selftest') {
+    const fn = mode === 'count' ? armCount : armSelftest
+    await fn(process.argv[4]!, process.argv[5]!, process.argv[6]!)
   } else {
     await armMain(process.argv[3]!, process.argv[4]!, process.argv[5]!)
   }
@@ -284,6 +339,7 @@ interface Counts {
   dataReads: number
   indexReads: number
   records: number
+  checksum: string
   pattern: number[]
 }
 
@@ -292,6 +348,52 @@ function countArm(kind: string, dir: string, file: string): Counts {
 }
 
 const median = (xs: number[]) => [...xs].sort((a, b) => a - b)[xs.length >> 1]!
+
+// --------------------------------------------------------------- the gate ---
+//
+// `make sweep-verify`. Runs before anything is timed, in the same spirit as
+// `make verify` gating `make bench`: a curve drawn through versions that do not
+// all answer the same query is not a curve. It checks two things per version —
+// that the build imports and returns records at all, and that reading through
+// the counting filehandle gives the identical record set as reading by path.
+//
+// The second is the one worth having. An instrument that wraps I/O can change
+// what the library returns, and when it does the damage looks like a library
+// difference, which is exactly what a sweep is trying to detect.
+if (MODE === 'verify') {
+  let failures = 0
+  let checked = 0
+  for (const lib of libraries) {
+    if (lib.versions.length === 0) continue
+    const label = (onlyCases ?? CASE_LABELS)[0]!
+    const file = caseFile(lib.kind, label)
+    if (!existsSync(file)) {
+      console.log(`${lib.package}: no corpus at ${file}, skipping`)
+      continue
+    }
+    console.log(`\n${lib.package} — ${label}`)
+    for (const v of lib.versions) {
+      checked++
+      try {
+        const got = JSON.parse(runArm(['selftest', lib.kind, v.dir, file]))
+        if (got.ok) {
+          console.log(`  ok    ${v.tag.padEnd(10)} ${got.pathRecords} records`)
+        } else {
+          failures++
+          console.log(
+            `  FAIL  ${v.tag.padEnd(10)} path ${got.pathRecords}/${got.pathChecksum} ` +
+              `vs filehandle ${got.handleRecords}/${got.handleChecksum}`,
+          )
+        }
+      } catch (e) {
+        failures++
+        console.log(`  FAIL  ${v.tag.padEnd(10)} ${String(e).split('\n')[0]}`)
+      }
+    }
+  }
+  console.log(`\n${checked - failures}/${checked} versions verified`)
+  process.exit(failures === 0 ? 0 : 1)
+}
 
 interface Point {
   tag: string
