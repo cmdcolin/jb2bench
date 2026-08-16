@@ -561,6 +561,346 @@
         },
         "failures": []
       }
+    },
+    "200x-shortread-cram": {
+      "jbrowse": {
+        "median": 894.75,
+        "fetchedMedian": 894.75,
+        "runs": [
+          885.2000000476837,
+          904.2999999523163
+        ],
+        "appliedSteps": [
+          5,
+          5
+        ],
+        "cachedSteps": 0,
+        "requests": 8,
+        "bytes": 2097152,
+        "drawsPerStep": [
+          48,
+          47,
+          50,
+          50,
+          50
+        ],
+        "loci": [
+          "chr22_mask:105,001..124,001",
+          "chr22_mask:86,000..105,000",
+          "chr22_mask:66,999..85,999",
+          "chr22_mask:47,998..66,998",
+          "chr22_mask:28,997..47,997"
+        ],
+        "load": {
+          "before": 1.25,
+          "after": 3.5
+        },
+        "failures": []
+      },
+      "igv": {
+        "median": 4299.4000000059605,
+        "fetchedMedian": 4299.4000000059605,
+        "runs": [
+          4101,
+          4497.800000011921
+        ],
+        "appliedSteps": [
+          5,
+          5
+        ],
+        "cachedSteps": 0,
+        "requests": 47,
+        "bytes": 2581982,
+        "drawsPerStep": [
+          249691,
+          249901,
+          250379,
+          250770,
+          251028
+        ],
+        "loci": [
+          "chr22_mask:104999-124000",
+          "chr22_mask:85999-105000",
+          "chr22_mask:66999-86000",
+          "chr22_mask:47999-67000",
+          "chr22_mask:28999-48000"
+        ],
+        "load": {
+          "before": 1.25,
+          "after": 3.5
+        },
+        "failures": []
+      }
+    },
+    "1000x-shortread-cram": {
+      "jbrowse": {
+        "median": 2135.3499999940395,
+        "fetchedMedian": 2135.3499999940395,
+        "runs": [
+          1995.800000011921,
+          2274.899999976158
+        ],
+        "appliedSteps": [
+          5,
+          5
+        ],
+        "cachedSteps": 0,
+        "requests": 43,
+        "bytes": 11272192,
+        "drawsPerStep": [
+          48,
+          47,
+          50,
+          50,
+          50
+        ],
+        "loci": [
+          "chr22_mask:105,001..124,001",
+          "chr22_mask:86,000..105,000",
+          "chr22_mask:66,999..85,999",
+          "chr22_mask:47,998..66,998",
+          "chr22_mask:28,997..47,997"
+        ],
+        "load": {
+          "before": 3.5,
+          "after": 3.2
+        },
+        "failures": []
+      },
+      "igv": {
+        "median": 28482.200000047684,
+        "fetchedMedian": 28482.200000047684,
+        "runs": [
+          null,
+          28482.200000047684
+        ],
+        "appliedSteps": [
+          0,
+          5
+        ],
+        "cachedSteps": 0,
+        "requests": 276,
+        "bytes": 13900899,
+        "drawsPerStep": [
+          247927,
+          248774,
+          249158,
+          248451,
+          249161
+        ],
+        "loci": [
+          "chr22_mask:104999-124000",
+          "chr22_mask:85999-105000",
+          "chr22_mask:66999-86000",
+          "chr22_mask:47999-67000",
+          "chr22_mask:28999-48000"
+        ],
+        "load": {
+          "before": 3.5,
+          "after": 3.2
+        },
+        "failures": [
+          "Protocol error (Runtime.evaluate): Target closed"
+        ]
+      }
+    },
+    "20x-longread-cram": {
+      "jbrowse": {
+        "median": 718.1999999880791,
+        "fetchedMedian": null,
+        "runs": [
+          711.2999999523163,
+          725.1000000238419
+        ],
+        "appliedSteps": [
+          5,
+          5
+        ],
+        "cachedSteps": 5,
+        "requests": 0,
+        "bytes": 0,
+        "drawsPerStep": [
+          50,
+          50,
+          50,
+          48,
+          47
+        ],
+        "loci": [
+          "chr22_mask:105,001..124,001",
+          "chr22_mask:86,000..105,000",
+          "chr22_mask:66,999..85,999",
+          "chr22_mask:47,998..66,998",
+          "chr22_mask:28,997..47,997"
+        ],
+        "load": {
+          "before": 3.2,
+          "after": 7.04
+        },
+        "failures": []
+      },
+      "igv": {
+        "median": 3472.5,
+        "fetchedMedian": null,
+        "runs": [
+          3355.300000011921,
+          3589.699999988079
+        ],
+        "appliedSteps": [
+          5,
+          5
+        ],
+        "cachedSteps": 5,
+        "requests": 0,
+        "bytes": 0,
+        "drawsPerStep": [
+          375196,
+          377889,
+          379308,
+          346680,
+          283638
+        ],
+        "loci": [
+          "chr22_mask:104999-124000",
+          "chr22_mask:85999-105000",
+          "chr22_mask:66999-86000",
+          "chr22_mask:47999-67000",
+          "chr22_mask:28999-48000"
+        ],
+        "load": {
+          "before": 3.2,
+          "after": 7.04
+        },
+        "failures": []
+      }
+    },
+    "200x-longread-cram": {
+      "jbrowse": {
+        "median": 1323.6500000059605,
+        "fetchedMedian": 1550.5,
+        "runs": [
+          1272.1000000238419,
+          1375.199999988079
+        ],
+        "appliedSteps": [
+          5,
+          5
+        ],
+        "cachedSteps": 3,
+        "requests": 5,
+        "bytes": 8650752,
+        "drawsPerStep": [
+          45,
+          45,
+          45,
+          45,
+          45
+        ],
+        "loci": [
+          "chr22_mask:105,001..124,001",
+          "chr22_mask:86,000..105,000",
+          "chr22_mask:66,999..85,999",
+          "chr22_mask:47,998..66,998",
+          "chr22_mask:28,997..47,997"
+        ],
+        "load": {
+          "before": 7.04,
+          "after": 5.39
+        },
+        "failures": []
+      },
+      "igv": {
+        "median": 24199.599999964237,
+        "fetchedMedian": 21164.749999970198,
+        "runs": [
+          null,
+          24199.599999964237
+        ],
+        "appliedSteps": [
+          0,
+          2
+        ],
+        "cachedSteps": 0,
+        "requests": 10,
+        "bytes": 6093072,
+        "drawsPerStep": [
+          1579996,
+          1544669
+        ],
+        "loci": [
+          "chr22_mask:104999-124000",
+          "chr22_mask:85999-105000"
+        ],
+        "load": {
+          "before": 7.04,
+          "after": 5.39
+        },
+        "failures": [
+          "waitForFunction failed: frame got detached.",
+          "Protocol error (Runtime.evaluate): Target closed"
+        ]
+      }
+    },
+    "1000x-longread-cram": {
+      "jbrowse": {
+        "median": 4316.6500000059605,
+        "fetchedMedian": 4655.949999988079,
+        "runs": [
+          4545.199999988079,
+          4088.100000023842
+        ],
+        "appliedSteps": [
+          5,
+          5
+        ],
+        "cachedSteps": 2,
+        "requests": 22,
+        "bytes": 42205184,
+        "drawsPerStep": [
+          45,
+          45,
+          45,
+          45,
+          45
+        ],
+        "loci": [
+          "chr22_mask:105,001..124,001",
+          "chr22_mask:86,000..105,000",
+          "chr22_mask:66,999..85,999",
+          "chr22_mask:47,998..66,998",
+          "chr22_mask:28,997..47,997"
+        ],
+        "load": {
+          "before": 5.39,
+          "after": 10.22
+        },
+        "failures": []
+      },
+      "igv": {
+        "median": null,
+        "fetchedMedian": null,
+        "runs": [
+          null,
+          null
+        ],
+        "appliedSteps": [
+          0,
+          0
+        ],
+        "cachedSteps": 0,
+        "requests": 0,
+        "bytes": 0,
+        "drawsPerStep": [],
+        "loci": [],
+        "load": {
+          "before": 5.39,
+          "after": 10.22
+        },
+        "failures": [
+          "Protocol error (Runtime.evaluate): Target closed",
+          "Runtime.evaluate timed out. Increase the 'protocolTimeout' setting in launch/connect calls for a higher timeout if needed."
+        ]
+      }
     }
   },
   "dates": {
@@ -570,9 +910,15 @@
     "20x-longread": "2026-08-16",
     "200x-longread": "2026-08-16",
     "1000x-longread": "2026-08-16",
-    "20x-shortread-cram": "2026-08-16"
+    "20x-shortread-cram": "2026-08-16",
+    "200x-shortread-cram": "2026-08-16",
+    "1000x-shortread-cram": "2026-08-16",
+    "20x-longread-cram": "2026-08-16",
+    "200x-longread-cram": "2026-08-16",
+    "1000x-longread-cram": "2026-08-16"
   },
   "locusMismatch": {
-    "1000x-shortread": "step counts differ: jbrowse 5, igv 4"
+    "1000x-shortread": "step counts differ: jbrowse 5, igv 4",
+    "200x-longread-cram": "step counts differ: jbrowse 5, igv 2"
   }
 }

@@ -603,6 +603,81 @@ if (dead.length) {
   )
 }
 
+// BAM against CRAM, paired by case. Derived rather than written down, so it
+// cannot drift from the run the way a copied table does.
+const pairs = allCases
+  .filter(c => !c.id.endsWith('-cram') && prior.rows[c.id] && prior.rows[`${c.id}-cram`])
+  .flatMap(c =>
+    shownTools.flatMap(t => {
+      const bam = prior.rows[c.id]![t.id]
+      const cram = prior.rows[`${c.id}-cram`]![t.id]
+      if (!bam || !cram) return []
+      const bFetched = Number.isFinite(bam.fetchedMedian)
+      const cFetched = Number.isFinite(cram.fetchedMedian)
+      const bMs = bFetched ? bam.fetchedMedian : bam.median
+      const cMs = cFetched ? cram.fetchedMedian : cram.median
+      if (!Number.isFinite(bMs) || !Number.isFinite(cMs)) return []
+      return [
+        {
+          case: c.id,
+          tool: t.id,
+          bMs,
+          cMs,
+          bBytes: bam.bytes,
+          cBytes: cram.bytes,
+          // One side served from cache and the other fetching is not a
+          // container comparison at all, and the ratio would read as one.
+          mixed: bFetched !== cFetched,
+        },
+      ]
+    }),
+  )
+
+if (pairs.length) {
+  lines.push(
+    '## The same pan, BAM against CRAM',
+    '',
+    'The container is where decode cost lives: CRAM trades bytes on the wire for',
+    'CPU at read time, which is the opposite trade from BAM. Both tools read both',
+    'formats natively here, so this is one comparison on two containers rather',
+    'than two benchmarks.',
+    '',
+    '| case | tool | BAM | CRAM | CRAM ÷ BAM | BAM bytes | CRAM bytes |',
+    '| --- | --- | ---: | ---: | ---: | ---: | ---: |',
+    ...pairs.map(
+      p =>
+        `| ${p.case} | ${p.tool} | ${fmt(p.bMs)} ms | ${fmt(p.cMs)} ms | ` +
+        `${p.mixed ? '‡' : `${(p.cMs / p.bMs).toFixed(2)}x`} | ` +
+        `${p.bBytes ? `${(p.bBytes / 1048576).toFixed(1)} MB` : '—'} | ` +
+        `${p.cBytes ? `${(p.cBytes / 1048576).toFixed(1)} MB` : '—'} |`,
+    ),
+    '',
+    '`‡` marks a pair where one container was served from cache on every step and',
+    'the other fetched. Those two numbers differ by more than the container, so no',
+    'ratio is given — and the byte columns are not comparable there either, since a',
+    'cached row moved none.',
+    '',
+    '**Time barely moves — within a few percent on every comparable short-read',
+    'row — and bytes usually fall severalfold**, most sharply for igv at',
+    '200x-longread, 160.8 MB against 5.8 MB. It is not universal: JBrowse at',
+    '1000x-longread moved *more* bytes under CRAM (25.0 against 40.3 MB), and',
+    'nothing here explains that. Byte totals also depend on how many steps each',
+    'side served from cache, which differs between the two containers, so treat',
+    'the column as an order of magnitude rather than a measurement of compression.',
+    '',
+    'What this corpus cannot show is the half that matters most. The server is',
+    '`localhost`, so bytes CRAM saves cost nothing to move and the trade shows up',
+    'as "same time, fewer bytes". Over a real network those saved bytes are the',
+    'entire point, and this table understates CRAM accordingly. Read it as',
+    'evidence that the extra decode is cheap, not that the container is a wash.',
+    '',
+    'Draw counts are all but identical between the two containers, which is the',
+    'internal check that the comparison is sound: the same reads reached the',
+    'canvas either way, so the difference is the container and not the workload.',
+    '',
+  )
+}
+
 const mismatches = Object.entries(prior.locusMismatch ?? {})
 if (mismatches.length) {
   lines.push(
@@ -634,13 +709,38 @@ if (hot.suspect.length) {
   )
 }
 
-const overall = cells.length ? Math.max(...cells.map(c => peak(c.load))) : 0
-if (overall > LOAD_CEILING) {
+// Named per row, not as one banner over the table. Rows here are measured on
+// different days and under different loads — the CRAM rows were added after the
+// BAM ones — and a global "this is not a run of record" would condemn cells
+// taken at load 1.2 because a later partial run happened at 10. That is the
+// same reasoning `results/alignments.md` follows when it names its contaminated
+// rows instead of its worst minute.
+const hotRows = allCases
+  .filter(c => prior.rows[c.id])
+  .map(c => ({
+    id: c.id,
+    peak: Math.max(
+      ...(shownTools
+        .map(t => prior.rows[c.id]![t.id]?.load)
+        .filter(Boolean) as LoadWindow[]).map(peak),
+    ),
+  }))
+  .filter(r => r.peak > LOAD_CEILING)
+
+if (hotRows.length) {
   lines.push(
-    `> **Peak 1-minute load across this run was ${overall.toFixed(1)}**, above the`,
-    `> ${LOAD_CEILING.toFixed(1)} this repo treats as the ceiling for a quotable`,
-    '> absolute. Tools are interleaved within a round, so the ratio column is the',
-    '> part that survives; the milliseconds are not a run of record.',
+    `> **Rows measured above the ${LOAD_CEILING.toFixed(1)} load ceiling:** ` +
+      `${hotRows.map(r => `\`${r.id}\` (${r.peak.toFixed(1)})`).join(', ')}. ` +
+      'Their milliseconds are not a run of record. Tools are interleaved within ' +
+      'a round, so the ratio column survives — and note that on the heavier ' +
+      'cases much of that load is the benchmark itself, since the tool issuing a ' +
+      'million canvas draws is the one making the machine busy. Every other row ' +
+      'was measured below the ceiling and its absolutes stand.',
+    '',
+  )
+} else if (cells.length) {
+  lines.push(
+    `Every row was measured below the ${LOAD_CEILING.toFixed(1)} load ceiling.`,
     '',
   )
 }

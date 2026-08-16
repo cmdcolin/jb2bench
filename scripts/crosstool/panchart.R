@@ -101,11 +101,18 @@ pan_theme <- function(base = 12) {
 cov_scale <- scale_x_log10(breaks = c(20, 200, 1000),
                            labels = c("20x", "200x", "1000x"))
 
-load_note <- sprintf(
-  "Measured %s. Peak 1-minute load %.1f, against the 4.0 this repo treats as\nthe ceiling for a quotable absolute.",
-  d$dates[[1]], suppressWarnings(max(unlist(lapply(d$rows, function(r)
-    max(unlist(lapply(r, function(c) unlist(c$load))))))))
-)
+# Per row, not a single peak. Rows here were measured on different days and
+# loads -- the CRAM ones were added after the BAM ones -- and quoting the worst
+# minute over the whole figure would condemn cells taken at load 1.2 because a
+# later partial run happened at 10.
+row_peak <- sapply(d$rows, function(r)
+  suppressWarnings(max(unlist(lapply(r, function(cc) unlist(cc$load))))))
+hot <- names(row_peak)[is.finite(row_peak) & row_peak > 4]
+load_note <- if (length(hot)) sprintf(
+  "Measured %s. %d of %d rows ran above the 4.0 load ceiling and their absolutes are\nnot a run of record: %s.\nThe rest were measured below it.",
+  d$dates[[1]], length(hot), length(row_peak),
+  paste(strwrap(paste(hot, collapse = ", "), width = 80), collapse = "\n")
+) else sprintf("Measured %s. Every row below the 4.0 load ceiling.", d$dates[[1]])
 
 # ---- panel (a): time to content ------------------------------------------
 timed <- d2 |> filter(is.finite(ms))
@@ -153,8 +160,8 @@ if (nrow(missing)) {
     geom_point(data = missing2, aes(x = coverage, y = y), shape = 4, size = 3.2,
                stroke = 1.1, show.legend = FALSE) +
     geom_text(data = missing2, aes(x = coverage, y = y),
-              label = "did not complete", size = 2.7, vjust = -1.1, hjust = 0.9,
-              colour = "grey25", show.legend = FALSE)
+              label = "did not\ncomplete", size = 2.6, vjust = -0.35, hjust = 0.5,
+              lineheight = 0.9, colour = "grey25", show.legend = FALSE)
 }
 
 ggsave("results/figures/crosstool-pan-time.png", p_time,
