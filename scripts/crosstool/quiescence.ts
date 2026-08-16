@@ -17,10 +17,13 @@
 // THREE STRATEGIES. None is correct in general; they fail differently, and the
 // point of having them together is that a disagreement is visible.
 //
-//   draws   Patch the canvas drawing APIs, timestamp every call, and wait for a
-//           quiet interval WITH nothing in flight on the network. Cheap
-//           (an array push), tool-agnostic (asks the platform, not the app), and
-//           high resolution.
+//   draws   Patch the canvas drawing APIs, timestamp every call, and report the
+//           last one. Cheap (an array push), tool-agnostic (asks the platform,
+//           not the app), and high resolution. **What it reports is a canvas
+//           render that happened** — a positive event — and the stillness test
+//           is only the stopping rule that decides when to believe it.
+//           `isContentDrawn` in drawclock.ts owns that rule for every caller
+//           here, because it existed twice once and got fixed once.
 //             Fails when: a page animates to canvas forever (never quiet); work
 //             happens that never reaches a main-thread canvas; or — measured,
 //             not hypothetical — a page keeps issuing draw calls after the
@@ -50,7 +53,13 @@
 // report can state it rather than assume a sign for it.
 import type { Page } from 'puppeteer'
 
-import { DRAW_CLOCK_INIT, DRAW_CLOCK_READ, DRAW_CLOCK_RESET } from './drawclock.ts'
+import {
+  DEFAULT_QUIET_MS,
+  DRAW_CLOCK_INIT,
+  DRAW_CLOCK_READ,
+  DRAW_CLOCK_RESET,
+  isContentDrawn,
+} from './drawclock.ts'
 
 export type Strategy = 'draws' | 'paint' | 'idle'
 
@@ -107,7 +116,7 @@ const DATA_RE = /\.(bam|bai|cram|crai|bw|fa|fai|vcf|gz|tbi)(\?|$)/
  * the network counters have to see the first request.
  */
 export async function attachQuiescence(page: Page, opts: QuiescenceOptions = {}) {
-  const quietMs = opts.quietMs ?? 1000
+  const quietMs = opts.quietMs ?? DEFAULT_QUIET_MS
   const pollMs = opts.pollMs ?? 150
   const stablePolls = opts.stablePolls ?? 5
   const maxWaitMs = opts.maxWaitMs ?? 120000
@@ -191,23 +200,31 @@ export async function attachQuiescence(page: Page, opts: QuiescenceOptions = {})
             ms: number
             sinceLast: number
           }
-          // Three conditions, not one. Nothing in flight, nothing having
-          // *recently* been in flight, and nothing drawn recently — a tool that
-          // pauses between bursts satisfies any one of these while still
-          // working.
-          const networkQuiet = inFlight <= 0 && Date.now() - lastNetwork > quietMs
+          const now = Date.now()
           if (strategy === 'idle') {
-            if (networkQuiet && Date.now() - t0 > quietMs) {
+            if (inFlight <= 0 && now - lastNetwork > quietMs && now - t0 > quietMs) {
               return {
                 strategy,
-                ms: Date.now() - t0,
+                ms: now - t0,
                 events: c.count,
                 requests,
                 bytes,
                 atFloor: false,
               }
             }
-          } else if (c.count > 0 && networkQuiet && c.sinceLast > quietMs) {
+            // The shared rule, not a second copy of it. panprofile.ts asks the
+            // same question, and a completion rule that exists twice is a
+            // completion rule that gets fixed once.
+          } else if (
+            isContentDrawn({
+              drawCount: c.count,
+              lastDrawAt: now - c.sinceLast,
+              lastNetworkAt: lastNetwork,
+              inFlight,
+              now,
+              quietMs,
+            })
+          ) {
             return {
               strategy,
               ms: c.ms,
