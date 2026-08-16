@@ -63,6 +63,24 @@ did not:
 | JBrowse 1 v1.16.11 | yes | `~/src/dont_care/jb2profile/jb1web` | prior art, not wired up here |
 | `@jbrowse/react-linear-genome-view` | yes | `~/src/dont_care/jb2profile/jb2lgv` | prior art, not wired up here |
 
+### One layer down: the parser against other languages
+
+The table above is browsers. At the *parser* layer there is exactly one
+cross-language comparison and it is someone else's:
+[brentp/vcf-bench](https://github.com/brentp/vcf-bench) times eleven bindings on
+"iterate rows, pull an INFO integer, report the mean". `@gmod/vcf` comes in at
+**24 s against C htslib's 18 s**, ahead of pysam (28 s) and plain cyvcf2 (29 s) —
+a JavaScript parser between the C family and the Python bindings.
+
+**That figure is for `@gmod/vcf` v5.0.2**, the 2023-era parser, so it predates
+the 7.2.0 rewrites. `ecosystem/sweep.ts`'s vcf arm now runs that exact operation
+on every major so the v5-to-v7 ratio can be carried onto the published scale;
+`ecosystem/vcf-crosslang.json` transcribes the table and the caveats. Two of
+those matter most: the task never touches a genotype, which is the part a
+variant display renders and the part 7.2.0 rewrote; and the JS entry was
+contributed by this project's author, so it is self-reported within someone
+else's harness.
+
 The register to keep: **igv.js confounds parser and renderer** because it
 maintains its own readers, while **GenomeSpy shares our decoder** (`@gmod/bam`
 `^7.1.19`), so a GenomeSpy comparison largely isolates the render path. That

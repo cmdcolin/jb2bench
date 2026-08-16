@@ -397,6 +397,47 @@ the current pure-JS decompressor also beats {{parserBgzfOldVer}}'s native-zlib
 path, by {{parserBgzfNodeMin}}x to {{parserBgzfNodeMax}}x, because that path
 spent its advantage on Buffer conversions and promisify wrapping.
 
+## How does the parser compare to htslib? — `vcf-crosslang.json`
+
+Everything above compares `@gmod/vcf` against older `@gmod/vcf`, which says how
+much it improved and not where it stands beside a C implementation. That is a
+question a reviewer asks, and there is a published answer:
+[brentp/vcf-bench](https://github.com/brentp/vcf-bench) times eleven language
+bindings on one task — iterate a VCF's rows, pull an integer out of INFO,
+accumulate, report the mean.
+
+| tool | VCF |
+| --- | ---: |
+| C htslib, hts-zig, hts-nim | 18 s |
+| d-htslib, crystal-htslib, go-vcfgo | 19 s |
+| cyvcf2 (libdeflate) | 20 s |
+| rust-htslib | 22 s |
+| **`@gmod/vcf` (JavaScript)** | **24 s** |
+| pysam | 28 s |
+| cyvcf2 | 29 s |
+| pyvcf | 1009 s |
+
+A JavaScript parser landing between the C family and the Python bindings, ahead
+of both pysam and plain cyvcf2, is the interesting part.
+
+**And that figure is for v5.0.2** — the 2023-era parser, the same vintage as this
+directory's *old* side. It predates the 7.2.0 rewrites entirely. `sweep.ts`
+therefore runs that exact operation (`parseLine`, then `INFO.AN[0]`) on every
+major, so the v5-to-v7 ratio measured here can be carried onto the published
+scale. Doing so is a projection and has to be labelled as one: different corpus,
+different machine, different year.
+
+Two things keep this honest. The task **never touches a genotype**, and genotypes
+are what a variant display renders and what 7.2.0 rewrote — so it measures line
+and INFO parsing, and `results/vcf-scan.md` measures the other thing; they are
+complementary rather than competing. And the JS entry in that repository was
+contributed by this project's author, which makes it a self-reported entry in
+someone else's harness rather than an independent measurement.
+
+Transcribed rather than re-run, like the Zarr numbers below and for the same
+reason — the harness is someone else's and re-running it means building ten
+toolchains. `vcf-crosslang.json` is where to update it.
+
 ## Zarr is measured elsewhere
 
 The other ecosystem change worth reporting is a format, not a parser: packing a
@@ -443,6 +484,8 @@ paper, run `make bench` here and then `make sync-benchmarks` in the paper repo.
 - `versions.json` — the two-point pins, with SHAs, and any deliberate patch
 - `sweep.json` — the per-major pins for `make sweep`, and the selection rule
 - `zarr.json` — the Zarr measurement, transcribed from its own harness
+- `vcf-crosslang.json` — brentp/vcf-bench's cross-language table, transcribed,
+  with the caveats that have to travel with it
 - `setup.sh` — clone + build both sides; writes `.libs/manifest.txt`
 - `setup-sweep.sh` — the same for `sweep.json`, tolerant of a version that will
   no longer build; writes `.libs/sweep-manifest.txt`

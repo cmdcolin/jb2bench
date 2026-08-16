@@ -164,18 +164,33 @@ async function makeQuery(kind: string, mod: any, dir: string, file: string, coun
     // string representations, and the difference is half of what changed in
     // 7.2.0.
     const { header, lines } = vcfParts(file)
-    // parseLine on every version, not each version's cheapest genotype call.
-    // The cheap call appears partway along the axis, so sweeping it would put
-    // a step in the curve that is a change of question rather than of speed.
+    // parseLine plus one INFO integer, on every version. Two reasons for that
+    // exact shape:
+    //
+    // It is one question along the whole axis. The two-point benchmark asks
+    // each side for genotypes through the cheapest call it offers — SAMPLES on
+    // v5, GENOTYPES() on v7 — because that is what a JBrowse upgrade buys. On a
+    // sweep that API appears partway along, so the curve would carry a step
+    // that is a change of question rather than of speed.
+    //
+    // And it is *the task brentp/vcf-bench measures*, verbatim: parse the line,
+    // read `INFO.AN[0]`, accumulate. That benchmark times eleven languages on
+    // it — C htslib 18 s, cyvcf2 29 s, @gmod/vcf 24 s — and its JS entry pins
+    // `@gmod/vcf ^5.0.2`, so its published figure is for the 2023-era parser and
+    // predates the 7.2.0 rewrite. Measuring the identical operation here means
+    // this sweep's v5-to-v7 ratio can be carried onto that published scale
+    // without re-running ten toolchains. See `vcf-crosslang.json`.
     const Ctor = mod.default ?? mod.VCF
     run = async () => {
       const parser = new Ctor({ header })
-      return fold(
-        lines.map(line => {
-          const v = parser.parseLine(line)
-          return { start: v.POS, end: v.POS, flags: v.ALT?.length ?? 0 }
-        }),
-      )
+      let sum = 0
+      let n = 0
+      for (const line of lines) {
+        const v = parser.parseLine(line)
+        sum = (sum + (v.INFO?.AN?.[0] ?? 0)) % 1_000_000_007
+        n++
+      }
+      return { n, sum }
     }
   } else if (kind === 'bgzf') {
     // The browser path on every version. v1.x shipped two decompressors and
