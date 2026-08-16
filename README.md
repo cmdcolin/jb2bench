@@ -797,16 +797,36 @@ MODES=in CASES=20x-shortread,200x-longread node scripts/render/runner-interactio
 node scripts/render/report.ts > results/report.html
 ```
 
-**A build you made yourself needs its `fetchSizeLimit` raised, or it measures
-nothing.** `shell/load_alignments.sh` wires the tracks with adapter defaults,
-and `BamAdapter`/`CramAdapter` default `fetchSizeLimit` to 5 MB — but the 19 kb
-benchmark window over 1000x coverage is a 28.1 MB fetch. The track then renders
+**Check `fetchSizeLimit` before trusting a 1000x row — but check it, do not
+assume it.** `shell/load_alignments.sh` wires the tracks with adapter defaults,
+and `BamAdapter`/`CramAdapter` still default the slot to 5 MB
+(`plugins/alignments/src/BamAdapter/configSchema.ts`), while the 19 kb window
+over 1000x coverage is a 28.1 MB fetch. When it does fire, the track renders
 "Requested too much data (28.1 Mb). Zoom in to see features, or force load" and
-never fetches at all. Nothing errors; the page loads, the chrome paints, and the
-run happily measures an empty browser. Set the slot to something large on every
-track in the build's `config.json` before profiling or timing anything at 1000x.
-This is the same family of failure as "a config that 404s photographs
-perfectly" — see `flame/WORKER_FINDINGS.md`, which hit it.
+never fetches: nothing errors, the page loads, the chrome paints, and the run
+happily measures an empty browser — the same family of failure as "a config that
+404s photographs perfectly", which `flame/WORKER_FINDINGS.md` hit.
+
+**It does not currently fire on `builds/current`, which sets the slot nowhere.**
+Verified 2026-08-16 by loading `1000x.shortread.bam` and `1000x.longread.bam` at
+the benchmark window and watching the network: 13 and 15 data requests
+respectively, and no refusal text anywhere on the page. So the config pass this
+section used to demand is not owed for that build, and an hour spent on it would
+buy nothing.
+
+Why the 28.1 MB figure does not translate into a refusal here has not been
+established — the limit is checked against an estimate the adapter computes, and
+that estimate is evidently not the whole-window byte count. Treat this as
+"measured, unexplained", and re-check after any adapter change rather than
+trusting either the warning or this correction:
+
+```bash
+node --experimental-strip-types scripts/render/bailcheck.ts   # PORT=8000 by default
+```
+
+It loads each track, counts data-file responses, greps the page for the refusal
+text, and exits non-zero if anything refused — so it can gate a run rather than
+being a thing to remember.
 
 Both matrices take upwards of 20 minutes, and a single contaminated row does not
 justify redoing the other five, so each can be run in part. Rows or modes left
