@@ -6,23 +6,27 @@
   "rows": {
     "20x-shortread": {
       "jbrowse": {
-        "median": 221.19999998807907,
-        "fetchedMedian": 361.59999999403954,
+        "median": 685.0999999642372,
+        "fetchedMedian": 688.1999999880791,
         "runs": [
-          221.19999998807907
+          687.0999999642372,
+          685.0999999642372,
+          661
         ],
         "appliedSteps": [
+          5,
+          5,
           5
         ],
         "cachedSteps": 3,
         "requests": 2,
         "bytes": 524288,
         "drawsPerStep": [
-          10,
-          45,
-          48,
-          10,
-          47
+          46,
+          42,
+          47,
+          50,
+          50
         ],
         "loci": [
           "chr22_mask:105,001..124,001",
@@ -32,18 +36,22 @@
           "chr22_mask:28,997..47,997"
         ],
         "load": {
-          "before": 4.32,
-          "after": 4.31
+          "before": 1.08,
+          "after": 1.27
         },
         "failures": []
       },
       "igv": {
-        "median": 593.5,
-        "fetchedMedian": 593.5,
+        "median": 536.8000000119209,
+        "fetchedMedian": 536.8000000119209,
         "runs": [
-          593.5
+          514.8999999761581,
+          538.8000000119209,
+          536.8000000119209
         ],
         "appliedSteps": [
+          5,
+          5,
           5
         ],
         "cachedSteps": 0,
@@ -64,27 +72,31 @@
           "chr22_mask:28999-48000"
         ],
         "load": {
-          "before": 4.32,
-          "after": 4.31
+          "before": 1.08,
+          "after": 1.27
         },
         "failures": []
       }
     },
     "200x-shortread": {
       "jbrowse": {
-        "median": 532.1999999880791,
-        "fetchedMedian": 537.9000000059605,
+        "median": 914.5,
+        "fetchedMedian": 914.5,
         "runs": [
-          532.1999999880791
+          950.4000000357628,
+          914.5,
+          906.3000000119209
         ],
         "appliedSteps": [
+          5,
+          5,
           5
         ],
-        "cachedSteps": 1,
-        "requests": 4,
+        "cachedSteps": 0,
+        "requests": 5,
         "bytes": 7340032,
         "drawsPerStep": [
-          10,
+          48,
           47,
           50,
           50,
@@ -98,18 +110,22 @@
           "chr22_mask:28,997..47,997"
         ],
         "load": {
-          "before": 4.31,
-          "after": 7.44
+          "before": 1.27,
+          "after": 1.01
         },
         "failures": []
       },
       "igv": {
-        "median": 5153.600000023842,
-        "fetchedMedian": 5153.600000023842,
+        "median": 4342.600000023842,
+        "fetchedMedian": 4342.600000023842,
         "runs": [
-          5153.600000023842
+          4332,
+          4342.600000023842,
+          4379.599999964237
         ],
         "appliedSteps": [
+          5,
+          5,
           5
         ],
         "cachedSteps": 0,
@@ -130,16 +146,306 @@
           "chr22_mask:28999-48000"
         ],
         "load": {
-          "before": 4.31,
-          "after": 7.44
+          "before": 1.27,
+          "after": 1.01
         },
         "failures": []
+      }
+    },
+    "1000x-shortread": {
+      "jbrowse": {
+        "median": 2023.300000011921,
+        "fetchedMedian": 2023.300000011921,
+        "runs": [
+          2023.300000011921,
+          1946.800000011921,
+          3543
+        ],
+        "appliedSteps": [
+          5,
+          5,
+          5
+        ],
+        "cachedSteps": 0,
+        "requests": 10,
+        "bytes": 34340864,
+        "drawsPerStep": [
+          48,
+          47,
+          50,
+          50,
+          50
+        ],
+        "loci": [
+          "chr22_mask:105,001..124,001",
+          "chr22_mask:86,000..105,000",
+          "chr22_mask:66,999..85,999",
+          "chr22_mask:47,998..66,998",
+          "chr22_mask:28,997..47,997"
+        ],
+        "load": {
+          "before": 1.01,
+          "after": 0.46
+        },
+        "failures": []
+      },
+      "igv": {
+        "median": 27162.600000023842,
+        "fetchedMedian": 27001.100000023842,
+        "runs": [
+          27162.600000023842,
+          26336.599999964237,
+          28337.5
+        ],
+        "appliedSteps": [
+          4,
+          4,
+          4
+        ],
+        "cachedSteps": 0,
+        "requests": 106,
+        "bytes": 123938627,
+        "drawsPerStep": [
+          248023,
+          248742,
+          249514,
+          248718
+        ],
+        "loci": [
+          "chr22_mask:104999-124000",
+          "chr22_mask:85999-105000",
+          "chr22_mask:66999-86000",
+          "chr22_mask:47999-67000"
+        ],
+        "load": {
+          "before": 1.01,
+          "after": 0.46
+        },
+        "failures": [
+          "Runtime.evaluate timed out. Increase the 'protocolTimeout' setting in launch/connect calls for a higher timeout if needed.",
+          "Runtime.evaluate timed out. Increase the 'protocolTimeout' setting in launch/connect calls for a higher timeout if needed.",
+          "Runtime.evaluate timed out. Increase the 'protocolTimeout' setting in launch/connect calls for a higher timeout if needed."
+        ]
+      }
+    },
+    "20x-longread": {
+      "jbrowse": {
+        "median": 701.6999999880791,
+        "fetchedMedian": null,
+        "runs": [
+          668.3000000119209,
+          701.6999999880791,
+          706.3000000119209
+        ],
+        "appliedSteps": [
+          5,
+          5,
+          5
+        ],
+        "cachedSteps": 5,
+        "requests": 0,
+        "bytes": 0,
+        "drawsPerStep": [
+          50,
+          50,
+          50,
+          48,
+          47
+        ],
+        "loci": [
+          "chr22_mask:105,001..124,001",
+          "chr22_mask:86,000..105,000",
+          "chr22_mask:66,999..85,999",
+          "chr22_mask:47,998..66,998",
+          "chr22_mask:28,997..47,997"
+        ],
+        "load": {
+          "before": 0.46,
+          "after": 1.31
+        },
+        "failures": []
+      },
+      "igv": {
+        "median": 2886.199999988079,
+        "fetchedMedian": 2886.199999988079,
+        "runs": [
+          2810.7999999523163,
+          2886.199999988079,
+          2921.900000035763
+        ],
+        "appliedSteps": [
+          5,
+          5,
+          5
+        ],
+        "cachedSteps": 2,
+        "requests": 5,
+        "bytes": 5637824,
+        "drawsPerStep": [
+          375196,
+          377889,
+          379308,
+          346680,
+          283638
+        ],
+        "loci": [
+          "chr22_mask:104999-124000",
+          "chr22_mask:85999-105000",
+          "chr22_mask:66999-86000",
+          "chr22_mask:47999-67000",
+          "chr22_mask:28999-48000"
+        ],
+        "load": {
+          "before": 0.46,
+          "after": 1.31
+        },
+        "failures": []
+      }
+    },
+    "200x-longread": {
+      "jbrowse": {
+        "median": 1016.4000000357628,
+        "fetchedMedian": null,
+        "runs": [
+          1016.4000000357628,
+          999,
+          1021.0999999642372
+        ],
+        "appliedSteps": [
+          5,
+          5,
+          5
+        ],
+        "cachedSteps": 5,
+        "requests": 0,
+        "bytes": 0,
+        "drawsPerStep": [
+          45,
+          45,
+          45,
+          45,
+          45
+        ],
+        "loci": [
+          "chr22_mask:105,001..124,001",
+          "chr22_mask:86,000..105,000",
+          "chr22_mask:66,999..85,999",
+          "chr22_mask:47,998..66,998",
+          "chr22_mask:28,997..47,997"
+        ],
+        "load": {
+          "before": 1.31,
+          "after": 1.38
+        },
+        "failures": []
+      },
+      "igv": {
+        "median": 17291,
+        "fetchedMedian": 17291,
+        "runs": [
+          17377.69999998808,
+          17291,
+          16321.800000011921
+        ],
+        "appliedSteps": [
+          5,
+          5,
+          5
+        ],
+        "cachedSteps": 0,
+        "requests": 22,
+        "bytes": 168632909,
+        "drawsPerStep": [
+          1579996,
+          1544669,
+          1585083,
+          1524264,
+          1354058
+        ],
+        "loci": [
+          "chr22_mask:104999-124000",
+          "chr22_mask:85999-105000",
+          "chr22_mask:66999-86000",
+          "chr22_mask:47999-67000",
+          "chr22_mask:28999-48000"
+        ],
+        "load": {
+          "before": 1.31,
+          "after": 1.38
+        },
+        "failures": []
+      }
+    },
+    "1000x-longread": {
+      "jbrowse": {
+        "median": 4169,
+        "fetchedMedian": 4375.3499999940395,
+        "runs": [
+          4290.599999964237,
+          3858.5,
+          4169
+        ],
+        "appliedSteps": [
+          5,
+          5,
+          5
+        ],
+        "cachedSteps": 3,
+        "requests": 9,
+        "bytes": 26214400,
+        "drawsPerStep": [
+          45,
+          45,
+          18,
+          69,
+          45
+        ],
+        "loci": [
+          "chr22_mask:105,001..124,001",
+          "chr22_mask:86,000..105,000",
+          "chr22_mask:66,999..85,999",
+          "chr22_mask:47,998..66,998",
+          "chr22_mask:28,997..47,997"
+        ],
+        "load": {
+          "before": 1.38,
+          "after": 0.61
+        },
+        "failures": []
+      },
+      "igv": {
+        "median": null,
+        "fetchedMedian": null,
+        "runs": [
+          null
+        ],
+        "appliedSteps": [
+          0
+        ],
+        "cachedSteps": 0,
+        "requests": 0,
+        "bytes": 0,
+        "drawsPerStep": [],
+        "loci": [],
+        "load": {
+          "before": 0.56,
+          "after": 0.55
+        },
+        "failures": [
+          "Runtime.evaluate timed out. Increase the 'protocolTimeout' setting in launch/connect calls for a higher timeout if needed."
+        ]
       }
     }
   },
   "dates": {
     "20x-shortread": "2026-08-16",
-    "200x-shortread": "2026-08-16"
+    "200x-shortread": "2026-08-16",
+    "1000x-shortread": "2026-08-16",
+    "20x-longread": "2026-08-16",
+    "200x-longread": "2026-08-16",
+    "1000x-longread": "2026-08-16"
   },
-  "locusMismatch": {}
+  "locusMismatch": {
+    "1000x-shortread": "step counts differ: jbrowse 5, igv 4"
+  }
 }

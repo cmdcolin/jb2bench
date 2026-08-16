@@ -53,44 +53,118 @@ each step actually did".
 
 | case | JBrowse (current) | igv.js 3.8.5 | ratio | load | date |
 | --- | ---: | ---: | ---: | ---: | --- |
-| 20x-shortread | 362 ms | 594 ms | 1.64x | 4.3 | 2026-08-16 |
-| 200x-shortread | 538 ms | 5154 ms | 9.58x | 7.4 | 2026-08-16 |
+| 20x-shortread | 688 ms | 537 ms | 0.78x | 1.3 | 2026-08-16 |
+| 200x-shortread | 915 ms | 4343 ms | 4.75x | 1.3 | 2026-08-16 |
+| 1000x-shortread | 2023 ms | 27001 ms | 13.35x | 1.0 | 2026-08-16 |
+| 20x-longread | 702 ms † | 2886 ms | — | 1.3 | 2026-08-16 |
+| 200x-longread | 1016 ms † | 17291 ms | — | 1.4 | 2026-08-16 |
+| 1000x-longread | 4375 ms | — | — | 1.4 | 2026-08-16 |
 
 `ratio` is igv ÷ JBrowse: above 1.0 means JBrowse got content back sooner.
+
+`†` is a median over **all** steps rather than fetched ones, because that
+tool issued no data request on any of them. It is not a missing
+measurement and not a comparable one: on both long-read rows below,
+JBrowse rendered fully on every step — the same 45-50 draw burst it shows
+everywhere else — while fetching nothing, so what it already held from the
+initial load covered the whole five-viewport pan. The ratio is left blank
+for those rows rather than dividing a cached median by a fetched one.
+
+**Why it held that much is not established here.** Long reads force a
+wider fetch than the viewport, since a read overlapping the left edge may
+start tens of kilobases earlier, and the BAI chunk granularity is coarse
+at this depth — but neither of those has been measured against the bytes
+the initial load actually pulled. Treat it as an observation about where
+the cost went, not an account of the caching.
 
 ## What each step actually did
 
 This table is not supporting detail; it is the reason the one above is
 restricted to fetched steps. **A pan is not automatically the "both tools must
-fetch" case.** JBrowse reads in 256 KiB blocks, so one request can cover more
-than a viewport and some of its pan steps are served entirely from what it
-already holds; the `cached` column counts them. Averaging a cache hit together
-with a fetch and calling the difference "rendering" is exactly the error this
-benchmark exists to avoid.
+fetch" case.** JBrowse reads in 256 KiB blocks, so at low coverage one request
+can cover more than a viewport and some of its pan steps are served entirely
+from what it already holds; the `cached` column counts them. Averaging a cache
+hit together with a fetch and calling the difference "rendering" is exactly the
+error this benchmark exists to avoid.
 
-`draws` is canvas draw calls per step, which is the architectural difference
-in one column: igv issues one drawing operation per read, JBrowse batches the
-whole pileup into a handful of GPU draws.
+A cache hit and a step the detector gave up on before the fetch began look the
+same in a request count, and an earlier version of this instrument confused
+them — it reported 3 of 5 steps cached at 1000x where the true answer is none.
+`draws` is what separates them: a real cache hit still shows a full render
+burst, while an abandoned step shows only the handful of draws that
+re-project stale content.
+
+`draws` is canvas draw calls per step, and it is the most robust number in
+this file: it repeats to within about 1% across runs, because it is a function
+of the data and the code rather than of the machine. Like the request counts,
+it can be quoted from a contaminated run.
+
+It is also the architectural difference in one column — three to four orders of
+magnitude between a tool that draws through the 2D canvas API and one that
+batches the pileup into a handful of GPU draws. **It is not one call per
+read.** At 20x-shortread igv issues about 30 calls per read in the window, and
+at 200x about 8, so the count grows far more slowly than the read count and
+nothing here explains the shape of that. Report the magnitude, not a per-read
+rate.
 
 | case | tool | steps | cached | requests | bytes | draws/step |
 | --- | --- | ---: | ---: | ---: | ---: | ---: |
-| 20x-shortread | jbrowse | 5 | 3 | 2 | 512 KB | 10–48 |
+| 20x-shortread | jbrowse | 5 | 3 | 2 | 512 KB | 42–50 |
 | 20x-shortread | igv | 5 | 0 | 7 | 995 KB | 94199–95329 |
-| 200x-shortread | jbrowse | 5 | 1 | 4 | 7168 KB | 10–50 |
+| 200x-shortread | jbrowse | 5 | 0 | 5 | 7168 KB | 47–50 |
 | 200x-shortread | igv | 5 | 0 | 27 | 23267 KB | 249693–251073 |
+| 1000x-shortread | jbrowse | 5 | 0 | 10 | 33536 KB | 47–50 |
+| 1000x-shortread | igv | 4 | 0 | 106 | 121034 KB | 248023–249514 |
+| 20x-longread | jbrowse | 5 | 5 | 0 | — | 47–50 |
+| 20x-longread | igv | 5 | 2 | 5 | 5506 KB | 283638–379308 |
+| 200x-longread | jbrowse | 5 | 5 | 0 | — | 45–45 |
+| 200x-longread | igv | 5 | 0 | 22 | 164681 KB | 1354058–1585083 |
+| 1000x-longread | jbrowse | 5 | 3 | 9 | 25600 KB | 18–69 |
+| 1000x-longread | igv | 0 | 0 | 0 | — | — |
 
 `steps` is how many of the 5 attempted pans applied — a pan stops
 rather than clamps when the next viewport would run off the contig, because a
 mostly-empty view scores fast for the same reason a refusal does.
 
-Every measured case agreed on where it panned to, within 50 bp — the two
-tools report a locus differently (`105,001..124,001` against
-`104999-124000`) but visited the same regions.
+### Read the load column carefully here
 
-> **Peak 1-minute load across this run was 7.4**, above the
-> 4.0 this repo treats as the ceiling for a quotable
-> absolute. Tools are interleaved within a round, so the ratio column is the
-> part that survives; the milliseconds are not a run of record.
+`README.md` warns that a heavy row does not generate its own load — that was
+established for the cold-load matrix, where sampling during a 1000x-longread
+render found load already at 35 with `chrome=0`. **It is not true of this
+benchmark.** A pan run on the heavier cases sits at `chrome=11` and drives the
+load average up by itself, and it does so unequally: the tool issuing a quarter
+of a million canvas draws per step is the one making the machine busy.
+
+So a high `load` on a row here is partly a consequence of the measurement
+rather than a contaminant of it, and treating it as automatic grounds to
+discard the row would throw away the heavy cases — which are the ones worth
+having. The protection that matters is the interleaving: each round runs every
+tool back to back, so whatever the machine is doing lands on all of them.
+
+## Cells that did not complete
+
+- `1000x-longread` / igv: Runtime.evaluate timed out. Increase the 'protocolTimeout' setting in launch/connect calls for a higher timeout if needed.
+
+A tool that cannot finish a case is a result, not a gap, and it is reported
+the way `results/crosstool.md` reports its censored igv rows.
+
+**igv.js at 1000x-longread is at the browser's memory ceiling, not merely
+slow.** Diagnosed separately on 2026-08-16: the renderer reaches **2299 MB of
+heap** and becomes ready at **80.6 s** — before any pan. Across attempts it
+has timed out on a 180 s protocol limit three times, closed its target
+outright once, and completed once. igv parses alignments on the main thread,
+so a 268 MB BAM lands in one renderer process; JBrowse decodes the same file
+in a worker and completed all five pan steps. Read the blank as "not
+reliably measurable at this depth" rather than as a large number.
+
+## Locus mismatches — these rows are not comparisons
+
+The two tools are driven by different mechanisms (JBrowse by
+`horizontalScroll`, igv by `search`), so where they actually landed is
+checked rather than assumed. These cases disagreed by more than 50 bp and
+should not be read as a comparison of anything:
+
+- `1000x-shortread`: step counts differ: jbrowse 5, igv 4
 
 Caveats that travel with any external claim: one other tool, one workload
 family, one locus, one machine. igv.js parses in the main thread and JBrowse

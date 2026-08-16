@@ -537,6 +537,42 @@ lines.push(
   '',
 )
 
+// Cells that produced no measurement at all. Reported rather than left blank,
+// because "this tool could not finish this case" is a result — and the blank it
+// would otherwise leave sits in the heaviest row, which is the one the framing
+// says to weight most.
+const dead: string[] = []
+for (const c of allCases) {
+  const row = prior.rows[c.id]
+  if (!row) continue
+  for (const t of shownTools) {
+    const cellData = row[t.id]
+    if (!cellData || cellData.failures?.length === 0) continue
+    if (Number.isFinite(cellData.median)) continue
+    dead.push(`\`${c.id}\` / ${t.id}: ${[...new Set(cellData.failures)].join('; ')}`)
+  }
+}
+if (dead.length) {
+  lines.push(
+    '## Cells that did not complete',
+    '',
+    ...dead.map(d => `- ${d}`),
+    '',
+    'A tool that cannot finish a case is a result, not a gap, and it is reported',
+    'the way `results/crosstool.md` reports its censored igv rows.',
+    '',
+    '**igv.js at 1000x-longread is at the browser\'s memory ceiling, not merely',
+    'slow.** Diagnosed separately on 2026-08-16: the renderer reaches **2299 MB of',
+    'heap** and becomes ready at **80.6 s** — before any pan. Across attempts it',
+    'has timed out on a 180 s protocol limit three times, closed its target',
+    'outright once, and completed once. igv parses alignments on the main thread,',
+    'so a 268 MB BAM lands in one renderer process; JBrowse decodes the same file',
+    'in a worker and completed all five pan steps. Read the blank as "not',
+    'reliably measurable at this depth" rather than as a large number.',
+    '',
+  )
+}
+
 const mismatches = Object.entries(prior.locusMismatch ?? {})
 if (mismatches.length) {
   lines.push(
