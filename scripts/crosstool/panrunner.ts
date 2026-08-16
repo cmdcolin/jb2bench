@@ -88,10 +88,25 @@ const allTools: Tool[] = [
 const toolFilter = process.env.TOOLS?.split(',')
 const tools = toolFilter ? allTools.filter(t => toolFilter.includes(t.id)) : allTools
 
+// BAM and CRAM. The BAM ids keep their bare form (`200x-shortread`) rather than
+// gaining a `-bam` suffix, so results recorded before CRAM was added are not
+// orphaned; CRAM rows are suffixed.
+//
+// Both tools read CRAM natively — igv's harness switches format and index
+// extension on the track name, and the JBrowse build carries a CramAdapter track
+// per case — so this is the same comparison on a different container, not a
+// different benchmark. It is worth having because the container is where the
+// decode cost lives: CRAM trades bytes on the wire for CPU at read time, which is
+// the opposite trade from BAM and should move the two tools differently.
 const allCases: { id: string; track: string }[] = []
 for (const read of ['shortread', 'longread']) {
   for (const cov of ['20x', '200x', '1000x']) {
     allCases.push({ id: `${cov}-${read}`, track: `${cov}.${read}.bam` })
+  }
+}
+for (const read of ['shortread', 'longread']) {
+  for (const cov of ['20x', '200x', '1000x']) {
+    allCases.push({ id: `${cov}-${read}-cram`, track: `${cov}.${read}.cram` })
   }
 }
 const selected = process.env.CASES?.split(',')
@@ -485,10 +500,25 @@ lines.push(
   'It is also the architectural difference in one column — three to four orders of',
   'magnitude between a tool that draws through the 2D canvas API and one that',
   'batches the pileup into a handful of GPU draws. **It is not one call per',
-  'read.** At 20x-shortread igv issues about 30 calls per read in the window, and',
-  'at 200x about 8, so the count grows far more slowly than the read count and',
-  'nothing here explains the shape of that. Report the magnitude, not a per-read',
-  'rate.',
+  'read.** At 20x-shortread igv issues about 30 calls per read in the window and',
+  'at 200x about 8, and above 200x the count stops growing at all, saturating',
+  'near 250,000.',
+  '',
+  '**That saturation is not downsampling**, which was the obvious suspect and is',
+  'wrong. Measured with `samplingDepth=10000`, which clips nothing on this corpus',
+  '(the deepest 100 bp window holds roughly 700 short reads), draws and time are',
+  'both unchanged: 249,693-250,415 against 249,693-251,073 at 200x, and 27.6 s',
+  'against 27.0 s at 1000x. The remaining candidate is the one the cold-load',
+  'matrix already names — igv packs rows until it runs out of canvas, so a fixed',
+  'track height caps how many reads can be drawn at all. Testing that needs the',
+  'height control (`TOOLS=igv-h600ctl,igv-h300`), which this runner does not yet',
+  'define. Until then: report the magnitude and the saturation, not a per-read',
+  'rate and not a cause.',
+  '',
+  'The same control answers the question it was originally there for. **igv is not',
+  'winning any row by drawing less**: turning downsampling off changes neither its',
+  'time nor its draw count, so this is not a downsampled tool measured against a',
+  'complete one.',
   '',
   `| case | tool | steps | cached | requests | bytes | draws/step |`,
   '| --- | --- | ---: | ---: | ---: | ---: | ---: |',
