@@ -35,6 +35,7 @@ is also runnable alone:
 | `make gff3` | `gff-nostream` eager vs lazy attributes, one process per side | `results/gff3-lazy.{md,json}` |
 | `./setup-sweep.sh` | clone + build every version in `sweep.json` (tens of minutes, once) | `.libs/*/sweep/`, `.libs/sweep-manifest.txt` |
 | `make sweep-verify` | the sweep's gate — does every build import, and does the counting instrument change its answer? | |
+| `Rscript sweepchart.R` | the curves, from the run's JSON | `results/figures/sweep-*.png` |
 | `make sweep` | every major line, one process per version | `results/sweep.{md,json}` |
 | `MODE=count make sweep` | the same, counting reads and bytes instead of timing — needs no idle box | same |
 | `make cohort` | N-BigWig panel: request counts and timings | `results/cohort-bw.{md,json}` |
@@ -555,6 +556,8 @@ paper, run `make bench` here and then `make sync-benchmarks` in the paper repo.
 - `equivalence.test.ts` — the gate
 - `bam.bench.ts`, `cram.bench.ts`, `bgzf.bench.ts`, `bbi.bench.ts`
 - `sweep.ts` — the per-major curve, one process per version
+- `sweepchart.R` — its figures; reads and time are drawn as separate files
+  because one needs an idle box and the other does not
 - `cohort-bw.ts` — the N-BigWig panel, request counts and timings
 - `lib/corpus.ts` — corpus, window, and the CRAM `seqFetch`
 - `lib/legacy-resolve.mjs` — the two module hooks that let plain node import the

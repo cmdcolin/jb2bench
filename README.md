@@ -450,6 +450,10 @@ separates them is the draw count. A genuine cache hit still shows a full 42–50
 draw burst; an abandoned step shows the 10-draw re-projection of stale content
 and nothing else.
 
+Figures: `Rscript scripts/crosstool/panchart.R` →
+`results/figures/crosstool-pan-time.png` and `-draws.png`, drawn from the run's
+JSON so a slide cannot quote a number no run produced.
+
 **The numbers live in [`results/crosstool-pan.md`](results/crosstool-pan.md) and
 are deliberately not repeated here.** An earlier draft of this section did copy
 the table in, and it was stale inside an hour — which is the same argument the
