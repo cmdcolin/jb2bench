@@ -255,11 +255,18 @@ async function armCount(kind: string, dir: string, file: string) {
   const { run, counters } = await makeQuery(kind, mod, dir, file, true)
   const got = await run()
   const [data, index] = counters
+  // `@gmod/vcf` is handed lines a reader already decoded and bgzf-filehandle is
+  // handed a buffer, so neither opens a file and neither has a request shape to
+  // report. Saying so explicitly matters: a zero here would read as "this
+  // version issues no requests", which is a claim, where the truth is that the
+  // question does not apply.
+  const countable = counters.length > 0
   console.log(
     JSON.stringify({
-      ...totals(counters),
-      dataReads: data?.reads ?? 0,
-      indexReads: index?.reads ?? 0,
+      ...(countable
+        ? { ...totals(counters), dataReads: data!.reads, indexReads: index?.reads ?? 0 }
+        : { reads: null, bytes: null, dataReads: null, indexReads: null }),
+      countable,
       records: got.n,
       checksum: String(got.sum),
       pattern: data?.sizes.slice(0, 12) ?? [],
@@ -432,10 +439,12 @@ function arm(kind: string, dir: string, file: string) {
 }
 
 interface Counts {
-  reads: number
-  bytes: number
-  dataReads: number
-  indexReads: number
+  /** null when the library has no filehandle, so the question does not apply */
+  reads: number | null
+  bytes: number | null
+  dataReads: number | null
+  indexReads: number | null
+  countable: boolean
   records: number
   checksum: string
   pattern: number[]
@@ -625,9 +634,9 @@ for (const lib of libraries) {
           ? ''.padStart(21)
           : `${`${p.ms.toFixed(2)} ms`.padStart(12)}` +
             `${`${(base! / p.ms).toFixed(2)}x`.padStart(9)}`
-      const req = p.counts
+      const req = p.counts?.countable
         ? `  ${p.counts.reads} reads (${p.counts.dataReads}+${p.counts.indexReads}), ` +
-          `${(p.counts.bytes / 1024).toFixed(0)} KB`
+          `${(p.counts.bytes! / 1024).toFixed(0)} KB`
         : ''
       console.log(`     ${p.tag.padEnd(10)}${time}  ${p.records} recs${flag}${req}`)
     }
@@ -714,10 +723,16 @@ for (const r of results) {
     const star = r.disagree.includes(p.tag) ? ' \\*' : ''
     const time = p.ms === null ? '—' : `${p.ms.toFixed(2)} ms`
     const rel = p.ms === null || base === null ? '—' : `${(base / p.ms).toFixed(2)}x`
-    const reads = p.counts
+    // `—` covers both "not counted this run" and "this library has no
+    // filehandle, so there is nothing to count". The second is stated in prose
+    // per library rather than encoded in the cell, because a reader seeing a
+    // dash in one row and a number in another should not have to guess which.
+    const reads = p.counts?.countable
       ? `${p.counts.reads} (${p.counts.dataReads}+${p.counts.indexReads})`
       : '—'
-    const bytes = p.counts ? `${(p.counts.bytes / 1024).toFixed(0)} KB` : '—'
+    const bytes = p.counts?.countable
+      ? `${(p.counts.bytes! / 1024).toFixed(0)} KB`
+      : '—'
     md.push(`| ${p.tag} | ${time} | ${rel} | ${reads} | ${bytes} | ${p.records}${star} |`)
   }
   md.push('')
