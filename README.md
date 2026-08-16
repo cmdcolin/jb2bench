@@ -30,6 +30,8 @@ numbers describe the same bytes.
 | `flame/` | CPU profiles and the findings drawn from them |
 | `ecosystem/` | the parser-library benchmarks, self-contained |
 | `screenshots/` | puppeteer verify/probe output (untracked) |
+| `Makefile`, `scripts/gate.ts` | every benchmark in one place, and the preflight that decides whether a timing is worth keeping |
+| `results/figures/` | the ggplot2 figures, laid out like the 2023 paper's Fig 8: format × read type, time against coverage |
 
 ## Where the conclusions are
 
@@ -99,6 +101,14 @@ matches the historical jb2profile region.
 
 `scripts/render/runner.ts` → `results/alignments.md`. Cold-start
 navigation→render-complete time, median of 6 runs after a warmup.
+
+**Twelve cases since 2026-08-16, not six: both formats.** `shell/load_alignments.sh`
+had always staged the CRAM tracks and nothing measured them, so the table
+answered "what does coverage cost" without ever answering "what does the format
+cost" — which is the axis the 2023 paper's Fig 8 is built on. Rows are now keyed
+`<coverage>-<readtype>-<format>`, and every row recorded before that date was
+relabelled `-bam`, since BAM is what it was. `FORMATS=bam` restores the old
+six-case run for when the full matrix is unaffordable.
 
 This is fetch-dominated — both architectures fetch in workers — so it
 *undersells* the GPU branch. Wins are 1.3–1.4× on the short-read cases, 1.4×
@@ -787,6 +797,35 @@ Two things that do *not* work as idleness checks:
 The durable fix is per-cell recording rather than pre-run gating: every cell
 stores the load either side of itself, and a row above 4.0 reports `unusable`
 instead of a speedup.
+
+### The whole suite, in one place
+
+`make` at the repo root lists every benchmark; `make all` runs them. The two
+things it does that running the scripts by hand does not:
+
+- **`make gate` runs first, and `make timings` depends on it.** It checks load,
+  the number of `claude` processes (the load average lags them by minutes), free
+  disk, every corpus file, which build each port is actually serving, and whether
+  the sweep builds exist. Each of those checks is there because its absence has
+  already cost a run — the details are in `scripts/gate.ts`.
+- **Counting and timing are separate targets.** `make counts` is exact on any
+  machine, because a request count does not care what else is running; `make
+  timings` is worthless on a busy one. On a box that has been at load 15 for
+  weeks, that split is the difference between a result and nothing.
+
+```bash
+make            # what every target does
+make gate       # is this machine fit to measure on right now?
+make counts     # request shapes and the equivalence gate — any box
+make timings    # render, interaction, cross-tool, parsers — idle box only
+make figures    # ggplot2 figures from the recorded JSON
+make all        # gate, counts, timings, figures, report
+```
+
+Logs land in `results/logs/<target>-<date>.log`, untracked. The Makefile does
+not stage `builds/` or start the http-servers: which build sits on which port is
+a decision rather than a default, so that stays `make serve` and the manual
+steps below.
 
 ```bash
 pnpm install

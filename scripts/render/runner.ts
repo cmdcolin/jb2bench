@@ -41,10 +41,18 @@ for (const b of builds) {
 }
 const UNDER_TEST = builds[0]!.name
 
+// Both formats, because the question the 2023 paper's Fig 8 asks is what a
+// format costs at a coverage — CRAM trades bytes on the wire for a reference
+// -based decode, and which side of that trade wins is the whole point of
+// plotting them beside each other. shell/load_alignments.sh has always staged
+// the CRAM tracks; until 2026-08-16 nothing measured them.
+const FORMATS = process.env.FORMATS?.split(',') ?? ['bam', 'cram']
 const allCases: { id: string; track: string }[] = []
 for (const read of ['shortread', 'longread']) {
   for (const cov of ['20x', '200x', '1000x']) {
-    allCases.push({ id: `${cov}-${read}`, track: `${cov}.${read}.bam` })
+    for (const fmt of FORMATS) {
+      allCases.push({ id: `${cov}-${read}-${fmt}`, track: `${cov}.${read}.${fmt}` })
+    }
   }
 }
 
@@ -133,9 +141,26 @@ interface Saved {
   results?: Record<string, Record<string, Cell>>
   measuredAt?: Record<string, string>
 }
-const prior: Saved = fs.existsSync('results/alignments.json')
+const priorRaw: Saved = fs.existsSync('results/alignments.json')
   ? (JSON.parse(fs.readFileSync('results/alignments.json', 'utf8')) as Saved)
   : {}
+
+// Every row recorded before 2026-08-16 was keyed `<cov>-<read>` and was BAM,
+// since BAM was all the runner enumerated. Renaming those keys to carry the
+// format they always described keeps three years of measurements on the same
+// axis as the CRAM rows rather than stranding them under names nothing reads.
+// It relabels, never re-values.
+function migrate<T>(byCase: Record<string, T> | undefined) {
+  const out: Record<string, T> = {}
+  for (const [k, v] of Object.entries(byCase ?? {})) {
+    out[/-(bam|cram)$/.test(k) ? k : `${k}-bam`] = v
+  }
+  return out
+}
+const prior: Saved = {
+  results: migrate(priorRaw.results),
+  measuredAt: migrate(priorRaw.measuredAt),
+}
 
 const stamp = new Date().toISOString().slice(0, 10)
 const measuredAt = { ...prior.measuredAt }

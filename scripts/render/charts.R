@@ -51,13 +51,43 @@ paper_theme <- function(base = 13) {
 }
 
 split_case <- function(id) {
-  # "200x-longread" -> coverage 200, read "longread"
-  tidyr::separate_wider_delim(
-    data.frame(case = id), case, delim = "-",
-    names = c("cov", "read"), cols_remove = FALSE
-  ) |>
-    mutate(coverage = as.numeric(sub("x$", "", cov)))
+  # "200x-longread-cram" -> coverage 200, read longread, format CRAM.
+  # Rows recorded before the runner enumerated formats are two-part and BAM.
+  data.frame(case = id) |>
+    mutate(
+      cov      = sub("-.*$", "", case),
+      read     = sub("^[^-]+-([a-z]+read).*$", "\\1", case),
+      fmt      = ifelse(grepl("-(bam|cram)$", case), sub("^.*-", "", case), "bam"),
+      coverage = as.numeric(sub("x$", "", cov))
+    )
 }
+
+# The paper's Fig 8 layout: one panel per (format, read type), time against
+# coverage, one colour per program. Rows are CRAM over BAM as they are there, so
+# the two figures can be read side by side.
+fmt_levels  <- c("cram", "bam")
+fmt_labels  <- c("CRAM", "BAM")
+read_levels <- c("shortread", "longread")
+read_labels <- c("short read", "long read")
+
+as_matrix_facets <- function(df) {
+  df |>
+    filter(fmt %in% fmt_levels, read %in% read_levels) |>
+    mutate(
+      fmt  = factor(fmt, levels = fmt_levels, labels = fmt_labels),
+      read = factor(read, levels = read_levels, labels = read_labels)
+    )
+}
+
+cov_axis <- scale_x_log10(breaks = c(20, 200, 1000),
+                          labels = c("20x", "200x", "1000x"))
+
+# facet_wrap rather than facet_grid, for the reason the paper drew four separate
+# plots: facet_grid shares a y scale down each row, which puts every short-read
+# panel on the floor of its row's long-read axis and hides the shape the figure
+# exists to show. facet_wrap gives each panel its own.
+matrix_facets <- facet_wrap(vars(fmt, read), nrow = 2, scales = "free_y",
+                            labeller = label_wrap_gen(multi_line = FALSE))
 
 # ---------------------------------------------------------------- cold load
 cold <- fromJSON("results/alignments.json", simplifyVector = FALSE)
@@ -80,13 +110,9 @@ cold_rows <- do.call(rbind, lapply(names(cold$results), function(case) {
 
 cold_df <- cold_rows |>
   left_join(split_case(unique(cold_rows$case)), by = "case") |>
-  mutate(
-    program = factor(PROG[build], levels = unname(PROG)),
-    read = factor(read,
-                  levels = c("shortread", "longread"),
-                  labels = c("BAM shortread", "BAM longread"))
-  ) |>
-  filter(!is.na(program))
+  mutate(program = factor(PROG[build], levels = unname(PROG))) |>
+  filter(!is.na(program)) |>
+  as_matrix_facets()
 
 # Only cases where all four builds were measured. 1000x-longread has no v2.4.0
 # cell and its baselines are the 2026-08-05 pair taken at load 35 -- 36 s and
@@ -102,13 +128,18 @@ cold_df <- cold_df |> filter(case %in% complete)
 peak_load <- max(cold_df$load, na.rm = TRUE)
 dates <- paste(sort(unique(na.omit(cold_df$measured))), collapse = ", ")
 
+# A format with no rows yet is named in the caption rather than drawn as an
+# empty band: the CRAM cases only became measurable on 2026-08-16, and a blank
+# facet reads as "CRAM rendered nothing" instead of "nobody has run it".
+missing_fmt <- setdiff(fmt_labels, as.character(unique(cold_df$fmt)))
+
 p_cold <- ggplot(cold_df, aes(coverage, median, colour = program, group = program)) +
   geom_line(linewidth = 0.7) +
   geom_point(size = 2.1) +
   geom_errorbar(aes(ymin = pmax(median - sd, 0), ymax = median + sd),
                 width = 0.06, linewidth = 0.45, show.legend = FALSE) +
-  facet_wrap(~read, nrow = 1, scales = "free_y") +
-  scale_x_log10(breaks = c(20, 200, 1000), labels = c("20x", "200x", "1000x")) +
+  matrix_facets +
+  cov_axis +
   scale_y_continuous(limits = c(0, NA), labels = label_number(accuracy = 1)) +
   scale_colour_manual(values = PROG_COL, name = "program") +
   labs(
@@ -123,6 +154,10 @@ p_cold <- ggplot(cold_df, aes(coverage, median, colour = program, group = progra
       sprintf("%.1f", peak_load),
       " — far above the 4.0 this repo treats as usable, so the absolute seconds are not quotable.\n",
       "Builds are measured back to back within each case, so a load spike lands on all four at once and the ratios between them survive it better than the values do.\n",
+      if (length(missing_fmt)) {
+        paste0("No ", paste(missing_fmt, collapse = " or "),
+               " row: those cases have not been run since the runner started enumerating formats.\n")
+      } else "",
       if (length(dropped)) {
         paste0("Excluded: ", paste(dropped, collapse = ", "),
                " — no v2.4.0 cell, and its baselines are the pair that read 36 s and 56 s for identical work.")
@@ -131,13 +166,14 @@ p_cold <- ggplot(cold_df, aes(coverage, median, colour = program, group = progra
   ) +
   paper_theme()
 
-ggsave("results/figures/cold-load.png", p_cold, width = 11, height = 4.9, dpi = 150)
+ggsave("results/figures/cold-load.png", p_cold,
+       width = 11, height = if (length(missing_fmt)) 5.2 else 7.6, dpi = 150)
 
 # Speedup against the published version, which is the question the paper's
 # readers are actually asking. Drawn as bars because a ratio has a meaningful
 # zero and a meaningful 1.0, neither of which a line chart shows.
 sp <- cold_df |>
-  select(case, read, coverage, build, median) |>
+  select(case, fmt, read, coverage, build, median) |>
   pivot_wider(names_from = build, values_from = median) |>
   filter(!is.na(`release-2.4.0`), !is.na(current)) |>
   mutate(speedup = `release-2.4.0` / current)
@@ -147,7 +183,7 @@ p_sp <- ggplot(sp, aes(factor(coverage, labels = c("20x", "200x", "1000x")), spe
   geom_hline(yintercept = 1, linetype = "dashed", colour = "grey30") +
   geom_text(aes(label = sprintf("%.2f×", speedup)),
             vjust = -0.45, size = 3.5, colour = "grey15") +
-  facet_wrap(~read, nrow = 1) +
+  facet_grid(fmt ~ read) +
   scale_y_continuous(limits = c(0, max(sp$speedup) * 1.18), expand = c(0, 0)) +
   labs(
     title = "How much faster than the version the 2023 paper benchmarked",
@@ -277,6 +313,53 @@ if (file.exists(eco_path)) {
     paper_theme()
 
   ggsave("results/figures/parsers.png", p_eco, width = 12, height = 4.4, dpi = 150)
+
+  # The same data in the paper's Fig 8 layout — time against coverage, one line
+  # per version, faceted format x read type. The bar chart above answers "how
+  # much faster"; this answers the question a ratio destroys, which is how each
+  # format's cost grows with depth. CRAM's long-read column is the one to look
+  # at: the 2023 parser bends upward where the current one does not.
+  #
+  # BigWig is deliberately absent. It is not an alignment format, its cases are
+  # summary reads of 1-3 ms, and a fifth panel of flat lines at the bottom of a
+  # log axis would be four fifths of the figure saying nothing.
+  matrix_rows <- rows |>
+    filter(grepl("^(bam|cram) [0-9]+x (short|long)read$", case)) |>
+    mutate(
+      fmt  = sub(" .*$", "", case),
+      read = sub("^.* ", "", case),
+      coverage = as.numeric(sub("^[a-z]+ ([0-9]+)x .*$", "\\1", case))
+    ) |>
+    pivot_longer(c(old, new), names_to = "side", values_to = "ms") |>
+    mutate(
+      secs = ms / 1000,
+      version = factor(side, levels = c("old", "new"),
+                       labels = c("2023 release", "current release"))
+    ) |>
+    as_matrix_facets()
+
+  p_mat <- ggplot(matrix_rows,
+                  aes(coverage, secs, colour = version, group = version)) +
+    geom_line(linewidth = 0.7) +
+    geom_point(size = 2.1) +
+    matrix_facets +
+    cov_axis +
+    scale_y_continuous(limits = c(0, NA), labels = label_number(accuracy = 0.1)) +
+    scale_colour_manual(values = c("2023 release" = "#c1462f",
+                                   "current release" = "#12796e"),
+                        name = "library") +
+    labs(
+      title = "Parser cost by format, read type and coverage",
+      subtitle = "One query over the 19 kb window, decode only — no browser, no GPU. Lower is better.",
+      x = "coverage", y = "time (s)",
+      caption = paste0(
+        "Mean of the vitest bench iterations, both sides built from source at pinned tags with the same toolchain.\n",
+        "Panels carry their own y scale: a shared one would put every BAM cell on the floor of the CRAM long-read axis."
+      )
+    ) +
+    paper_theme()
+
+  ggsave("results/figures/parser-matrix.png", p_mat, width = 11, height = 7.2, dpi = 150)
 }
 
 cat("wrote:\n")

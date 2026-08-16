@@ -41,6 +41,11 @@ data/cohort/
 # ecosystem/cram-samtools.ts reads it, and that runs without it.
 data/paper2019/
 
+# Per-run logs from the top-level Makefile. The tables and JSON they produced
+# are tracked; the console transcript behind them is not, except where a run was
+# interesting enough to be committed by hand (results/run-*.log).
+results/logs/
+
 # jbrowse-web builds under test. Each is a deployed build plus symlinked copies
 # of the alignment data; stage them per README ("Builds compared").
 builds/
