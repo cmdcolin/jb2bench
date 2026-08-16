@@ -15,10 +15,18 @@
 # already matches the server's is left alone, so a second run is a no-op.
 #
 # Parallel, because the EBI mirror throttles per connection rather than per
-# client. Measured 2026-08-16 on this box: the low-coverage CRAM alone held
-# 588-639 KB/s; adding a second stream took it to 997 KB/s while the second ran
-# at 1593 KB/s, for 2.59 MB/s combined. Four times the throughput for nothing.
-# JOBS=1 restores sequential fetching if a mirror ever objects.
+# client. Measured 2026-08-16 on this box, on the same files:
+#
+#   one file, one connection          588-639 KB/s
+#   three files at once               997 + 1593 + 865 = 3.0 MB/s
+#   one file, four range connections  7.6 MB/s
+#
+# So the fetch is parallel two ways: JOBS files at a time, and SPLIT connections
+# within a file large enough to be worth splitting. The second matters more than
+# it looks, because the corpus ends with a single 8 GB file that file-level
+# parallelism cannot help at all — that last file alone was a three-hour tail.
+# JOBS=1 restores sequential fetching if a mirror ever objects, SPLIT=1 the
+# single-connection resume.
 #
 # Needs samtools (for the .fai files, and to convert the E. coli BAM) and curl.
 set -e
@@ -53,14 +61,53 @@ mkdir -p "$OUT"
 # its own output, so check before starting rather than dying 4 GB into an 8.6 GB
 # download. Refuses rather than warns: a partial corpus produces a table with
 # silently missing rows, which is worse than no table.
+#
+# What is already downloaded counts against that, or a resume would demand room
+# for the whole corpus a second time — the state every interrupted run is in.
 need_gb=17
 [ "$WHICH" = ecoli ] && need_gb=3
+got_gb=$(du -sBG "$OUT" 2>/dev/null | tr -dc '0-9')
+need_gb=$((need_gb - ${got_gb:-0}))
 have_gb=$(df -BG --output=avail . | tail -1 | tr -dc '0-9')
-if [ "$have_gb" -lt "$need_gb" ]; then
-  echo "need ~${need_gb} GB free for '$WHICH', have ${have_gb} GB in $(pwd)" >&2
+if [ "$need_gb" -gt 0 ] && [ "$have_gb" -lt "$need_gb" ]; then
+  echo "need ~${need_gb} GB more for '$WHICH', have ${have_gb} GB in $(pwd)" >&2
   echo "free space, or point data/paper2019 at another filesystem with a symlink" >&2
   exit 1
 fi
+
+# One file over several connections, because the throttle is per connection and
+# the corpus ends with a single 8 GB file that no amount of file-level
+# parallelism helps: the last hours of a fetch are one stream at ~590 KB/s.
+# The mirror answers range requests (`206 Partial Content`), so the remaining
+# bytes are split SPLIT ways and reassembled.
+#
+# Interruption-safe by construction. Each part is appended in order and deleted
+# as it lands, so the destination is always a valid prefix of the file — a run
+# killed halfway leaves something the next run resumes from rather than a
+# scrambled file that only fails later, inside a decode.
+split_fetch() {
+  local url=$1 dest=$2 from=$3 total=$4
+  local span=$(((total - from + SPLIT - 1) / SPLIT))
+  local pids=() i start end
+  for i in $(seq 0 $((SPLIT - 1))); do
+    start=$((from + i * span))
+    end=$((start + span - 1))
+    [ "$end" -ge "$total" ] && end=$((total - 1))
+    [ "$start" -gt "$end" ] && continue
+    curl -fL --retry 5 --retry-delay 10 -r "$start-$end" -o "$dest.part$i" "$url" &
+    pids+=($!)
+  done
+  local ok=0
+  for p in "${pids[@]}"; do wait "$p" || ok=1; done
+  if [ "$ok" -ne 0 ]; then
+    echo "  ! $(basename "$dest"): a range failed; parts kept, rerun to continue" >&2
+    return 1
+  fi
+  for i in $(seq 0 $((SPLIT - 1))); do
+    [ -f "$dest.part$i" ] || continue
+    cat "$dest.part$i" >> "$dest" && rm -f "$dest.part$i"
+  done
+}
 
 # Skips a file already at its full size, resumes a partial one, and verifies the
 # result against the length the server reported. Truncated corpus files are the
@@ -82,7 +129,11 @@ fetch() {
     return 0
   fi
   echo "  > $2 ($(numfmt --to=iec "$remote"))"
-  curl -fL -C - --retry 5 --retry-delay 10 -o "$dest" "$url"
+  if [ "$SPLIT" -gt 1 ] && [ $((remote - local_size)) -gt $((256 * 1024 * 1024)) ]; then
+    split_fetch "$url" "$dest" "$local_size" "$remote"
+  else
+    curl -fL -C - --retry 5 --retry-delay 10 -o "$dest" "$url"
+  fi
   local got
   got=$(stat -c %s "$dest")
   if [ "$got" -ne "$remote" ]; then
@@ -94,7 +145,12 @@ fetch() {
 # Runs the queued fetches JOBS at a time and reports which of them failed. A
 # failure here is almost always a truncated resume rather than a dead URL, and
 # the next run continues it, so this counts them rather than aborting the rest.
-JOBS=${JOBS:-3}
+#
+# JOBS x SPLIT is the peak number of connections this opens on a public mirror,
+# and 8 is as far as that should go for a benchmark corpus: the measured gain is
+# in going from one connection to a few, not in going from eight to sixteen.
+JOBS=${JOBS:-2}
+SPLIT=${SPLIT:-4}
 queue=()
 enqueue() { queue+=("$1"$'\t'"$2"); }
 
