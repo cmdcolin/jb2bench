@@ -1,0 +1,411 @@
+// The version sweep: every major line of @gmod/bam, @gmod/cram and @gmod/bbi
+// on the same window the render benchmarks draw, one process per version.
+//
+// versions.json answers "how much faster did the parsers get since 2023" with a
+// ratio between two points. That is the number the paper quotes, and it cannot
+// say where the change landed — whether the library got steadily faster, or one
+// release did all of it and the rest were flat, or something regressed and was
+// recovered. A reader deciding whether to upgrade is asking the second question.
+//
+// Why one process per version, and not a vitest bench. scan.ts explains it for
+// two builds; the argument gets worse with eight. Every build imported into one
+// V8 shares inline caches at the call sites they all reach, so each is slower
+// than it would be alone and not by the same amount — and here the arms are not
+// even symmetric, since a sweep loads N of them rather than two. Whatever that
+// does to the numbers, it does unevenly along the axis being plotted, which is
+// the one shape a curve must not have imposed on it.
+//
+// So: one child process per version, the version order rotated every round so
+// machine drift cannot align with position on the curve, each child reporting
+// its own best-of-N, and the driver taking the median across rounds.
+//
+//   node --experimental-strip-types sweep.ts                    # everything
+//   LIBS=bam-js node --experimental-strip-types sweep.ts        # one library
+//   CASES='200x shortread' node --experimental-strip-types sweep.ts
+//
+// Needs ./setup-sweep.sh to have run. Versions it could not build are skipped
+// and named in the output rather than dropped.
+import { execFileSync } from 'node:child_process'
+import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs'
+import { fileURLToPath } from 'node:url'
+
+import { END, OLD_CRAM_OPTS, REF, START, seqFetch } from './lib/corpus.ts'
+
+const SELF = fileURLToPath(import.meta.url)
+const here = (p: string) => new URL(p, import.meta.url)
+
+const ROUNDS = Number(process.env.ROUNDS ?? 5)
+const INNER = Number(process.env.INNER ?? 3)
+
+// ------------------------------------------------------------------- arm ---
+//
+// Prints one line: "<best ms> <record count> <checksum>". The checksum is
+// order-independent — summed rather than folded — because two majors may return
+// the same records in a different order, which is not a disagreement. Count and
+// checksum both travel so the driver can flag a version whose numbers describe
+// different work from its neighbours' rather than printing it as a speedup.
+
+function fold(recs: Iterable<{ start: number; end: number; flags: number }>) {
+  let sum = 0
+  let n = 0
+  for (const r of recs) {
+    const h = (r.start * 31 + r.end * 17 + r.flags) % 1_000_000_007
+    sum = (sum + h) % 1_000_000_007
+    n++
+  }
+  return { n, sum }
+}
+
+// Accessors moved from methods to properties between majors: @gmod/bam v1-v2
+// answer r.get('start')/r.end()/r.flags, later ones r.start/r.end/r.flags, and
+// @gmod/cram before v8 reports a 1-based alignmentStart with the span in
+// lengthOnRef. Normalizing here rather than per version keeps one definition of
+// what is being checksummed.
+// `flags` is a plain property on every major, including the ones whose start
+// and end are methods — `get('flags')` throws on those, because their `get`
+// only reaches fields that have a matching accessor. equivalence.test.ts reads
+// it the same way.
+const bamRec = (r: any) => ({
+  start: typeof r.get === 'function' ? r.get('start') : r.start,
+  end: typeof r.end === 'function' ? r.end() : r.end,
+  flags: r.flags,
+})
+
+const cramRec = (r: any) => {
+  const start = r.start ?? r.alignmentStart - 1
+  return { start, end: start + (r.lengthOnRef ?? 0), flags: r.flags }
+}
+
+const bwRec = (f: any) => ({
+  start: f.start,
+  end: f.end,
+  flags: Math.round(Math.fround(f.score) * 1000) | 0,
+})
+
+async function armMain(kind: string, dir: string, file: string) {
+  const mod = await import(`${dir}/esm/index.js`)
+
+  let pass: () => Promise<{ n: number; sum: number }>
+
+  if (kind === 'bam') {
+    // A fresh BamFile per pass: current releases cache parsed chunks on the
+    // instance, so reusing one would measure the cache. bam.bench.ts does the
+    // same, for the same reason.
+    pass = async () => {
+      const bam = new mod.BamFile({ bamPath: file })
+      await bam.getHeader()
+      return fold((await bam.getRecordsForRange(REF, START, END)).map(bamRec))
+    }
+  } else if (kind === 'cram') {
+    // fetchSizeLimit is passed to every version that has it, not only the 2023
+    // one: majors before 8 default it to 3 MB and throw on every long-read
+    // window here, and JBrowse's own CramAdapter raised it. Passing an option a
+    // later version ignores is harmless; withholding it would make the early
+    // majors unmeasurable rather than slow.
+    pass = async () => {
+      const cram = new mod.IndexedCramFile({
+        cramPath: file,
+        index: new mod.CraiIndex({ path: `${file}.crai` }),
+        seqFetch,
+        checkSequenceMD5: false,
+        ...OLD_CRAM_OPTS,
+      })
+      return fold((await cram.getRecordsForRange(0, START, END)).map(cramRec))
+    }
+  } else if (kind === 'bigwig') {
+    pass = async () => {
+      const bw = new mod.BigWig({ path: file })
+      return fold((await bw.getFeatures(REF, START, END)).map(bwRec))
+    }
+  } else {
+    throw new Error(`unknown kind ${kind}`)
+  }
+
+  const first = await pass()
+  await pass()
+  const ts: number[] = []
+  for (let i = 0; i < INNER; i++) {
+    const t = performance.now()
+    await pass()
+    ts.push(performance.now() - t)
+  }
+  ts.sort((a, b) => a - b)
+  // best-of-N: on a shared box the minimum is the least contaminated estimate
+  // of the work, which is what the rest of this repo also assumes.
+  console.log(`${ts[0]!.toFixed(4)} ${first.n} ${first.sum}`)
+}
+
+if (process.argv[2] === '--arm') {
+  await armMain(process.argv[3]!, process.argv[4]!, process.argv[5]!)
+  process.exit(0)
+}
+
+// ---------------------------------------------------------------- driver ---
+
+interface Version {
+  tag: string
+  dir: string
+}
+interface Library {
+  name: string
+  package: string
+  kind: string
+  pinnedMajor2023: number
+  versions: Version[]
+  unbuildable: string[]
+}
+
+const sweepCfg = JSON.parse(readFileSync(here('sweep.json'), 'utf8'))
+
+const onlyLibs = process.env.LIBS?.split(',').map(s => s.trim())
+const onlyCases = process.env.CASES?.split(',').map(s => s.trim())
+
+// The cases. Heavy first, because that is where a parser difference is legible
+// and where the paper's framing puts the weight; the light case is kept as the
+// control that says whether a curve is the parser or is process startup.
+const CASE_LABELS = ['20x shortread', '200x shortread', '200x longread']
+const caseFile = (kind: string, label: string) => {
+  const [cov, read] = label.split(' ')
+  const ext = kind === 'bigwig' ? 'bw' : kind
+  return fileURLToPath(here(`../data/${cov}.${read}.${ext}`))
+}
+
+const libraries: Library[] = []
+for (const l of sweepCfg.libraries) {
+  if (onlyLibs && !onlyLibs.includes(l.name)) continue
+  const versions: Version[] = []
+  const unbuildable: string[] = []
+  for (const v of l.versions) {
+    const dir = fileURLToPath(here(`.libs/${l.name}/sweep/${v.tag}`))
+    if (existsSync(`${dir}/esm/index.js`)) {
+      versions.push({ tag: v.tag, dir })
+    } else {
+      unbuildable.push(v.tag)
+    }
+  }
+  libraries.push({ ...l, versions, unbuildable })
+}
+
+if (libraries.every(l => l.versions.length === 0)) {
+  console.error('no sweep builds found — run ./setup-sweep.sh first')
+  process.exit(1)
+}
+
+function arm(kind: string, dir: string, file: string) {
+  const out = execFileSync(
+    process.execPath,
+    [
+      '--experimental-strip-types',
+      // Every pre-2024 build emits ESM into a package.json with no "type", so
+      // node warns once per arm about reparsing it. True, expected, and 60
+      // lines of it per round would bury the failures that matter.
+      '--disable-warning=MODULE_TYPELESS_PACKAGE_JSON',
+      // Supplies the extensionless and directory specifiers the pre-2024 builds
+      // emit, which node's ESM resolver rejects. Fallback only; see the hook.
+      '--import',
+      fileURLToPath(here('lib/legacy-resolve-register.mjs')),
+      SELF,
+      '--arm',
+      kind,
+      dir,
+      file,
+    ],
+    { encoding: 'utf8', maxBuffer: 1 << 20 },
+  ).trim()
+  const [ms, n, sum] = out.split(' ')
+  return { ms: Number(ms), n: Number(n), sum: sum! }
+}
+
+const median = (xs: number[]) => [...xs].sort((a, b) => a - b)[xs.length >> 1]!
+
+interface Point {
+  tag: string
+  major: number
+  ms: number
+  records: number
+  checksum: string
+}
+interface CaseResult {
+  library: string
+  package: string
+  case: string
+  points: Point[]
+  /** versions whose record set differs from the newest built version's */
+  disagree: string[]
+}
+
+const results: CaseResult[] = []
+const loadAvg = () => Number(readFileSync('/proc/loadavg', 'utf8').split(' ')[0])
+const loads: number[] = []
+
+for (const lib of libraries) {
+  if (lib.versions.length === 0) {
+    console.log(`\n## ${lib.package}: nothing built, skipping`)
+    continue
+  }
+  console.log(`\n## ${lib.package} — ${lib.versions.length} versions`)
+  if (lib.unbuildable.length) {
+    console.log(`   unbuildable: ${lib.unbuildable.join(', ')}`)
+  }
+
+  for (const label of CASE_LABELS) {
+    if (onlyCases && !onlyCases.includes(label)) continue
+    const file = caseFile(lib.kind, label)
+    if (!existsSync(file)) {
+      console.log(`   ${label}: no ${file}, skipping`)
+      continue
+    }
+
+    const times = new Map<string, number[]>(lib.versions.map(v => [v.tag, []]))
+    let meta = new Map<string, { n: number; sum: string }>()
+
+    for (let r = 0; r < ROUNDS; r++) {
+      loads.push(loadAvg())
+      // Rotate the order every round. Machine drift over a round is real and
+      // roughly monotonic; if the order were fixed it would add a tilt along
+      // the version axis, which is the exact artefact a curve would be read as
+      // a trend.
+      for (let k = 0; k < lib.versions.length; k++) {
+        const v = lib.versions[(k + r) % lib.versions.length]!
+        try {
+          const got = arm(lib.kind, v.dir, file)
+          times.get(v.tag)!.push(got.ms)
+          meta.set(v.tag, { n: got.n, sum: got.sum })
+        } catch (e) {
+          // A version that builds but cannot read this file is a result. Record
+          // it as absent from this case rather than killing the sweep.
+          if (r === 0) {
+            console.log(`   ${label} ${v.tag}: FAILED (${String(e).split('\n')[0]})`)
+          }
+        }
+      }
+    }
+
+    const points: Point[] = []
+    for (const v of lib.versions) {
+      const ts = times.get(v.tag)!
+      if (ts.length === 0) continue
+      const m = meta.get(v.tag)!
+      points.push({
+        tag: v.tag,
+        major: Number(v.tag.slice(1).split('.')[0]),
+        ms: median(ts),
+        records: m.n,
+        checksum: m.sum,
+      })
+    }
+    if (points.length === 0) continue
+
+    const newest = points[points.length - 1]!
+    const disagree = points
+      .filter(p => p.checksum !== newest.checksum)
+      .map(p => p.tag)
+
+    results.push({
+      library: lib.name,
+      package: lib.package,
+      case: label,
+      points,
+      disagree,
+    })
+
+    console.log(`\n   ${label}`)
+    for (const p of points) {
+      const rel = points[0]!.ms / p.ms
+      const flag = disagree.includes(p.tag) ? ' *' : ''
+      console.log(
+        `     ${p.tag.padEnd(10)}${`${p.ms.toFixed(2)} ms`.padStart(12)}` +
+          `${`${rel.toFixed(2)}x`.padStart(9)}  ${p.records} recs${flag}`,
+      )
+    }
+  }
+}
+
+// ---------------------------------------------------------------- report ---
+
+mkdirSync(here('results/'), { recursive: true })
+writeFileSync(
+  here('results/sweep.json'),
+  JSON.stringify(
+    {
+      rounds: ROUNDS,
+      inner: INNER,
+      rule: sweepCfg.rule,
+      ruleDate: sweepCfg.ruleDate,
+      measured: new Date().toISOString().slice(0, 10),
+      loadPeak: loads.length ? Math.max(...loads) : null,
+      loadMedian: loads.length ? median(loads) : null,
+      unbuildable: Object.fromEntries(
+        libraries.map(l => [l.name, l.unbuildable]),
+      ),
+      results,
+    },
+    null,
+    2,
+  ),
+)
+
+const peak = loads.length ? Math.max(...loads) : 0
+const md: string[] = [
+  '# Parser version sweep',
+  '',
+  `Generated by \`make sweep\`. One process per version, version order rotated`,
+  `every round, each arm reporting its own best-of-${INNER} and the table the`,
+  `median over ${ROUNDS} rounds. Window \`${REF}:${START}-${END}\`, the same one`,
+  'the render benchmarks draw.',
+  '',
+  `Version selection: ${sweepCfg.rule}.`,
+  '',
+  peak > 4
+    ? `> **Peak 1-minute load during this run was ${peak.toFixed(1)}**, above the ` +
+      '4.0 this repo treats as the ceiling for a quotable absolute. Read the ' +
+      'shape of each curve, which is protected by the rotated version order, ' +
+      'and not the milliseconds.'
+    : `Peak 1-minute load during this run: ${peak.toFixed(1)}.`,
+  '',
+  'The `x` column is against the **oldest built version** of that library, so a',
+  'row reads as "how much of the total gain had arrived by here". The `recs`',
+  'column is the record count each version returned; a `*` marks a version whose',
+  'records differ from the newest one it is being compared against, which is a',
+  'reason to distrust that row rather than a speedup.',
+  '',
+]
+
+for (const r of results) {
+  md.push(`## ${r.package} — ${r.case}`, '')
+  md.push('| version | time | vs oldest | records |', '| --- | ---: | ---: | ---: |')
+  for (const p of r.points) {
+    const rel = r.points[0]!.ms / p.ms
+    const star = r.disagree.includes(p.tag) ? ' \\*' : ''
+    md.push(
+      `| ${p.tag} | ${p.ms.toFixed(2)} ms | ${rel.toFixed(2)}x | ${p.records}${star} |`,
+    )
+  }
+  md.push('')
+  if (r.disagree.length) {
+    md.push(
+      `> Record sets differ from the newest version at: ${r.disagree.join(', ')}. ` +
+        'The equivalence gate (`make verify`) adjudicates the 2023-vs-current ' +
+        'case of this; nothing yet adjudicates the intermediate ones.',
+      '',
+    )
+  }
+}
+
+const unb = libraries.filter(l => l.unbuildable.length)
+if (unb.length) {
+  md.push('## Versions that would not build', '')
+  md.push(
+    'Recorded rather than dropped: which majors of a library can still be built',
+    'from source with a current toolchain is a fact about the library, and a gap',
+    'in a curve should be visible as a gap.',
+    '',
+  )
+  for (const l of unb) {
+    md.push(`- \`${l.package}\`: ${l.unbuildable.join(', ')}`)
+  }
+  md.push('')
+}
+
+writeFileSync(here('results/sweep.md'), md.join('\n'))
+console.log('\nwrote results/sweep.md and results/sweep.json')

@@ -29,6 +29,11 @@ data/variants.*.vcf
 # to register the tracks in a staged build.
 data/rowsweep/
 
+# The cohort signal panel: one BigWig per sample over the benchmark contig, for
+# ecosystem/cohort-bw.ts. Regenerate with shell/generate_cohort_bw.sh (node,
+# bedGraphToBigWig) — a few MB and under a minute for the default 100.
+data/cohort/
+
 # jbrowse-web builds under test. Each is a deployed build plus symlinked copies
 # of the alignment data; stage them per README ("Builds compared").
 builds/

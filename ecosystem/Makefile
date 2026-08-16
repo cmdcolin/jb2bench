@@ -7,7 +7,7 @@
 # libraries that return different records is not a comparison, so the gate runs
 # first and a failure stops the run.
 
-.PHONY: all bench setup install typecheck verify time report scan gff3 clean distclean
+.PHONY: all bench setup setup-sweep install typecheck verify time report scan gff3 sweep cohort clean distclean
 
 all: bench
 
@@ -52,6 +52,26 @@ scan: install setup
 # release — but it does need ../shell/generate_gff3.sh to have run.
 gff3: install
 	node --experimental-strip-types gff3-lazy.ts
+
+# Every major line of @gmod/bam, @gmod/cram and @gmod/bbi, rather than the two
+# points versions.json compares. Out of `bench` because it needs its own 30-odd
+# library builds and answers a different question: not how much faster the
+# parsers got, but where along the way it happened. One process per version, for
+# the reason `scan` is one process per side — and more so, since a sweep loads N
+# builds into one V8 rather than two.
+.libs/sweep-manifest.txt: sweep.json setup-sweep.sh
+	./setup-sweep.sh
+
+setup-sweep: .libs/sweep-manifest.txt
+
+sweep: install setup-sweep
+	node --experimental-strip-types sweep.ts
+
+# The 100-BigWig cohort panel. Reports request counts, which are exact and need
+# no idle machine, alongside timings, which do. Needs the corpus:
+# ../shell/generate_cohort_bw.sh
+cohort: install
+	node --experimental-strip-types cohort-bw.ts
 
 bench: verify time report
 

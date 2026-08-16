@@ -1,0 +1,107 @@
+{
+  "comment": [
+    "The version sweep. versions.json compares two points — the release JBrowse 2",
+    "pinned in 2023 against the current one — which says how much faster the",
+    "parsers got but not where the change landed. This file names every major",
+    "line in between so the answer can be a curve rather than a ratio.",
+    "",
+    "Selection rule: the newest patch of each major line, read off npm on",
+    "2026-08-16. Newest-patch rather than first-release of each major because a",
+    "major line accumulates fixes after its .0, and the last patch is the one that",
+    "line finally became; the first .0 would credit the next major with work its",
+    "predecessor shipped.",
+    "",
+    "The rule has one consequence worth stating rather than discovering: the 2023",
+    "pins in versions.json are NOT sweep points. @gmod/bam v2.0.0 is the pin and",
+    "v2.0.4 is the sweep's major-2 point. They are close but not identical, so a",
+    "sweep row and a versions.json row for the same major are two measurements,",
+    "not one repeated. sweep.ts marks the major each 2023 pin falls inside.",
+    "",
+    "A version that will not build from source with today's toolchain is recorded",
+    "as unbuildable and skipped, not fatal — setup.sh --sweep keeps going. Which",
+    "of a library's majors can still be built at all is itself a result, so it is",
+    "reported rather than silently dropped.",
+    "",
+    "bgzf-filehandle and vcf-js are deliberately absent for now. Both are",
+    "measurable by the same driver — add a block here with the same shape and",
+    "sweep.ts picks it up — but the three libraries below are the ones whose",
+    "2023-to-current gap the render benchmarks actually sit on top of."
+  ],
+  "rule": "newest patch of each major line, npm as of 2026-08-16",
+  "ruleDate": "2026-08-16",
+  "libraries": [
+    {
+      "name": "bam-js",
+      "package": "@gmod/bam",
+      "repo": "https://github.com/GMOD/bam-js",
+      "kind": "bam",
+      "pinnedMajor2023": 2,
+      "versions": [
+        { "tag": "v1.1.18" },
+        { "tag": "v2.0.4" },
+        { "tag": "v3.0.3" },
+        { "tag": "v4.0.1" },
+        { "tag": "v5.0.7" },
+        { "tag": "v6.1.1" },
+        { "tag": "v7.9.1" },
+        { "tag": "v8.11.0" }
+      ]
+    },
+    {
+      "name": "cram-js",
+      "package": "@gmod/cram",
+      "repo": "https://github.com/GMOD/cram-js",
+      "kind": "cram",
+      "pinnedMajor2023": 1,
+      "comment": [
+        "Every major before 8 defaults fetchSizeLimit to 3 MB and throws past it,",
+        "which every long-read window in this corpus exceeds. JBrowse 2 never ran",
+        "that default — its CramAdapter set 200_000_000 — so the arm passes the",
+        "same value to any version that accepts it. That is the identical",
+        "adjustment lib/corpus.ts already documents as OLD_CRAM_OPTS, applied",
+        "across the sweep rather than only to the 2023 point."
+      ],
+      "versions": [
+        { "tag": "v1.7.4", "extraDeps": ["generic-filehandle@^3.0.0"] },
+        { "tag": "v2.0.4", "extraDeps": ["generic-filehandle@^3.0.0"] },
+        { "tag": "v3.0.7" },
+        { "tag": "v4.0.10" },
+        { "tag": "v5.1.0" },
+        { "tag": "v6.0.1" },
+        { "tag": "v7.0.3" },
+        { "tag": "v8.7.0" },
+        { "tag": "v9.0.0" },
+        { "tag": "v10.6.1" },
+        { "tag": "v11.4.1" },
+        { "tag": "v12.0.1" },
+        { "tag": "v13.4.1" }
+      ]
+    },
+    {
+      "name": "bbi-js",
+      "package": "@gmod/bbi",
+      "repo": "https://github.com/GMOD/bbi-js",
+      "kind": "bigwig",
+      "pinnedMajor2023": 4,
+      "comment": [
+        "The single-file BigWig case is 1-3 ms and versions.json reports it as",
+        "flat to slightly negative. Read the sweep here for shape, not for a",
+        "headline: cohort-bw.ts is where this library's cost becomes legible,",
+        "because a per-file fixed cost is what a signal panel pays 100 times."
+      ],
+      "versions": [
+        { "tag": "v1.0.35" },
+        { "tag": "v2.0.5" },
+        { "tag": "v3.0.1" },
+        { "tag": "v4.0.6" },
+        { "tag": "v5.0.2" },
+        { "tag": "v6.0.3" },
+        { "tag": "v7.1.0" },
+        { "tag": "v8.1.2" },
+        { "tag": "v9.3.3" },
+        { "tag": "v10.0.2" },
+        { "tag": "v11.2.1" }
+      ]
+    }
+  ]
+}
