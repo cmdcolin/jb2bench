@@ -14,6 +14,12 @@
 # where it stopped rather than starting the 8.6 GB file again. A file whose size
 # already matches the server's is left alone, so a second run is a no-op.
 #
+# Parallel, because the EBI mirror throttles per connection rather than per
+# client. Measured 2026-08-16 on this box: the low-coverage CRAM alone held
+# 588-639 KB/s; adding a second stream took it to 997 KB/s while the second ran
+# at 1593 KB/s, for 2.59 MB/s combined. Four times the throughput for nothing.
+# JOBS=1 restores sequential fetching if a mirror ever objects.
+#
 # Needs samtools (for the .fai files, and to convert the E. coli BAM) and curl.
 set -e
 cd "$(dirname "$0")/.."
@@ -85,18 +91,44 @@ fetch() {
   fi
 }
 
+# Runs the queued fetches JOBS at a time and reports which of them failed. A
+# failure here is almost always a truncated resume rather than a dead URL, and
+# the next run continues it, so this counts them rather than aborting the rest.
+JOBS=${JOBS:-3}
+queue=()
+enqueue() { queue+=("$1"$'\t'"$2"); }
+
+drain() {
+  local pids=() failed=0 entry url name
+  for entry in "${queue[@]}"; do
+    url=${entry%%$'\t'*}
+    name=${entry##*$'\t'}
+    fetch "$url" "$name" &
+    pids+=($!)
+    # `|| true` because a failed job's status arrives here, and under `set -e`
+    # one incomplete download would otherwise kill the run that could resume it.
+    while [ "$(jobs -rp | wc -l)" -ge "$JOBS" ]; do wait -n || true; done
+  done
+  for p in "${pids[@]}"; do wait "$p" || failed=$((failed + 1)); done
+  queue=()
+  [ "$failed" -eq 0 ] || echo "  ! $failed download(s) incomplete — rerun to resume" >&2
+}
+
 # .fai for both references, and a .crai for anything that arrived without one.
 index_ref() {
   [ -f "$OUT/$1.fai" ] || { echo "  + $1.fai"; samtools faidx "$OUT/$1"; }
 }
 
 if [ "$WHICH" = all ] || [ "$WHICH" = human ]; then
-  echo "1000 Genomes NA12878, GRCh38:"
-  fetch "$LOW" NA12878.low_coverage.cram
-  fetch "$LOW.crai" NA12878.low_coverage.cram.crai
-  fetch "$EXOME" NA12878.exome.cram
-  fetch "$EXOME.crai" NA12878.exome.cram.crai
-  fetch "$HUMAN_REF" GRCh38_full_analysis_set_plus_decoy_hla.fa
+  echo "1000 Genomes NA12878, GRCh38 (${JOBS} at a time):"
+  enqueue "$LOW" NA12878.low_coverage.cram
+  enqueue "$LOW.crai" NA12878.low_coverage.cram.crai
+  enqueue "$EXOME" NA12878.exome.cram
+  enqueue "$EXOME.crai" NA12878.exome.cram.crai
+  enqueue "$HUMAN_REF" GRCh38_full_analysis_set_plus_decoy_hla.fa
+  drain
+  # After the downloads, not between them: faidx on a file still being written
+  # produces an index for a prefix of it.
   index_ref GRCh38_full_analysis_set_plus_decoy_hla.fa
 fi
 
