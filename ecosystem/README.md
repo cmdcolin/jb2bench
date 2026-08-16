@@ -151,10 +151,40 @@ other two get their own benchmarks.
 
 ### Where along the way did it happen? — `make sweep`
 
-`sweep.json` names every major line of `@gmod/bam`, `@gmod/cram` and `@gmod/bbi`
-— the newest patch of each, so a major is credited with what it finally became
-rather than with its `.0`. `make sweep` runs all of them over the same window and
-writes [`results/sweep.md`](results/sweep.md).
+`sweep.json` names every major line of `@gmod/bam`, `@gmod/cram`, `@gmod/bbi`,
+`@gmod/vcf` and `@gmod/bgzf-filehandle` — the newest patch of each, so a major is
+credited with what it finally became rather than with its `.0`. `make sweep` runs
+all of them over the same window and writes
+[`results/sweep.md`](results/sweep.md).
+
+The last two get a curve and no request-shape column, because neither takes a
+filehandle the way the other three do: `@gmod/vcf` is handed lines a reader
+already decoded, and `bgzf-filehandle` is handed a buffer. Their rows are
+timings, so unlike the other three they need an idle box.
+
+**The `@gmod/vcf` curve is three points, not seven**, and the missing majors are
+a fact rather than an oversight: v1 through v4 have no `build:esm` script at all.
+They build, but they only ever produced CommonJS, and putting that on the same
+axis would fold a module-format and transpiler-target change into a curve meant
+to be about library code — the exact confound this directory refuses when it
+explains why both sides are built from source rather than installed from npm.
+`setup-sweep.sh` records that case as `no-esm-target`, distinct from a version
+that has the script and still produced nothing.
+
+Two of them are also measured through a deliberately narrower call than the
+two-point benchmark uses, and the reason is the same in both cases — a sweep must
+ask one question along its whole axis:
+
+- **`@gmod/vcf` through `parseLine` alone.** `vcf.bench.ts` asks each side for
+  genotypes through the cheapest call it offers, `SAMPLES` on v5 and
+  `GENOTYPES()` on v7, because that is what a JBrowse upgrade actually buys. On
+  a sweep that API appears partway along the axis, so the curve would carry a
+  step that is a change of question rather than of speed.
+- **`bgzf-filehandle` through `pakoUnzip` where it exists**, falling back to
+  `unzip`. v1.x shipped two decompressors and chose at import time — `unzip`
+  wrapping `zlib.gunzip` in Node, `pakoUnzip` for browsers — so sweeping `unzip`
+  would compare C++ against JavaScript at the version where the split ends and
+  report it as a regression.
 
 The question is not rhetorical. Someone on `@gmod/bam` v5 deciding whether an
 upgrade is worth the churn cannot use a 2023-to-current ratio, because almost
@@ -166,6 +196,18 @@ sharing does to their inline caches, it does *unevenly along the axis being
 plotted* — which is the one artefact a curve must not have imposed on it. The
 version order rotates every round, so machine drift cannot line up with position
 on the curve either.
+
+**Nothing compiled or transpiled is inside a timed window.** The libraries are
+plain JavaScript by the time an arm sees them — `setup-sweep.sh` ran each one's
+own `build:esm` once, so the arm imports `esm/*.js` and never meets TypeScript.
+`--experimental-strip-types` applies to the benchmark file rather than to the
+library, and it happens at process start; the module hooks do their work during
+import. Corpus preparation is outside too: the VCF arm decodes and splits its
+lines, and the bgzf arm reads its buffer, before the clock starts. Two warmup
+passes precede the timed ones, so no measurement pays for V8's first sight of the
+code path. What *is* inside, for the three file-backed kinds, is opening the file
+afresh each pass — deliberately, because the current releases cache parsed chunks
+on the instance and reusing one would measure the cache.
 
 **Versions that will not build are reported, not dropped.** Which majors of a
 library can still be built from source with a current toolchain is a fact about
@@ -415,6 +457,47 @@ the current pure-JS decompressor also beats 1.4.3's native-zlib
 path, by 1.33x to 3.19x, because that path
 spent its advantage on Buffer conversions and promisify wrapping.
 
+## How does the parser compare to htslib? — `vcf-crosslang.json`
+
+Everything above compares `@gmod/vcf` against older `@gmod/vcf`, which says how
+much it improved and not where it stands beside a C implementation. That is a
+question a reviewer asks, and there is a published answer:
+[brentp/vcf-bench](https://github.com/brentp/vcf-bench) times eleven language
+bindings on one task — iterate a VCF's rows, pull an integer out of INFO,
+accumulate, report the mean.
+
+| tool | VCF |
+| --- | ---: |
+| C htslib, hts-zig, hts-nim | 18 s |
+| d-htslib, crystal-htslib, go-vcfgo | 19 s |
+| cyvcf2 (libdeflate) | 20 s |
+| rust-htslib | 22 s |
+| **`@gmod/vcf` (JavaScript)** | **24 s** |
+| pysam | 28 s |
+| cyvcf2 | 29 s |
+| pyvcf | 1009 s |
+
+A JavaScript parser landing between the C family and the Python bindings, ahead
+of both pysam and plain cyvcf2, is the interesting part.
+
+**And that figure is for v5.0.2** — the 2023-era parser, the same vintage as this
+directory's *old* side. It predates the 7.2.0 rewrites entirely. `sweep.ts`
+therefore runs that exact operation (`parseLine`, then `INFO.AN[0]`) on every
+major, so the v5-to-v7 ratio measured here can be carried onto the published
+scale. Doing so is a projection and has to be labelled as one: different corpus,
+different machine, different year.
+
+Two things keep this honest. The task **never touches a genotype**, and genotypes
+are what a variant display renders and what 7.2.0 rewrote — so it measures line
+and INFO parsing, and `results/vcf-scan.md` measures the other thing; they are
+complementary rather than competing. And the JS entry in that repository was
+contributed by this project's author, which makes it a self-reported entry in
+someone else's harness rather than an independent measurement.
+
+Transcribed rather than re-run, like the Zarr numbers below and for the same
+reason — the harness is someone else's and re-running it means building ten
+toolchains. `vcf-crosslang.json` is where to update it.
+
 ## Zarr is measured elsewhere
 
 The other ecosystem change worth reporting is a format, not a parser: packing a
@@ -464,6 +547,8 @@ paper, run `make bench` here and then `make sync-benchmarks` in the paper repo.
 - `versions.json` — the two-point pins, with SHAs, and any deliberate patch
 - `sweep.json` — the per-major pins for `make sweep`, and the selection rule
 - `zarr.json` — the Zarr measurement, transcribed from its own harness
+- `vcf-crosslang.json` — brentp/vcf-bench's cross-language table, transcribed,
+  with the caveats that have to travel with it
 - `setup.sh` — clone + build both sides; writes `.libs/manifest.txt`
 - `setup-sweep.sh` — the same for `sweep.json`, tolerant of a version that will
   no longer build; writes `.libs/sweep-manifest.txt`
