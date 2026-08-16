@@ -29,6 +29,7 @@ coverage legible:
 | **tool, cold load** | `results/crosstool.md` | how do we compare to igv.js on the same bytes? |
 | **tool, interaction** | `results/crosstool-pan.md` | and with application startup out of the number? |
 | **compute substrate** | `results/ld-gpu-vs-cpu.md` | is the LD compute shader worth it? |
+| **implementation language** | `ecosystem/vcf-crosslang.json` (transcribed) | how does our parser stand beside htslib? |
 | **the instrument itself** | `results/quiescence.md` | which completion detector, and how far apart are they? |
 
 Two of those rows are the reason the set is worth having rather than a single
@@ -51,6 +52,9 @@ did not:
   give — genotypes and feature counts do not fit in a 19 kb alignment window.
 - **The Zarr comparison** is transcribed from a harness in `jbrowse-components`
   and re-measures nothing here.
+- **The cross-language VCF table** (`ecosystem/vcf-crosslang.json`) is someone
+  else's harness on someone else's corpus, transcribed. Its `@gmod/vcf` figure
+  is for v5.0.2, so it describes the 2023 parser and not the current one.
 
 ## Cross-tool coverage, honestly
 
