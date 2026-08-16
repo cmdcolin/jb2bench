@@ -123,6 +123,15 @@ filehandle the way the other three do: `@gmod/vcf` is handed lines a reader
 already decoded, and `bgzf-filehandle` is handed a buffer. Their rows are
 timings, so unlike the other three they need an idle box.
 
+**The `@gmod/vcf` curve is three points, not seven**, and the missing majors are
+a fact rather than an oversight: v1 through v4 have no `build:esm` script at all.
+They build, but they only ever produced CommonJS, and putting that on the same
+axis would fold a module-format and transpiler-target change into a curve meant
+to be about library code — the exact confound this directory refuses when it
+explains why both sides are built from source rather than installed from npm.
+`setup-sweep.sh` records that case as `no-esm-target`, distinct from a version
+that has the script and still produced nothing.
+
 Two of them are also measured through a deliberately narrower call than the
 two-point benchmark uses, and the reason is the same in both cases — a sweep must
 ask one question along its whole axis:

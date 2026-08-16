@@ -136,8 +136,19 @@ for i in $(seq 0 $((libcount - 1))); do
     (cd "$dir" && pnpm run build:esm >/dev/null 2>&1) || true
 
     if [ ! -f "$dir/esm/index.js" ]; then
-      echo "   $name $tag: BUILD PRODUCED NO esm/index.js"
-      echo "$name $tag unbuildable reason=no-esm-output" >>"$MANIFEST"
+      # Two different facts wear the same missing file. A version whose
+      # package.json has no build:esm script never shipped ESM at all — it
+      # predates it — and building its CommonJS instead would fold a module
+      # format and transpiler target into a curve that is supposed to be about
+      # library code. A version that HAS the script and still produced nothing
+      # is a build failure. Say which.
+      if node -p "!!(require('./$dir/package.json').scripts||{})['build:esm']" 2>/dev/null | grep -q true; then
+        echo "   $name $tag: BUILD PRODUCED NO esm/index.js"
+        echo "$name $tag unbuildable reason=no-esm-output" >>"$MANIFEST"
+      else
+        echo "   $name $tag: predates the ESM build (no build:esm script)"
+        echo "$name $tag unbuildable reason=no-esm-target" >>"$MANIFEST"
+      fi
       failed=$((failed + 1))
       continue
     fi
