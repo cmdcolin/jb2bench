@@ -115,9 +115,18 @@ Three findings from building it are worth carrying into anything else here:
   interactions of about that length. Anything here that measures an *interaction*
   by screenshot polling inherits that; cold load is long enough not to care.
 - **"Both tools must fetch" was an assumption and is false at some steps.**
-  JBrowse reads 256 KiB blocks, so a one-viewport pan can land inside what it
-  already holds. The runner counts requests per step and restricts the headline
-  to steps that fetched.
+  JBrowse reads 256 KiB blocks, so at low coverage a one-viewport pan can land
+  inside what it already holds — 3 of 5 steps at 20x-shortread, none at 1000x.
+  The runner counts requests per step and restricts the headline to steps that
+  fetched.
+- **A completion rule built on quiet is a rule that cannot tell finished from
+  pausing.** The first pan detector waited 400 ms for drawing to stop; JBrowse's
+  own `LGVCoarseDynamicBlocks` debounce is 500 ms, so the gate opened inside it
+  and reported **42 ms for 2.3 s of work**. Worse, firing before the fetch began
+  also left the request counter at zero, so those steps were recorded as cache
+  hits — which is where the inflated caching figure above came from. The window
+  is now set from two measured constants rather than picked, and what is reported
+  is the timestamp of a canvas draw rather than the moment of confidence.
 - **The detector needed its own harness**, which is now
   `scripts/crosstool/quiescheck.ts` → `results/quiescence.md`. It falsified two
   claims within a run of being written: that screenshot cost is a property of

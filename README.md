@@ -437,9 +437,18 @@ JBrowse cold load, where draws read 4792 ms against paint's 2346 ms — the page
 keeps issuing draw calls after the visible result has settled.
 
 **A pan is not automatically the "both tools fetch" case, so the run counts.**
-JBrowse reads 256 KiB blocks, so some of its pan steps are served from what it
-already holds; igv's never were. The headline table is restricted to steps where
-that tool actually issued a request, and the per-step table shows the rest.
+JBrowse reads 256 KiB blocks, so at low coverage a one-viewport pan can land
+inside what it already holds — at 20x-shortread, 3 of 5 steps issue no request at
+all, while igv's never do. The headline table is restricted to steps where that
+tool actually fetched, and the per-step table shows the rest.
+
+Read that column with the detector's history in mind. A cache hit and a step the
+detector abandoned before the fetch started look identical from the outside, and
+the first version of this instrument confused them: at 1000x it reported 3 of 5
+steps cached where the true answer is **none** — every step fetches 6.5 MB. What
+separates them is the draw count. A genuine cache hit still shows a full 42–50
+draw burst; an abandoned step shows the 10-draw re-projection of stale content
+and nothing else.
 
 **The numbers live in [`results/crosstool-pan.md`](results/crosstool-pan.md) and
 are deliberately not repeated here.** An earlier draft of this section did copy
