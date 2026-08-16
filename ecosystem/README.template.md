@@ -16,6 +16,7 @@ make scan      # only the @gmod/vcf genotype-scan before/after
 make gff3      # only the gff-nostream eager-vs-lazy attribute comparison
 make sweep     # every major line of bam, cram and bbi, not just the endpoints
 make cohort    # 100 BigWigs: what a per-sample signal panel costs to open
+make cram-samtools  # the 2019 paper's cram-js-vs-samtools benchmark, re-run
 ```
 
 `make bench` clones and builds every library version named in `versions.json` (a
@@ -38,6 +39,7 @@ is also runnable alone:
 | `make sweep` | every major line, one process per version | `results/sweep.{md,json}` |
 | `MODE=count make sweep` | the same, counting reads and bytes instead of timing — needs no idle box | same |
 | `make cohort` | N-BigWig panel: request counts and timings | `results/cohort-bw.{md,json}` |
+| `make cram-samtools` | `@gmod/cram` against `samtools view`, the 2019 paper's procedure | `results/cram-samtools.{md,json}` |
 | `make clean` | drop `results/` | |
 | `make distclean` | also drop `.libs/` and `node_modules/` | |
 
@@ -460,6 +462,55 @@ Transcribed rather than re-run, like the Zarr numbers below and for the same
 reason — the harness is someone else's and re-running it means building ten
 toolchains. `vcf-crosslang.json` is where to update it.
 
+## How does CRAM compare to samtools? — `make cram-samtools`
+
+The cross-language question the section above answers for VCF by transcribing
+someone else's table, CRAM can answer by re-running its own. `@gmod/cram` was
+published with a benchmark against `samtools view`
+([Buels *et al.* 2019](https://doi.org/10.1093/bioinformatics/btz384)), and that
+harness is vendored here in [`paper-2019/`](paper-2019/README.md) — scripts, fetch
+list, and the 900 raw runtimes behind the figure. `cram-samtools.ts` re-runs its
+procedure: random intervals at 1 kb, 10 kb and 100 kb, one query per process,
+both tools timed as whole processes.
+
+The published result was an order of magnitude, near enough flat across three
+files and three interval lengths — 9.6x to 20.8x. Twelve majors of `@gmod/cram`
+have landed since, along with wasm htscodecs and six years of samtools.
+
+Reading the raw TSV is what makes the re-run worth doing, because it shows three
+things the figure cannot, and each one changes what the comparison should
+measure:
+
+- **Most cells never timed a decode.** The fastest of the 900 runs is 0.284 s and
+  the median is 0.885 s, so six of the nine cells sit within a factor of 1.3 of
+  their own floor. What they measured was node starting, two libraries being
+  imported and a `.crai` being parsed. Against a tool that starts in 5 ms, that
+  reports a constant — three times per file. So every arm here reports its import,
+  its first query and a warm query separately, and the driver times the process
+  around them. The paper's comparison is the process column; a browser's question
+  is the query column, since it imports once and queries thousands of times.
+- **Random intervals on an exome are usually empty**, and on low-coverage WGS
+  often nearly so. The 2019 harness discarded record counts, so nothing in its
+  output separates a cell that decoded reads from one that decoded none. Every
+  interval here carries its count.
+- **Nothing checked that the two tools returned the same reads.** They are folded
+  to the same checksum over (start, end, flags) here, from CRAM records on one
+  side and SAM text on the other, and disagreement is reported per cell rather
+  than averaged into a speedup.
+
+Two fixture groups, never pooled: the paper's own corpus, which
+`../shell/fetch_paper2019.sh` fetches (~16 GB, and the E. coli file is no longer
+served — Illumina's FTP host resolves but does not answer), and this repo's
+simulated corpus, which puts the ratio on the same bytes as `results/sweep.md`
+and the render benchmarks. The arms come from the `make sweep` builds, so every
+version in the table was built by one pipeline.
+
+**The slice worker pool cannot appear in this table.** It needs a Worker and a
+Blob URL, and `getSharedSliceWorkerPool` returns undefined under node by design,
+so a CLI benchmark is blind to the largest single change to CRAM decode since the
+paper. [`../results/crampool.md`](../results/crampool.md) measures it where it
+exists.
+
 ## Zarr is measured elsewhere
 
 The other ecosystem change worth reporting is a format, not a parser: packing a
@@ -517,7 +568,12 @@ paper, run `make bench` here and then `make sync-benchmarks` in the paper repo.
 - `sweepchart.R` — its figures; reads and time are drawn as separate files
   because one needs an idle box and the other does not
 - `cohort-bw.ts` — the N-BigWig panel, request counts and timings
+- `cram-samtools.ts`, `cram-samtools.json` — the 2019 paper's benchmark, re-run
+  against every cram-js line since
+- `paper-2019/` — that paper's harness and its 900 raw runtimes, vendored
 - `lib/corpus.ts` — corpus, window, and the CRAM `seqFetch`
+- `lib/indexed-ref.ts` — a .fai-indexed FASTA reader, for the fixtures too large
+  to answer `seqFetch` from memory
 - `lib/legacy-resolve.mjs` — the two module hooks that let plain node import the
   pre-2024 builds
 - `report.ts` — everything under "Generated output"

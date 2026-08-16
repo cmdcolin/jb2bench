@@ -54,6 +54,7 @@ Every number lives in a file; nothing is summarized only here.
 | [`ecosystem/results/cohort-bw.md`](ecosystem/results/cohort-bw.md) | what does a 100-sample BigWig panel cost to open? |
 | [`ecosystem/results/vcf-scan.md`](ecosystem/results/vcf-scan.md) | what did the @gmod/vcf 7.2.0 genotype-scan rewrite buy? |
 | [`ecosystem/results/gff3-lazy.md`](ecosystem/results/gff3-lazy.md) | is deferring GFF3 attribute parsing worth it, and to whom? |
+| [`ecosystem/results/cram-samtools.md`](ecosystem/results/cram-samtools.md) | where does @gmod/cram stand against samtools now, on the 2019 paper's own benchmark? (no run of record yet) |
 
 ## The corpus
 
@@ -82,6 +83,12 @@ except the reference is untracked and regenerable — roughly 750 MB.
 - `R103.model` — the pbsim error model for the long-read simulation. Tracked.
 - `hg19_17.chrom.sizes` — chr17's size, left over from the variant-matrix work.
   Nothing in this repo currently reads it.
+- `paper2019/` — the corpus the 2019 cram-js paper benchmarked: two 1000 Genomes
+  NA12878 CRAMs and GRCh38 with decoys, ~16 GB, downloaded rather than
+  simulated by `shell/fetch_paper2019.sh`. Only
+  `ecosystem/cram-samtools.ts` reads it, and only to say something about the
+  published numbers as published; that benchmark also runs on the simulated
+  corpus above, which is where its result sits beside everything else here.
 
 The benchmark window throughout is `chr22_mask:124000-143000` (19 kb), which
 matches the historical jb2profile region.

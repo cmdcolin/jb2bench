@@ -7,7 +7,7 @@
 # libraries that return different records is not a comparison, so the gate runs
 # first and a failure stops the run.
 
-.PHONY: all bench setup setup-sweep install typecheck verify time report scan gff3 sweep sweep-verify cohort clean distclean
+.PHONY: all bench setup setup-sweep install typecheck verify time report scan gff3 sweep sweep-verify cohort cram-samtools clean distclean
 
 all: bench
 
@@ -81,6 +81,14 @@ sweep: sweep-verify
 # ../shell/generate_cohort_bw.sh
 cohort: install
 	node --experimental-strip-types cohort-bw.ts
+
+# The 2019 cram-js paper's benchmark against samtools, re-run. Depends on the
+# sweep builds rather than versions.json's two, so the table can put every major
+# on one axis, and needs samtools on PATH. The paper's own fixtures come from
+# ../shell/fetch_paper2019.sh; without them it runs on this repo's corpus alone
+# and says which fixtures it could not resolve.
+cram-samtools: install setup-sweep
+	node --experimental-strip-types cram-samtools.ts
 
 bench: verify time report
 

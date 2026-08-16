@@ -29,7 +29,7 @@ coverage legible:
 | **tool, cold load** | `results/crosstool.md` | how do we compare to igv.js on the same bytes? |
 | **tool, interaction** | `results/crosstool-pan.md` | and with application startup out of the number? |
 | **compute substrate** | `results/ld-gpu-vs-cpu.md` | is the LD compute shader worth it? |
-| **implementation language** | `ecosystem/vcf-crosslang.json` (transcribed) | how does our parser stand beside htslib? |
+| **implementation language** | `ecosystem/vcf-crosslang.json` (transcribed), `ecosystem/results/cram-samtools.md` (run here) | how does our parser stand beside htslib? |
 | **the instrument itself** | `results/quiescence.md` | which completion detector, and how far apart are they? |
 
 Two of those rows are the reason the set is worth having rather than a single
@@ -69,8 +69,25 @@ did not:
 
 ### One layer down: the parser against other languages
 
-The table above is browsers. At the *parser* layer there is exactly one
-cross-language comparison and it is someone else's:
+The table above is browsers. At the *parser* layer there are two cross-language
+comparisons, and only one of them is someone else's.
+
+**CRAM against samtools, run here.** `@gmod/cram` was published with a benchmark
+against `samtools view` (Buels *et al.* 2019), and that harness — scripts, fetch
+list, and the 900 raw runtimes behind its figure — is vendored at
+`ecosystem/paper-2019/`. `ecosystem/cram-samtools.ts` re-runs its procedure
+against every cram-js major since, on the paper's own corpus and on ours.
+Nothing about it is transcribed: both tools run on this machine, on the same
+intervals, and their records are checksummed against each other. It has no run
+of record yet. Three properties of the 2019 data are why the re-run is worth
+more than a refresh of its numbers: the fastest of its 900 runs is 0.284 s
+against a 0.885 s median, so most of its cells timed node's startup rather than
+a decode; its random intervals on an exome are usually empty and it kept no
+record counts to show it; and it never checked that the two tools returned the
+same reads. The re-run separates the process clock from the query clock, counts
+records per interval, and reports checksum agreement per cell.
+
+**VCF against htslib, transcribed.**
 [brentp/vcf-bench](https://github.com/brentp/vcf-bench) times eleven bindings on
 "iterate rows, pull an INFO integer, report the mean". `@gmod/vcf` comes in at
 **24 s against C htslib's 18 s**, ahead of pysam (28 s) and plain cyvcf2 (29 s) —
@@ -233,6 +250,22 @@ carries a median of five steps measured once. Between two runs of the same
 build, `200x-shortread` moved 1818 → 1310 ms. Running each cell three times and
 reporting a median of medians would close the gap, at roughly 3× the pan mode's
 ~12 minutes.
+
+### 8. Run the cram-vs-samtools reproduction
+
+The harness exists (`ecosystem/cram-samtools.ts`, `make cram-samtools`) and has
+never produced a run of record. Three things stand between it and one:
+
+- **An idle box**, as ever. The wall-clock arm is the paper-comparable one and
+  it is a process spawn, so it is more exposed to load than most things here.
+- **Disk.** The paper's own corpus is ~16 GB and `shell/fetch_paper2019.sh`
+  refuses to start without ~17 GB free. On the corpus in `data/` it runs today
+  and needs nothing fetched.
+- **The E. coli fixture is gone.** `ussd-ftp.illumina.com` resolves and does not
+  answer, so the file behind the paper's only *high-coverage* condition — the
+  one condition where its cram-js bars rose clear of node's startup — cannot be
+  re-fetched. No mirror is known. This repo's `1000x.shortread.cram` is the
+  nearest stand-in and is not the same bytes.
 
 ## The standing constraint
 

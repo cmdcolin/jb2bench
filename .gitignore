@@ -34,6 +34,13 @@ data/rowsweep/
 # bedGraphToBigWig) — a few MB and under a minute for the default 100.
 data/cohort/
 
+# The 2019 cram-js paper's own corpus: two 1000 Genomes NA12878 CRAMs, GRCh38
+# with decoys, and the E. coli fixture — ~16 GB, downloaded rather than
+# generated. Fetch with shell/fetch_paper2019.sh, which is resumable and skips
+# anything already at full size. Nothing else in this repo needs it; only
+# ecosystem/cram-samtools.ts reads it, and that runs without it.
+data/paper2019/
+
 # jbrowse-web builds under test. Each is a deployed build plus symlinked copies
 # of the alignment data; stage them per README ("Builds compared").
 builds/

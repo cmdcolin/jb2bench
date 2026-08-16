@@ -1,0 +1,89 @@
+{
+  "comment": [
+    "The 2019 cram-js paper's benchmark, re-run against today's library and today's",
+    "samtools. paper-2019/ holds the original harness and its raw results; this file",
+    "declares what the reproduction runs.",
+    "",
+    "Two fixture groups, and they answer different questions. 'paper2019' is the",
+    "corpus the paper itself used, fetched by ../shell/fetch_paper2019.sh — the only",
+    "way to say anything about the published numbers as published. 'corpus' is this",
+    "repo's own simulated corpus, which every other benchmark here reads, so the",
+    "cram-vs-samtools ratio sits on the same bytes as sweep.md and alignments.md.",
+    "Neither substitutes for the other and the report never pools them.",
+    "",
+    "The cram-js arms come from the sweep builds (.libs/cram-js/sweep/<tag>), so",
+    "every version in the table was built by one pipeline with one toolchain, and a",
+    "difference between arms is library code. v1.7.4 is the last of the 1.x line the",
+    "paper ran; v13.4.1 is the current release. Add or remove tags here, or override",
+    "for one run with ARMS=v1.7.4,v13.4.1.",
+    "",
+    "'contigs' is how many leading sequences of the reference a random interval may",
+    "land in. 24 is chr1-chr22, chrX, chrY, which is what the paper drew from — the",
+    "GRCh38 analysis set continues with chrM, the alts and the decoys, and a browser",
+    "query on a decoy contig is not a case anyone cares about."
+  ],
+  "lengths": [1000, 10000, 100000],
+  "reps": 20,
+  "seed": 20190517,
+  "arms": [
+    { "tag": "v1.7.4", "label": "1.7.4" },
+    { "tag": "v10.6.1", "label": "10.6.1" },
+    { "tag": "v13.4.1", "label": "13.4.1" }
+  ],
+  "paperOpts": {
+    "cacheSize": 1000000,
+    "fetchSizeLimit": 52428800,
+    "checkSequenceMD5": false
+  },
+  "fixtures": [
+    {
+      "name": "human low-coverage",
+      "group": "paper2019",
+      "cram": "paper2019/NA12878.low_coverage.cram",
+      "ref": "paper2019/GRCh38_full_analysis_set_plus_decoy_hla.fa",
+      "contigs": 24
+    },
+    {
+      "name": "human exome",
+      "group": "paper2019",
+      "cram": "paper2019/NA12878.exome.cram",
+      "ref": "paper2019/GRCh38_full_analysis_set_plus_decoy_hla.fa",
+      "contigs": 24
+    },
+    {
+      "name": "E. coli high-coverage",
+      "group": "paper2019",
+      "cram": "paper2019/MiSeq_Ecoli_DH10B.cram",
+      "ref": "paper2019/DH10B.fasta",
+      "contigs": 1
+    },
+    {
+      "name": "20x shortread",
+      "group": "corpus",
+      "cram": "20x.shortread.cram",
+      "ref": "hg19mod.fa",
+      "contigs": 1
+    },
+    {
+      "name": "200x shortread",
+      "group": "corpus",
+      "cram": "200x.shortread.cram",
+      "ref": "hg19mod.fa",
+      "contigs": 1
+    },
+    {
+      "name": "1000x shortread",
+      "group": "corpus",
+      "cram": "1000x.shortread.cram",
+      "ref": "hg19mod.fa",
+      "contigs": 1
+    },
+    {
+      "name": "200x longread",
+      "group": "corpus",
+      "cram": "200x.longread.cram",
+      "ref": "hg19mod.fa",
+      "contigs": 1
+    }
+  ]
+}
