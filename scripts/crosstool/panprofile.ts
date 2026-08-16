@@ -96,6 +96,15 @@ const CONTIG_LENGTH = Number(process.env.CONTIG_LENGTH ?? 250001)
 
 const browser = await puppeteer.launch({
   headless: process.env.HEADLESS !== '0',
+  // Puppeteer's default protocolTimeout is 180 s, and it applies to a single
+  // `evaluate` round trip. igv.js parses alignments on the main thread, so at
+  // 1000x-longread it blocks JavaScript long enough to blow through that — the
+  // first run of this matrix recorded three "Runtime.evaluate timed out"
+  // failures on that cell and nothing else. A harness timeout reported as a tool
+  // result is the same error as an unrecognized loading indicator scoring a
+  // perfect zero, pointed the other way: it censors the case where the
+  // difference is largest.
+  protocolTimeout: Number(process.env.PROTOCOL_TIMEOUT ?? 600000),
   args: [
     '--no-sandbox',
     '--ignore-gpu-blocklist',
