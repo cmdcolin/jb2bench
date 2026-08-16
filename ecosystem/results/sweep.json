@@ -1,11 +1,11 @@
 {
-  "rounds": 3,
-  "inner": 1,
+  "rounds": 5,
+  "inner": 3,
   "rule": "newest patch of each major line, npm as of 2026-08-16",
   "ruleDate": "2026-08-16",
   "measured": "2026-08-16",
-  "loadPeak": 17.25,
-  "loadMedian": 14.07,
+  "loadPeak": 10.3,
+  "loadMedian": 10.3,
   "unbuildable": {
     "bam-js": [],
     "cram-js": [],
@@ -20,64 +20,541 @@
         {
           "tag": "v1.1.18",
           "major": 1,
-          "ms": 61.371,
+          "ms": null,
           "records": 3079,
-          "checksum": "700117106"
+          "checksum": "",
+          "counts": {
+            "reads": 4,
+            "bytes": 583060,
+            "dataReads": 3,
+            "indexReads": 1,
+            "records": 3079,
+            "pattern": [
+              131493,
+              65535,
+              385216
+            ]
+          }
         },
         {
           "tag": "v2.0.4",
           "major": 2,
-          "ms": 67.0528,
+          "ms": null,
           "records": 3079,
-          "checksum": "700117106"
+          "checksum": "",
+          "counts": {
+            "reads": 4,
+            "bytes": 583060,
+            "dataReads": 3,
+            "indexReads": 1,
+            "records": 3079,
+            "pattern": [
+              131493,
+              65535,
+              385216
+            ]
+          }
         },
         {
           "tag": "v3.0.3",
           "major": 3,
-          "ms": 63.3781,
+          "ms": null,
           "records": 3081,
-          "checksum": "713525628"
+          "checksum": "",
+          "counts": {
+            "reads": 4,
+            "bytes": 583060,
+            "dataReads": 3,
+            "indexReads": 1,
+            "records": 3081,
+            "pattern": [
+              131493,
+              65535,
+              385216
+            ]
+          }
         },
         {
           "tag": "v4.0.1",
           "major": 4,
-          "ms": 57.4579,
+          "ms": null,
           "records": 3081,
-          "checksum": "713525628"
+          "checksum": "",
+          "counts": {
+            "reads": 4,
+            "bytes": 583060,
+            "dataReads": 3,
+            "indexReads": 1,
+            "records": 3081,
+            "pattern": [
+              131493,
+              65535,
+              385216
+            ]
+          }
         },
         {
           "tag": "v5.0.7",
           "major": 5,
-          "ms": 68.8814,
+          "ms": null,
           "records": 3081,
-          "checksum": "713525628"
+          "checksum": "",
+          "counts": {
+            "reads": 4,
+            "bytes": 583060,
+            "dataReads": 3,
+            "indexReads": 1,
+            "records": 3081,
+            "pattern": [
+              131493,
+              65535,
+              385216
+            ]
+          }
         },
         {
           "tag": "v6.1.1",
           "major": 6,
-          "ms": 91.4015,
+          "ms": null,
           "records": 3081,
-          "checksum": "713525628"
+          "checksum": "",
+          "counts": {
+            "reads": 4,
+            "bytes": 583060,
+            "dataReads": 3,
+            "indexReads": 1,
+            "records": 3081,
+            "pattern": [
+              131493,
+              65535,
+              385216
+            ]
+          }
         },
         {
           "tag": "v7.9.1",
           "major": 7,
-          "ms": 17.9481,
+          "ms": null,
           "records": 3081,
-          "checksum": "713525628"
+          "checksum": "",
+          "counts": {
+            "reads": 8,
+            "bytes": 790135,
+            "dataReads": 7,
+            "indexReads": 1,
+            "records": 3081,
+            "pattern": [
+              65958,
+              65536,
+              65536,
+              76001,
+              65536,
+              385216,
+              65536
+            ]
+          }
         },
         {
           "tag": "v8.11.0",
           "major": 8,
-          "ms": 19.2251,
+          "ms": null,
           "records": 3081,
-          "checksum": "713525628"
+          "checksum": "",
+          "counts": {
+            "reads": 8,
+            "bytes": 790135,
+            "dataReads": 7,
+            "indexReads": 1,
+            "records": 3081,
+            "pattern": [
+              65958,
+              65536,
+              65536,
+              76001,
+              385216,
+              65536,
+              65536
+            ]
+          }
         }
       ],
       "disagree": [
         "v1.1.18",
         "v2.0.4"
       ]
+    },
+    {
+      "library": "bam-js",
+      "package": "@gmod/bam",
+      "case": "200x shortread",
+      "points": [
+        {
+          "tag": "v1.1.18",
+          "major": 1,
+          "ms": null,
+          "records": 31126,
+          "checksum": "",
+          "counts": {
+            "reads": 4,
+            "bytes": 3259805,
+            "dataReads": 3,
+            "indexReads": 1,
+            "records": 31126,
+            "pattern": [
+              131493,
+              65535,
+              3061937
+            ]
+          }
+        },
+        {
+          "tag": "v2.0.4",
+          "major": 2,
+          "ms": null,
+          "records": 31126,
+          "checksum": "",
+          "counts": {
+            "reads": 4,
+            "bytes": 3259805,
+            "dataReads": 3,
+            "indexReads": 1,
+            "records": 31126,
+            "pattern": [
+              131493,
+              65535,
+              3061937
+            ]
+          }
+        },
+        {
+          "tag": "v3.0.3",
+          "major": 3,
+          "ms": null,
+          "records": 31134,
+          "checksum": "",
+          "counts": {
+            "reads": 4,
+            "bytes": 3259805,
+            "dataReads": 3,
+            "indexReads": 1,
+            "records": 31134,
+            "pattern": [
+              131493,
+              65535,
+              3061937
+            ]
+          }
+        },
+        {
+          "tag": "v4.0.1",
+          "major": 4,
+          "ms": null,
+          "records": 31134,
+          "checksum": "",
+          "counts": {
+            "reads": 4,
+            "bytes": 3259805,
+            "dataReads": 3,
+            "indexReads": 1,
+            "records": 31134,
+            "pattern": [
+              131493,
+              65535,
+              3061937
+            ]
+          }
+        },
+        {
+          "tag": "v5.0.7",
+          "major": 5,
+          "ms": null,
+          "records": 31134,
+          "checksum": "",
+          "counts": {
+            "reads": 4,
+            "bytes": 3259805,
+            "dataReads": 3,
+            "indexReads": 1,
+            "records": 31134,
+            "pattern": [
+              131493,
+              65535,
+              3061937
+            ]
+          }
+        },
+        {
+          "tag": "v6.1.1",
+          "major": 6,
+          "ms": null,
+          "records": 31134,
+          "checksum": "",
+          "counts": {
+            "reads": 4,
+            "bytes": 3259805,
+            "dataReads": 3,
+            "indexReads": 1,
+            "records": 31134,
+            "pattern": [
+              131493,
+              65535,
+              3061937
+            ]
+          }
+        },
+        {
+          "tag": "v7.9.1",
+          "major": 7,
+          "ms": null,
+          "records": 31133,
+          "checksum": "",
+          "counts": {
+            "reads": 8,
+            "bytes": 3513603,
+            "dataReads": 7,
+            "indexReads": 1,
+            "records": 31133,
+            "pattern": [
+              65958,
+              75159,
+              75092,
+              3061937,
+              74982,
+              84351,
+              75284
+            ]
+          }
+        },
+        {
+          "tag": "v8.11.0",
+          "major": 8,
+          "ms": null,
+          "records": 31133,
+          "checksum": "",
+          "counts": {
+            "reads": 8,
+            "bytes": 3513603,
+            "dataReads": 7,
+            "indexReads": 1,
+            "records": 31133,
+            "pattern": [
+              65958,
+              75159,
+              74982,
+              75092,
+              84351,
+              75284,
+              3061937
+            ]
+          }
+        }
+      ],
+      "disagree": [
+        "v1.1.18",
+        "v2.0.4",
+        "v3.0.3",
+        "v4.0.1",
+        "v5.0.7",
+        "v6.1.1"
+      ]
+    },
+    {
+      "library": "bam-js",
+      "package": "@gmod/bam",
+      "case": "200x longread",
+      "points": [
+        {
+          "tag": "v1.1.18",
+          "major": 1,
+          "ms": null,
+          "records": 335,
+          "checksum": "",
+          "counts": {
+            "reads": 9,
+            "bytes": 55459318,
+            "dataReads": 8,
+            "indexReads": 1,
+            "records": 335,
+            "pattern": [
+              131488,
+              65535,
+              18608230,
+              5057010,
+              1239920,
+              4810746,
+              6536966,
+              19008551
+            ]
+          }
+        },
+        {
+          "tag": "v2.0.4",
+          "major": 2,
+          "ms": null,
+          "records": 335,
+          "checksum": "",
+          "counts": {
+            "reads": 9,
+            "bytes": 55459318,
+            "dataReads": 8,
+            "indexReads": 1,
+            "records": 335,
+            "pattern": [
+              131488,
+              65535,
+              18608230,
+              5057010,
+              1239920,
+              4810746,
+              6536966,
+              19008551
+            ]
+          }
+        },
+        {
+          "tag": "v3.0.3",
+          "major": 3,
+          "ms": null,
+          "records": 335,
+          "checksum": "",
+          "counts": {
+            "reads": 9,
+            "bytes": 55459318,
+            "dataReads": 8,
+            "indexReads": 1,
+            "records": 335,
+            "pattern": [
+              131488,
+              65535,
+              18608230,
+              5057010,
+              1239920,
+              4810746,
+              6536966,
+              19008551
+            ]
+          }
+        },
+        {
+          "tag": "v4.0.1",
+          "major": 4,
+          "ms": null,
+          "records": 335,
+          "checksum": "",
+          "counts": {
+            "reads": 9,
+            "bytes": 55459318,
+            "dataReads": 8,
+            "indexReads": 1,
+            "records": 335,
+            "pattern": [
+              131488,
+              65535,
+              18608230,
+              5057010,
+              1239920,
+              4810746,
+              6536966,
+              19008551
+            ]
+          }
+        },
+        {
+          "tag": "v5.0.7",
+          "major": 5,
+          "ms": null,
+          "records": 335,
+          "checksum": "",
+          "counts": {
+            "reads": 9,
+            "bytes": 55459318,
+            "dataReads": 8,
+            "indexReads": 1,
+            "records": 335,
+            "pattern": [
+              131488,
+              65535,
+              18608230,
+              5057010,
+              1239920,
+              4810746,
+              6536966,
+              19008551
+            ]
+          }
+        },
+        {
+          "tag": "v6.1.1",
+          "major": 6,
+          "ms": null,
+          "records": 335,
+          "checksum": "",
+          "counts": {
+            "reads": 9,
+            "bytes": 55459318,
+            "dataReads": 8,
+            "indexReads": 1,
+            "records": 335,
+            "pattern": [
+              131488,
+              65535,
+              18608230,
+              5057010,
+              1239920,
+              4810746,
+              6536966,
+              19008551
+            ]
+          }
+        },
+        {
+          "tag": "v7.9.1",
+          "major": 7,
+          "ms": null,
+          "records": 335,
+          "checksum": "",
+          "counts": {
+            "reads": 8,
+            "bytes": 55311862,
+            "dataReads": 7,
+            "indexReads": 1,
+            "records": 335,
+            "pattern": [
+              65953,
+              1239920,
+              4810746,
+              5040624,
+              6536966,
+              18608230,
+              19008551
+            ]
+          }
+        },
+        {
+          "tag": "v8.11.0",
+          "major": 8,
+          "ms": null,
+          "records": 335,
+          "checksum": "",
+          "counts": {
+            "reads": 8,
+            "bytes": 55311862,
+            "dataReads": 7,
+            "indexReads": 1,
+            "records": 335,
+            "pattern": [
+              65953,
+              1239920,
+              5040624,
+              4810746,
+              6536966,
+              19008551,
+              18608230
+            ]
+          }
+        }
+      ],
+      "disagree": []
     },
     {
       "library": "cram-js",
@@ -87,93 +564,366 @@
         {
           "tag": "v1.7.4",
           "major": 1,
-          "ms": 639.1525,
+          "ms": null,
           "records": 3079,
-          "checksum": "700117106"
+          "checksum": "",
+          "counts": {
+            "reads": 280,
+            "bytes": 540808,
+            "dataReads": 279,
+            "indexReads": 1,
+            "records": 3079,
+            "pattern": [
+              26,
+              52,
+              52,
+              14,
+              14,
+              22,
+              23,
+              17,
+              17,
+              578,
+              575,
+              4
+            ]
+          }
         },
         {
           "tag": "v2.0.4",
           "major": 2,
-          "ms": 505.8213,
+          "ms": null,
           "records": 3079,
-          "checksum": "700117106"
+          "checksum": "",
+          "counts": {
+            "reads": 280,
+            "bytes": 540808,
+            "dataReads": 279,
+            "indexReads": 1,
+            "records": 3079,
+            "pattern": [
+              26,
+              52,
+              52,
+              14,
+              14,
+              22,
+              23,
+              17,
+              17,
+              578,
+              575,
+              4
+            ]
+          }
         },
         {
           "tag": "v3.0.7",
           "major": 3,
-          "ms": 488.9107,
+          "ms": null,
           "records": 3079,
-          "checksum": "700117106"
+          "checksum": "",
+          "counts": {
+            "reads": 280,
+            "bytes": 540808,
+            "dataReads": 279,
+            "indexReads": 1,
+            "records": 3079,
+            "pattern": [
+              26,
+              52,
+              52,
+              14,
+              14,
+              22,
+              23,
+              17,
+              17,
+              578,
+              575,
+              4
+            ]
+          }
         },
         {
           "tag": "v4.0.10",
           "major": 4,
-          "ms": 532.0132,
+          "ms": null,
           "records": 3079,
-          "checksum": "700117106"
+          "checksum": "",
+          "counts": {
+            "reads": 280,
+            "bytes": 540808,
+            "dataReads": 279,
+            "indexReads": 1,
+            "records": 3079,
+            "pattern": [
+              26,
+              52,
+              52,
+              14,
+              14,
+              22,
+              23,
+              17,
+              17,
+              578,
+              575,
+              4
+            ]
+          }
         },
         {
           "tag": "v5.1.0",
           "major": 5,
-          "ms": 488.5054,
+          "ms": null,
           "records": 3079,
-          "checksum": "700117106"
+          "checksum": "",
+          "counts": {
+            "reads": 280,
+            "bytes": 540808,
+            "dataReads": 279,
+            "indexReads": 1,
+            "records": 3079,
+            "pattern": [
+              26,
+              52,
+              52,
+              14,
+              14,
+              22,
+              23,
+              17,
+              17,
+              578,
+              575,
+              4
+            ]
+          }
         },
         {
           "tag": "v6.0.1",
           "major": 6,
-          "ms": 430.5474,
+          "ms": null,
           "records": 3081,
-          "checksum": "713525628"
+          "checksum": "",
+          "counts": {
+            "reads": 280,
+            "bytes": 540808,
+            "dataReads": 279,
+            "indexReads": 1,
+            "records": 3081,
+            "pattern": [
+              26,
+              52,
+              52,
+              14,
+              14,
+              22,
+              23,
+              17,
+              17,
+              578,
+              575,
+              4
+            ]
+          }
         },
         {
           "tag": "v7.0.3",
           "major": 7,
-          "ms": 347.5814,
+          "ms": null,
           "records": 3081,
-          "checksum": "713525628"
+          "checksum": "",
+          "counts": {
+            "reads": 280,
+            "bytes": 540808,
+            "dataReads": 279,
+            "indexReads": 1,
+            "records": 3081,
+            "pattern": [
+              26,
+              52,
+              52,
+              14,
+              14,
+              22,
+              23,
+              17,
+              17,
+              578,
+              575,
+              4
+            ]
+          }
         },
         {
           "tag": "v8.7.0",
           "major": 8,
-          "ms": 94.0916,
+          "ms": null,
           "records": 3081,
-          "checksum": "713525628"
+          "checksum": "",
+          "counts": {
+            "reads": 16,
+            "bytes": 270416,
+            "dataReads": 15,
+            "indexReads": 1,
+            "records": 3081,
+            "pattern": [
+              26,
+              52,
+              52,
+              14,
+              14,
+              17,
+              17,
+              589,
+              586,
+              17,
+              17,
+              113
+            ]
+          }
         },
         {
           "tag": "v9.0.0",
           "major": 9,
-          "ms": 79.0669,
+          "ms": null,
           "records": 3081,
-          "checksum": "713525628"
+          "checksum": "",
+          "counts": {
+            "reads": 16,
+            "bytes": 270416,
+            "dataReads": 15,
+            "indexReads": 1,
+            "records": 3081,
+            "pattern": [
+              26,
+              52,
+              52,
+              14,
+              14,
+              17,
+              17,
+              589,
+              586,
+              17,
+              17,
+              114
+            ]
+          }
         },
         {
           "tag": "v10.6.1",
           "major": 10,
-          "ms": 55.6329,
+          "ms": null,
           "records": 3081,
-          "checksum": "713525628"
+          "checksum": "",
+          "counts": {
+            "reads": 16,
+            "bytes": 270416,
+            "dataReads": 15,
+            "indexReads": 1,
+            "records": 3081,
+            "pattern": [
+              26,
+              52,
+              52,
+              14,
+              14,
+              17,
+              17,
+              589,
+              586,
+              17,
+              17,
+              114
+            ]
+          }
         },
         {
           "tag": "v11.4.1",
           "major": 11,
-          "ms": 67.2429,
+          "ms": null,
           "records": 3081,
-          "checksum": "713525628"
+          "checksum": "",
+          "counts": {
+            "reads": 16,
+            "bytes": 270416,
+            "dataReads": 15,
+            "indexReads": 1,
+            "records": 3081,
+            "pattern": [
+              26,
+              52,
+              52,
+              14,
+              14,
+              17,
+              17,
+              589,
+              586,
+              17,
+              17,
+              113
+            ]
+          }
         },
         {
           "tag": "v12.0.1",
           "major": 12,
-          "ms": 49.5485,
+          "ms": null,
           "records": 3081,
-          "checksum": "713525628"
+          "checksum": "",
+          "counts": {
+            "reads": 16,
+            "bytes": 270416,
+            "dataReads": 15,
+            "indexReads": 1,
+            "records": 3081,
+            "pattern": [
+              26,
+              52,
+              52,
+              14,
+              14,
+              17,
+              17,
+              589,
+              586,
+              17,
+              17,
+              113
+            ]
+          }
         },
         {
           "tag": "v13.4.1",
           "major": 13,
-          "ms": 44.5106,
+          "ms": null,
           "records": 3081,
-          "checksum": "713525628"
+          "checksum": "",
+          "counts": {
+            "reads": 16,
+            "bytes": 270416,
+            "dataReads": 15,
+            "indexReads": 1,
+            "records": 3081,
+            "pattern": [
+              26,
+              52,
+              52,
+              14,
+              14,
+              17,
+              17,
+              113,
+              114,
+              17,
+              17,
+              589
+            ]
+          }
         }
       ],
       "disagree": [
@@ -185,6 +935,759 @@
       ]
     },
     {
+      "library": "cram-js",
+      "package": "@gmod/cram",
+      "case": "200x shortread",
+      "points": [
+        {
+          "tag": "v1.7.4",
+          "major": 1,
+          "ms": null,
+          "records": 31126,
+          "checksum": "",
+          "counts": {
+            "reads": 538,
+            "bytes": 1099273,
+            "dataReads": 537,
+            "indexReads": 1,
+            "records": 31126,
+            "pattern": [
+              26,
+              52,
+              52,
+              52,
+              52,
+              14,
+              14,
+              14,
+              14,
+              22,
+              22,
+              22
+            ]
+          }
+        },
+        {
+          "tag": "v2.0.4",
+          "major": 2,
+          "ms": null,
+          "records": 31126,
+          "checksum": "",
+          "counts": {
+            "reads": 538,
+            "bytes": 1099273,
+            "dataReads": 537,
+            "indexReads": 1,
+            "records": 31126,
+            "pattern": [
+              26,
+              52,
+              52,
+              52,
+              52,
+              14,
+              14,
+              14,
+              14,
+              22,
+              22,
+              22
+            ]
+          }
+        },
+        {
+          "tag": "v3.0.7",
+          "major": 3,
+          "ms": null,
+          "records": 31126,
+          "checksum": "",
+          "counts": {
+            "reads": 538,
+            "bytes": 1099273,
+            "dataReads": 537,
+            "indexReads": 1,
+            "records": 31126,
+            "pattern": [
+              26,
+              52,
+              52,
+              52,
+              52,
+              14,
+              14,
+              14,
+              14,
+              22,
+              22,
+              22
+            ]
+          }
+        },
+        {
+          "tag": "v4.0.10",
+          "major": 4,
+          "ms": null,
+          "records": 31126,
+          "checksum": "",
+          "counts": {
+            "reads": 538,
+            "bytes": 1099273,
+            "dataReads": 537,
+            "indexReads": 1,
+            "records": 31126,
+            "pattern": [
+              26,
+              52,
+              52,
+              52,
+              52,
+              14,
+              14,
+              14,
+              14,
+              22,
+              22,
+              22
+            ]
+          }
+        },
+        {
+          "tag": "v5.1.0",
+          "major": 5,
+          "ms": null,
+          "records": 31126,
+          "checksum": "",
+          "counts": {
+            "reads": 538,
+            "bytes": 1099273,
+            "dataReads": 537,
+            "indexReads": 1,
+            "records": 31126,
+            "pattern": [
+              26,
+              52,
+              52,
+              52,
+              52,
+              14,
+              14,
+              14,
+              14,
+              22,
+              22,
+              22
+            ]
+          }
+        },
+        {
+          "tag": "v6.0.1",
+          "major": 6,
+          "ms": null,
+          "records": 31133,
+          "checksum": "",
+          "counts": {
+            "reads": 538,
+            "bytes": 1099273,
+            "dataReads": 537,
+            "indexReads": 1,
+            "records": 31133,
+            "pattern": [
+              26,
+              52,
+              52,
+              52,
+              52,
+              14,
+              14,
+              14,
+              14,
+              22,
+              22,
+              22
+            ]
+          }
+        },
+        {
+          "tag": "v7.0.3",
+          "major": 7,
+          "ms": null,
+          "records": 31133,
+          "checksum": "",
+          "counts": {
+            "reads": 538,
+            "bytes": 1099273,
+            "dataReads": 537,
+            "indexReads": 1,
+            "records": 31133,
+            "pattern": [
+              26,
+              52,
+              52,
+              52,
+              52,
+              14,
+              14,
+              14,
+              14,
+              22,
+              22,
+              22
+            ]
+          }
+        },
+        {
+          "tag": "v8.7.0",
+          "major": 8,
+          "ms": null,
+          "records": 31133,
+          "checksum": "",
+          "counts": {
+            "reads": 30,
+            "bytes": 549870,
+            "dataReads": 29,
+            "indexReads": 1,
+            "records": 31133,
+            "pattern": [
+              26,
+              52,
+              52,
+              52,
+              52,
+              14,
+              14,
+              14,
+              14,
+              17,
+              17,
+              17
+            ]
+          }
+        },
+        {
+          "tag": "v9.0.0",
+          "major": 9,
+          "ms": null,
+          "records": 31133,
+          "checksum": "",
+          "counts": {
+            "reads": 30,
+            "bytes": 549870,
+            "dataReads": 29,
+            "indexReads": 1,
+            "records": 31133,
+            "pattern": [
+              26,
+              52,
+              52,
+              52,
+              52,
+              14,
+              14,
+              14,
+              14,
+              17,
+              17,
+              17
+            ]
+          }
+        },
+        {
+          "tag": "v10.6.1",
+          "major": 10,
+          "ms": null,
+          "records": 31133,
+          "checksum": "",
+          "counts": {
+            "reads": 30,
+            "bytes": 549870,
+            "dataReads": 29,
+            "indexReads": 1,
+            "records": 31133,
+            "pattern": [
+              26,
+              52,
+              52,
+              52,
+              52,
+              14,
+              14,
+              14,
+              14,
+              17,
+              17,
+              17
+            ]
+          }
+        },
+        {
+          "tag": "v11.4.1",
+          "major": 11,
+          "ms": null,
+          "records": 31133,
+          "checksum": "",
+          "counts": {
+            "reads": 30,
+            "bytes": 549870,
+            "dataReads": 29,
+            "indexReads": 1,
+            "records": 31133,
+            "pattern": [
+              26,
+              52,
+              52,
+              52,
+              52,
+              14,
+              14,
+              14,
+              14,
+              17,
+              17,
+              17
+            ]
+          }
+        },
+        {
+          "tag": "v12.0.1",
+          "major": 12,
+          "ms": null,
+          "records": 31133,
+          "checksum": "",
+          "counts": {
+            "reads": 30,
+            "bytes": 549870,
+            "dataReads": 29,
+            "indexReads": 1,
+            "records": 31133,
+            "pattern": [
+              26,
+              52,
+              52,
+              52,
+              52,
+              14,
+              14,
+              14,
+              14,
+              17,
+              17,
+              17
+            ]
+          }
+        },
+        {
+          "tag": "v13.4.1",
+          "major": 13,
+          "ms": null,
+          "records": 31133,
+          "checksum": "",
+          "counts": {
+            "reads": 30,
+            "bytes": 549870,
+            "dataReads": 29,
+            "indexReads": 1,
+            "records": 31133,
+            "pattern": [
+              26,
+              52,
+              52,
+              52,
+              52,
+              14,
+              14,
+              14,
+              14,
+              17,
+              17,
+              17
+            ]
+          }
+        }
+      ],
+      "disagree": [
+        "v1.7.4",
+        "v2.0.4",
+        "v3.0.7",
+        "v4.0.10",
+        "v5.1.0"
+      ]
+    },
+    {
+      "library": "cram-js",
+      "package": "@gmod/cram",
+      "case": "200x longread",
+      "points": [
+        {
+          "tag": "v1.7.4",
+          "major": 1,
+          "ms": null,
+          "records": 331,
+          "checksum": "",
+          "counts": {
+            "reads": 728,
+            "bytes": 35854580,
+            "dataReads": 727,
+            "indexReads": 1,
+            "records": 331,
+            "pattern": [
+              26,
+              52,
+              52,
+              52,
+              52,
+              52,
+              52,
+              14,
+              14,
+              14,
+              14,
+              14
+            ]
+          }
+        },
+        {
+          "tag": "v2.0.4",
+          "major": 2,
+          "ms": null,
+          "records": 331,
+          "checksum": "",
+          "counts": {
+            "reads": 728,
+            "bytes": 35854580,
+            "dataReads": 727,
+            "indexReads": 1,
+            "records": 331,
+            "pattern": [
+              26,
+              52,
+              52,
+              52,
+              52,
+              52,
+              52,
+              14,
+              14,
+              14,
+              14,
+              14
+            ]
+          }
+        },
+        {
+          "tag": "v3.0.7",
+          "major": 3,
+          "ms": null,
+          "records": 335,
+          "checksum": "",
+          "counts": {
+            "reads": 728,
+            "bytes": 35854580,
+            "dataReads": 727,
+            "indexReads": 1,
+            "records": 335,
+            "pattern": [
+              26,
+              52,
+              52,
+              52,
+              52,
+              52,
+              52,
+              14,
+              14,
+              14,
+              14,
+              14
+            ]
+          }
+        },
+        {
+          "tag": "v4.0.10",
+          "major": 4,
+          "ms": null,
+          "records": 335,
+          "checksum": "",
+          "counts": {
+            "reads": 728,
+            "bytes": 35854580,
+            "dataReads": 727,
+            "indexReads": 1,
+            "records": 335,
+            "pattern": [
+              26,
+              52,
+              52,
+              52,
+              52,
+              52,
+              52,
+              14,
+              14,
+              14,
+              14,
+              14
+            ]
+          }
+        },
+        {
+          "tag": "v5.1.0",
+          "major": 5,
+          "ms": null,
+          "records": 335,
+          "checksum": "",
+          "counts": {
+            "reads": 728,
+            "bytes": 35854580,
+            "dataReads": 727,
+            "indexReads": 1,
+            "records": 335,
+            "pattern": [
+              26,
+              52,
+              52,
+              52,
+              52,
+              52,
+              52,
+              14,
+              14,
+              14,
+              14,
+              14
+            ]
+          }
+        },
+        {
+          "tag": "v6.0.1",
+          "major": 6,
+          "ms": null,
+          "records": 335,
+          "checksum": "",
+          "counts": {
+            "reads": 728,
+            "bytes": 35854580,
+            "dataReads": 727,
+            "indexReads": 1,
+            "records": 335,
+            "pattern": [
+              26,
+              52,
+              52,
+              52,
+              52,
+              52,
+              52,
+              14,
+              14,
+              14,
+              14,
+              14
+            ]
+          }
+        },
+        {
+          "tag": "v7.0.3",
+          "major": 7,
+          "ms": null,
+          "records": 335,
+          "checksum": "",
+          "counts": {
+            "reads": 728,
+            "bytes": 35854580,
+            "dataReads": 727,
+            "indexReads": 1,
+            "records": 335,
+            "pattern": [
+              26,
+              52,
+              52,
+              52,
+              52,
+              52,
+              52,
+              14,
+              14,
+              14,
+              14,
+              14
+            ]
+          }
+        },
+        {
+          "tag": "v8.7.0",
+          "major": 8,
+          "ms": null,
+          "records": 335,
+          "checksum": "",
+          "counts": {
+            "reads": 44,
+            "bytes": 17927326,
+            "dataReads": 43,
+            "indexReads": 1,
+            "records": 335,
+            "pattern": [
+              26,
+              52,
+              52,
+              52,
+              52,
+              52,
+              52,
+              14,
+              14,
+              14,
+              14,
+              14
+            ]
+          }
+        },
+        {
+          "tag": "v9.0.0",
+          "major": 9,
+          "ms": null,
+          "records": 335,
+          "checksum": "",
+          "counts": {
+            "reads": 44,
+            "bytes": 17927326,
+            "dataReads": 43,
+            "indexReads": 1,
+            "records": 335,
+            "pattern": [
+              26,
+              52,
+              52,
+              52,
+              52,
+              52,
+              52,
+              14,
+              14,
+              14,
+              14,
+              14
+            ]
+          }
+        },
+        {
+          "tag": "v10.6.1",
+          "major": 10,
+          "ms": null,
+          "records": 335,
+          "checksum": "",
+          "counts": {
+            "reads": 44,
+            "bytes": 17927326,
+            "dataReads": 43,
+            "indexReads": 1,
+            "records": 335,
+            "pattern": [
+              26,
+              52,
+              52,
+              52,
+              52,
+              52,
+              52,
+              14,
+              14,
+              14,
+              14,
+              14
+            ]
+          }
+        },
+        {
+          "tag": "v11.4.1",
+          "major": 11,
+          "ms": null,
+          "records": 335,
+          "checksum": "",
+          "counts": {
+            "reads": 44,
+            "bytes": 17927326,
+            "dataReads": 43,
+            "indexReads": 1,
+            "records": 335,
+            "pattern": [
+              26,
+              52,
+              52,
+              52,
+              52,
+              52,
+              52,
+              14,
+              14,
+              14,
+              14,
+              14
+            ]
+          }
+        },
+        {
+          "tag": "v12.0.1",
+          "major": 12,
+          "ms": null,
+          "records": 335,
+          "checksum": "",
+          "counts": {
+            "reads": 44,
+            "bytes": 17927326,
+            "dataReads": 43,
+            "indexReads": 1,
+            "records": 335,
+            "pattern": [
+              26,
+              52,
+              52,
+              52,
+              52,
+              52,
+              52,
+              14,
+              14,
+              14,
+              14,
+              14
+            ]
+          }
+        },
+        {
+          "tag": "v13.4.1",
+          "major": 13,
+          "ms": null,
+          "records": 335,
+          "checksum": "",
+          "counts": {
+            "reads": 44,
+            "bytes": 17927326,
+            "dataReads": 43,
+            "indexReads": 1,
+            "records": 335,
+            "pattern": [
+              26,
+              52,
+              52,
+              52,
+              52,
+              52,
+              52,
+              14,
+              14,
+              14,
+              14,
+              14
+            ]
+          }
+        }
+      ],
+      "disagree": [
+        "v1.7.4",
+        "v2.0.4"
+      ]
+    },
+    {
       "library": "bbi-js",
       "package": "@gmod/bbi",
       "case": "20x shortread",
@@ -192,82 +1695,747 @@
         {
           "tag": "v1.0.35",
           "major": 1,
-          "ms": 4.3302,
+          "ms": null,
           "records": 4901,
-          "checksum": "529781147"
+          "checksum": "",
+          "counts": {
+            "reads": 5,
+            "bytes": 31243,
+            "dataReads": 5,
+            "indexReads": 0,
+            "records": 4901,
+            "pattern": [
+              2000,
+              56,
+              48,
+              8196,
+              20943
+            ]
+          }
         },
         {
           "tag": "v2.0.5",
           "major": 2,
-          "ms": 3.4797,
+          "ms": null,
           "records": 4901,
-          "checksum": "529781147"
+          "checksum": "",
+          "counts": {
+            "reads": 5,
+            "bytes": 31243,
+            "dataReads": 5,
+            "indexReads": 0,
+            "records": 4901,
+            "pattern": [
+              2000,
+              56,
+              48,
+              8196,
+              20943
+            ]
+          }
         },
         {
           "tag": "v3.0.1",
           "major": 3,
-          "ms": 2.4301,
+          "ms": null,
           "records": 4901,
-          "checksum": "529781147"
+          "checksum": "",
+          "counts": {
+            "reads": 5,
+            "bytes": 31243,
+            "dataReads": 5,
+            "indexReads": 0,
+            "records": 4901,
+            "pattern": [
+              2000,
+              56,
+              48,
+              8196,
+              20943
+            ]
+          }
         },
         {
           "tag": "v4.0.6",
           "major": 4,
-          "ms": 2.875,
+          "ms": null,
           "records": 4901,
-          "checksum": "529781147"
+          "checksum": "",
+          "counts": {
+            "reads": 5,
+            "bytes": 31243,
+            "dataReads": 5,
+            "indexReads": 0,
+            "records": 4901,
+            "pattern": [
+              2000,
+              56,
+              48,
+              8196,
+              20943
+            ]
+          }
         },
         {
           "tag": "v5.0.2",
           "major": 5,
-          "ms": 2.1256,
+          "ms": null,
           "records": 4901,
-          "checksum": "529781147"
+          "checksum": "",
+          "counts": {
+            "reads": 5,
+            "bytes": 31243,
+            "dataReads": 5,
+            "indexReads": 0,
+            "records": 4901,
+            "pattern": [
+              2000,
+              56,
+              48,
+              8196,
+              20943
+            ]
+          }
         },
         {
           "tag": "v6.0.3",
           "major": 6,
-          "ms": 2.2956,
+          "ms": null,
           "records": 4901,
-          "checksum": "529781147"
+          "checksum": "",
+          "counts": {
+            "reads": 5,
+            "bytes": 31243,
+            "dataReads": 5,
+            "indexReads": 0,
+            "records": 4901,
+            "pattern": [
+              2000,
+              56,
+              48,
+              8196,
+              20943
+            ]
+          }
         },
         {
           "tag": "v7.1.0",
           "major": 7,
-          "ms": 2.8985,
+          "ms": null,
           "records": 4901,
-          "checksum": "529781147"
+          "checksum": "",
+          "counts": {
+            "reads": 7,
+            "bytes": 31241,
+            "dataReads": 7,
+            "indexReads": 0,
+            "records": 4901,
+            "pattern": [
+              2000,
+              32,
+              4,
+              18,
+              48,
+              8196,
+              20943
+            ]
+          }
         },
         {
           "tag": "v8.1.2",
           "major": 8,
-          "ms": 3.087,
+          "ms": null,
           "records": 4901,
-          "checksum": "529781147"
+          "checksum": "",
+          "counts": {
+            "reads": 7,
+            "bytes": 31241,
+            "dataReads": 7,
+            "indexReads": 0,
+            "records": 4901,
+            "pattern": [
+              2000,
+              32,
+              4,
+              18,
+              48,
+              8196,
+              20943
+            ]
+          }
         },
         {
           "tag": "v9.3.3",
           "major": 9,
-          "ms": 2.5515,
+          "ms": null,
           "records": 4901,
-          "checksum": "529781147"
+          "checksum": "",
+          "counts": {
+            "reads": 7,
+            "bytes": 31241,
+            "dataReads": 7,
+            "indexReads": 0,
+            "records": 4901,
+            "pattern": [
+              2000,
+              32,
+              4,
+              18,
+              48,
+              8196,
+              20943
+            ]
+          }
         },
         {
           "tag": "v10.0.2",
           "major": 10,
-          "ms": 2.7353,
+          "ms": null,
           "records": 4901,
-          "checksum": "529781147"
+          "checksum": "",
+          "counts": {
+            "reads": 6,
+            "bytes": 31241,
+            "dataReads": 6,
+            "indexReads": 0,
+            "records": 4901,
+            "pattern": [
+              2000,
+              32,
+              22,
+              48,
+              8196,
+              20943
+            ]
+          }
         },
         {
           "tag": "v11.2.1",
           "major": 11,
-          "ms": 2.7256,
+          "ms": null,
           "records": 4901,
-          "checksum": "529781147"
+          "checksum": "",
+          "counts": {
+            "reads": 6,
+            "bytes": 31241,
+            "dataReads": 6,
+            "indexReads": 0,
+            "records": 4901,
+            "pattern": [
+              2000,
+              32,
+              22,
+              48,
+              8196,
+              20943
+            ]
+          }
         }
       ],
       "disagree": []
+    },
+    {
+      "library": "bbi-js",
+      "package": "@gmod/bbi",
+      "case": "200x shortread",
+      "points": [
+        {
+          "tag": "v1.0.35",
+          "major": 1,
+          "ms": null,
+          "records": 14555,
+          "checksum": "",
+          "counts": {
+            "reads": 5,
+            "bytes": 65825,
+            "dataReads": 5,
+            "indexReads": 0,
+            "records": 14555,
+            "pattern": [
+              2000,
+              56,
+              48,
+              8196,
+              55525
+            ]
+          }
+        },
+        {
+          "tag": "v2.0.5",
+          "major": 2,
+          "ms": null,
+          "records": 14555,
+          "checksum": "",
+          "counts": {
+            "reads": 5,
+            "bytes": 65825,
+            "dataReads": 5,
+            "indexReads": 0,
+            "records": 14555,
+            "pattern": [
+              2000,
+              56,
+              48,
+              8196,
+              55525
+            ]
+          }
+        },
+        {
+          "tag": "v3.0.1",
+          "major": 3,
+          "ms": null,
+          "records": 14555,
+          "checksum": "",
+          "counts": {
+            "reads": 5,
+            "bytes": 65825,
+            "dataReads": 5,
+            "indexReads": 0,
+            "records": 14555,
+            "pattern": [
+              2000,
+              56,
+              48,
+              8196,
+              55525
+            ]
+          }
+        },
+        {
+          "tag": "v4.0.6",
+          "major": 4,
+          "ms": null,
+          "records": 14555,
+          "checksum": "",
+          "counts": {
+            "reads": 5,
+            "bytes": 65825,
+            "dataReads": 5,
+            "indexReads": 0,
+            "records": 14555,
+            "pattern": [
+              2000,
+              56,
+              48,
+              8196,
+              55525
+            ]
+          }
+        },
+        {
+          "tag": "v5.0.2",
+          "major": 5,
+          "ms": null,
+          "records": 14555,
+          "checksum": "",
+          "counts": {
+            "reads": 5,
+            "bytes": 65825,
+            "dataReads": 5,
+            "indexReads": 0,
+            "records": 14555,
+            "pattern": [
+              2000,
+              56,
+              48,
+              8196,
+              55525
+            ]
+          }
+        },
+        {
+          "tag": "v6.0.3",
+          "major": 6,
+          "ms": null,
+          "records": 14555,
+          "checksum": "",
+          "counts": {
+            "reads": 5,
+            "bytes": 65825,
+            "dataReads": 5,
+            "indexReads": 0,
+            "records": 14555,
+            "pattern": [
+              2000,
+              56,
+              48,
+              8196,
+              55525
+            ]
+          }
+        },
+        {
+          "tag": "v7.1.0",
+          "major": 7,
+          "ms": null,
+          "records": 14555,
+          "checksum": "",
+          "counts": {
+            "reads": 7,
+            "bytes": 65823,
+            "dataReads": 7,
+            "indexReads": 0,
+            "records": 14555,
+            "pattern": [
+              2000,
+              32,
+              4,
+              18,
+              48,
+              8196,
+              55525
+            ]
+          }
+        },
+        {
+          "tag": "v8.1.2",
+          "major": 8,
+          "ms": null,
+          "records": 14555,
+          "checksum": "",
+          "counts": {
+            "reads": 7,
+            "bytes": 65823,
+            "dataReads": 7,
+            "indexReads": 0,
+            "records": 14555,
+            "pattern": [
+              2000,
+              32,
+              4,
+              18,
+              48,
+              8196,
+              55525
+            ]
+          }
+        },
+        {
+          "tag": "v9.3.3",
+          "major": 9,
+          "ms": null,
+          "records": 14555,
+          "checksum": "",
+          "counts": {
+            "reads": 7,
+            "bytes": 65823,
+            "dataReads": 7,
+            "indexReads": 0,
+            "records": 14555,
+            "pattern": [
+              2000,
+              32,
+              4,
+              18,
+              48,
+              8196,
+              55525
+            ]
+          }
+        },
+        {
+          "tag": "v10.0.2",
+          "major": 10,
+          "ms": null,
+          "records": 14555,
+          "checksum": "",
+          "counts": {
+            "reads": 6,
+            "bytes": 65823,
+            "dataReads": 6,
+            "indexReads": 0,
+            "records": 14555,
+            "pattern": [
+              2000,
+              32,
+              22,
+              48,
+              8196,
+              55525
+            ]
+          }
+        },
+        {
+          "tag": "v11.2.1",
+          "major": 11,
+          "ms": null,
+          "records": 14555,
+          "checksum": "",
+          "counts": {
+            "reads": 6,
+            "bytes": 65823,
+            "dataReads": 6,
+            "indexReads": 0,
+            "records": 14555,
+            "pattern": [
+              2000,
+              32,
+              22,
+              48,
+              8196,
+              55525
+            ]
+          }
+        }
+      ],
+      "disagree": []
+    },
+    {
+      "library": "bbi-js",
+      "package": "@gmod/bbi",
+      "case": "200x longread",
+      "points": [
+        {
+          "tag": "v1.0.35",
+          "major": 1,
+          "ms": null,
+          "records": 17676,
+          "checksum": "",
+          "counts": {
+            "reads": 5,
+            "bytes": 75387,
+            "dataReads": 5,
+            "indexReads": 0,
+            "records": 17676,
+            "pattern": [
+              2000,
+              56,
+              48,
+              8196,
+              65087
+            ]
+          }
+        },
+        {
+          "tag": "v2.0.5",
+          "major": 2,
+          "ms": null,
+          "records": 17676,
+          "checksum": "",
+          "counts": {
+            "reads": 5,
+            "bytes": 75387,
+            "dataReads": 5,
+            "indexReads": 0,
+            "records": 17676,
+            "pattern": [
+              2000,
+              56,
+              48,
+              8196,
+              65087
+            ]
+          }
+        },
+        {
+          "tag": "v3.0.1",
+          "major": 3,
+          "ms": null,
+          "records": 17676,
+          "checksum": "",
+          "counts": {
+            "reads": 5,
+            "bytes": 75387,
+            "dataReads": 5,
+            "indexReads": 0,
+            "records": 17676,
+            "pattern": [
+              2000,
+              56,
+              48,
+              8196,
+              65087
+            ]
+          }
+        },
+        {
+          "tag": "v4.0.6",
+          "major": 4,
+          "ms": null,
+          "records": 17676,
+          "checksum": "",
+          "counts": {
+            "reads": 5,
+            "bytes": 75387,
+            "dataReads": 5,
+            "indexReads": 0,
+            "records": 17676,
+            "pattern": [
+              2000,
+              56,
+              48,
+              8196,
+              65087
+            ]
+          }
+        },
+        {
+          "tag": "v5.0.2",
+          "major": 5,
+          "ms": null,
+          "records": 17676,
+          "checksum": "",
+          "counts": {
+            "reads": 5,
+            "bytes": 75387,
+            "dataReads": 5,
+            "indexReads": 0,
+            "records": 17676,
+            "pattern": [
+              2000,
+              56,
+              48,
+              8196,
+              65087
+            ]
+          }
+        },
+        {
+          "tag": "v6.0.3",
+          "major": 6,
+          "ms": null,
+          "records": 17676,
+          "checksum": "",
+          "counts": {
+            "reads": 5,
+            "bytes": 75387,
+            "dataReads": 5,
+            "indexReads": 0,
+            "records": 17676,
+            "pattern": [
+              2000,
+              56,
+              48,
+              8196,
+              65087
+            ]
+          }
+        },
+        {
+          "tag": "v7.1.0",
+          "major": 7,
+          "ms": null,
+          "records": 17676,
+          "checksum": "",
+          "counts": {
+            "reads": 7,
+            "bytes": 75385,
+            "dataReads": 7,
+            "indexReads": 0,
+            "records": 17676,
+            "pattern": [
+              2000,
+              32,
+              4,
+              18,
+              48,
+              8196,
+              65087
+            ]
+          }
+        },
+        {
+          "tag": "v8.1.2",
+          "major": 8,
+          "ms": null,
+          "records": 17676,
+          "checksum": "",
+          "counts": {
+            "reads": 7,
+            "bytes": 75385,
+            "dataReads": 7,
+            "indexReads": 0,
+            "records": 17676,
+            "pattern": [
+              2000,
+              32,
+              4,
+              18,
+              48,
+              8196,
+              65087
+            ]
+          }
+        },
+        {
+          "tag": "v9.3.3",
+          "major": 9,
+          "ms": null,
+          "records": 17675,
+          "checksum": "",
+          "counts": {
+            "reads": 7,
+            "bytes": 75385,
+            "dataReads": 7,
+            "indexReads": 0,
+            "records": 17675,
+            "pattern": [
+              2000,
+              32,
+              4,
+              18,
+              48,
+              8196,
+              65087
+            ]
+          }
+        },
+        {
+          "tag": "v10.0.2",
+          "major": 10,
+          "ms": null,
+          "records": 17675,
+          "checksum": "",
+          "counts": {
+            "reads": 6,
+            "bytes": 75385,
+            "dataReads": 6,
+            "indexReads": 0,
+            "records": 17675,
+            "pattern": [
+              2000,
+              32,
+              22,
+              48,
+              8196,
+              65087
+            ]
+          }
+        },
+        {
+          "tag": "v11.2.1",
+          "major": 11,
+          "ms": null,
+          "records": 17675,
+          "checksum": "",
+          "counts": {
+            "reads": 6,
+            "bytes": 75385,
+            "dataReads": 6,
+            "indexReads": 0,
+            "records": 17675,
+            "pattern": [
+              2000,
+              32,
+              22,
+              48,
+              8196,
+              65087
+            ]
+          }
+        }
+      ],
+      "disagree": [
+        "v1.0.35",
+        "v2.0.5",
+        "v3.0.1",
+        "v4.0.6",
+        "v5.0.2",
+        "v6.0.3",
+        "v7.1.0",
+        "v8.1.2"
+      ]
     }
   ]
 }

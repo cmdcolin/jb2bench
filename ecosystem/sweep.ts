@@ -30,6 +30,7 @@ import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs'
 import { fileURLToPath } from 'node:url'
 
 import { END, OLD_CRAM_OPTS, REF, START, seqFetch } from './lib/corpus.ts'
+import { countingFile, totals } from './lib/counting-filehandle.ts'
 
 const SELF = fileURLToPath(import.meta.url)
 const here = (p: string) => new URL(p, import.meta.url)
@@ -135,8 +136,60 @@ async function armMain(kind: string, dir: string, file: string) {
   console.log(`${ts[0]!.toFixed(4)} ${first.n} ${first.sum}`)
 }
 
+/**
+ * The same query, counted rather than timed: how many reads, over how many
+ * bytes, split between the data file and its index.
+ *
+ * This half needs no idle machine, which is why it exists. It is also the half
+ * that transfers to the network — a read is a range request there, and a panel
+ * waits on round trips rather than on bytes.
+ */
+async function armCount(kind: string, dir: string, file: string) {
+  const mod = await import(`${dir}/esm/index.js`)
+  const data = await countingFile(dir, file)
+  let index: Awaited<ReturnType<typeof countingFile>> | undefined
+  let records = 0
+
+  if (kind === 'bam') {
+    index = await countingFile(dir, `${file}.bai`)
+    const bam = new mod.BamFile({
+      bamFilehandle: data.handle,
+      baiFilehandle: index.handle,
+    })
+    await bam.getHeader()
+    records = (await bam.getRecordsForRange(REF, START, END)).length
+  } else if (kind === 'cram') {
+    index = await countingFile(dir, `${file}.crai`)
+    const cram = new mod.IndexedCramFile({
+      cramFilehandle: data.handle,
+      index: new mod.CraiIndex({ filehandle: index.handle }),
+      seqFetch,
+      checkSequenceMD5: false,
+      ...OLD_CRAM_OPTS,
+    })
+    records = (await cram.getRecordsForRange(0, START, END)).length
+  } else {
+    const bw = new mod.BigWig({ filehandle: data.handle })
+    records = (await bw.getFeatures(REF, START, END)).length
+  }
+
+  console.log(
+    JSON.stringify({
+      ...totals(index ? [data.counter, index.counter] : [data.counter]),
+      dataReads: data.counter.reads,
+      indexReads: index?.counter.reads ?? 0,
+      records,
+      pattern: data.counter.sizes.slice(0, 12),
+    }),
+  )
+}
+
 if (process.argv[2] === '--arm') {
-  await armMain(process.argv[3]!, process.argv[4]!, process.argv[5]!)
+  if (process.argv[3] === 'count') {
+    await armCount(process.argv[4]!, process.argv[5]!, process.argv[6]!)
+  } else {
+    await armMain(process.argv[3]!, process.argv[4]!, process.argv[5]!)
+  }
   process.exit(0)
 }
 
@@ -159,6 +212,14 @@ const sweepCfg = JSON.parse(readFileSync(here('sweep.json'), 'utf8'))
 
 const onlyLibs = process.env.LIBS?.split(',').map(s => s.trim())
 const onlyCases = process.env.CASES?.split(',').map(s => s.trim())
+
+// MODE=count skips the timings entirely. Counts are exact and identical on every
+// machine, so that mode produces a result on a box far too busy for a timing —
+// which this one has been for weeks. MODE=time skips the counting for a quick
+// re-run of the curve alone.
+const MODE = process.env.MODE ?? 'both'
+const doCount = MODE !== 'time'
+const doTime = MODE !== 'count'
 
 // The cases. Heavy first, because that is where a parser difference is legible
 // and where the paper's framing puts the weight; the light case is kept as the
@@ -191,8 +252,8 @@ if (libraries.every(l => l.versions.length === 0)) {
   process.exit(1)
 }
 
-function arm(kind: string, dir: string, file: string) {
-  const out = execFileSync(
+function runArm(args: string[]) {
+  return execFileSync(
     process.execPath,
     [
       '--experimental-strip-types',
@@ -206,14 +267,28 @@ function arm(kind: string, dir: string, file: string) {
       fileURLToPath(here('lib/legacy-resolve-register.mjs')),
       SELF,
       '--arm',
-      kind,
-      dir,
-      file,
+      ...args,
     ],
     { encoding: 'utf8', maxBuffer: 1 << 20 },
   ).trim()
-  const [ms, n, sum] = out.split(' ')
+}
+
+function arm(kind: string, dir: string, file: string) {
+  const [ms, n, sum] = runArm([kind, dir, file]).split(' ')
   return { ms: Number(ms), n: Number(n), sum: sum! }
+}
+
+interface Counts {
+  reads: number
+  bytes: number
+  dataReads: number
+  indexReads: number
+  records: number
+  pattern: number[]
+}
+
+function countArm(kind: string, dir: string, file: string): Counts {
+  return JSON.parse(runArm(['count', kind, dir, file]))
 }
 
 const median = (xs: number[]) => [...xs].sort((a, b) => a - b)[xs.length >> 1]!
@@ -221,9 +296,10 @@ const median = (xs: number[]) => [...xs].sort((a, b) => a - b)[xs.length >> 1]!
 interface Point {
   tag: string
   major: number
-  ms: number
+  ms: number | null
   records: number
   checksum: string
+  counts: Counts | null
 }
 interface CaseResult {
   library: string
@@ -236,7 +312,10 @@ interface CaseResult {
 
 const results: CaseResult[] = []
 const loadAvg = () => Number(readFileSync('/proc/loadavg', 'utf8').split(' ')[0])
-const loads: number[] = []
+// Sampled even under MODE=count, where it changes no conclusion: without it the
+// report says "peak load 0.0", which reads as an idle box rather than as a run
+// that never asked.
+const loads: number[] = [loadAvg()]
 
 for (const lib of libraries) {
   if (lib.versions.length === 0) {
@@ -257,9 +336,25 @@ for (const lib of libraries) {
     }
 
     const times = new Map<string, number[]>(lib.versions.map(v => [v.tag, []]))
-    let meta = new Map<string, { n: number; sum: string }>()
+    const meta = new Map<string, { n: number; sum: string }>()
+    const counts = new Map<string, Counts>()
 
-    for (let r = 0; r < ROUNDS; r++) {
+    // Counting first, and once: it is exact, so repeating it would only cost
+    // time. Its record count also stands in for the timing arm's when MODE=count
+    // means no timing arm ever runs.
+    if (doCount) {
+      for (const v of lib.versions) {
+        try {
+          const got = countArm(lib.kind, v.dir, file)
+          counts.set(v.tag, got)
+          if (!meta.has(v.tag)) meta.set(v.tag, { n: got.records, sum: '' })
+        } catch (e) {
+          console.log(`   ${label} ${v.tag}: count FAILED (${String(e).split('\n')[0]})`)
+        }
+      }
+    }
+
+    for (let r = 0; doTime && r < ROUNDS; r++) {
       loads.push(loadAvg())
       // Rotate the order every round. Machine drift over a round is real and
       // roughly monotonic; if the order were fixed it would add a tilt along
@@ -284,21 +379,28 @@ for (const lib of libraries) {
     const points: Point[] = []
     for (const v of lib.versions) {
       const ts = times.get(v.tag)!
-      if (ts.length === 0) continue
-      const m = meta.get(v.tag)!
+      const m = meta.get(v.tag)
+      if (!m) continue
       points.push({
         tag: v.tag,
         major: Number(v.tag.slice(1).split('.')[0]),
-        ms: median(ts),
+        ms: ts.length ? median(ts) : null,
         records: m.n,
         checksum: m.sum,
+        counts: counts.get(v.tag) ?? null,
       })
     }
     if (points.length === 0) continue
 
+    // Compare against the newest built version. The checksum is the stronger
+    // test — two versions can return the same number of different records — but
+    // MODE=count never runs the arm that computes one, so fall back to the
+    // record count there rather than reporting a silent all-clear.
     const newest = points[points.length - 1]!
     const disagree = points
-      .filter(p => p.checksum !== newest.checksum)
+      .filter(p =>
+        newest.checksum ? p.checksum !== newest.checksum : p.records !== newest.records,
+      )
       .map(p => p.tag)
 
     results.push({
@@ -310,13 +412,19 @@ for (const lib of libraries) {
     })
 
     console.log(`\n   ${label}`)
+    const base = points[0]!.ms
     for (const p of points) {
-      const rel = points[0]!.ms / p.ms
       const flag = disagree.includes(p.tag) ? ' *' : ''
-      console.log(
-        `     ${p.tag.padEnd(10)}${`${p.ms.toFixed(2)} ms`.padStart(12)}` +
-          `${`${rel.toFixed(2)}x`.padStart(9)}  ${p.records} recs${flag}`,
-      )
+      const time =
+        p.ms === null
+          ? ''.padStart(21)
+          : `${`${p.ms.toFixed(2)} ms`.padStart(12)}` +
+            `${`${(base! / p.ms).toFixed(2)}x`.padStart(9)}`
+      const req = p.counts
+        ? `  ${p.counts.reads} reads (${p.counts.dataReads}+${p.counts.indexReads}), ` +
+          `${(p.counts.bytes / 1024).toFixed(0)} KB`
+        : ''
+      console.log(`     ${p.tag.padEnd(10)}${time}  ${p.records} recs${flag}${req}`)
     }
   }
 }
@@ -356,7 +464,12 @@ const md: string[] = [
   '',
   `Version selection: ${sweepCfg.rule}.`,
   '',
-  peak > 4
+  !doTime
+    ? `> **Counts only** (\`MODE=count\`); no timing was taken, so every \`time\` ` +
+      'cell reads `—`. Nothing in this table is a timing, and nothing in it ' +
+      `depends on what the machine was doing — load was ${peak.toFixed(1)} and it ` +
+      'would not have mattered.'
+    : peak > 4
     ? `> **This is not a run of record. Peak 1-minute load was ${peak.toFixed(1)}**, ` +
       'against the 4.0 this repo treats as the ceiling for a quotable absolute ' +
       'and the 1.5–2.9 a clean run wants. Do not quote a millisecond from this ' +
@@ -366,23 +479,40 @@ const md: string[] = [
       'landing on one version.'
     : `Peak 1-minute load during this run: ${peak.toFixed(1)}.`,
   '',
-  'The `x` column is against the **oldest built version** of that library, so a',
-  'row reads as "how much of the total gain had arrived by here". The `recs`',
-  'column is the record count each version returned; a `*` marks a version whose',
-  'records differ from the newest one it is being compared against, which is a',
-  'reason to distrust that row rather than a speedup.',
+  'Each table carries two kinds of column, and they do not decay together.',
+  '',
+  '**`time` and `vs oldest` are timings.** `vs oldest` is against the oldest',
+  'built version of that library, so a row reads as "how much of the total gain',
+  'had arrived by here".',
+  '',
+  '**`reads`, `bytes` and `records` are counts.** They come from a filehandle that',
+  'records every call, so they are exact, identical on every machine, and',
+  'unaffected by whatever else the box was doing. `reads` splits as data + index.',
+  'A `*` on `records` marks a version returning a different record set from the',
+  'newest one it is being compared against — a reason to distrust that row rather',
+  'than a speedup.',
+  '',
+  'Reads are the quantity that transfers to the network: locally one is a syscall,',
+  'over HTTP it is a range request and a round trip.',
   '',
 ]
 
 for (const r of results) {
   md.push(`## ${r.package} — ${r.case}`, '')
-  md.push('| version | time | vs oldest | records |', '| --- | ---: | ---: | ---: |')
+  md.push(
+    '| version | time | vs oldest | reads | bytes | records |',
+    '| --- | ---: | ---: | ---: | ---: | ---: |',
+  )
+  const base = r.points[0]!.ms
   for (const p of r.points) {
-    const rel = r.points[0]!.ms / p.ms
     const star = r.disagree.includes(p.tag) ? ' \\*' : ''
-    md.push(
-      `| ${p.tag} | ${p.ms.toFixed(2)} ms | ${rel.toFixed(2)}x | ${p.records}${star} |`,
-    )
+    const time = p.ms === null ? '—' : `${p.ms.toFixed(2)} ms`
+    const rel = p.ms === null || base === null ? '—' : `${(base / p.ms).toFixed(2)}x`
+    const reads = p.counts
+      ? `${p.counts.reads} (${p.counts.dataReads}+${p.counts.indexReads})`
+      : '—'
+    const bytes = p.counts ? `${(p.counts.bytes / 1024).toFixed(0)} KB` : '—'
+    md.push(`| ${p.tag} | ${time} | ${rel} | ${reads} | ${bytes} | ${p.records}${star} |`)
   }
   md.push('')
   if (r.disagree.length) {

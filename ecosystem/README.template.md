@@ -34,6 +34,7 @@ is also runnable alone:
 | `make gff3` | `gff-nostream` eager vs lazy attributes, one process per side | `results/gff3-lazy.{md,json}` |
 | `./setup-sweep.sh` | clone + build every version in `sweep.json` (tens of minutes, once) | `.libs/*/sweep/`, `.libs/sweep-manifest.txt` |
 | `make sweep` | every major line, one process per version | `results/sweep.{md,json}` |
+| `MODE=count make sweep` | the same, counting reads and bytes instead of timing — needs no idle box | same |
 | `make cohort` | N-BigWig panel: request counts and timings | `results/cohort-bw.{md,json}` |
 | `make clean` | drop `results/` | |
 | `make distclean` | also drop `.libs/` and `node_modules/` | |
@@ -128,7 +129,23 @@ on the curve either.
 
 **Versions that will not build are reported, not dropped.** Which majors of a
 library can still be built from source with a current toolchain is a fact about
-the library, and a gap in a curve should look like a gap.
+the library, and a gap in a curve should look like a gap. As of 2026-08-16 there
+are none: all 32 still build.
+
+**`MODE=count` reports request shape instead of time**, and is the mode to reach
+for on a box like this one. It counts every `read` and `readFile` the library
+makes, split between the data file and its index, through a wrapper around the
+library's *own* `LocalFile`. Those counts are exact, identical on every machine,
+and unaffected by load — so unlike every timing here they need no caveat and do
+not go stale. They are also what transfers to the network, where a read is a
+range request and a round trip.
+
+Wrapping the real `LocalFile` rather than implementing one is not fastidiousness.
+The first version of this did implement one, and two majors of `@gmod/bam` then
+failed with "Not a BAI file" while their neighbours passed — a wrong answer
+produced by the instrument, in a shape that would have read as a library defect.
+A benchmark whose whole output is "how many reads" must not be the thing deciding
+what a read is.
 
 Getting plain node to import the pre-2024 builds took two module hooks
 (`lib/legacy-resolve.mjs`), and both are worth knowing about because vitest had

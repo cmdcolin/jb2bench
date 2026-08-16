@@ -17,6 +17,7 @@ coverage legible:
 
 | axis varied | benchmarks | what it answers |
 | --- | --- | --- |
+| **request shape** | `ecosystem/results/sweep.md` (counts), `cohort-bw.md` | how many reads and bytes, and how does that change with version and with file count? |
 | **JBrowse version** | `results/alignments.md`, `results/interaction.md` | what did this release, and the three years since the published one, do for a user? |
 | **renderer backend** | `results/backends.md` | how much of that is the GPU path rather than everything else? |
 | **library version, 2 points** | `ecosystem/results/ecosystem.md` | how much faster are the parsers than in 2023? |
@@ -86,18 +87,27 @@ What is missing is the glue and a locus policy that keeps every step inside the
 coverage plateau, which the JBrowse pan already implements and would have to be
 mirrored for igv.
 
-### 2. Request-shape counting for BAM and CRAM
+### 2. Extend request-shape counting beyond the three swept libraries
 
-`cohort-bw.ts` counts every `read()` and every byte through a recording
-filehandle. That number is **exact, machine-independent, and does not decay** —
-which matters more here than it looks, because this box has been above the load
-ceiling for most of a month and every timing taken on it is provisional.
+**The counting itself now exists** — `MODE=count make sweep` reports reads and
+bytes for every major of `@gmod/bam`, `@gmod/cram` and `@gmod/bbi`, and
+`make cohort` does it across file count. Those numbers are exact,
+machine-independent and do not decay, so they are the one part of this
+repository that a box at load 11 can still produce honestly. Given how much of
+`NEXT_STEPS.md` is blocked on an idle machine, that property is worth spending
+more on.
 
-The same wrapper works on `@gmod/bam` and `@gmod/cram`: both accept a
-`filehandle`. Counting requests and bytes across the sweep would give the paper
-a table of results that **cannot be contaminated by load at all**, on the same
-corpus as everything else. Given how much of `NEXT_STEPS.md` is blocked on an
-idle machine, this is the cheapest way to add evidence that does not need one.
+What it is worth spending on next:
+
+- **`@gmod/vcf` and `bgzf-filehandle`** have no request-shape number, because
+  they are not in `sweep.json` yet (gap 5).
+- **The equivalence gate does not adjudicate the intermediate versions.** The
+  sweep flags a version whose record set differs from the newest; only the
+  2023-vs-current pair has anything that says which side is right.
+- **The counter watches `read` and `readFile`.** That was enough to find that
+  every `@gmod/bam` slurps the whole `.bai` rather than ranging into it — a
+  counter watching only `read` reported zero index requests and made the index
+  look free. Any future method that fetches bytes needs adding to that set.
 
 ### 3. Refresh the "current" pins before quoting them
 
@@ -149,6 +159,22 @@ for weeks — load was 8.2 at the start of this session's work and 15 during it,
 against the 4.0 ceiling `results/` applies and the 1.5–2.9 a clean run wants.
 Check `pgrep -c claude`, not just `uptime`.
 
-That is the argument for gap 2 above. A benchmark whose output is a count rather
-than a duration is one this box can still produce honestly, and the repo
-currently has exactly one of them.
+That is the argument for counting. A benchmark whose output is a count rather
+than a duration is one this box can still produce honestly, and the two that now
+exist — `MODE=count make sweep` and `make cohort` — are the only results here
+taken since July that need no caveat about the machine at all.
+
+What they found, on that basis:
+
+- **`@gmod/cram` v8 cut the 200x-longread query from 728 reads over 35 MB to 44
+  reads over 17.5 MB.** That is the same major where the timing curve steps, so
+  the CRAM speedup is at least partly a change in request shape rather than in
+  decode speed.
+- **`@gmod/bam` v7 went the other way on this corpus**: 4 reads and 569 KB
+  became 8 reads and 772 KB at 20x shortread, while getting several times
+  faster. More requests, more bytes, less time.
+- **`@gmod/bbi` splits one 56-byte header read into two** between v4 and v10,
+  which is an extra round trip per file — 100 of them across a cohort panel.
+
+None of those three is visible in a timing, and the first two are invisible in
+the two-point table as well.

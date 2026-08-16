@@ -46,14 +46,14 @@ through the same layout, so this is the pattern each version repeats N times.
 ## Time
 
 Sequential opens, one process per version, version order rotated every round,
-each arm best-of-2 and the table the median over 3 rounds.
+each arm best-of-1 and the table the median over 1 rounds.
 
-> **This half is not a run of record. Peak 1-minute load was 10.8**, against the 4.0 this repo treats as the ceiling for a quotable absolute. Do not quote a millisecond from this table. The request counts above are unaffected — they are counts, not timings, and they are the same on an idle box and a loaded one.
+> **This half is not a run of record. Peak 1-minute load was 5.6**, against the 4.0 this repo treats as the ceiling for a quotable absolute. Do not quote a millisecond from this table. The request counts above are unaffected — they are counts, not timings, and they are the same on an idle box and a loaded one.
 
 | version | N=1 | N=10 | N=100 |
 | --- | ---: | ---: | ---: |
-| v4.0.0 (2023) | 1.0 ms | 7.4 ms | 48.9 ms |
-| v10.0.2 (current) | 1.0 ms | 5.5 ms | 51.8 ms |
+| v4.0.0 (2023) | 1.5 ms | 16.1 ms | 94.4 ms |
+| v10.0.2 (current) | 1.1 ms | 6.6 ms | 80.4 ms |
 
 A browser opens its tracks concurrently, so this is not the wall clock a user
 sees. What concurrency hides is precisely the per-file cost the table is about,

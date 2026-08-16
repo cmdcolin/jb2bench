@@ -31,19 +31,11 @@
 //   node --experimental-strip-types cohort-bw.ts
 //   SWEEP=1 node --experimental-strip-types cohort-bw.ts   # every built major
 import { execFileSync } from 'node:child_process'
-import {
-  closeSync,
-  existsSync,
-  fstatSync,
-  mkdirSync,
-  openSync,
-  readFileSync,
-  readSync,
-  writeFileSync,
-} from 'node:fs'
+import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs'
 import { fileURLToPath } from 'node:url'
 
 import { END, REF, START } from './lib/corpus.ts'
+import { countingFile } from './lib/counting-filehandle.ts'
 
 const SELF = fileURLToPath(import.meta.url)
 const here = (p: string) => new URL(p, import.meta.url)
@@ -58,70 +50,9 @@ const sampleFiles = (n: number) =>
 
 // ------------------------------------------------------------------- arm ---
 
-/**
- * A filehandle that counts. It serves both of the two incompatible interfaces
- * @gmod/bbi has used, distinguishing them by the type of the first argument
- * rather than by a version number, because the version number is exactly what
- * this benchmark is varying.
- *
- *   generic-filehandle   read(buffer, offset, length, position) -> {bytesRead}
- *   generic-filehandle2  read(length, position)                 -> Uint8Array
- *
- * Only the counting arm uses it. The timing arm passes a plain path, so no
- * wrapper sits in the measured path and the two sides are not being compared
- * through an adapter one of them fits better than the other.
- */
-class CountingFilehandle {
-  reads = 0
-  bytes = 0
-  /** every read's length, in order — the per-file access pattern */
-  sizes: number[] = []
-  #fd: number
-  #size: number
-  #path: string
-
-  constructor(path: string) {
-    this.#path = path
-    this.#fd = openSync(path, 'r')
-    this.#size = fstatSync(this.#fd).size
-  }
-
-  async read(a: any, b?: any, c?: any, d?: any) {
-    if (typeof a === 'number') {
-      // generic-filehandle2: read(length, position)
-      const length = a
-      const position = b ?? 0
-      const buf = Buffer.allocUnsafe(length)
-      const bytesRead = readSync(this.#fd, buf, 0, length, position)
-      this.reads++
-      this.bytes += bytesRead
-      this.sizes.push(bytesRead)
-      return new Uint8Array(buf.buffer, buf.byteOffset, bytesRead)
-    }
-    // generic-filehandle: read(buffer, offset, length, position)
-    const bytesRead = readSync(this.#fd, a, b ?? 0, c, d)
-    this.reads++
-    this.bytes += bytesRead
-    this.sizes.push(bytesRead)
-    return { bytesRead, buffer: a }
-  }
-
-  async readFile() {
-    const buf = readFileSync(this.#path)
-    this.reads++
-    this.bytes += buf.length
-    this.sizes.push(buf.length)
-    return buf
-  }
-
-  async stat() {
-    return { size: this.#size }
-  }
-
-  async close() {
-    closeSync(this.#fd)
-  }
-}
+// The counting filehandle is shared with sweep.ts, which counts the same way
+// on BAM and CRAM. Only the counting arm uses it: the timing arm passes a plain
+// path, so no wrapper sits in a measured path.
 
 async function armCount(dir: string, n: number) {
   const { BigWig } = await import(`${dir}/esm/index.js`)
@@ -134,14 +65,13 @@ async function armCount(dir: string, n: number) {
   // which is the part a library author can act on.
   let pattern: number[] = []
   for (const file of sampleFiles(n)) {
-    const fh = new CountingFilehandle(file)
-    const bw = new BigWig({ filehandle: fh })
-    const feats = await bw.getFeatures(REF, START, END)
-    features += feats.length
-    reads += fh.reads
-    bytes += fh.bytes
-    if (pattern.length === 0) pattern = fh.sizes
-    await fh.close()
+    const { handle, counter } = await countingFile(dir, file)
+    const bw = new BigWig({ filehandle: handle })
+    features += (await bw.getFeatures(REF, START, END)).length
+    reads += counter.reads
+    bytes += counter.bytes
+    if (pattern.length === 0) pattern = counter.sizes
+    await handle.close()
   }
   console.log(JSON.stringify({ reads, bytes, features, pattern }))
 }
