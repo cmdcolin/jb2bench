@@ -396,10 +396,30 @@ const lines: string[] = [
   `| --- | ${shownTools.map(() => '---:').join(' | ')} | ---: | ---: | --- |`,
 ]
 
+/**
+ * A tool that fetched on no step has no fetched median, and printing a bare dash
+ * throws away a real finding: at 20x-longread JBrowse served all five pan steps
+ * from one 256 KiB block, with a full render burst each time. Show its
+ * all-steps median instead, daggered, so the cell says "measured, but not the
+ * same measurement as its neighbour" rather than "missing".
+ */
+const cell = (c: Cell | undefined) => {
+  if (!c) return { text: '—', comparable: false }
+  if (Number.isFinite(c.fetchedMedian)) {
+    return { text: `${fmt(c.fetchedMedian)} ms`, comparable: true }
+  }
+  if (Number.isFinite(c.median)) {
+    return { text: `${fmt(c.median)} ms †`, comparable: false }
+  }
+  return { text: '—', comparable: false }
+}
+
+let anyDaggered = false
 for (const c of allCases) {
   const row = prior.rows[c.id]
   if (!row) continue
-  const vals = shownTools.map(t => row[t.id]?.fetchedMedian)
+  const cells = shownTools.map(t => cell(row[t.id]))
+  if (cells.some(x => x.text.includes('†'))) anyDaggered = true
   const jb = row.jbrowse?.fetchedMedian
   const ig = row.igv?.fetchedMedian
   const ratio =
@@ -412,7 +432,7 @@ for (const c of allCases) {
     ),
   )
   lines.push(
-    `| ${c.id} | ${vals.map(v => `${fmt(v)} ms`).join(' | ')} | ${ratio} | ` +
+    `| ${c.id} | ${cells.map(x => x.text).join(' | ')} | ${ratio} | ` +
       `${rowPeak.toFixed(1)} | ${prior.dates[c.id] ?? '—'} |`,
   )
 }
@@ -420,6 +440,17 @@ for (const c of allCases) {
 lines.push(
   '',
   '`ratio` is igv ÷ JBrowse: above 1.0 means JBrowse got content back sooner.',
+  ...(anyDaggered
+    ? [
+        '',
+        '`†` is a median over **all** steps rather than fetched ones, because that',
+        'tool fetched on none of them. It is not a missing measurement and not a',
+        'comparable one: at 20x-longread JBrowse served all five pan steps from a',
+        'single 256 KiB block it already held, rendering fully each time. The',
+        'ratio is left blank for those rows rather than dividing two different',
+        'things.',
+      ]
+    : []),
   '',
   '## What each step actually did',
   '',
