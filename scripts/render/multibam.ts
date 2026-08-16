@@ -384,6 +384,8 @@ interface Row {
   readyMs: number[]
   frame: FrameStats
   passes: FrameStats[]
+  /** raw per-frame gaps, one array per pass, rounded to 0.1 ms */
+  gaps: number[][]
   load: { before: number; after: number }
   errors: string[]
 }
