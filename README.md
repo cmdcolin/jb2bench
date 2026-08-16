@@ -441,20 +441,20 @@ JBrowse reads 256 KiB blocks, so some of its pan steps are served from what it
 already holds; igv's never were. The headline table is restricted to steps where
 that tool actually issued a request, and the per-step table shows the rest.
 
-First run, 2026-08-16, on a box at load 4.3–7.4 — the ratios are interleaved and
-survive that, the milliseconds are not a run of record:
+**The numbers live in [`results/crosstool-pan.md`](results/crosstool-pan.md) and
+are deliberately not repeated here.** An earlier draft of this section did copy
+the table in, and it was stale inside an hour when the next run moved the ratios
+— which is the same argument the ecosystem benchmarks make for generating their
+prose from the run. What is worth stating here is the shape, because that has
+held across every run so far: JBrowse ahead on both short-read cases, by a
+little at 20x and by roughly an order of magnitude at 200x.
 
-| case | JBrowse | igv.js 3.8.5 | ratio | igv draws/step | JBrowse draws/step |
-| --- | ---: | ---: | ---: | ---: | ---: |
-| 20x-shortread | 362 ms | 594 ms | 1.64× | ~95,000 | 10–48 |
-| 200x-shortread | 538 ms | 5154 ms | 9.58× | ~250,000 | 10–50 |
-
-The draws column is the architecture in one number, and it is the sturdiest
-figure here: it repeats to within ~1% across runs, because it depends on the data
-and the code rather than on the machine, so it survives a contaminated run the
-way the parser request counts do. Three to four orders of magnitude separate a
-tool drawing through the 2D canvas API from one batching the pileup into a
-handful of GPU draws.
+The mechanism behind the widening gap is in the per-step table, and it is the
+sturdiest figure in the file: **canvas draw calls per step repeat to within ~1%
+across runs**, because they depend on the data and the code rather than on the
+machine. Like the parser request counts, they survive a contaminated run. Three
+to four orders of magnitude separate a tool drawing through the 2D canvas API
+from one batching the pileup into a handful of GPU draws.
 
 It is **not** one call per read — about 30 per read at 20x and 8 at 200x, so the
 count grows much more slowly than the read count, and nothing here explains that

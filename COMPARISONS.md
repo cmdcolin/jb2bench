@@ -98,9 +98,11 @@ all.
 ### 1. Extend the cross-tool pan past the two cases it has run
 
 **Done, and it needed a new instrument.** `scripts/crosstool/panrunner.ts` →
-`results/crosstool-pan.md`. First run says 1.64× at 20x-shortread and 9.58× at
-200x-shortread, with igv issuing ~95,000 and ~250,000 canvas draw calls per pan
-against JBrowse's 10–50.
+`results/crosstool-pan.md`, which is where the numbers are; repeating them here
+is how the README's copy went stale within an hour. The shape has held across
+runs: JBrowse ahead on both short-read cases, marginally at 20x and by roughly an
+order of magnitude at 200x, with igv issuing ~95,000 and ~250,000 canvas draw
+calls per pan against JBrowse's 10–50.
 
 Three findings from building it are worth carrying into anything else here:
 
