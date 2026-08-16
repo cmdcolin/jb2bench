@@ -26,8 +26,10 @@ coverage legible:
 | **file count** | `ecosystem/results/cohort-bw.md` | what does a cohort panel cost to open? |
 | **row count** | `results/rowsweep` (no run of record) | is row count paid once at upload or every frame? |
 | **track count** | `scripts/render/multibam.ts` | what does a multi-track pan cost? |
-| **tool** | `results/crosstool.md` | how do we compare to igv.js on the same bytes? |
+| **tool, cold load** | `results/crosstool.md` | how do we compare to igv.js on the same bytes? |
+| **tool, interaction** | `results/crosstool-pan.md` | and with application startup out of the number? |
 | **compute substrate** | `results/ld-gpu-vs-cpu.md` | is the LD compute shader worth it? |
+| **the instrument itself** | `results/quiescence.md` | which completion detector, and how far apart are they? |
 
 Two of those rows are the reason the set is worth having rather than a single
 headline. The **two-point** and **every-major** parser comparisons answer
@@ -54,10 +56,12 @@ did not:
 
 | tool | reads our corpus? | harness | state |
 | --- | --- | --- | --- |
-| igv.js 3.8.5 | yes, same indexed BAM over range requests | `crosstool/index.html` | **runs**, `results/crosstool.md` |
+| igv.js 3.8.5 | yes, same indexed BAM over range requests | `crosstool/index.html` | **runs**, cold load and pan |
 | igv.js 2.12.1 | yes | same, `?igv=2.12.1` | loads; the version the 2023 paper timed |
 | GenomeSpy 0.82.0 | yes — native `bam` lazy source | `crosstool/genomespy.html` | **draws nothing**; five causes ruled out |
 | HiGlass + `higlass-pileup` | yes, client-side indexed BAM | none written | not started |
+| JBrowse 1 v1.16.11 | yes | `~/src/dont_care/jb2profile/jb1web` | prior art, not wired up here |
+| `@jbrowse/react-linear-genome-view` | yes | `~/src/dont_care/jb2profile/jb2lgv` | prior art, not wired up here |
 
 The register to keep: **igv.js confounds parser and renderer** because it
 maintains its own readers, while **GenomeSpy shares our decoder** (`@gmod/bam`
@@ -73,19 +77,51 @@ all.
 
 ## Gaps, ordered by what they would do for the paper
 
-### 1. A cross-tool pan
+### 1. Extend the cross-tool pan past the two cases it has run
 
-Every cross-tool number is a cold load, which is the measurement least sensitive
-to what this release changed. Against release-4.3.0 there are zoom and pan
-tables; against igv.js there is neither a pan nor a trustworthy zoom. A pan at
-constant scale makes *both* tools fetch, so what is left is the cost of turning
-bytes into pixels.
+**Done, and it needed a new instrument.** `scripts/crosstool/panrunner.ts` →
+`results/crosstool-pan.md`. First run says 1.64× at 20x-shortread and 9.58× at
+200x-shortread, with igv issuing ~95,000 and ~250,000 canvas draw calls per pan
+against JBrowse's 10–50.
 
-Both halves exist: `scripts/render/interaction.ts` drives a JBrowse pan, and
-`scripts/crosstool/paintprofile.ts` is an instrument belonging to neither tool.
-What is missing is the glue and a locus policy that keeps every step inside the
-coverage plateau, which the JBrowse pan already implements and would have to be
-mirrored for igv.
+Three findings from building it are worth carrying into anything else here:
+
+- **Screenshot polling cannot resolve an interaction.** A `page.screenshot()` on
+  this box costs 43–161 ms, so the detector's floor is 450–1100 ms against
+  interactions of about that length. Anything here that measures an *interaction*
+  by screenshot polling inherits that; cold load is long enough not to care.
+- **"Both tools must fetch" was an assumption and is false at some steps.**
+  JBrowse reads 256 KiB blocks, so a one-viewport pan can land inside what it
+  already holds. The runner counts requests per step and restricts the headline
+  to steps that fetched.
+- **The detector needed its own harness**, which is now
+  `scripts/crosstool/quiescheck.ts` → `results/quiescence.md`. It falsified two
+  claims within a run of being written: that screenshot cost is a property of
+  the page (it tracks machine load — the two harnesses swapped places between
+  runs), and that canvas draws necessarily read earlier than screen paint (on a
+  JBrowse cold load, draws read 2779 ms against paint's 2213 ms, because the page
+  keeps drawing after the visible result settles). Both had already been written
+  down as mechanism before being measured.
+
+What is still owed: the four remaining cases (`1000x-shortread`, and the three
+long-read rows), `RUNS=3` rather than 1, and an idle box.
+
+### 1a. Older prior art: `~/src/dont_care/jb2profile`
+
+The benchmark this repo replaced. Worth knowing about for two reasons, and worth
+**not** cross-quoting for a third:
+
+- It carries baselines this repo does not have: **JBrowse 1** (v1.16.11) and
+  **`@jbrowse/react-linear-genome-view`** embedded, each as its own harness app
+  (`jb1web`, `jb2lgv`, `igvjs`). If the paper ever wants a JBrowse-1 comparison,
+  the harness already exists there.
+- It measured **frames per second** during interaction, which is a different
+  question from either time-to-content or per-frame main-thread cost.
+- **Its numbers are not commensurable with this repo's.** `results/*.json` there
+  are hyperfine whole-process wall-clock timings — 4.33 s for 20x-shortread BAM —
+  which include the ~3 s constant browser launch that this repo's in-page
+  navigation→render-complete metric deliberately excludes. Quoting one against
+  the other would read as a regression that is entirely the change of metric.
 
 ### 2. Extend request-shape counting beyond the three swept libraries
 

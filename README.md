@@ -47,6 +47,8 @@ Every number lives in a file; nothing is summarized only here.
 | [`flame/ZOOM_SETTLE.md`](flame/ZOOM_SETTLE.md) | why does a zoom take 0.8 s to stop changing? |
 | [`flame/WORKER_FINDINGS.md`](flame/WORKER_FINDINGS.md) | which worker-side plugin optimizations are worth doing? |
 | [`results/crosstool.md`](results/crosstool.md) | how does the render time compare against igv.js? |
+| [`results/crosstool-pan.md`](results/crosstool-pan.md) | and how does a *pan* compare, with startup out of the number? |
+| [`results/quiescence.md`](results/quiescence.md) | which completion detector, and what does being wrong cost? |
 | [`ecosystem/README.md`](ecosystem/README.md) | how much faster did the parser libraries get since 2023? |
 | [`ecosystem/results/sweep.md`](ecosystem/results/sweep.md) | *where* along the majors did the parsers get faster? |
 | [`ecosystem/results/cohort-bw.md`](ecosystem/results/cohort-bw.md) | what does a 100-sample BigWig panel cost to open? |
@@ -314,6 +316,7 @@ npx http-server crosstool -p 8003 -s --cors &
 RUNS=3 node scripts/crosstool/runner.ts          # → results/crosstool.{md,json}
 TOOLS=igv-h600ctl,igv-h300 CASES=200x-shortread node scripts/crosstool/runner.ts
 node scripts/crosstool/zoomrunner.ts             # → results/crosstool-zoom.{md,json}
+RUNS=3 node scripts/crosstool/panrunner.ts       # → results/crosstool-pan.{md,json}
 ```
 
 #### igv.js is now version-selectable
@@ -398,6 +401,57 @@ any resulting number should be read:
   number is *not* decoder-controlled in the same way — it would carry six major
   versions of parser difference. Say so rather than presenting the three as one
   matrix.
+
+#### Cross-tool pan, and the instrument it needed
+
+`scripts/crosstool/panrunner.ts` → `results/crosstool-pan.md`. Scroll sideways
+one full viewport at constant scale, five steps, from the benchmark window. This
+is the cross-tool measurement the cold-load matrix was missing: cold load is
+dominated by application boot and assembly resolution, which say nothing about a
+renderer, and the zoom result below is a JBrowse debounce rather than JBrowse's
+pixels. A pan runs against an application that is already up.
+
+**Paint quiescence cannot resolve it.** The screenshot detector needs six
+samples at best, and one `page.screenshot()` on this box measures anywhere from
+43 to 161 ms, putting its own floor between roughly 450 and 1100 ms — against
+pans of about that length. Steps duly came back resolved in exactly the minimum
+six polls, reporting numbers made almost entirely of instrument.
+
+So `scripts/crosstool/drawclock.ts` patches the canvas drawing APIs and
+timestamps every call — the platform, not the application. That alone is still
+wrong: JBrowse re-projects the reads it already holds in a millisecond or two,
+then goes quiet while it fetches, then draws again, and a draws-only detector
+stops at the first gap and reports **1.4 ms**. The gate is therefore *draws
+quiet **and** nothing in flight*, with the network side read from CDP because
+JBrowse fetches in a worker and a page-side `fetch` hook would see igv's requests
+and none of JBrowse's.
+
+**The detector now has its own harness**, because it has been the thing that
+breaks: `scripts/crosstool/quiescheck.ts` → [`results/quiescence.md`](results/quiescence.md)
+runs the strategies against each other on both harnesses and reports where they
+disagree. It has already corrected two claims made on this page. Screenshot cost
+was first attributed to the page (43 ms JBrowse, 161 ms igv); a run on a busier
+box measured the opposite assignment (157 / 49), so what varies is the machine.
+And the natural story that draws read early and paint reads late is false on a
+JBrowse cold load, where draws read 4792 ms against paint's 2346 ms — the page
+keeps issuing draw calls after the visible result has settled.
+
+**A pan is not automatically the "both tools fetch" case, so the run counts.**
+JBrowse reads 256 KiB blocks, so some of its pan steps are served from what it
+already holds; igv's never were. The headline table is restricted to steps where
+that tool actually issued a request, and the per-step table shows the rest.
+
+First run, 2026-08-16, on a box at load 4.3–7.4 — the ratios are interleaved and
+survive that, the milliseconds are not a run of record:
+
+| case | JBrowse | igv.js 3.8.5 | ratio | igv draws/step | JBrowse draws/step |
+| --- | ---: | ---: | ---: | ---: | ---: |
+| 20x-shortread | 362 ms | 594 ms | 1.64× | ~95,000 | 10–48 |
+| 200x-shortread | 538 ms | 5154 ms | 9.58× | ~250,000 | 10–50 |
+
+The draws column is the architecture in one number: igv issues a drawing
+operation per read, JBrowse batches the pileup into a handful of GPU draws. It
+is also why the ratio grows with depth.
 
 ### The zoom result is not what it looks like
 

@@ -1,0 +1,76 @@
+{
+  "runs": 1,
+  "track": "20x.shortread.bam",
+  "measured": "2026-08-16",
+  "loadPeak": 3.37,
+  "screenshotCostMs": {
+    "jbrowse": 73.66666666666667,
+    "igv": 62.666666666666664
+  },
+  "observations": [
+    {
+      "harness": "jbrowse",
+      "phase": "load",
+      "strategy": "draws",
+      "ms": 2829.600000023842,
+      "events": 20,
+      "atFloor": false
+    },
+    {
+      "harness": "jbrowse",
+      "phase": "pan",
+      "strategy": "draws",
+      "ms": 2.400000035762787,
+      "events": 10,
+      "atFloor": false
+    },
+    {
+      "harness": "jbrowse",
+      "phase": "load",
+      "strategy": "paint",
+      "ms": 2179,
+      "events": 12,
+      "atFloor": false
+    },
+    {
+      "harness": "jbrowse",
+      "phase": "pan",
+      "strategy": "paint",
+      "ms": 1247,
+      "events": 10,
+      "atFloor": false
+    },
+    {
+      "harness": "igv",
+      "phase": "load",
+      "strategy": "draws",
+      "ms": 1093.2999999523163,
+      "events": 95147,
+      "atFloor": false
+    },
+    {
+      "harness": "igv",
+      "phase": "pan",
+      "strategy": "draws",
+      "ms": 518.8999999761581,
+      "events": 95096,
+      "atFloor": false
+    },
+    {
+      "harness": "igv",
+      "phase": "load",
+      "strategy": "paint",
+      "ms": 1585,
+      "events": 6,
+      "atFloor": true
+    },
+    {
+      "harness": "igv",
+      "phase": "pan",
+      "strategy": "paint",
+      "ms": 966,
+      "events": 6,
+      "atFloor": true
+    }
+  ]
+}

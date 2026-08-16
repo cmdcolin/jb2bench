@@ -1,0 +1,145 @@
+{
+  "igvVersion": "3.8.5",
+  "jbrowseBuild": "current",
+  "panDir": "left",
+  "steps": 5,
+  "rows": {
+    "20x-shortread": {
+      "jbrowse": {
+        "median": 221.19999998807907,
+        "fetchedMedian": 361.59999999403954,
+        "runs": [
+          221.19999998807907
+        ],
+        "appliedSteps": [
+          5
+        ],
+        "cachedSteps": 3,
+        "requests": 2,
+        "bytes": 524288,
+        "drawsPerStep": [
+          10,
+          45,
+          48,
+          10,
+          47
+        ],
+        "loci": [
+          "chr22_mask:105,001..124,001",
+          "chr22_mask:86,000..105,000",
+          "chr22_mask:66,999..85,999",
+          "chr22_mask:47,998..66,998",
+          "chr22_mask:28,997..47,997"
+        ],
+        "load": {
+          "before": 4.32,
+          "after": 4.31
+        },
+        "failures": []
+      },
+      "igv": {
+        "median": 593.5,
+        "fetchedMedian": 593.5,
+        "runs": [
+          593.5
+        ],
+        "appliedSteps": [
+          5
+        ],
+        "cachedSteps": 0,
+        "requests": 7,
+        "bytes": 1019266,
+        "drawsPerStep": [
+          95096,
+          95329,
+          94626,
+          94252,
+          94199
+        ],
+        "loci": [
+          "chr22_mask:104999-124000",
+          "chr22_mask:85999-105000",
+          "chr22_mask:66999-86000",
+          "chr22_mask:47999-67000",
+          "chr22_mask:28999-48000"
+        ],
+        "load": {
+          "before": 4.32,
+          "after": 4.31
+        },
+        "failures": []
+      }
+    },
+    "200x-shortread": {
+      "jbrowse": {
+        "median": 532.1999999880791,
+        "fetchedMedian": 537.9000000059605,
+        "runs": [
+          532.1999999880791
+        ],
+        "appliedSteps": [
+          5
+        ],
+        "cachedSteps": 1,
+        "requests": 4,
+        "bytes": 7340032,
+        "drawsPerStep": [
+          10,
+          47,
+          50,
+          50,
+          50
+        ],
+        "loci": [
+          "chr22_mask:105,001..124,001",
+          "chr22_mask:86,000..105,000",
+          "chr22_mask:66,999..85,999",
+          "chr22_mask:47,998..66,998",
+          "chr22_mask:28,997..47,997"
+        ],
+        "load": {
+          "before": 4.31,
+          "after": 7.44
+        },
+        "failures": []
+      },
+      "igv": {
+        "median": 5153.600000023842,
+        "fetchedMedian": 5153.600000023842,
+        "runs": [
+          5153.600000023842
+        ],
+        "appliedSteps": [
+          5
+        ],
+        "cachedSteps": 0,
+        "requests": 27,
+        "bytes": 23825575,
+        "drawsPerStep": [
+          249693,
+          249945,
+          250415,
+          250721,
+          251073
+        ],
+        "loci": [
+          "chr22_mask:104999-124000",
+          "chr22_mask:85999-105000",
+          "chr22_mask:66999-86000",
+          "chr22_mask:47999-67000",
+          "chr22_mask:28999-48000"
+        ],
+        "load": {
+          "before": 4.31,
+          "after": 7.44
+        },
+        "failures": []
+      }
+    }
+  },
+  "dates": {
+    "20x-shortread": "2026-08-16",
+    "200x-shortread": "2026-08-16"
+  },
+  "locusMismatch": {}
+}
