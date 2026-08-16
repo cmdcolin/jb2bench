@@ -41,9 +41,11 @@ import path from 'path'
 import puppeteer from 'puppeteer'
 
 import {
+  DEFAULT_QUIET_MS,
   DRAW_CLOCK_INIT,
   DRAW_CLOCK_READ,
   DRAW_CLOCK_RESET,
+  isContentDrawn,
 } from './drawclock.ts'
 
 const url = process.argv[2]
@@ -71,9 +73,10 @@ const READY_TIMEOUT = Number(process.env.READY_TIMEOUT ?? 180000)
 // bracket the truth from either side: a draw call precedes the compositor, a
 // screenshot follows it.
 const INSTRUMENT = process.env.INSTRUMENT === 'paint' ? 'paint' : 'draws'
-// How long without a canvas draw counts as done. Has to clear a rAF-driven
-// redraw sequence without swallowing a refetch that lands later.
-const QUIET_MS = Number(process.env.QUIET_MS ?? 400)
+// Settling margin on the final draw burst — NOT the completion criterion. The
+// criterion is `isContentDrawn`: a canvas was drawn after the region's bytes
+// arrived. See drawclock.ts for the trace that forced the distinction.
+const QUIET_MS = Number(process.env.QUIET_MS ?? DEFAULT_QUIET_MS)
 
 // Pan LEFT, for the reason interaction.ts documents at length: pbsim's long
 // reads run off both ends of chr22_mask, so long-read depth tapers there, and
@@ -120,15 +123,17 @@ const shot = async () =>
 // the same asymmetry that made screenshots unusable, arrived at from a
 // different direction.
 let inFlight = 0
-page.on('request', () => {
-  inFlight++
-})
-page.on('requestfinished', () => {
-  inFlight--
-})
-page.on('requestfailed', () => {
-  inFlight--
-})
+// Not only "is anything in flight now" but "when did anything last happen". A
+// tool that fetches in bursts drops to zero between them — traced at 1000x, one
+// such lull ran ~300 ms — and an instantaneous test reads that as finished.
+let lastNetworkAt = 0
+const netEvent = (delta: number) => {
+  inFlight += delta
+  lastNetworkAt = Date.now()
+}
+page.on('request', () => netEvent(1))
+page.on('requestfinished', () => netEvent(-1))
+page.on('requestfailed', () => netEvent(-1))
 
 // Per-step network accounting, because "a pan is the case where BOTH tools must
 // fetch" is a claim and not a definition.
@@ -144,6 +149,8 @@ page.on('requestfailed', () => {
 // the method section asserting it.
 let stepRequests = 0
 let stepBytes = 0
+// When the last byte of data landed. This is half of the completion rule: the
+// step is not done until a canvas has been drawn *after* this moment.
 const DATA_RE = /\.(bam|bai|cram|crai|bw|fa|fai)(\?|$)/
 page.on('response', res => {
   if (!DATA_RE.test(res.url())) return
@@ -170,14 +177,28 @@ page.on('response', res => {
 async function drawsSettled(t0: number) {
   for (;;) {
     if (Date.now() - t0 > MAX_WAIT) {
-      throw new Error(`no quiet draw within ${MAX_WAIT} ms`)
+      throw new Error(`no content draw within ${MAX_WAIT} ms`)
     }
     const got = (await page.evaluate(DRAW_CLOCK_READ)) as {
       count: number
       ms: number
       sinceLast: number
     }
-    if (got.count > 0 && inFlight <= 0 && got.sinceLast > QUIET_MS) {
+    // The draw clock runs on page time and the network events on wall clock;
+    // t0 is the same instant in both, so this puts the last draw on the wall
+    // clock to compare against the last response. Millisecond skew is
+    // irrelevant against the hundreds of ms being separated.
+    const lastDrawAt = t0 + got.ms
+    if (
+      isContentDrawn({
+        drawCount: got.count,
+        lastDrawAt,
+        lastNetworkAt,
+        inFlight,
+        now: Date.now(),
+        quietMs: QUIET_MS,
+      })
+    ) {
       return got
     }
     await new Promise(r => setTimeout(r, 50))
@@ -308,6 +329,7 @@ try {
     await page.evaluate(DRAW_CLOCK_RESET)
     stepRequests = 0
     stepBytes = 0
+    lastNetworkAt = Date.now()
     const tStep = Date.now()
     const applied = await page.evaluate(
       ({ tool, sign, locus }) => {

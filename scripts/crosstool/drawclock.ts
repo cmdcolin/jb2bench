@@ -82,6 +82,85 @@ export const DRAW_CLOCK_RESET = `(() => {
 })()`
 
 /**
+ * The completion rule, in one place because two callers had it and a fix would
+ * otherwise land in only one.
+ *
+ * **The rule is positive: a canvas was drawn after the region's bytes arrived.**
+ * That is a statement about something happening, and it is what "the track is
+ * showing the new data" actually means. Waiting for the page to go quiet is the
+ * opposite kind of statement — it cannot distinguish "finished" from "pausing",
+ * and every wrong number this instrument has produced came from that confusion.
+ *
+ * The trace that settles it, a 1000x-shortread pan in JBrowse:
+ *
+ *     t=6ms      10 draws     re-projection of reads already held
+ *     t=6-507    nothing at all — the 500ms LGVCoarseDynamicBlocks debounce
+ *     t=507      20 draws
+ *     t=507-1251 draws stop; in-flight touches 0 in a ~300ms lull
+ *     t=1251-2069  the actual fetch
+ *     t=2345     48 draws     THE ANSWER
+ *
+ * A quiet-based rule fires twice before 1251 and reports 42 ms for 2.3 s of
+ * work. The positive rule cannot: at both false points, no draw had happened
+ * *after* the last byte landed.
+ *
+ * `quietMs` remains, demoted to what it should always have been — a settling
+ * margin on the final draw burst, not the criterion. Raising it costs wall clock
+ * and never inflates the answer, because what is reported is the timestamp of
+ * the last draw rather than the moment the detector became sure.
+ *
+ * A step that fetched nothing (JBrowse serves some pans from a 256 KiB block it
+ * already holds) has no "bytes arrived" to be after, so it falls back to draw
+ * plus settle. Those steps are counted separately by the caller and excluded
+ * from the headline for exactly that reason.
+ */
+export function isContentDrawn(s: {
+  drawCount: number
+  /** wall-clock ms of the last draw */
+  lastDrawAt: number
+  /** wall-clock ms of the last network event (start or finish) */
+  lastNetworkAt: number
+  inFlight: number
+  now: number
+  quietMs: number
+}) {
+  return (
+    s.drawCount > 0 &&
+    s.inFlight <= 0 &&
+    s.now - s.lastDrawAt > s.quietMs &&
+    s.now - s.lastNetworkAt > s.quietMs
+  )
+}
+
+/**
+ * How long both channels must be still before the last draw is believed.
+ *
+ * Two measured constants it has to clear, and it is set from them rather than
+ * picked:
+ *
+ *   ~501 ms  JBrowse's LGVCoarseDynamicBlocks debounce. After a pan it
+ *            re-projects held reads immediately and then does nothing at all
+ *            for half a second. A 400 ms window fires inside that gap and
+ *            reports 42 ms for 2.3 s of work.
+ *   ~700 ms  how long after the pan its worker's first request appears. Until
+ *            then there is no network activity either, so the network channel
+ *            cannot rescue a too-short window.
+ *
+ * 1500 ms clears both with margin. It costs wall clock per step and **never
+ * inflates a result**, because what is reported is the timestamp of the last
+ * canvas draw, not the moment the detector became sure.
+ *
+ * An earlier version tried a stricter, more appealing rule — require a draw
+ * *after* the last data response, so completion is a positive fact rather than
+ * an absence. It works on JBrowse, whose worker fetches and whose main thread
+ * then draws, and it is unusable on igv.js, which parses and draws interleaved
+ * on one thread: traced at 20x, igv's last draw lands 1 ms after its last
+ * response, so the ordering test is a coin toss and the run hangs about half
+ * the time. The rule has to hold for both tools or it is not an instrument.
+ */
+export const DEFAULT_QUIET_MS = 1500
+
+/**
  * Read the result: time from reset to the last draw, how many there were, and
  * how long ago the last one was. `sinceLast` is computed in page time so the
  * caller never has to reconcile two clocks.

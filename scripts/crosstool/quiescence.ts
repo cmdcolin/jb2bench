@@ -55,7 +55,23 @@ import { DRAW_CLOCK_INIT, DRAW_CLOCK_READ, DRAW_CLOCK_RESET } from './drawclock.
 export type Strategy = 'draws' | 'paint' | 'idle'
 
 export interface QuiescenceOptions {
-  /** ms without a canvas draw before `draws` calls it done */
+  /**
+   * ms without a canvas draw AND without network activity before `draws` calls
+   * it done.
+   *
+   * **Must exceed the longest pause the application takes while still working**,
+   * and 400 ms does not. Traced on a 1000x-shortread pan, JBrowse re-projects
+   * the reads it already holds at t=6 ms, then sits completely idle for 501 ms —
+   * that is the 500 ms `LGVCoarseDynamicBlocks` debounce `README.md` documents
+   * elsewhere — then draws again at 507 ms, pauses ~300 ms between requests,
+   * fetches from 1251 to 2069 ms, and finally draws the real content at
+   * 2345 ms. A 400 ms gate opens twice during that, and the first time it does,
+   * the step reports **42 ms** for work that took 2.3 s.
+   *
+   * 1000 ms clears the documented debounce with margin. Raising it costs wall
+   * clock and **does not inflate the result**: what is reported is the timestamp
+   * of the last draw, not the moment the detector became confident.
+   */
   quietMs?: number
   /** ms between screenshots for `paint` */
   pollMs?: number
@@ -91,7 +107,7 @@ const DATA_RE = /\.(bam|bai|cram|crai|bw|fa|fai|vcf|gz|tbi)(\?|$)/
  * the network counters have to see the first request.
  */
 export async function attachQuiescence(page: Page, opts: QuiescenceOptions = {}) {
-  const quietMs = opts.quietMs ?? 400
+  const quietMs = opts.quietMs ?? 1000
   const pollMs = opts.pollMs ?? 150
   const stablePolls = opts.stablePolls ?? 5
   const maxWaitMs = opts.maxWaitMs ?? 120000
@@ -105,11 +121,18 @@ export async function attachQuiescence(page: Page, opts: QuiescenceOptions = {})
   let inFlight = 0
   let requests = 0
   let bytes = 0
+  // Not just "is anything in flight right now" but "when did anything last
+  // happen". A tool that fetches in bursts drops to zero in flight between them,
+  // and an instantaneous test treats that as finished — traced at 1000x, one
+  // such lull lasted ~300 ms.
+  let lastNetwork = 0
   page.on('request', () => {
     inFlight++
+    lastNetwork = Date.now()
   })
   const done = () => {
     inFlight--
+    lastNetwork = Date.now()
   }
   page.on('requestfinished', done)
   page.on('requestfailed', done)
@@ -141,6 +164,7 @@ export async function attachQuiescence(page: Page, opts: QuiescenceOptions = {})
     async mark() {
       requests = 0
       bytes = 0
+      lastNetwork = Date.now()
       await page
         .evaluate(DRAW_CLOCK_RESET)
         .catch(() => undefined /* no document yet */)
@@ -167,7 +191,11 @@ export async function attachQuiescence(page: Page, opts: QuiescenceOptions = {})
             ms: number
             sinceLast: number
           }
-          const networkQuiet = inFlight <= 0
+          // Three conditions, not one. Nothing in flight, nothing having
+          // *recently* been in flight, and nothing drawn recently — a tool that
+          // pauses between bursts satisfies any one of these while still
+          // working.
+          const networkQuiet = inFlight <= 0 && Date.now() - lastNetwork > quietMs
           if (strategy === 'idle') {
             if (networkQuiet && Date.now() - t0 > quietMs) {
               return {
