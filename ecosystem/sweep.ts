@@ -180,9 +180,13 @@ async function makeQuery(kind: string, mod: any, dir: string, file: string, coun
     // predates the 7.2.0 rewrite. Measuring the identical operation here means
     // this sweep's v5-to-v7 ratio can be carried onto that published scale
     // without re-running ten toolchains. See `vcf-crosslang.json`.
+    // Parser built once, outside the timed callback, the way scan.ts does it and
+    // the way vcf-bench's own script does: it constructs the parser on the first
+    // data line and then parses the rest. Header parsing is a fixed per-file cost
+    // that has nothing to do with the per-line scan being compared.
     const Ctor = mod.default ?? mod.VCF
+    const parser = new Ctor({ header })
     run = async () => {
-      const parser = new Ctor({ header })
       let sum = 0
       let n = 0
       for (const line of lines) {
@@ -224,6 +228,27 @@ async function makeQuery(kind: string, mod: any, dir: string, file: string, coun
   return { run, counters }
 }
 
+/**
+ * What is inside the timed window, and what is deliberately not.
+ *
+ * **No compilation or transpilation is.** The library under test is plain
+ * JavaScript: `setup-sweep.sh` ran its own `build:esm` once, so the arm imports
+ * `esm/*.js` and never sees TypeScript. `--experimental-strip-types` applies to
+ * this file, not to the library, and it happens at process start — long before
+ * the clock starts. The module hooks in `lib/legacy-resolve.mjs` likewise do
+ * their work during import.
+ *
+ * Reading and preparing the corpus is outside it too: `vcfParts` decodes and
+ * splits, and the bgzf arm reads its buffer, before `run` is ever called.
+ *
+ * Two warmup passes run before the timed ones, so a measurement is not paying
+ * for V8's first sight of the code path.
+ *
+ * What IS inside, for the three file-backed kinds, is opening the file afresh
+ * each pass. That is deliberate rather than sloppy — the current releases cache
+ * parsed chunks on the instance, so reusing one would measure the cache — and it
+ * is the same choice `bam.bench.ts` makes.
+ */
 async function armMain(kind: string, dir: string, file: string) {
   const mod = await import(`${dir}/esm/index.js`)
   const { run } = await makeQuery(kind, mod, dir, file, false)

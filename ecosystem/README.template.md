@@ -158,6 +158,18 @@ plotted* — which is the one artefact a curve must not have imposed on it. The
 version order rotates every round, so machine drift cannot line up with position
 on the curve either.
 
+**Nothing compiled or transpiled is inside a timed window.** The libraries are
+plain JavaScript by the time an arm sees them — `setup-sweep.sh` ran each one's
+own `build:esm` once, so the arm imports `esm/*.js` and never meets TypeScript.
+`--experimental-strip-types` applies to the benchmark file rather than to the
+library, and it happens at process start; the module hooks do their work during
+import. Corpus preparation is outside too: the VCF arm decodes and splits its
+lines, and the bgzf arm reads its buffer, before the clock starts. Two warmup
+passes precede the timed ones, so no measurement pays for V8's first sight of the
+code path. What *is* inside, for the three file-backed kinds, is opening the file
+afresh each pass — deliberately, because the current releases cache parsed chunks
+on the instance and reusing one would measure the cache.
+
 **Versions that will not build are reported, not dropped.** Which majors of a
 library can still be built from source with a current toolchain is a fact about
 the library, and a gap in a curve should look like a gap. As of 2026-08-16 there
