@@ -103,10 +103,14 @@ all.
 
 **Done, and it needed a new instrument.** `scripts/crosstool/panrunner.ts` →
 `results/crosstool-pan.md`, which is where the numbers are; repeating them here
-is how the README's copy went stale within an hour. The shape has held across
-runs: JBrowse ahead on both short-read cases, marginally at 20x and by roughly an
-order of magnitude at 200x, with igv issuing ~95,000 and ~250,000 canvas draw
-calls per pan against JBrowse's 10–50.
+is how the README's copy went stale within an hour.
+
+The shape, from the clean run of 2026-08-16 (load 0.5–1.5): **the two tools cross
+between 20x and 200x**. igv is faster at 20x short read; JBrowse is several times
+faster at 200x and an order of magnitude faster at 1000x. That is not a wash — it
+is the difference between a cost that scales with read count and one that does
+not, and the earlier claim here that JBrowse led at every short-read case came
+from the broken detector described below.
 
 Three findings from building it are worth carrying into anything else here:
 

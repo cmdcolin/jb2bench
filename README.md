@@ -452,11 +452,16 @@ and nothing else.
 
 **The numbers live in [`results/crosstool-pan.md`](results/crosstool-pan.md) and
 are deliberately not repeated here.** An earlier draft of this section did copy
-the table in, and it was stale inside an hour when the next run moved the ratios
-— which is the same argument the ecosystem benchmarks make for generating their
-prose from the run. What is worth stating here is the shape, because that has
-held across every run so far: JBrowse ahead on both short-read cases, by a
-little at 20x and by roughly an order of magnitude at 200x.
+the table in, and it was stale inside an hour — which is the same argument the
+ecosystem benchmarks make for generating their prose from the run.
+
+The shape, from the clean run of 2026-08-16: **the two tools cross between 20x
+and 200x short read.** igv is faster at 20x; JBrowse is several times faster at
+200x and an order of magnitude faster at 1000x. igv's pan cost tracks read count
+almost exactly — a 50× rise in coverage buys a 50× rise in time — while
+JBrowse's rises under 3× over the same range. An earlier version of this section
+claimed JBrowse led everywhere; that came from the detector bug below, which
+truncated JBrowse's steps and flattered it.
 
 The mechanism behind the widening gap is in the per-step table, and it is the
 sturdiest figure in the file: **canvas draw calls per step repeat to within ~1%
