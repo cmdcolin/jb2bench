@@ -1,0 +1,40 @@
+{
+  "loc": "chr22_mask:124000-143000",
+  "runs": 1,
+  "build": "current",
+  "port": 8000,
+  "browser": "chrome",
+  "stamp": "2026-08-06",
+  "results": {
+    "20x-shortread": {
+      "webgl": {
+        "median": 2937,
+        "mean": 2937,
+        "stddev": 0,
+        "runs": [
+          2937
+        ],
+        "load": {
+          "before": 23.13,
+          "after": 22.44
+        },
+        "rung": "WebGL2",
+        "drawn": 0.3350358606557377
+      },
+      "canvas2d": {
+        "median": 3147,
+        "mean": 3147,
+        "stddev": 0,
+        "runs": [
+          3147
+        ],
+        "load": {
+          "before": 22.44,
+          "after": 25.26
+        },
+        "rung": "Canvas2D",
+        "drawn": 0.338046875
+      }
+    }
+  }
+}

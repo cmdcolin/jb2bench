@@ -68,6 +68,16 @@ screenshots/
 flame/*.folded
 flame/*.svg
 
+# A superseded backend table. scripts/render/backends.ts writes one file per
+# browser now (results/backends-chrome.*, results/backends-firefox.*), so these
+# two names are never regenerated, and the run behind them predates the
+# correction in that script's header: they report WebGPU as absent on this box,
+# when navigator.gpu does resolve a hardware adapter and only does so on a secure
+# origin. The per-browser files are the ones to read. Delete these when you no
+# longer want the 2026-08-06 numbers on disk.
+/results/backends.json
+/results/backends.md
+
 # The eight library versions ecosystem/ compares: each is a clone of a GMOD repo
 # at a tag pinned in ecosystem/versions.json, carrying its own .git and its own
 # node_modules. ecosystem/setup.sh rebuilds them in a few minutes.
