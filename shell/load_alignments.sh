@@ -39,6 +39,10 @@ for l in builds/*; do
         --config '{"displayDefaults":{"colorBy":{"type":"modifications"}}}' >/dev/null
     fi
   done
+  # CRAM decodes against the reference, and a 2.x build wants that adapter named
+  # in the track config -- see shell/cram_seqadapter.js for what it looks like
+  # when it is missing.
+  node shell/cram_seqadapter.js "$l"
   echo "  tracks loaded"
 done
 echo "DONE loading alignments"
