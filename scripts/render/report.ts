@@ -45,7 +45,16 @@ const inter = JSON.parse(
   fs.readFileSync('results/interaction.json', 'utf8'),
 ) as Interaction
 
-const CASES = [
+// The cold-load runner measures both formats and keys its rows `<cov>-<read>-<fmt>`;
+// the interaction runner is BAM-only and keys its rows `<cov>-<read>`. Two lists
+// rather than one with a suffix rule, because a row that exists on one side and
+// not the other should be visible as such rather than silently absent.
+const COLD_CASES = ['bam', 'cram'].flatMap(fmt =>
+  ['shortread', 'longread'].flatMap(read =>
+    ['20x', '200x', '1000x'].map(cov => `${cov}-${read}-${fmt}`),
+  ),
+)
+const INTER_CASES = [
   '20x-shortread',
   '200x-shortread',
   '1000x-shortread',
@@ -79,9 +88,118 @@ function speedup(id: string, from: string) {
 const esc = (s: string) =>
   s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
 
+// Figures are inlined rather than linked: a published artifact is served under a
+// CSP that blocks every external host, so a <img src="figures/..."> renders as a
+// broken image there while looking fine locally.
+const figure = (name: string, caption: string) => {
+  const p = `results/figures/${name}`
+  if (!fs.existsSync(p)) {
+    return ''
+  }
+  const b64 = fs.readFileSync(p).toString('base64')
+  return `<figure>
+    <img src="data:image/png;base64,${b64}" alt="${esc(caption)}">
+    <figcaption>${caption}</figcaption>
+  </figure>`
+}
+
+// Transcribed from ~/paper: Table `tab:speedup-strategies` and the Materials and
+// methods section. Grouped by where in the path each one acts, because the
+// paper's point is that no single stage is the bottleneck.
+const TECHNIQUES: { group: string; rows: [string, string, string][] }[] = [
+  {
+    group: 'How a record is represented',
+    rows: [
+      [
+        'Columnar typed arrays, end to end',
+        'One object per feature holding all its attributes',
+        'The layout the encoder copies from and the shader reads',
+      ],
+      [
+        'Arena allocation per decoded block',
+        'One small object per record or read feature',
+        'A CRAM read feature falls from 64 to 19 bytes',
+      ],
+      [
+        'Numeric decoding instead of strings — packed CIGAR to opcode arrays, genotypes interned to integer codes',
+        'A string per record, or per sample per site, that a later stage re-parses',
+        'Genotype-matrix preparation 1.87× and 2.47× faster, output byte-identical',
+      ],
+      [
+        'WebAssembly for the innermost loops — libdeflate, htscodecs, the clustering distance kernel',
+        'A JavaScript inflate and codec implementation',
+        '2.5–3× on inflation in isolation, but only a few percent of a whole query',
+      ],
+    ],
+  },
+  {
+    group: 'What crosses a boundary',
+    rows: [
+      [
+        'Zero-copy transport: buffers handed across the worker as transferables',
+        'A structured clone costing time proportional to payload size',
+        'The shape parsed is the shape moved and the shape drawn — no translation step',
+      ],
+      [
+        'One read per byte range, shared between callers',
+        'One request per caller, cancelled by the first to abandon it',
+        'No refetch or spurious failure when a neighbouring block is dropped',
+      ],
+      [
+        'Coalesce many regions into one pass',
+        'One request per region',
+        '25-chromosome overview: 27 range requests and 691 kB fall to 3 and 312 kB',
+      ],
+      [
+        'One chunked, compressed store across samples',
+        'One BigWig per sample, each latency-bound',
+        '2,504 individuals: 15,048 requests and 24.5 s fall to 3 requests and 0.2 s',
+      ],
+    ],
+  },
+  {
+    group: 'What the GPU holds',
+    rows: [
+      [
+        'Absolute genomic coordinates resident on the card',
+        'Rendered output bound to a specific bpPerPx',
+        'Pan, zoom, recolour and re-sort become shader parameter changes, with no refetch',
+      ],
+      [
+        'Double-single coordinate split, high and low float',
+        '32-bit float positions',
+        'Base-accurate addressing across a human chromosome',
+      ],
+      [
+        'One shader source in Slang, compiled to WGSL and GLSL with the buffer layout',
+        'Two hand-maintained implementations kept in step',
+        'The encoder and the shader that reads it cannot disagree',
+      ],
+      [
+        'WebGPU compute over the resident genotype matrix',
+        'A precomputed file fixing panel, metric and window when written',
+        'All three become analytical choices; CPU fallback below a work threshold',
+      ],
+    ],
+  },
+]
+
+const techniqueBlocks = TECHNIQUES.map(
+  g => `<h3 class="grp">${g.group}</h3>
+  <div class="scroll"><table class="tech">
+    <thead><tr><th scope="col">Technique</th><th scope="col">Replaces</th><th scope="col">What it buys</th></tr></thead>
+    <tbody>${g.rows
+      .map(
+        r =>
+          `<tr><th scope="row">${r[0]}</th><td>${r[1]}</td><td class="eff">${r[2]}</td></tr>`,
+      )
+      .join('')}</tbody>
+  </table></div>`,
+).join('\n')
+
 // ---------------------------------------------------------------- cold table
 let coldRows = ''
-for (const id of CASES) {
+for (const id of COLD_CASES) {
   const load = rowLoad(id)
   const hot = load > LOAD_CEILING
   const sp = speedup(id, PUB)
@@ -117,7 +235,7 @@ function ifmt(r?: Inter) {
 }
 
 let zoomRows = ''
-for (const id of CASES) {
+for (const id of INTER_CASES) {
   const n = icell(id, 'in', 'new')
   const b = icell(id, 'in', 'baseline')
   const p = icell(id, 'in', 'published')
@@ -132,7 +250,7 @@ for (const id of CASES) {
 }
 
 let panRows = ''
-for (const id of CASES) {
+for (const id of INTER_CASES) {
   const n = icell(id, 'pan', 'new')
   const b = icell(id, 'pan', 'baseline')
   const p = icell(id, 'pan', 'published')
@@ -150,10 +268,10 @@ for (const id of CASES) {
 }
 
 // ------------------------------------------------------------------ headline
-const measurable = CASES.map(id => speedup(id, PUB)).filter(Number.isFinite)
+const measurable = COLD_CASES.map(id => speedup(id, PUB)).filter(Number.isFinite)
 const lo = measurable.length ? Math.min(...measurable) : Number.NaN
 const hi = measurable.length ? Math.max(...measurable) : Number.NaN
-const measuredToday = CASES.filter(
+const measuredToday = COLD_CASES.filter(
   id => cellOf(id, PUB) !== undefined,
 ).length
 
@@ -286,6 +404,24 @@ const html = `<title>JBrowse 2 Since v2.4.0</title>
   .panel ul { margin: 0; padding-left: 1.1rem; display: flex; flex-direction: column; gap: 0.45rem; }
   code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.88em; background: var(--accent-soft); color: var(--accent); padding: 0.08em 0.32em; border-radius: 2px; }
   footer { border-top: 1px solid var(--line); padding-top: 1.5rem; color: var(--muted); font-size: 0.85rem; }
+
+  h3.grp {
+    font-family: system-ui, sans-serif; font-size: 0.74rem; letter-spacing: 0.11em;
+    text-transform: uppercase; color: var(--muted); margin-top: 0.5rem;
+  }
+  table.tech th, table.tech td { white-space: normal; vertical-align: top; }
+  table.tech { font-size: 0.86rem; }
+  table.tech tbody th { width: 30%; font-weight: 600; font-family: inherit; font-size: 0.86rem; color: var(--ink); }
+  table.tech td { width: 30%; color: var(--muted); }
+  table.tech td.eff { width: 40%; color: var(--accent); }
+  p.note { font-size: 0.92rem; color: var(--muted); }
+
+  figure { margin: 0; display: flex; flex-direction: column; gap: 0.6rem; }
+  figure img {
+    width: 100%; max-width: 100%; height: auto; display: block;
+    background: #fff; border: 1px solid var(--line); border-radius: 3px; padding: 0.4rem;
+  }
+  figcaption { font-size: 0.85rem; color: var(--muted); max-width: 46rem; }
 </style>
 
 <div class="wrap">
@@ -391,6 +527,36 @@ const html = `<title>JBrowse 2 Since v2.4.0</title>
         <tbody>${panRows}</tbody>
       </table>
     </div>
+  </section>
+
+  <section>
+    <h2>It is not the GPU</h2>
+    <p class="prose">
+      A record crosses six stages between file byte and pixel: decompression, parsing,
+      an in-memory representation, a thread boundary, an encode step, a draw. Each was
+      individually reasonable and none profiled as the bottleneck — <strong>the cost was
+      at the boundaries between them</strong>, where every stage handed the next a record
+      in a shape that stage had to rebuild. A profiler charges that work to the stage
+      doing the rebuilding, not to the boundary that forced it, so no measurement of a
+      single layer points at it and no owner of a single layer can remove it.
+    </p>
+    ${techniqueBlocks}
+    <p class="prose note">
+      The WebAssembly row is why that distinction decides the outcome: inflation alone
+      gets 2.5–3× faster, but a query also fetches bytes and walks an index, so the
+      multiplier reaches the user as a few percent. A stage optimized alone is bounded by
+      the stages around it. The ones that compound are the ones that change what crosses a
+      boundary — the columnar layout, the arena, and the zero-copy transport those two
+      make possible.
+    </p>
+  </section>
+
+  <section>
+    <h2>The figures</h2>
+    ${figure('cold-load.png', 'Cold load to rendered reads, by coverage and read type. Laid out like Fig 8 of the 2023 paper so the two can be read side by side.')}
+    ${figure('speedup-vs-published.png', 'Cold-load speedup of current HEAD over v2.4.0, the version the paper benchmarked.')}
+    ${figure('interaction.png', 'Time-to-content after a zoom and after a pan. Zoom-in is the current renderer’s best case; pan is its worst.')}
+    ${figure('parsers.png', 'The parser libraries, 2023 release against current. BigWig is the honest exception.')}
   </section>
 
   <section>
