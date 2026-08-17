@@ -1,0 +1,164 @@
+=== 20x-shortread  15:51:23  load 10.00 ===new: port 8000 is serving builds/current
+baseline: port 8001 is serving builds/release-4.3.0
+published: port 8004 is serving builds/release-2.4.0
+20x-shortread / current / zoom-in: time-to-content 0ms (loading=false, steps=5, load=3.1→2.8)
+20x-shortread / release-4.3.0 / zoom-in: time-to-content ≥120006ms (loading=true, steps=5, censored=5, load=2.8→7.9)
+20x-shortread / release-2.4.0 / zoom-in: time-to-content 681ms (loading=true, steps=5, load=7.9→10.9)
+
+# Zoom interaction benchmark
+
+Region `chr22_mask:124000-143000`. **time-to-content** = ms a loading indicator ("Downloading alignments...") is shown after a zoom before correct content returns; median over the measured steps. redraw = longest frame (ms) of the GPU redraw. A `≥` prefix marks a censored value: the step was still loading at MAX_WAIT (120000 ms), so the true figure is larger.
+
+Measured — in: 2026-08-13, out: 2026-08-05, pan: 2026-08-05. Comparisons *within* a section are same-run; comparisons across sections may not be.
+
+## Zoom IN — only the old renderer refetches
+
+The new view is a strict subset of already-loaded reads, so the GPU branch re-projects without going to the network. This is its best case.
+
+
+## Zoom OUT — mostly refused, not measured
+
+Zooming out was meant to be the case where BOTH builds refetch, isolating render cost from avoided fetching. It largely does not work: past a byte threshold JBrowse declines the fetch and renders "Requested too much data (N Mb). Zoom in to see features or force load" instead of reads.
+
+That path is fast and paints nothing, so it previously scored as a ~90ms success — the best-looking number in the table was a refusal to draw. `_bail_` marks a cell where no step drew anything; `(n bail)` marks partial refusal, with the median taken only over steps that did draw.
+
+The honest reading: for anything heavier than 20x shortread, this comparison has no render timing in it. The PAN section below is the test this was meant to be.
+
+
+## PAN at constant zoom — both builds refetch
+
+One full viewport sideways per step, `bpPerPx` unchanged. The region is new to both builds so neither can serve it from what it holds, and the bytes per step are the same as the initial render's, so the density cap that turns zoom-out into a refusal test is never approached. This is the refetch-vs-refetch comparison zoom-out was supposed to be.
+
+Both architectures pay the fetch here, so this is the branch's *hardest* case — the opposite end from zoom-in. Any remaining gap is render cost, not avoided network.
+
+A 19 kb window gets about five viewport-widths before it runs out of the 250 kb `chr22_mask`; steps beyond that are not attempted rather than clamped into a mostly-empty view.
+
+The pan runs **leftward** from the benchmark locus. pbsim's long reads run off the ends of the contig, so long-read depth tapers there — panning right put two of five windows on thinned data (1000x.longread falls 1178 → 938 → 500 over the last three windows), which reads as a speedup in both builds at once. Leftward keeps four of five inside the plateau. Short-read depth is flat across the whole contig either way, and 20x-shortread indeed measures the same in both directions.
+
+
+Wrote results/interaction.{json,md}
+rtread 15:51:48 ===
+=== 200x-longread  15:51:48  load 9.20 ===
+new: port 8000 is serving builds/current
+baseline: port 8001 is serving builds/release-4.3.0
+published: port 8004 is serving builds/release-2.4.0
+200x-longread / current / zoom-in: time-to-content 0ms (loading=false, steps=5, load=9.2→8.7)
+200x-longread / release-4.3.0 / zoom-in: time-to-content 2954ms (loading=true, steps=5, load=8.7→5.8)
+200x-longread / release-2.4.0 / zoom-in: time-to-content 0ms (loading=false, steps=5, load=5.8→5.3)
+
+# Zoom interaction benchmark
+
+Region `chr22_mask:124000-143000`. **time-to-content** = ms a loading indicator ("Downloading alignments...") is shown after a zoom before correct content returns; median over the measured steps. redraw = longest frame (ms) of the GPU redraw. A `≥` prefix marks a censored value: the step was still loading at MAX_WAIT (120000 ms), so the true figure is larger.
+
+Measured — in: 2026-08-13, out: 2026-08-05, pan: 2026-08-05. Comparisons *within* a section are same-run; comparisons across sections may not be.
+
+## Zoom IN — only the old renderer refetches
+
+The new view is a strict subset of already-loaded reads, so the GPU branch re-projects without going to the network. This is its best case.
+
+
+## Zoom OUT — mostly refused, not measured
+
+Zooming out was meant to be the case where BOTH builds refetch, isolating render cost from avoided fetching. It largely does not work: past a byte threshold JBrowse declines the fetch and renders "Requested too much data (N Mb). Zoom in to see features or force load" instead of reads.
+
+That path is fast and paints nothing, so it previously scored as a ~90ms success — the best-looking number in the table was a refusal to draw. `_bail_` marks a cell where no step drew anything; `(n bail)` marks partial refusal, with the median taken only over steps that did draw.
+
+The honest reading: for anything heavier than 20x shortread, this comparison has no render timing in it. The PAN section below is the test this was meant to be.
+
+
+## PAN at constant zoom — both builds refetch
+
+One full viewport sideways per step, `bpPerPx` unchanged. The region is new to both builds so neither can serve it from what it holds, and the bytes per step are the same as the initial render's, so the density cap that turns zoom-out into a refusal test is never approached. This is the refetch-vs-refetch comparison zoom-out was supposed to be.
+
+Both architectures pay the fetch here, so this is the branch's *hardest* case — the opposite end from zoom-in. Any remaining gap is render cost, not avoided network.
+
+A 19 kb window gets about five viewport-widths before it runs out of the 250 kb `chr22_mask`; steps beyond that are not attempted rather than clamped into a mostly-empty view.
+
+The pan runs **leftward** from the benchmark locus. pbsim's long reads run off the ends of the contig, so long-read depth tapers there — panning right put two of five windows on thinned data (1000x.longread falls 1178 → 938 → 500 over the last three windows), which reads as a speedup in both builds at once. Leftward keeps four of five inside the plateau. Short-read depth is flat across the whole contig either way, and 20x-shortread indeed measures the same in both directions.
+
+
+Wrote results/interaction.{json,md}
+=== done 200x-longread 15:52:42 ===
+=== 1000x-shortread  15:52:42  load 5.35 ===
+new: port 8000 is serving builds/current
+baseline: port 8001 is serving builds/release-4.3.0
+published: port 8004 is serving builds/release-2.4.0
+1000x-shortread / current / zoom-in: time-to-content 0ms (loading=false, steps=5, load=5.3→5.0)
+1000x-shortread / release-4.3.0 / zoom-in: time-to-content 1968ms (loading=true, steps=5, load=5.0→8.2)
+1000x-shortread / release-2.4.0 / zoom-in: time-to-content 0ms (loading=false, steps=5, load=8.2→10.9)
+
+# Zoom interaction benchmark
+
+Region `chr22_mask:124000-143000`. **time-to-content** = ms a loading indicator ("Downloading alignments...") is shown after a zoom before correct content returns; median over the measured steps. redraw = longest frame (ms) of the GPU redraw. A `≥` prefix marks a censored value: the step was still loading at MAX_WAIT (120000 ms), so the true figure is larger.
+
+Measured — in: 2026-08-13, out: 2026-08-05, pan: 2026-08-05. Comparisons *within* a section are same-run; comparisons across sections may not be.
+
+## Zoom IN — only the old renderer refetches
+
+The new view is a strict subset of already-loaded reads, so the GPU branch re-projects without going to the network. This is its best case.
+
+
+## Zoom OUT — mostly refused, not measured
+
+Zooming out was meant to be the case where BOTH builds refetch, isolating render cost from avoided fetching. It largely does not work: past a byte threshold JBrowse declines the fetch and renders "Requested too much data (N Mb). Zoom in to see features or force load" instead of reads.
+
+That path is fast and paints nothing, so it previously scored as a ~90ms success — the best-looking number in the table was a refusal to draw. `_bail_` marks a cell where no step drew anything; `(n bail)` marks partial refusal, with the median taken only over steps that did draw.
+
+The honest reading: for anything heavier than 20x shortread, this comparison has no render timing in it. The PAN section below is the test this was meant to be.
+
+
+## PAN at constant zoom — both builds refetch
+
+One full viewport sideways per step, `bpPerPx` unchanged. The region is new to both builds so neither can serve it from what it holds, and the bytes per step are the same as the initial render's, so the density cap that turns zoom-out into a refusal test is never approached. This is the refetch-vs-refetch comparison zoom-out was supposed to be.
+
+Both architectures pay the fetch here, so this is the branch's *hardest* case — the opposite end from zoom-in. Any remaining gap is render cost, not avoided network.
+
+A 19 kb window gets about five viewport-widths before it runs out of the 250 kb `chr22_mask`; steps beyond that are not attempted rather than clamped into a mostly-empty view.
+
+The pan runs **leftward** from the benchmark locus. pbsim's long reads run off the ends of the contig, so long-read depth tapers there — panning right put two of five windows on thinned data (1000x.longread falls 1178 → 938 → 500 over the last three windows), which reads as a speedup in both builds at once. Leftward keeps four of five inside the plateau. Short-read depth is flat across the whole contig either way, and 20x-shortread indeed measures the same in both directions.
+
+
+Wrote results/interaction.{json,md}
+=== done 1000x-shortread 15:53:38 ===
+=== 20x-longread  15:53:38  load 10.92 ===
+new: port 8000 is serving builds/current
+baseline: port 8001 is serving builds/release-4.3.0
+published: port 8004 is serving builds/release-2.4.0
+20x-longread / current / zoom-in: time-to-content 0ms (loading=false, steps=5, load=10.9→10.3)
+20x-longread / release-4.3.0 / zoom-in: time-to-content 1186ms (loading=true, steps=5, load=10.3→8.1)
+20x-longread / release-2.4.0 / zoom-in: time-to-content 0ms (loading=false, steps=5, load=8.1→10.0)
+
+# Zoom interaction benchmark
+
+Region `chr22_mask:124000-143000`. **time-to-content** = ms a loading indicator ("Downloading alignments...") is shown after a zoom before correct content returns; median over the measured steps. redraw = longest frame (ms) of the GPU redraw. A `≥` prefix marks a censored value: the step was still loading at MAX_WAIT (120000 ms), so the true figure is larger.
+
+Measured — in: 2026-08-13, out: 2026-08-05, pan: 2026-08-05. Comparisons *within* a section are same-run; comparisons across sections may not be.
+
+## Zoom IN — only the old renderer refetches
+
+The new view is a strict subset of already-loaded reads, so the GPU branch re-projects without going to the network. This is its best case.
+
+
+## Zoom OUT — mostly refused, not measured
+
+Zooming out was meant to be the case where BOTH builds refetch, isolating render cost from avoided fetching. It largely does not work: past a byte threshold JBrowse declines the fetch and renders "Requested too much data (N Mb). Zoom in to see features or force load" instead of reads.
+
+That path is fast and paints nothing, so it previously scored as a ~90ms success — the best-looking number in the table was a refusal to draw. `_bail_` marks a cell where no step drew anything; `(n bail)` marks partial refusal, with the median taken only over steps that did draw.
+
+The honest reading: for anything heavier than 20x shortread, this comparison has no render timing in it. The PAN section below is the test this was meant to be.
+
+
+## PAN at constant zoom — both builds refetch
+
+One full viewport sideways per step, `bpPerPx` unchanged. The region is new to both builds so neither can serve it from what it holds, and the bytes per step are the same as the initial render's, so the density cap that turns zoom-out into a refusal test is never approached. This is the refetch-vs-refetch comparison zoom-out was supposed to be.
+
+Both architectures pay the fetch here, so this is the branch's *hardest* case — the opposite end from zoom-in. Any remaining gap is render cost, not avoided network.
+
+A 19 kb window gets about five viewport-widths before it runs out of the 250 kb `chr22_mask`; steps beyond that are not attempted rather than clamped into a mostly-empty view.
+
+The pan runs **leftward** from the benchmark locus. pbsim's long reads run off the ends of the contig, so long-read depth tapers there — panning right put two of five windows on thinned data (1000x.longread falls 1178 → 938 → 500 over the last three windows), which reads as a speedup in both builds at once. Leftward keeps four of five inside the plateau. Short-read depth is flat across the whole contig either way, and 20x-shortread indeed measures the same in both directions.
+
+
+Wrote results/interaction.{json,md}
+=== done 20x-longread 15:54:08 ===
+ALL ZOOM CASES DONE 15:54:08
