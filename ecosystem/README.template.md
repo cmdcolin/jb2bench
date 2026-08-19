@@ -108,7 +108,7 @@ through the genotype scan, and reporting one would misdescribe the other.
 The three genotype readings answer three different questions:
 
 - **`vcf genotypes`** — every sample's GT, through the cheapest call each version
-  offers. v5.0.9 had only `SAMPLES`, which parses *every* FORMAT field of every
+  offers. v5.0.10 had only `SAMPLES`, which parses *every* FORMAT field of every
   sample to reach one; v7.2.0 has `GENOTYPES()`. That the new call is cheaper
   partly because the API grew is the point, not a confound — it is what a
   JBrowse upgrade actually buys.
