@@ -34,9 +34,24 @@ for i in $(seq 0 $((count - 1))); do
 
     if [ $FORCE -eq 1 ]; then rm -rf "$dir"; fi
 
-    if [ -f "$dir/esm/index.js" ]; then
+    # "Already built" has to mean "built at the tag we are asking for". It used
+    # to mean only that an esm/index.js existed, so a repin left the old build
+    # in place and the manifest recorded the NEW tag beside the OLD version --
+    # a stale build wearing a fresh label, which is the one failure this whole
+    # directory is arranged to prevent. Found on 2026-08-18, when moving the
+    # old side to what v2.4.0 shipped produced `tag=v1.1.18 version=2.0.0`.
+    built_ver=""
+    if [ -f "$dir/package.json" ]; then
+      built_ver=$(node -p "require('./$dir/package.json').version" 2>/dev/null || echo "")
+    fi
+    want="${tag#v}"
+
+    if [ -f "$dir/esm/index.js" ] && [ "$built_ver" = "$want" ]; then
       echo "== $name/$side ($tag) already built"
     else
+      if [ -f "$dir/esm/index.js" ]; then
+        echo "== $name/$side: holds $built_ver, $tag is pinned -- re-cloning"
+      fi
       echo "== $name/$side ($tag): cloning $repo"
       rm -rf "$dir"
       mkdir -p "$(dirname "$dir")"
@@ -69,9 +84,16 @@ for i in $(seq 0 $((count - 1))); do
     fi
 
     # Record what actually got built, so a results file can be audited later.
+    # A tag whose package.json disagrees with it is not fatal -- a release can
+    # be cut before its version bump -- but it is marked, because every label
+    # downstream comes from the tag and only this line knows what was built.
     sha=$(cd "$dir" && git rev-parse HEAD)
     ver=$(node -p "require('./$dir/package.json').version")
-    echo "$name/$side tag=$tag version=$ver sha=$sha" >>"$LIBS/manifest.txt"
+    mark=""
+    if [ "$ver" != "$want" ]; then
+      mark="  MISMATCH: package.json says $ver"
+    fi
+    echo "$name/$side tag=$tag version=$ver sha=$sha$mark" >>"$LIBS/manifest.txt"
     deps=$(cd "$dir" && node -p "JSON.stringify(require('./package.json').dependencies||{})")
     echo "  deps=$deps" >>"$LIBS/manifest.txt"
   done

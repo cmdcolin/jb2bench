@@ -26,7 +26,7 @@ is also runnable alone:
 
 | command | what it does | writes |
 | --- | --- | --- |
-| `./setup.sh` | clone + build every version in `versions.json` | `.libs/`, `.libs/manifest.txt` |
+| `./setup.sh` | clone + build every version in `versions.json`, re-cloning any side whose build is not at the pinned tag | `.libs/`, `.libs/manifest.txt` |
 | `./setup.sh --force` | re-clone and rebuild all of them | same |
 | `make verify` | the equivalence gate — do both sides return the same records? | `results/equivalence.json` |
 | `make time` | the timings | `results/bench.json` |
