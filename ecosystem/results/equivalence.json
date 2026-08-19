@@ -30,15 +30,17 @@
       "kind": "bam",
       "case": "200x shortread",
       "old": 31126,
-      "new": 31134,
+      "new": 31133,
       "gained": 8,
-      "lostBoundary": 0,
+      "lostBoundary": 1,
       "lostInterior": 0,
       "exampleGained": [
         "chr22_mask_127231_127727_1:0:0_8:0:0_6a0f|127230|127230|133",
         "chr22_mask_127671_128145_4:0:0_11:0:0_e5c50|127670|127670|69"
       ],
-      "exampleLostBoundary": []
+      "exampleLostBoundary": [
+        "chr22_mask_123498_124000_2:0:0_1:1:0_cf6f4|123850|124000|83"
+      ]
     },
     {
       "kind": "bam",
@@ -55,15 +57,18 @@
       "kind": "bam",
       "case": "1000x shortread",
       "old": 153652,
-      "new": 153686,
+      "new": 153677,
       "gained": 34,
-      "lostBoundary": 0,
+      "lostBoundary": 9,
       "lostInterior": 0,
       "exampleGained": [
         "chr22_mask_124403_124897_10:0:0_4:0:0_3b93f|124747|124747|165",
         "chr22_mask_124882_125313_4:0:0_8:0:0_9d269|124881|124881|69"
       ],
-      "exampleLostBoundary": []
+      "exampleLostBoundary": [
+        "chr22_mask_123851_124411_4:1:0_4:0:0_160d3|123850|124000|1187",
+        "chr22_mask_123851_124311_5:1:0_5:0:0_40a88|123850|124000|163"
+      ]
     },
     {
       "kind": "bam",
@@ -105,17 +110,16 @@
       "kind": "cram",
       "case": "200x shortread",
       "old": 31126,
-      "new": 31131,
+      "new": 31133,
       "gained": 8,
-      "lostBoundary": 3,
+      "lostBoundary": 1,
       "lostInterior": 0,
       "exampleGained": [
         "chr22_mask_127231_127727_1:0:0_8:0:0_6a0f|127230|133",
         "chr22_mask_127671_128145_4:0:0_11:0:0_e5c50|127670|69"
       ],
       "exampleLostBoundary": [
-        "chr22_mask_123498_124000_2:0:0_1:1:0_cf6f4|123850|83",
-        "chr22_mask_123852_124334_4:1:0_2:0:0_21a44|123851|99"
+        "chr22_mask_123498_124000_2:0:0_1:1:0_cf6f4|123850|83"
       ]
     },
     {
@@ -136,9 +140,9 @@
       "kind": "cram",
       "case": "1000x shortread",
       "old": 153652,
-      "new": 153669,
+      "new": 153677,
       "gained": 34,
-      "lostBoundary": 17,
+      "lostBoundary": 9,
       "lostInterior": 0,
       "exampleGained": [
         "chr22_mask_124403_124897_10:0:0_4:0:0_3b93f|124747|165",
@@ -180,9 +184,9 @@
     {
       "kind": "cram-lengthOnRef",
       "case": "200x shortread",
-      "old": 31123,
-      "new": 31123,
-      "compared": 31123
+      "old": 31125,
+      "new": 31125,
+      "compared": 31125
     },
     {
       "kind": "cram-lengthOnRef",
@@ -194,9 +198,9 @@
     {
       "kind": "cram-lengthOnRef",
       "case": "1000x shortread",
-      "old": 153635,
-      "new": 153635,
-      "compared": 153635
+      "old": 153643,
+      "new": 153643,
+      "compared": 153643
     },
     {
       "kind": "cram-lengthOnRef",
@@ -293,6 +297,60 @@
       "case": "20x.longread.bam",
       "old": 12242345,
       "new": 12242345,
+      "gained": 0,
+      "lostBoundary": 0,
+      "lostInterior": 0
+    },
+    {
+      "kind": "vcf",
+      "case": "100 samples gtonly",
+      "old": 31700,
+      "new": 31700,
+      "gained": 0,
+      "lostBoundary": 0,
+      "lostInterior": 0
+    },
+    {
+      "kind": "vcf",
+      "case": "1000 samples gtonly",
+      "old": 317000,
+      "new": 317000,
+      "gained": 0,
+      "lostBoundary": 0,
+      "lostInterior": 0
+    },
+    {
+      "kind": "vcf",
+      "case": "3000 samples gtonly",
+      "old": 951000,
+      "new": 951000,
+      "gained": 0,
+      "lostBoundary": 0,
+      "lostInterior": 0
+    },
+    {
+      "kind": "vcf",
+      "case": "100 samples wide",
+      "old": 31700,
+      "new": 31700,
+      "gained": 0,
+      "lostBoundary": 0,
+      "lostInterior": 0
+    },
+    {
+      "kind": "vcf",
+      "case": "1000 samples wide",
+      "old": 317000,
+      "new": 317000,
+      "gained": 0,
+      "lostBoundary": 0,
+      "lostInterior": 0
+    },
+    {
+      "kind": "vcf",
+      "case": "3000 samples wide",
+      "old": 951000,
+      "new": 951000,
       "gained": 0,
       "lostBoundary": 0,
       "lostInterior": 0

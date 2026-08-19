@@ -89,9 +89,11 @@ Three things to know before starting:
 Unchanged from the previous two handoffs, and still not done. Two things have
 been added since that make it more urgent rather than less:
 
-- **`@gmod/vcf` still has no rows in the table.** It was added to
-  `versions.json` after the last `make time`, and `results/ecosystem.md` prints
-  a derived warning saying so. The warning removes itself on the next full run.
+- **`@gmod/vcf` still has no rows in the timing table**, though it now has
+  equivalence rows: `make verify` on 2026-08-18 covered all six VCF cases for
+  the first time and both sides return identical records. `results/ecosystem.md`
+  still prints its derived warning about the missing timings, which removes
+  itself on the next full run.
 - **Both pins moved on 2026-08-18, so every recorded number is now off-pin.**
   The old side is the versions `jbrowse-components` resolved at **v2.4.0** — the
   release the paper archived — read out of that tag's `yarn.lock`: bam 1.1.18,
@@ -106,8 +108,20 @@ been added since that make it more urgent rather than less:
   from `versions.json` by `lib/arms.ts` rather than typed into each bench file,
   which is how the two drifted apart in the first place.
 
-`./setup.sh` has to clone and build the five new old-side tags before
-`make time`, so budget the extra few minutes the first time.
+**`./setup.sh` and `make verify` are done — only the timings are owed.** All
+twelve builds are at their pinned tags and their SHAs match `versions.json`, and
+the gate passes 32/32. Running `make time` is what is left, and it is the part
+that needs an idle box.
+
+The gate found one thing worth carrying into the write-up. Moving the current
+side to bam 8.11.0 and cram 13.4.1 changed which records come back at the
+**window edge**: 200x shortread returns 31133 where 7.8.1/10.4.0 returned 31134
+and 31131, and 1000x shortread 153677 where they returned 153686 and 153669. The
+records dropped all straddle the boundary — `chr22_mask_123498_124000_…` ends
+exactly at the window start — and `lostInterior` stays 0 everywhere, which is
+what the gate actually asserts. Read it as an edge-inclusion change and not as
+data loss, and note that **BAM and CRAM now agree exactly** where the previous
+pair disagreed by 3 and 17 records.
 
 `ecosystem/vitest.config.ts` asked for a single worker as
 `poolOptions: { forks: { singleFork: true } }`. Vitest 4 removed `poolOptions`
