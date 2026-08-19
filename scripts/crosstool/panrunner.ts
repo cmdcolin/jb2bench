@@ -33,6 +33,8 @@
 // Usage: node scripts/crosstool/panrunner.ts
 //   CASES=20x-shortread,...     subset of rows (CASES=none regenerates report)
 //   TOOLS=jbrowse,igv,igv-deep  subset of columns
+//   JBROWSE_PORTS=8000,8001,8004  one JBrowse arm per port; 8004 is the version
+//                               the 2023 paper benchmarked against igv.js
 //   RUNS=3 STEPS=5 PAN_DIR=left
 import { execFileSync } from 'child_process'
 import fs from 'fs'
@@ -45,11 +47,30 @@ const LOC = 'chr22_mask:124000-143000'
 const LOAD_CEILING = 4.0
 const DEEP = 10000
 
-const JBROWSE_PORT = Number(process.env.JBROWSE_PORT ?? 8000)
+// One JBrowse arm per port. The 2023 paper's own Fig 8 is igv.js against
+// JBrowse v2.4.0, so serving 8004 here re-runs that comparison on this corpus
+// with this instrument, and 8001 puts the last release between the two. The
+// default stays 8000 alone: the extra arms triple the wall clock of a matrix
+// that already runs for the better part of an hour, so they are asked for
+// rather than assumed.
+//
+// The first port is the build under test and keeps the tool id `jbrowse`,
+// because that id is the key every already-recorded row in
+// results/crosstool-pan.json is stored under, and the ratio column is against
+// it. The rest are `jbrowse-<build>`.
+const JBROWSE_PORTS = (process.env.JBROWSE_PORTS ?? process.env.JBROWSE_PORT ?? '8000')
+  .split(',')
+  .map(Number)
 const IGV_PORT = Number(process.env.IGV_PORT ?? 8003)
 
-const jbrowseBuild = await resolveBuild(JBROWSE_PORT)
-console.log(`port ${JBROWSE_PORT} is serving builds/${jbrowseBuild}`)
+const jbrowseArms = await Promise.all(
+  JBROWSE_PORTS.map(async (port, i) => {
+    const build = await resolveBuild(port)
+    console.log(`port ${port} is serving builds/${build}`)
+    return { port, build, id: i === 0 ? 'jbrowse' : `jbrowse-${build}` }
+  }),
+)
+const jbrowseBuild = jbrowseArms[0]!.build
 
 const igvVersion = JSON.parse(
   fs.readFileSync('node_modules/igv/package.json', 'utf8'),
@@ -64,13 +85,16 @@ interface Tool {
 }
 
 const allTools: Tool[] = [
-  {
-    id: 'jbrowse',
-    label: `JBrowse (${jbrowseBuild})`,
-    kind: 'jbrowse',
-    url: t =>
-      `http://localhost:${JBROWSE_PORT}/?loc=${LOC}&assembly=hg19mod&tracks=${t}&renderer=webgl`,
-  },
+  // `renderer=webgl` goes only to the build under test: it is the branch's
+  // WebGL2 pin, and a release that predates the parameter ignores it anyway.
+  ...jbrowseArms.map(({ port, build, id }, i) => ({
+    id,
+    label: `JBrowse (${build})`,
+    kind: 'jbrowse' as const,
+    url: (t: string) =>
+      `http://localhost:${port}/?loc=${LOC}&assembly=hg19mod&tracks=${t}` +
+      (i === 0 ? '&renderer=webgl' : ''),
+  })),
   {
     id: 'igv',
     label: `igv.js ${igvVersion}`,
@@ -212,6 +236,8 @@ const RESULTS = 'results/crosstool-pan.json'
 interface Recorded {
   igvVersion: string
   jbrowseBuild: string
+  /** every JBrowse arm this file holds, tool id → build directory */
+  jbrowseBuilds: Record<string, string>
   panDir: string
   steps: number
   rows: Record<string, Row>
@@ -224,6 +250,7 @@ const prior: Recorded = fs.existsSync(RESULTS)
   : {
       igvVersion,
       jbrowseBuild,
+      jbrowseBuilds: {},
       panDir: process.env.PAN_DIR ?? 'left',
       steps: Number(process.env.STEPS ?? 5),
       rows: {},
@@ -333,6 +360,10 @@ for (const c of cases) {
 
   prior.igvVersion = igvVersion
   prior.jbrowseBuild = jbrowseBuild
+  prior.jbrowseBuilds = {
+    ...prior.jbrowseBuilds,
+    ...Object.fromEntries(jbrowseArms.map(a => [a.id, a.build])),
+  }
   fs.mkdirSync('results', { recursive: true })
   fs.writeFileSync(RESULTS, JSON.stringify(prior, null, 2))
 }
@@ -347,9 +378,27 @@ for (const [id, row] of Object.entries(prior.rows)) {
 }
 const hot = outliers(cells)
 
-const shownTools = allTools.filter(t =>
-  Object.values(prior.rows).some(r => r[t.id]),
-)
+// Columns come from what the file holds, not only from what this run served. A
+// re-run of the 8000 arm alone must not silently drop a v2.4.0 column measured
+// last week — the data is still in the JSON, and a table that omits it is a
+// narrower claim than the one on disk. A recorded arm nobody served this time is
+// presentation-only: it has a label, and asking it for a URL is a bug.
+const recordedArms: Tool[] = Object.entries(prior.jbrowseBuilds ?? {})
+  .filter(([id]) => !allTools.some(t => t.id === id))
+  .map(([id, build]) => ({
+    id,
+    label: `JBrowse (${build})`,
+    kind: 'jbrowse' as const,
+    url: () => {
+      throw new Error(`${id} was not served this run; serve its port to measure it`)
+    },
+  }))
+
+const shownTools = [
+  ...allTools.filter(t => t.kind === 'jbrowse'),
+  ...recordedArms,
+  ...allTools.filter(t => t.kind !== 'jbrowse'),
+].filter(t => Object.values(prior.rows).some(r => r[t.id]))
 const fmt = (v: number | undefined) =>
   v === undefined || !Number.isFinite(v) ? '—' : `${Math.round(v)}`
 

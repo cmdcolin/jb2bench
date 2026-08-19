@@ -39,6 +39,37 @@ version can only use the second. The **file count** row exists because the
 two-point BigWig comparison reports nothing — 1–3 ms, flat — and that is a
 property of measuring a per-file cost once, not of the library.
 
+## The three versions, and which benchmarks have them
+
+Three versions are worth a column in anything published from here, and they are
+not the same three at both layers:
+
+- **v2.4.0** — what the 2023 Genome Biology paper benchmarked as "jb2 parallel"
+  and archived on Zenodo (`10.5281/zenodo.7710472`). The version a reader of the
+  paper has in mind.
+- **v4.3.0** — the last release, 2026-05-21. What a user has today.
+- **main** — the GPU renderer, unreleased at the time of writing. What v5.0.0
+  will be.
+
+| benchmark | v2.4.0 | v4.3.0 | main | note |
+| --- | --- | --- | --- | --- |
+| `results/alignments.md` — cold load | column | column | column | every BAM row measured under load 14–35 and marked `unusable`; every CRAM row unmeasured |
+| `results/interaction.md` — zoom, pan | **absent** | column | column | the runner has had the arm since 2026-08-11 and no run has served port 8004 |
+| `results/crosstool-pan.md` — vs igv.js | **absent** | **absent** | column | `make crosstool-versions` runs all three; the paper's own Fig 8 is this comparison at v2.4.0 |
+| `results/crosstool.md` — cold load vs igv.js | **absent** | **absent** | column | superseded by the pan; the cold load folds in application boot |
+| `results/backends.md` | n/a | n/a | column | one build, one variable: the `?renderer=` rung |
+| `results/multibam-pan.md` | n/a | n/a | two branch builds | track count is the axis, not version |
+| `ecosystem/` — parser libraries | pinned, unmeasured | n/a | pinned, unmeasured | repinned 2026-08-18 to v2.4.0's lockfile and npm latest; see gap 3 |
+
+The parser layer has no v4.3.0 column and does not want one: a release pins a
+range, not a version, so "what 4.3.0 shipped" and "what is current" are the same
+answer within a major. What it compares is the paper's resolved versions against
+today's.
+
+`builds/` holds 4.1.15 as well, which the render table reports and nothing else
+does. It answers "what did the last release change" rather than any of the three
+questions above.
+
 ## What is measured on the same bytes, and what is not
 
 The strongest property this repo has is that the render benchmarks and the
@@ -199,15 +230,25 @@ What it is worth spending on next:
   counter watching only `read` reported zero index requests and made the index
   look free. Any future method that fetches bytes needs adding to that set.
 
-### 3. Refresh the "current" pins before quoting them
+### 3. Re-run `make bench` on the repinned parser arms
 
-`versions.json` pins current at `@gmod/bam` v7.8.1, `@gmod/cram` v10.4.0,
-`@gmod/bbi` v10.0.2. npm as of 2026-08-16 has **8.11.0, 13.4.1 and 11.2.1**. The
-paper's parser numbers therefore understate the current releases by one, three
-and one major respectively. `sweep.json` already names the newest of each, so
-the sweep and the two-point table currently disagree about what "current" means —
-which is fine as long as it is deliberate, and is worth reconciling before
-submission.
+**Repinned 2026-08-18; the numbers have not caught up.** `versions.json` used to
+compare `@gmod/bam` v2.0.0 against v7.8.1. Both ends were wrong for the question
+it asks. The old end was read off `jbrowse-components` six months after the
+paper, which is a whole major line past what v2.4.0 shipped on two of the five
+libraries; the new end was up to three majors behind npm. Both ends now come
+from a checkable source — the v2.4.0 tag's `yarn.lock` for the old, npm latest
+for the new, which is also what main's ranges resolve to.
+
+`ecosystem/results/` still holds the numbers measured at the superseded pins, so
+`report.ts` refuses to regenerate the tables until `./setup.sh && make time` has
+run: relabelling old timings with new pins is the exact defect the repin fixes.
+Until then `ecosystem/README.md` and `results/ecosystem.md` describe v2.0.0 vs
+v7.8.1 and say so in their arm labels.
+
+Expect the 2023 side to get **slower**, not faster, since bam 1.1.18 and bbi
+3.0.0 precede the versions previously measured — so every ratio in the table is
+currently a lower bound on what the repin will report.
 
 ### 4. Sweep the application the way the libraries are now swept
 

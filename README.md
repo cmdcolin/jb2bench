@@ -569,7 +569,7 @@ symlinks into `data/`, staged by hand and wired up with
 
 | build | what it is |
 | --- | --- |
-| `current` | `jbrowse-components` HEAD, copied from `products/jbrowse-web/build`. The first build in `runner.ts`. |
+| `current` | `jbrowse-components` main, copied from `products/jbrowse-web/build`. The first build in `runner.ts`. Restaged 2026-08-18 from `7fbb075ee5`; the commit it came from is in `builds/current/BUILD_INFO.txt`, because "HEAD" names a different build every week and the recorded numbers say only `current`. |
 | `webgl-poc` | the original branch build (Jun 13) the June numbers and all the flame profiles come from |
 | `webgl-poc-current` | a fresh build of the same branch (2026-07-10), used for `results/interaction-cpu.md` |
 | `webgl-poc-fixed` | the branch plus the tooltip-clear-on-zoom fix `ce1e168b71`, measured perf-neutral |
@@ -622,10 +622,16 @@ were 2.0× (1000x-shortread), 2.4× (20x-shortread) and 3.6× (200x-longread).
 The cold-load measurement on an idle box is still owed, and it is the one worth
 having, since a contaminated row can only be re-run and not repaired.
 
-**It is wired into both runners** on port 8004 — `runner.ts` (cold load) and
-`runner-interaction.ts` (zoom, zoom-out, pan) — and appears as an extra column
-in `results/alignments.md` and all three tables of `results/interaction.md` on
-the next run.
+**It is wired into all three runners** on port 8004 — `runner.ts` (cold load),
+`runner-interaction.ts` (zoom, zoom-out, pan) and, since 2026-08-18,
+`panrunner.ts` (against igv.js, via `JBROWSE_PORTS` or `make crosstool-versions`).
+
+Only the first has run. `results/alignments.md` has its v2.4.0 column;
+`results/interaction.md` and `results/crosstool-pan.md` do not, and nothing is
+missing but a run with 8004 served. The igv.js arm is the one to run first if
+only one can be: igv.js against JBrowse v2.4.0 is the 2023 paper's own Fig 8, so
+running it here re-runs a published comparison on a corpus built to that paper's
+recipe, with an instrument that belongs to neither tool.
 
 In the interaction runner the role is **optional**: if nothing is served on
 8004 it logs `published: port 8004 not served, skipping (optional)` and emits
@@ -848,6 +854,10 @@ node scripts/gpucheck.ts headless
 # run the matrices from the repo root (paths in the runners are root-relative)
 node scripts/render/runner.ts             # → results/alignments.{md,json}
 node scripts/render/runner-interaction.ts # → results/interaction.{md,json}
+
+# against igv.js. One JBrowse arm per port, so this is where v2.4.0 gets its
+# cross-tool column — the comparison the 2023 paper's Fig 8 makes.
+JBROWSE_PORTS=8000,8001,8004 node scripts/crosstool/panrunner.ts
 
 # both runners narrow the same two ways, for when a full sweep is unaffordable:
 # CASES= picks rows, MODES= picks interactions, and either =none rebuilds the

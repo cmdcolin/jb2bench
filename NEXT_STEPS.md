@@ -1,8 +1,10 @@
 # Next steps
 
-Handoff updated 2026-08-16, on top of the parser-sweep and cross-tool-pan work.
-The previous version sat on 2026-08-05 and several of its items have since
-closed; see §7.
+Handoff updated 2026-08-18, on top of the three-version pass: `builds/current`
+restaged from main, the parser pins moved to what v2.4.0 actually resolved, and
+the cross-tool pan taught to run more than one JBrowse arm. The version-coverage
+table those changes serve is in [`COMPARISONS.md`](COMPARISONS.md); what they
+left un-measured is §1, §1a and §2 here. The previous version sat on 2026-08-16.
 
 Verified green: `pnpm typecheck` (root and `ecosystem/`) 0 errors. That was not
 true on 2026-08-05 through 2026-08-16 — `b455a3c` added a field to
@@ -54,6 +56,34 @@ Expect this row to stay the noisiest thing in the repo regardless; it is 268 MB
 of BAM. The same case on the *interaction* benchmark moved 13913 → 15321 ms
 between two runs an hour apart.
 
+## 1a. Fill the three-version matrix — needs the same idle box
+
+Everything a reader of the 2023 paper would ask for is now *wired* and mostly
+un-measured. [`COMPARISONS.md`](COMPARISONS.md) has the coverage table; this is
+the run list, cheapest first, all four serving from `make serve`:
+
+```bash
+node scripts/render/runner-interaction.ts   # fills the missing v2.4.0 column
+node scripts/render/runner.ts               # every BAM row is currently unusable, and no CRAM row exists
+make crosstool-versions                     # igv.js against v2.4.0, 4.3.0 and main — the paper's own Fig 8
+```
+
+Three things to know before starting:
+
+- **The interaction table has never had its published column**, though
+  `runner-interaction.ts` has carried the arm since 2026-08-11 and
+  `scripts/render/report.ts` already reads it. Nothing is missing but a run with
+  port 8004 served. The `published` role is optional precisely so that a run
+  without it still produces the narrower table, which is why the omission was
+  quiet for a week.
+- **The cold-load table is the one with the worst numbers and the widest
+  coverage.** All four columns exist; every BAM row was measured at load 14–35
+  and every CRAM row is blank, so the format axis the 2023 Fig 8 is built on has
+  never been measured here at all.
+- **`builds/current` is main @ `7fbb075ee5`, staged 2026-08-18.** The numbers
+  recorded before that date under the name `current` are a different build — the
+  2026-08-11 HEAD — which is why the build now carries a `BUILD_INFO.txt`.
+
 ## 2. Re-run `make bench` before quoting any ecosystem number
 
 Unchanged from the previous two handoffs, and still not done. Two things have
@@ -62,14 +92,22 @@ been added since that make it more urgent rather than less:
 - **`@gmod/vcf` still has no rows in the table.** It was added to
   `versions.json` after the last `make time`, and `results/ecosystem.md` prints
   a derived warning saying so. The warning removes itself on the next full run.
-- **The "current" pins are stale by up to three majors.** `versions.json` says
-  `@gmod/bam` v7.8.1, `@gmod/cram` v10.4.0, `@gmod/bbi` v10.0.2; npm on
-  2026-08-16 has **8.11.0, 13.4.1 and 11.2.1**. `sweep.json` names the newest of
-  each, so the sweep and the two-point table currently disagree about what
-  "current" means. That is fine as a deliberate choice and bad as an accident —
-  and the CRAM gap is the one that matters, because `results/sweep.md` shows
-  that line still moving after v10. **Deciding this is the author's call**, since
-  it changes a number the paper publishes; nothing here has changed it.
+- **Both pins moved on 2026-08-18, so every recorded number is now off-pin.**
+  The old side is the versions `jbrowse-components` resolved at **v2.4.0** — the
+  release the paper archived — read out of that tag's `yarn.lock`: bam 1.1.18,
+  cram 1.7.3, bbi 3.0.0, vcf 5.0.10, bgzf 1.4.5. It used to be a tree from six
+  months later, a whole major line off on bam and bbi. The new side is npm
+  latest (bam 8.11.0, cram 13.4.1, bbi 11.2.2, vcf 7.2.0, bgzf 6.6.0), which is
+  also what main's ranges resolve to; it used to trail by up to three majors.
+- **`report.ts` now refuses to run against off-pin numbers.** It compares the
+  version in each `bench.json` arm label against `versions.json` and throws, so
+  `make report` cannot relabel v2.0.0 timings as v1.1.18. That refusal is the
+  current state: try it and it names all eight stale arms. Arm labels are read
+  from `versions.json` by `lib/arms.ts` rather than typed into each bench file,
+  which is how the two drifted apart in the first place.
+
+`./setup.sh` has to clone and build the five new old-side tags before
+`make time`, so budget the extra few minutes the first time.
 
 `ecosystem/vitest.config.ts` asked for a single worker as
 `poolOptions: { forks: { singleFork: true } }`. Vitest 4 removed `poolOptions`

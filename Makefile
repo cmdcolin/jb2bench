@@ -23,8 +23,8 @@ STAMP := $(shell date +%Y-%m-%d)
 LOGDIR := results/logs
 
 .PHONY: help gate counts timings all figures report serve serve-stop \
-        corpus corpus-paper render interaction crosstool parsers \
-        parsers-count cram-samtools multibam backends clean-logs
+        corpus corpus-paper render interaction crosstool crosstool-versions \
+        parsers parsers-count cram-samtools multibam backends clean-logs
 
 help:
 	@echo "preflight"
@@ -44,6 +44,7 @@ help:
 	@echo "  make render          cold load, both formats x both read types"
 	@echo "  make interaction     zoom and pan time-to-content"
 	@echo "  make crosstool       against igv.js"
+	@echo "  make crosstool-versions  against igv.js, from v2.4.0 to HEAD (3x as long)"
 	@echo "  make parsers         the parser libraries, 2023 vs current, + the sweep"
 	@echo "  make cram-samtools   @gmod/cram against samtools, the 2019 paper's benchmark"
 	@echo "  make multibam        multi-track pan"
@@ -110,6 +111,14 @@ interaction: gate | $(LOGDIR)
 
 crosstool: gate | $(LOGDIR)
 	$(NODE) scripts/crosstool/panrunner.ts 2>&1 | tee $(LOGDIR)/crosstool-pan-$(STAMP).log
+
+# The 2023 paper's own comparison — igv.js against JBrowse v2.4.0 — plus the
+# last release in between, on this corpus and this instrument. Three JBrowse
+# arms instead of one, so budget roughly three times the wall clock; that is
+# why it is its own target and not what `crosstool` does by default.
+crosstool-versions: gate | $(LOGDIR)
+	JBROWSE_PORTS=8000,8001,8004 $(NODE) scripts/crosstool/panrunner.ts 2>&1 \
+	  | tee $(LOGDIR)/crosstool-pan-versions-$(STAMP).log
 
 multibam: gate | $(LOGDIR)
 	$(NODE) scripts/render/multibam.ts 2>&1 | tee $(LOGDIR)/multibam-$(STAMP).log
