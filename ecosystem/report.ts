@@ -21,6 +21,13 @@ const raw = readJson('results/bench.json')
 const versions = readJson('versions.json')
 const zarr = readJson('zarr.json')
 
+const lib = (name: string) => {
+  const l = versions.libraries.find((x: any) => x.name === name)
+  if (!l) throw new Error(`no library "${name}" in versions.json`)
+  return l
+}
+const tag = (name: string, side: 'old' | 'new') => lib(name)[side].tag
+
 let equivalenceData: any
 try {
   equivalenceData = readJson('results/equivalence.json')
@@ -54,6 +61,34 @@ function groups(): Group[] {
     throw new Error('no benchmark groups found in results/bench.json')
   }
   return out
+}
+
+// bench.json is a measurement; versions.json is a pin. When they disagree the
+// pin moved and the numbers did not, and every version this report prints would
+// name a build that produced none of them. That is not hypothetical: until
+// 2026-08-18 the pins said the 2023 side was @gmod/bam v2.0.0 while the paper's
+// v2.4.0 shipped 1.1.18, and the table published the wrong one for months
+// because nothing compared the two files. Refuse rather than relabel.
+const pinnedTags = new Set<string>(
+  versions.libraries.flatMap((l: any) => [l.old.tag, l.new.tag]),
+)
+const measuredTags = new Set<string>()
+for (const g of groups()) {
+  for (const b of g.benches) {
+    const v = /^v\d+\.\d+\.\d+/.exec(b.name)?.[0]
+    if (v) {
+      measuredTags.add(v)
+    }
+  }
+}
+const stalePins = [...measuredTags].filter(v => !pinnedTags.has(v))
+if (stalePins.length) {
+  throw new Error(
+    `results/bench.json holds timings for ${stalePins.join(', ')}, which ` +
+      'versions.json no longer pins. Re-run `./setup.sh && make time` before ' +
+      '`make report` — relabelling old numbers with new pins is the one thing ' +
+      'this report must not do.',
+  )
 }
 
 interface Row {
@@ -142,9 +177,9 @@ if (equivalenceData) {
   if (spans.length) {
     equivalence +=
       '\n### CRAM reference spans, against the BAM holding the same alignments\n\n' +
-      '| case | v1.7.1 agrees | current agrees | of |\n| --- | --- | --- | --- |\n' +
+      `| case | ${tag('cram-js', 'old')} agrees | current agrees | of |\n| --- | --- | --- | --- |\n` +
       spans.map((d: any) => `| ${d.case} | ${d.old} | ${d.new} | ${d.compared} |`).join('\n') +
-      "\n\nv1.7.1 derives a long read's reference span wrongly; the current\n" +
+      `\n\n${tag('cram-js', 'old')} derives a long read's reference span wrongly; the current\n` +
       'release reproduces the BAM exactly. Short reads were always correct in both.\n'
   }
 }
@@ -243,11 +278,6 @@ ${bodyRows.join('\n')}
 
 // --- the inline numbers -------------------------------------------------------
 
-const lib = (name: string) => {
-  const l = versions.libraries.find((x: any) => x.name === name)
-  if (!l) throw new Error(`no library "${name}" in versions.json`)
-  return l
-}
 const ver = (name: string, side: 'old' | 'new') => lib(name)[side].tag.replace(/^v/, '')
 
 const secs = (r: Row, side: 'old' | 'new') => (r[side].mean / 1000).toFixed(1)

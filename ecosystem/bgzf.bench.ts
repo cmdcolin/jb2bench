@@ -1,9 +1,9 @@
 import { readFileSync } from 'node:fs'
 import { bench, describe } from 'vitest'
 
-// v1.4.3 shipped two decompressors and picked between them at import time: in
+// v1.4.5 shipped two decompressors and picked between them at import time: in
 // Node its `unzip` is a thin wrapper over zlib.gunzip (C++), while browsers got
-// `pakoUnzip` (pure JS). v6.3.2 has one implementation, pako-esm2, everywhere.
+// `pakoUnzip` (pure JS). v6.6.0 has one implementation, pako-esm2, everywhere.
 //
 // So comparing the two `unzip` exports in Node compares C++ against JS and says
 // nothing about the library. Both paths are measured below and reported apart:
@@ -14,6 +14,7 @@ import {
   unzip as oldNodeUnzip,
 } from './.libs/bgzf-filehandle/old/esm/unzip.js'
 import { unzip as newUnzip } from './.libs/bgzf-filehandle/new/esm/unzip.js'
+import { newArm, oldArm } from './lib/arms.ts'
 import { DATA } from './lib/corpus.ts'
 
 // 1000x is left out: BAM is BGZF end to end, so unzipping 1000x.longread.bam
@@ -33,19 +34,19 @@ for (const { label, file } of CASES) {
   const opts = { iterations: 10, warmupIterations: 3 }
 
   describe(`bgzf browser path ${label}`, () => {
-    bench('v1.4.3 pako (2023)', async () => {
+    bench(oldArm('bgzf-filehandle', ' pako'), async () => {
       await oldBrowserUnzip(data)
     }, opts)
-    bench('v6.3.2 pako-esm2 (current)', async () => {
+    bench(newArm('bgzf-filehandle', ' pako-esm2'), async () => {
       await newUnzip(data)
     }, opts)
   })
 
   describe(`bgzf node path ${label}`, () => {
-    bench('v1.4.3 native zlib (2023)', async () => {
+    bench(oldArm('bgzf-filehandle', ' native zlib'), async () => {
       await oldNodeUnzip(data)
     }, opts)
-    bench('v6.3.2 pako-esm2 (current)', async () => {
+    bench(newArm('bgzf-filehandle', ' pako-esm2'), async () => {
       await newUnzip(data)
     }, opts)
   })

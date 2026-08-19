@@ -1,18 +1,33 @@
 {
   "comment": [
-    "Pinned refs for the parser-library comparison. 'old' is the version JBrowse 2",
-    "depended on at the time of the 2023 Genome Biology paper (Diesh et al. 2023);",
-    "the pin was read out of jbrowse-components at the last commit before",
-    "2023-08-15. 'new' is the current release. Both sides are cloned from GitHub at",
-    "these tags and built from source with the same toolchain, so the measured",
-    "difference is library code and not a change of transpiler target or module",
-    "format.",
+    "Pinned refs for the parser-library comparison. 'old' is what JBrowse 2",
+    "resolved at v2.4.0 — the release the 2023 Genome Biology paper benchmarked as",
+    "'jb2 parallel' and archived on Zenodo (10.5281/zenodo.7710472). The versions",
+    "come out of that tag's yarn.lock rather than off its package.json ranges,",
+    "because a range is not a version: v2.4.0 asks for @gmod/bam ^1.1.15 and ships",
+    "1.1.18. 'new' is the current release, which is also what main's ranges resolve",
+    "to today. Both sides are cloned from GitHub at these tags and built from",
+    "source with the same toolchain, so the measured difference is library code and",
+    "not a change of transpiler target or module format.",
     "",
-    "jbrowse-components pins at 2023-08-12 (rev 6fb9daa575):",
-    "  plugins/alignments: @gmod/bam ^2.0.0, @gmod/cram ^1.7.1",
-    "  plugins/wiggle:     @gmod/bbi ^4.0.0",
-    "  plugins/variants:   @gmod/vcf ^5.0.9",
-    "  core:               @gmod/bgzf-filehandle ^1.4.3",
+    "jbrowse-components at v2.4.0 (78707a2bc3, 2023-02-24) resolved:",
+    "  @gmod/bam 1.1.18, @gmod/cram 1.7.3, @gmod/bbi 3.0.0,",
+    "  @gmod/vcf 5.0.10, @gmod/bgzf-filehandle 1.4.5",
+    "",
+    "Until 2026-08-18 the old side was read off jbrowse-components at its last",
+    "commit before 2023-08-15 (rev 6fb9daa575) instead — six months past the",
+    "paper, and a whole major line off on two of the five libraries: bam 2.0.0",
+    "where the paper shipped 1.1.18, bbi 4.0.0 where it shipped 3.0.0. So the",
+    "table named the published version and measured a later one, understating the",
+    "change by however much those two majors were worth. What this file exists to",
+    "answer is how much faster the parsers got since the version people have read",
+    "about, so the pin is the archived release rather than a nearby tree.",
+    "",
+    "The 'new' pins are npm latest as of 2026-08-18. main pins @gmod/bam ^8.9.0,",
+    "@gmod/cram ^13.3.0, @gmod/bbi ^11.2.1, @gmod/vcf ^7.2.0 and",
+    "@gmod/bgzf-filehandle ^6.6.0, and every one of those ranges resolves to the",
+    "tag below, so 'new' is both the current release and what a build of main",
+    "installs.",
     "",
     "vcf-js appears twice, on two different axes. 'vcf-js' is the 2023-vs-current",
     "comparison every other entry makes. 'vcf-js-scan' is a single-release",
@@ -27,12 +42,12 @@
       "package": "@gmod/bam",
       "repo": "https://github.com/GMOD/bam-js",
       "old": {
-        "tag": "v2.0.0",
-        "sha": "ca48ec9830"
+        "tag": "v1.1.18",
+        "sha": "bdab15139d"
       },
       "new": {
-        "tag": "v7.8.1",
-        "sha": "01eae40f9a"
+        "tag": "v8.11.0",
+        "sha": "51de80027f"
       }
     },
     {
@@ -41,23 +56,23 @@
       "package": "@gmod/cram",
       "repo": "https://github.com/GMOD/cram-js",
       "old": {
-        "tag": "v1.7.1",
-        "sha": "4373143b3a",
+        "tag": "v1.7.3",
+        "sha": "bfec2875b8",
         "extraDeps": [
           "generic-filehandle@^3.0.0"
         ],
         "extraDepsReason": [
-          "v1.7.1 imports generic-filehandle without declaring it, in either",
+          "v1.7.3 imports generic-filehandle without declaring it, in either",
           "dependencies or devDependencies. Under npm's flat node_modules it",
           "resolved anyway, hoisted out of a transitive dep; pnpm's strict layout",
           "does not hoist, so the import fails. ^3.0.0 is the range",
-          "jbrowse-components itself pinned at the time (rev 6fb9daa575), so this",
-          "restores what a 2023 install actually resolved."
+          "jbrowse-components itself resolved at v2.4.0, so this restores what a",
+          "2023 install actually got."
         ]
       },
       "new": {
-        "tag": "v10.4.0",
-        "sha": "d0d6938296"
+        "tag": "v13.4.1",
+        "sha": "eb529bce16"
       }
     },
     {
@@ -66,12 +81,12 @@
       "package": "@gmod/bgzf-filehandle",
       "repo": "https://github.com/GMOD/bgzf-filehandle",
       "old": {
-        "tag": "v1.4.3",
-        "sha": "0be710d821"
+        "tag": "v1.4.5",
+        "sha": "75fa709890"
       },
       "new": {
-        "tag": "v6.3.2",
-        "sha": "a24bd8902f"
+        "tag": "v6.6.0",
+        "sha": "43a6817688"
       }
     },
     {
@@ -80,12 +95,12 @@
       "package": "@gmod/bbi",
       "repo": "https://github.com/GMOD/bbi-js",
       "old": {
-        "tag": "v4.0.0",
-        "sha": "a4b7c4c911"
+        "tag": "v3.0.0",
+        "sha": "8def16f471"
       },
       "new": {
-        "tag": "v10.0.2",
-        "sha": "b7e0478585"
+        "tag": "v11.2.2",
+        "sha": "2e727665c6"
       }
     },
     {
@@ -94,8 +109,8 @@
       "package": "@gmod/vcf",
       "repo": "https://github.com/GMOD/vcf-js",
       "old": {
-        "tag": "v5.0.9",
-        "sha": "06916457f6"
+        "tag": "v5.0.10",
+        "sha": "8d5c9518cd"
       },
       "new": {
         "tag": "v7.2.0",
@@ -117,7 +132,9 @@
       }
     }
   ],
-  "pinDate": "2023-08-15",
-  "pinDateProse": "15 August 2023",
-  "pinRev": "6fb9daa575"
+  "paperRelease": "v2.4.0",
+  "paperZenodo": "10.5281/zenodo.7710472",
+  "pinDate": "2023-02-24",
+  "pinDateProse": "24 February 2023",
+  "pinRev": "78707a2bc3"
 }

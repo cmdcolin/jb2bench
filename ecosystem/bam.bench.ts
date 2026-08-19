@@ -2,6 +2,7 @@ import { bench, describe } from 'vitest'
 
 import { BamFile as Old } from './.libs/bam-js/old/esm/index.js'
 import { BamFile as New } from './.libs/bam-js/new/esm/index.js'
+import { newArm, oldArm } from './lib/arms.ts'
 import { BAM_CASES, END, REF, START } from './lib/corpus.ts'
 import { iterations } from './lib/iterations.ts'
 
@@ -19,7 +20,7 @@ function run(Ctor: any, bamPath: string) {
 for (const { label, file } of BAM_CASES) {
   describe(`bam ${label}`, () => {
     const opts = iterations(label)
-    bench('v2.0.0 (2023)', run(Old, file), opts)
-    bench('v7.8.1 (current)', run(New, file), opts)
+    bench(oldArm('bam-js'), run(Old, file), opts)
+    bench(newArm('bam-js'), run(New, file), opts)
   })
 }

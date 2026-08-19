@@ -1,6 +1,6 @@
 import { bench, describe } from 'vitest'
 
-// The 2023-vs-current axis every other library here uses: v5.0.9, the version
+// The 2023-vs-current axis every other library here uses: v5.0.10, the version
 // JBrowse 2 pinned at the paper, against v7.2.0.
 //
 // The single-release before/after that isolates the 7.2.0 genotype-scan rewrite
@@ -8,6 +8,7 @@ import { bench, describe } from 'vitest'
 // bottom of this file.
 import OldVcf from './.libs/vcf-js/old/esm/index.js'
 import NewVcf from './.libs/vcf-js/new/esm/index.js'
+import { newArm, oldArm } from './lib/arms.ts'
 import { VCF_CASES, vcfParts } from './lib/corpus.ts'
 
 // Fixed rather than time-budgeted, for the reason lib/iterations.ts gives: two
@@ -28,7 +29,7 @@ function opts(samples: number) {
 // and nothing else. Each version is asked for it through the cheapest API that
 // version offers, which is the comparison that describes what upgrading buys.
 //
-//   v5.0.9   `variant.SAMPLES` — a lazy property that parses EVERY FORMAT field
+//   v5.0.10  `variant.SAMPLES` — a lazy property that parses EVERY FORMAT field
 //            of every sample into an object of arrays. There was no way to ask
 //            for GT alone.
 //   v7.x     `variant.GENOTYPES()` — GT alone, as a Record.
@@ -45,7 +46,7 @@ for (const { label, file, samples } of VCF_CASES) {
 
   describe(`vcf genotypes ${label}`, () => {
     bench(
-      'v5.0.9 SAMPLES (2023)',
+      oldArm('vcf-js', ' SAMPLES'),
       () => {
         for (const line of lines) {
           const v = oldParser.parseLine(line)
@@ -58,7 +59,7 @@ for (const { label, file, samples } of VCF_CASES) {
       o,
     )
     bench(
-      'v7.2.0 GENOTYPES (current)',
+      newArm('vcf-js', ' GENOTYPES'),
       () => {
         for (const line of lines) {
           newParser.parseLine(line).GENOTYPES()
@@ -69,11 +70,11 @@ for (const { label, file, samples } of VCF_CASES) {
   })
 
   // Like-for-like: the same whole-record parse on both sides, so the API change
-  // above is not doing the work. v5.0.9's SAMPLES is a property and v7.2.0's is
+  // above is not doing the work. v5.0.10's SAMPLES is a property and v7.2.0's is
   // a method; that rename is the only difference in what is being asked for.
   describe(`vcf SAMPLES ${label}`, () => {
     bench(
-      'v5.0.9 (2023)',
+      oldArm('vcf-js'),
       () => {
         for (const line of lines) {
           oldParser.parseLine(line).SAMPLES
@@ -82,7 +83,7 @@ for (const { label, file, samples } of VCF_CASES) {
       o,
     )
     bench(
-      'v7.2.0 (current)',
+      newArm('vcf-js'),
       () => {
         for (const line of lines) {
           newParser.parseLine(line).SAMPLES()

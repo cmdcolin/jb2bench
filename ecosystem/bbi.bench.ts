@@ -2,6 +2,7 @@ import { bench, describe } from 'vitest'
 
 import { BigWig as Old } from './.libs/bbi-js/old/esm/index.js'
 import { BigWig as New } from './.libs/bbi-js/new/esm/index.js'
+import { newArm, oldArm } from './lib/arms.ts'
 import { BW_CASES, END, REF, START } from './lib/corpus.ts'
 import { iterations } from './lib/iterations.ts'
 
@@ -18,7 +19,7 @@ function run(Ctor: any, path: string) {
 for (const { label, file } of BW_CASES) {
   describe(`bigwig ${label}`, () => {
     const opts = iterations(label)
-    bench('v4.0.0 (2023)', run(Old, file), opts)
-    bench('v10.0.2 (current)', run(New, file), opts)
+    bench(oldArm('bbi-js'), run(Old, file), opts)
+    bench(newArm('bbi-js'), run(New, file), opts)
   })
 }

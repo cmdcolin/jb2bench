@@ -165,7 +165,7 @@ export function reference(): string {
 export const seqFetch = async (_seqId: number, start: number, end: number) =>
   reference().slice(start - 1, end)
 
-// cram-js v1.7.1 defaults fetchSizeLimit to 3 MB and throws past it, which every
+// cram-js v1.7.3 defaults fetchSizeLimit to 3 MB and throws past it, which every
 // long-read window here exceeds. JBrowse 2 never ran that default: its
 // CramAdapter set `fetchSizeLimit: 200_000_000` with the comment "just make this
 // a large size to avoid hitting it". Passing the same value reproduces what

@@ -2,8 +2,8 @@
 
 The render benchmarks one directory up measure the browser. These measure the
 layer underneath it: the GMOD parser libraries JBrowse depends on, comparing the
-versions JBrowse 2 shipped at the time of the 2023 paper against the current
-releases.
+versions JBrowse 2 v2.4.0 shipped — the release the 2023 paper benchmarked —
+against the current releases, which are what main installs today.
 
 ## How to run it
 
@@ -66,10 +66,20 @@ in the few-percent range. The number that forced that split is
 
 {{versionsTable}}
 
-The 2023 column is not a guess. It is the pin read out of `jbrowse-components`
-at its last commit before {{pinDateIso}} (rev `{{pinRev}}`), which is the tree
-the JBrowse 2 paper describes. Exact tags and commit SHAs are in
-`versions.json`.
+The 2023 column is not a guess, and it is not a semver range either. It is what
+`jbrowse-components` **resolved** at v2.4.0 (rev `{{pinRev}}`, {{pinDateIso}}) —
+the release the paper benchmarked as "jb2 parallel" and archived on Zenodo — read
+out of that tag's `yarn.lock`. A range would not do: v2.4.0 asks for `@gmod/bam`
+`^1.1.15` and ships 1.1.18. Exact tags and commit SHAs are in `versions.json`.
+
+Until 2026-08-18 this column was pinned to a different tree: `jbrowse-components`
+at its last commit before 2023-08-15, six months past the paper. That is a whole
+major line off on two of the five libraries — bam 2.0.0 where the paper shipped
+1.1.18, bbi 4.0.0 where it shipped 3.0.0 — so the table named the published
+version while measuring a later one, and understated the change by whatever those
+majors were worth. [`results/sweep.md`](results/sweep.md) is where to see how much
+that is: it measures every major line of each library, so both pins appear on the
+same curve.
 
 ## Results
 

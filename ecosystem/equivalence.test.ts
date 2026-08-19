@@ -131,11 +131,11 @@ test.each(CRAM_CASES)('cram $label agrees', async ({ label, file }) => {
   }
   const o = await read(OldCram, OldCraiIndex, OLD_CRAM_OPTS)
   const n = await read(NewCram, NewCraiIndex)
-  // v1.7.1 exposes a 1-based alignmentStart; the current release exposes a
+  // v1.7.3 exposes a 1-based alignmentStart; the current release exposes a
   // 0-based start, so the old value is shifted to match before comparing.
   //
   // The key is identity — read name, start, flags — and deliberately excludes
-  // lengthOnRef, which legitimately changed: v1.7.1 derives a long read's
+  // lengthOnRef, which legitimately changed: v1.7.3 derives a long read's
   // reference span wrongly, and `cram lengthOnRef` below adjudicates that
   // against the BAM holding the same alignments rather than assuming it.
   compare(
@@ -158,7 +158,7 @@ test.each(CRAM_CASES)('cram $label agrees', async ({ label, file }) => {
 })
 
 // The BAM and the CRAM in each pair hold the same alignments, so the BAM's
-// reference span is the answer the CRAM reader has to reproduce. v1.7.1 does not
+// reference span is the answer the CRAM reader has to reproduce. v1.7.3 does not
 // reproduce it for long reads; the current release does, exactly.
 test.each(CRAM_CASES)('cram $label lengthOnRef matches the BAM', async ({ label, file }) => {
   const read = async (File: any, Index: any, extra: object = {}) =>
@@ -209,7 +209,7 @@ test.each(CRAM_CASES)('cram $label lengthOnRef matches the BAM', async ({ label,
   const o = score(oldRecs, oldKey)
   const n = score(newRecs, newKey)
   console.log(
-    `cram lengthOnRef ${label}: v1.7.1 ${o.agree}/${o.compared} match BAM, ` +
+    `cram lengthOnRef ${label}: v1.7.3 ${o.agree}/${o.compared} match BAM, ` +
       `current ${n.agree}/${n.compared}`,
   )
   deltas.push({
@@ -223,7 +223,7 @@ test.each(CRAM_CASES)('cram $label lengthOnRef matches the BAM', async ({ label,
   // Long reads go from near-zero agreement to exact. Short reads keep a residual
   // ~2% disagreement that both releases share, so it predates the upgrade and is
   // not what this benchmark is measuring; the invariant that matters is that the
-  // current release never agrees with the BAM *less* often than v1.7.1 did.
+  // current release never agrees with the BAM *less* often than v1.7.3 did.
   expect(n.agree).toBeGreaterThanOrEqual(o.agree)
 })
 
@@ -250,7 +250,7 @@ test('bgzf decompresses to the same bytes', async () => {
       newUnzip(data),
     ])
     console.log(
-      `bgzf ${name}: v1.4.3 pako=${browser.length} v1.4.3 zlib=${node.length} v6.3.2=${current.length}`,
+      `bgzf ${name}: v1.4.5 pako=${browser.length} v1.4.5 zlib=${node.length} v6.6.0=${current.length}`,
     )
     expect(current.length).toBe(browser.length)
     expect(current.length).toBe(node.length)
@@ -272,7 +272,7 @@ test('bgzf decompresses to the same bytes', async () => {
 // parser is a record it must parse. So the sides have to agree on the genotype
 // of every sample at every site, exactly.
 //
-// Both readings are checked. GENOTYPES() against v5.0.9's SAMPLES[k].GT is the
+// Both readings are checked. GENOTYPES() against v5.0.10's SAMPLES[k].GT is the
 // pair the headline benchmark times, and it is the one that could silently
 // diverge, since the two arrive at the genotype by different code. The
 // processGenotypes pair is checked as ranges resolved to strings, which is what
@@ -291,7 +291,7 @@ test.each(VCF_CASES)('vcf $label agrees', ({ label, file, samples }) => {
   let scanDiffs = 0
 
   for (const [i, line] of lines.entries()) {
-    // v5.0.9 renders GT as a one-element array of the genotype string
+    // v5.0.10 renders GT as a one-element array of the genotype string
     const oldSamples = oldParser.parseLine(line).SAMPLES
     const current = newParser.parseLine(line).GENOTYPES()
 

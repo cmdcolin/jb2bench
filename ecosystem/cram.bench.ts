@@ -8,6 +8,7 @@ import {
   CraiIndex as NewIndex,
   IndexedCramFile as NewFile,
 } from './.libs/cram-js/new/esm/index.js'
+import { newArm, oldArm } from './lib/arms.ts'
 import { CRAM_CASES, END, OLD_CRAM_OPTS, START, seqFetch } from './lib/corpus.ts'
 import { iterations } from './lib/iterations.ts'
 
@@ -30,7 +31,7 @@ function run(File: any, Index: any, cramPath: string, extra: object = {}) {
 for (const { label, file } of CRAM_CASES) {
   describe(`cram ${label}`, () => {
     const opts = iterations(label)
-    bench('v1.7.1 (2023)', run(OldFile, OldIndex, file, OLD_CRAM_OPTS), opts)
-    bench('v10.4.0 (current)', run(NewFile, NewIndex, file), opts)
+    bench(oldArm('cram-js'), run(OldFile, OldIndex, file, OLD_CRAM_OPTS), opts)
+    bench(newArm('cram-js'), run(NewFile, NewIndex, file), opts)
   })
 }
