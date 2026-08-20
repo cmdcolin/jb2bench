@@ -40,6 +40,7 @@ is also runnable alone:
 | `MODE=count make sweep` | the same, counting reads and bytes instead of timing — needs no idle box | same |
 | `make cohort` | N-BigWig panel: request counts and timings | `results/cohort-bw.{md,json}` |
 | `make cram-samtools` | `@gmod/cram` against `samtools view`, the 2019 paper's procedure | `results/cram-samtools.{md,json}` |
+| `make report-extras` | the paper macros and table for the two benchmarks above; measures nothing | `results/paper/parser-{extras,samtools}.tex` |
 | `make clean` | drop `results/` | |
 | `make distclean` | also drop `.libs/` and `node_modules/` | |
 
@@ -561,6 +562,19 @@ typed by hand:
 
 Edit `README.template.md`, never `README.md`. To pull a fresh run into the
 paper, run `make bench` here and then `make sync-benchmarks` in the paper repo.
+
+`report-extras.ts` writes the other two, from the two benchmarks that keep their
+own JSON and are not part of `make bench`:
+
+- `results/paper/parser-samtools.tex` — the 2019 cram-js benchmark re-run, as
+  the paper's table
+- `results/paper/parser-extras.tex` — its macros, plus the cohort panel's reads
+  per file
+
+It is a separate script because `report.ts` throws when `bench.json`'s arms are
+off-pin, which is the refusal the speedup table needs and would otherwise take
+the samtools numbers down with it — they are pinned by `sweep.json` and answer a
+different question.
 
 ## Layout
 

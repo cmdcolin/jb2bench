@@ -260,7 +260,9 @@ writeFileSync(
 \\begin{longtable}[]{@{}lrrrr@{}}
 \\caption{\\label{tab:parser-speedup}Parsing a 19 kb window, current release against the
 version in use in 2023. Ratio of mean wall-clock; BGZF is the pure-JavaScript
-path both releases run in a browser.}\\tabularnewline
+path both releases run in a browser. The BGZF column has no 1000$\\times$ rows:
+BAM is BGZF end to end, so decompressing those files whole would time garbage
+collection rather than the codec.}\\tabularnewline
 \\toprule\\noalign{}
 Case & ${COLUMNS.map(c => c.head).join(' & ')} \\\\
 \\midrule\\noalign{}

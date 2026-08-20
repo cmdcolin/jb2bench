@@ -7,7 +7,7 @@
 # libraries that return different records is not a comparison, so the gate runs
 # first and a failure stops the run.
 
-.PHONY: all bench setup setup-sweep install typecheck verify time report scan gff3 sweep sweep-verify cohort cram-samtools clean distclean
+.PHONY: all bench setup setup-sweep install typecheck verify time report report-extras scan gff3 sweep sweep-verify cohort cram-samtools clean distclean
 
 all: bench
 
@@ -89,6 +89,13 @@ cohort: install
 # and says which fixtures it could not resolve.
 cram-samtools: install setup-sweep
 	node --experimental-strip-types cram-samtools.ts
+
+# The paper macros that do not come from bench.json: the samtools comparison and
+# the cohort panel, each with its own JSON and its own schedule. Kept out of
+# `report` because that script refuses to run against off-pin arms, which is the
+# right refusal for the speedup table and would take these down with it.
+report-extras:
+	node --experimental-strip-types report-extras.ts
 
 bench: verify time report
 
