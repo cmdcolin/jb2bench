@@ -145,6 +145,7 @@ timings: render interaction crosstool parsers cram-samtools
 
 figures:
 	Rscript scripts/render/charts.R
+	Rscript scripts/crosstool/panchart.R
 	Rscript ecosystem/sweepchart.R
 
 report:
