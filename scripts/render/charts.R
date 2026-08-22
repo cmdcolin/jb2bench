@@ -191,7 +191,15 @@ p_sp <- ggplot(sp, aes(factor(coverage, labels = c("20x", "200x", "1000x")), spe
     x = "coverage", y = "speedup vs v2.4.0",
     caption = paste0(
       "Cumulative, not isolated: three years separate v2.4.0 from HEAD and almost none of it is the renderer.\n",
-      "Same corpus and same simulation commands as the paper's methods; 19 kb window against its 10 kb."
+      "Same corpus and same simulation commands as the paper's methods; 19 kb window against its 10 kb.\n",
+      # Same cold_df the panel above plots, so the same load caveat applies. A
+      # ratio survives a loaded machine better than a duration does, since both
+      # builds are measured back to back, but it does not survive it untouched.
+      if (peak_load > 4) {
+        sprintf(paste("Measured at peak 1-min load %.1f, over the 4.0 gate:",
+                      "both builds took the spike together, so read these as",
+                      "approximate."), peak_load)
+      } else ""
     )
   ) +
   paper_theme()
