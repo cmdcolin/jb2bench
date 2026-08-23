@@ -6,7 +6,15 @@ import { execFileSync } from 'child_process'
 import fs from 'fs'
 import { enumerateCases, migrateCaseKeys, selectCases } from './cases.ts'
 import { resolveBuild } from './servedbuild.ts'
-import { loadavg, outliers, peak, type LoadWindow } from './loadavg.ts'
+import {
+  FOREIGN_CORE_CEILING,
+  foreign,
+  loadavg,
+  outliers,
+  peak,
+  watchForeignCpu,
+  type LoadWindow,
+} from './loadavg.ts'
 
 // RUNS=1 takes a spike: one measured run per cell, enough to see the shape of a
 // matrix in minutes rather than in an hour. A spike has no spread, so stddev is
@@ -67,14 +75,22 @@ const allCases = enumerateCases()
 // JSON, for when the presentation changes but the numbers do not.
 const cases = selectCases(allCases)
 
-// Above this 1-minute load average a row is not comparable to one measured on a
-// quiet box, and the report says so instead of printing a speedup. A clean run
-// on this machine sits at 1.45-2.90; the ceiling is deliberately close to that
-// rather than to the load at which numbers become obviously absurd, because the
-// damage starts long before it is obvious. On 2026-08-05 the 1000x-longread row
-// was attempted twice, at peak loads of 31.9 and 35.4, and release-4.1.15 landed
-// at 25187ms and then 56452ms for the same work -- a 2.2x spread between two
-// measurements of one unchanged build, which is what an unusable row looks like.
+// A row is judged by FOREIGN CPU — cores burned by processes outside this run's
+// tree — and not by the load average. The load average counts the benchmark's
+// own threads, so a heavy cell disqualifies itself: measured 2026-08-23 on an
+// otherwise idle box, 1000x-shortread-bam on release-2.4.0 drove the 1-minute
+// average from 2.1 to 10.3 by itself, and the next cell inherited that as its
+// starting figure. A fixed load ceiling calls both rows unusable on a quiet
+// machine, and the heavier the case the more certainly it does.
+//
+// The load average is still recorded per cell, as context and for continuity
+// with rows measured before foreign CPU was attributed. Those older rows can
+// only be judged the old way, and the report says which rule it applied.
+//
+// What an unusable row looks like: on 2026-08-05 the 1000x-longread row was
+// attempted twice, at peak loads of 31.9 and 35.4, and release-4.1.15 landed at
+// 25187ms and then 56452ms for the same work — a 2.2x spread between two
+// measurements of one unchanged build.
 const LOAD_CEILING = 4.0
 
 const median = (a: number[]) => {
@@ -155,6 +171,10 @@ for (const c of cases) {
     for (let i = 0; i < WARMUP; i++) {
       runOnce(b, c.track)
     }
+    // Started after the warmup: the warmup's own cost is not part of what the
+    // measured runs competed with, and including it would charge this cell for
+    // work it did itself.
+    const cpu = watchForeignCpu()
     const runs: number[] = []
     for (let i = 0; i < RUNS; i++) {
       const v = runOnce(b, c.track)
@@ -162,7 +182,7 @@ for (const c of cases) {
       process.stdout.write(Number.isFinite(v) ? `${v.toFixed(0)} ` : 'FAIL ')
     }
     const ok = runs.filter(Number.isFinite)
-    const load = { before, after: loadavg() }
+    const load = { before, after: loadavg(), foreignCores: cpu.done() }
     const cell: Cell = {
       median: ok.length ? median(ok) : Number.NaN,
       mean: ok.length ? mean(ok) : Number.NaN,
@@ -174,7 +194,8 @@ for (const c of cases) {
     measured.push({ key: `${c.id} / ${b.name}`, load, value: cell })
     process.stdout.write(
       `=> median ${cell.median.toFixed(0)}ms ` +
-        `(load ${load.before.toFixed(1)}→${load.after.toFixed(1)})\n`,
+        `(load ${load.before.toFixed(1)}→${load.after.toFixed(1)}, ` +
+        `foreign ${load.foreignCores.toFixed(2)} cores)\n`,
     )
   }
 }
@@ -210,14 +231,15 @@ md += `Speedup = ${baseline} median ÷ ${UNDER_TEST} median.\n\n`
 // from different runs. Date each row rather than letting the page imply one
 // sitting, and carry the load it was taken under, since that is what decides
 // whether a row is worth believing.
-md += `\`measured\` is when each row was taken and \`load\` the highest 1-minute load average recorded across its cells. This machine is shared: a row measured under load is not comparable to one measured idle, so any row above ${LOAD_CEILING.toFixed(1)} reports **unusable** in place of a speedup rather than a number that looks like a result. \`?\` means the row predates per-cell load recording.\n\n`
+md += `\`measured\` is when each row was taken. \`foreign\` is the most CPU any of its cells saw burned by processes **outside this benchmark's own process tree**, in cores; a row above ${FOREIGN_CORE_CEILING} reports **unusable** in place of a speedup rather than a number that looks like a result.\n\n`
+md += `\`load\` is the highest 1-minute load average across the row's cells, kept as context and **not** as the verdict. It counts this benchmark's own threads, so a heavy cell inflates it by working: 1000x-shortread-bam on release-2.4.0 took it from 2.1 to 10.3 on an otherwise idle box, and the next cell started at 10.3 having inherited work this benchmark did itself. Judging by load called clean rows unusable, and the heavier the case the more certainly it did. Rows measured before 2026-08-23 have no foreign-CPU figure — they show \`?\` and are judged the old way, by load against ${LOAD_CEILING.toFixed(1)}, which is the best that can be done with what they recorded.\n\n`
 // The published version is the 2023 paper's, resolved from port 8004 rather than
 // by name so a restaged ports table cannot silently point this column at a
 // different build. Its speedup is the one a reader of that paper is asking for;
 // the baseline column answers the narrower "what did this release change".
 const published = builds.find(b => b.port === 8004)?.name
-md += `| case | ${builds.map(b => b.name).join(' | ')} | speedup vs ${baseline} |${published ? ` speedup vs ${published} |` : ''} measured | load |\n`
-md += `|---|${builds.map(() => '---:').join('|')}|---:|${published ? '---:|' : ''}---|---:|\n`
+md += `| case | ${builds.map(b => b.name).join(' | ')} | speedup vs ${baseline} |${published ? ` speedup vs ${published} |` : ''} measured | foreign | load |\n`
+md += `|---|${builds.map(() => '---:').join('|')}|---:|${published ? '---:|' : ''}---|---:|---:|\n`
 const unusable: string[] = []
 // A build column can be missing from a row rather than merely stale: adding
 // release-2.4.0 gave every previously-recorded row a cell it never had, and
@@ -233,12 +255,19 @@ for (const c of allCases) {
   const base = cellOf(baseline)
   const test = cellOf(UNDER_TEST)
   const sp = base && test ? base.median / test.median : Number.NaN
-  const loads = builds
-    .map(b => cellOf(b.name))
-    .filter(cell => cell !== undefined)
-    .map(cell => peak(cell.load ?? { before: 0, after: 0 }))
+  const cells = builds.map(b => cellOf(b.name)).filter(cell => cell !== undefined)
+  const loads = cells.map(cell => peak(cell.load ?? { before: 0, after: 0 }))
   const rowLoad = loads.length ? Math.max(...loads) : 0
-  const over = rowLoad > LOAD_CEILING
+  const foreigns = cells
+    .map(cell => foreign(cell.load ?? { before: 0, after: 0 }))
+    .filter(Number.isFinite)
+  // Foreign CPU decides it when the row has one. A row recorded before that was
+  // measured falls back to the load rule, which is wrong in the direction of
+  // calling clean rows dirty — the safe direction for a verdict to be wrong in.
+  const rowForeign = foreigns.length ? Math.max(...foreigns) : Number.NaN
+  const over = Number.isFinite(rowForeign)
+    ? rowForeign > FOREIGN_CORE_CEILING
+    : rowLoad > LOAD_CEILING
   if (over) {
     unusable.push(c.id)
   }
@@ -247,10 +276,10 @@ for (const c of allCases) {
   const pubCell = published
     ? ` ${fmt(cellOf(published) && test ? cellOf(published)!.median / test.median : Number.NaN)} |`
     : ''
-  md += `| ${c.id} | ${row.join(' | ')} | ${fmt(sp)} |${pubCell} ${measuredAt[c.id] ?? 'unknown'} | ${rowLoad ? rowLoad.toFixed(1) : '?'} |\n`
+  md += `| ${c.id} | ${row.join(' | ')} | ${fmt(sp)} |${pubCell} ${measuredAt[c.id] ?? 'unknown'} | ${Number.isFinite(rowForeign) ? rowForeign.toFixed(2) : '?'} | ${rowLoad ? rowLoad.toFixed(1) : '?'} |\n`
 }
 if (unusable.length) {
-  md += `\n> **${unusable.join(', ')}** ${unusable.length === 1 ? 'was' : 'were'} measured on a machine under heavy external load and the timings are not usable. The medians are left in the table because they are what was measured, not because they mean anything; re-run with \`CASES=${unusable.join(',')}\` on an idle box. Judge that the box is idle from \`uptime\` before starting, not from the load at the moment the run begins — on 2026-08-05 a run that started at load 3.15 was at 35 by the time it finished.\n`
+  md += `\n> **${unusable.join(', ')}** ${unusable.length === 1 ? 'was' : 'were'} measured while something else was using the machine, and the timings are not usable. The medians are left in the table because they are what was measured, not because they mean anything; re-run with \`CASES=${unusable.join(',')}\` on an idle box. Judge that the box is idle from \`uptime\` before starting, not from the load at the moment the run begins — on 2026-08-05 a run that started at load 3.15 was at 35 by the time it finished.\n`
 }
 fs.writeFileSync('results/alignments.md', md)
 console.log('\n' + md)

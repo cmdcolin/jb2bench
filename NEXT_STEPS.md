@@ -1,10 +1,74 @@
 # Next steps
 
-Handoff updated 2026-08-18, on top of the three-version pass: `builds/current`
+Handoff updated 2026-08-23. The box was finally idle, and the pass that used it
+found that **the heavy cells had stopped being measurable at all**: on
+`builds/current` five of twelve alignment tracks were refusing the fetch at the
+benchmark window, and the three release builds were not. See §0. The previous
+version sat on 2026-08-18, on top of the three-version pass: `builds/current`
 restaged from main, the parser pins moved to what v2.4.0 actually resolved, and
 the cross-tool pan taught to run more than one JBrowse arm. The version-coverage
-table those changes serve is in [`COMPARISONS.md`](COMPARISONS.md); what they
-left un-measured is §1, §1a and §2 here. The previous version sat on 2026-08-16.
+table those changes serve is in [`COMPARISONS.md`](COMPARISONS.md).
+
+---
+
+## 0. What the 2026-08-23 pass changed
+
+**`fetchSizeLimit` was refusing the heavy cells, on the build under test only.**
+`shell/patch_adapters.js` now raises it on every alignment track of every build,
+as a pass over the generated `config.json` that `load_alignments.sh` runs. Before
+that pass, measured across all twelve tracks and all four builds:
+
+| build | tracks refusing |
+| --- | --- |
+| `current` | **5 of 12** — `1000x.shortread.bam`, both `200x.longread`, both `1000x.longread` |
+| `release-4.3.0`, `release-4.1.15`, `release-2.4.0` | 0 of 12 |
+
+Two things there matter more than the count. Only the build under test refused,
+so every heavy row would have compared a refusal against a real render. And at
+`1000x.shortread` **BAM refused where CRAM did not** — the estimate is of
+compressed bytes — so the gate landed on one format and not the other at the
+same coverage, which is not a format axis. README said the limit "does not
+currently fire on builds/current", verified 2026-08-16 against the build staged
+*then*; `current` was restaged 2026-08-18 and it fires on that one.
+`scripts/render/bailmatrix.sh` runs the check over the whole matrix now instead
+of the two tracks `bailcheck.ts` defaulted to.
+
+**Zoom and pan gained the format axis.** They were BAM-only while cold load had
+carried both formats since 2026-08-16. `scripts/render/cases.ts` now owns the
+case enumeration for both runners, which is what had let them drift; recorded
+`<cov>-<read>` rows are relabelled `-bam`. The CRAM interaction cells are blank
+and owed a run.
+
+**`profile.ts` has a positive content gate.** Every readiness signal it consults
+is negative and passes on a page that drew nothing. A canvas element does not
+exist until something is drawn — measured on all three build generations,
+sampled mid-load at 0.7 s and 2.2 s with megabytes already fetched — so counting
+canvases separates "drew" from "declined to draw" with no threshold to tune.
+
+**The GenomeSpy harness had never worked, and nothing drove it.** Its root
+`genome` key is deprecated in GenomeSpy 0.85.0: the tool accepts it, registers
+the assembly, never loads it, and the first draw throws "Genome hg19mod has not
+been loaded yet" — while the harness's own `__gsState.ready` stays true, because
+`embed()` resolves before the draw. The spec now uses root `genomes` + root
+`assembly`. Two stale claims went with it: the header said the workload was
+BigWig signal "because GenomeSpy has no alignment track" (the spec has read BAM
+since it was written, through that tool's own lazy BAM source and `pileup`), and
+an inline comment said four genome-declaration forms had been tested and all
+four worked. **The fix is written but NOT yet verified against a running page** —
+it was made while the render matrix owned the box. Verify with
+`scripts/crosstool/toolcheck.ts` before believing any GenomeSpy number.
+
+**A probe that queries the DOM for canvases misses igv.js entirely.** igv 3.x
+calls `parentDiv.attachShadow()` and puts its whole UI inside, so
+`document.querySelectorAll('canvas')` returns zero on a page igv has drawn
+twelve canvases onto, and `document.contains(browser.root)` is false. The first
+version of `toolcheck.ts` reported a working igv as drawing nothing.
+`drawclock.ts` is unaffected — patching the canvas prototypes catches a draw
+wherever the element lives — but anything going through a DOM query is not.
+
+**igv.js 3.8.5 is npm `latest`** as of 2026-08-23, so the cross-tool column is
+the current release rather than a trailing pin. The 2023 paper's igv 2.12.1 is
+still vendored beside the harness and selected by URL.
 
 Verified green: `pnpm typecheck` (root and `ecosystem/`) 0 errors. That was not
 true on 2026-08-05 through 2026-08-16 — `b455a3c` added a field to
