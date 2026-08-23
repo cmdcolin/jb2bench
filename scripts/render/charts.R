@@ -144,10 +144,16 @@ p_cold <- ggplot(cold_df, aes(coverage, median, colour = program, group = progra
   scale_colour_manual(values = PROG_COL, name = "program") +
   labs(
     title = "Cold load to rendered reads — single track, 19 kb region",
-    subtitle = sprintf(
-      "In-page navigation→render-complete, median of %d runs after a warmup. Lower is better.",
-      cold$runs
-    ),
+    # A one-run spike has no spread to report, so it says so rather than
+    # printing "median of 1 runs" and implying a median of anything.
+    subtitle = if (cold$runs == 1) {
+      "In-page navigation→render-complete, one run per cell after a warmup. Lower is better."
+    } else {
+      sprintf(
+        "In-page navigation→render-complete, median of %d runs after a warmup. Lower is better.",
+        cold$runs
+      )
+    },
     x = "coverage", y = "time (s)",
     caption = paste0(
       "Measured ", dates, " on one workstation, peak 1-min load ",

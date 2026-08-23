@@ -7,8 +7,16 @@ import fs from 'fs'
 import { resolveBuild } from './servedbuild.ts'
 import { loadavg, outliers, peak, type LoadWindow } from './loadavg.ts'
 
-const RUNS = 6
-const WARMUP = 1
+// RUNS=1 takes a spike: one measured run per cell, enough to see the shape of a
+// matrix in minutes rather than in an hour. A spike has no spread, so stddev is
+// 0 and the error bars vanish -- it answers "roughly where does this sit" and
+// not "is this difference real". The recorded JSON carries the count, so a
+// figure drawn from a spike can say which it was.
+const RUNS = Number(process.env.RUNS ?? 6)
+const WARMUP = Number(process.env.WARMUP ?? 1)
+if (!Number.isInteger(RUNS) || RUNS < 1) {
+  throw new Error(`RUNS must be a positive integer, got ${process.env.RUNS}`)
+}
 const LOC = 'chr22_mask:124000-143000' // 19kb, matches historical jb2profile
 
 // renderer pinned to webgl2 for the new branch: WebGPU works but emits Dawn
