@@ -3,7 +3,9 @@
 \begin{longtable}[]{@{}lrrrr@{}}
 \caption{\label{tab:parser-speedup}Parsing a 19 kb window, current release against the
 version in use in 2023. Ratio of mean wall-clock; BGZF is the pure-JavaScript
-path both releases run in a browser.}\tabularnewline
+path both releases run in a browser. The BGZF column has no 1000$\times$ rows:
+BAM is BGZF end to end, so decompressing those files whole would time garbage
+collection rather than the codec.}\tabularnewline
 \toprule\noalign{}
 Case & BAM & CRAM & BGZF & BigWig \\
 \midrule\noalign{}
@@ -14,10 +16,10 @@ Case & BAM & CRAM & BGZF & BigWig \\
 \endhead
 \bottomrule\noalign{}
 \endlastfoot
-20x short read & 5.46x & 10.52x & 5.63x & 1.32x \\
-200x short read & 3.80x & 4.15x & 6.47x & \textbf{0.92x} \\
-1000x short read & 5.30x & 5.64x & --- & \textbf{0.86x} \\
-20x long read & 2.69x & 12.21x & 3.13x & 1.07x \\
-200x long read & 5.40x & 10.80x & 4.26x & \textbf{0.94x} \\
-1000x long read & 7.28x & 12.43x & --- & \textbf{0.82x} \\
+20x short read & 3.89x & 9.79x & 6.31x & 1.03x \\
+200x short read & 4.45x & 6.93x & 5.52x & \textbf{0.82x} \\
+1000x short read & 4.83x & 8.50x & --- & \textbf{0.92x} \\
+20x long read & 3.75x & 9.88x & 3.59x & \textbf{0.79x} \\
+200x long read & 4.46x & 7.90x & 3.44x & \textbf{0.84x} \\
+1000x long read & 5.81x & 12.20x & --- & \textbf{0.88x} \\
 \end{longtable}

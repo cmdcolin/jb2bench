@@ -3,8 +3,8 @@
 
 The render benchmarks one directory up measure the browser. These measure the
 layer underneath it: the GMOD parser libraries JBrowse depends on, comparing the
-versions JBrowse 2 shipped at the time of the 2023 paper against the current
-releases.
+versions JBrowse 2 v2.4.0 shipped — the release the 2023 paper benchmarked —
+against the current releases, which are what main installs today.
 
 ## How to run it
 
@@ -27,7 +27,7 @@ is also runnable alone:
 
 | command | what it does | writes |
 | --- | --- | --- |
-| `./setup.sh` | clone + build every version in `versions.json` | `.libs/`, `.libs/manifest.txt` |
+| `./setup.sh` | clone + build every version in `versions.json`, re-cloning any side whose build is not at the pinned tag | `.libs/`, `.libs/manifest.txt` |
 | `./setup.sh --force` | re-clone and rebuild all of them | same |
 | `make verify` | the equivalence gate — do both sides return the same records? | `results/equivalence.json` |
 | `make time` | the timings | `results/bench.json` |
@@ -41,6 +41,7 @@ is also runnable alone:
 | `MODE=count make sweep` | the same, counting reads and bytes instead of timing — needs no idle box | same |
 | `make cohort` | N-BigWig panel: request counts and timings | `results/cohort-bw.{md,json}` |
 | `make cram-samtools` | `@gmod/cram` against `samtools view`, the 2019 paper's procedure | `results/cram-samtools.{md,json}` |
+| `make report-extras` | the paper macros and table for the two benchmarks above; measures nothing | `results/paper/parser-{extras,samtools}.tex` |
 | `make clean` | drop `results/` | |
 | `make distclean` | also drop `.libs/` and `node_modules/` | |
 
@@ -67,60 +68,80 @@ in the few-percent range. The number that forced that split is
 
 | library | 2023 | current |
 | --- | --- | --- |
-| `@gmod/bam` | v2.0.0 | v7.8.1 |
-| `@gmod/cram` | v1.7.1 | v10.4.0 |
-| `@gmod/bgzf-filehandle` | v1.4.3 | v6.3.2 |
-| `@gmod/bbi` | v4.0.0 | v10.0.2 |
-| `@gmod/vcf` | v5.0.9 | v7.2.0 |
+| `@gmod/bam` | v1.1.18 | v8.11.0 |
+| `@gmod/cram` | v1.7.3 | v13.4.1 |
+| `@gmod/bgzf-filehandle` | v1.4.5 | v6.6.0 |
+| `@gmod/bbi` | v3.0.0 | v11.2.2 |
+| `@gmod/vcf` | v5.0.10 | v7.2.0 |
 
 Plus one narrower pair, on its own axis: `@gmod/vcf` v7.1.1 against v7.2.0, which isolates the genotype-scan rewrite. Measured by `make scan`, reported in [`results/vcf-scan.md`](results/vcf-scan.md).
 
-The 2023 column is not a guess. It is the pin read out of `jbrowse-components`
-at its last commit before 2023-08-15 (rev `6fb9daa575`), which is the tree
-the JBrowse 2 paper describes. Exact tags and commit SHAs are in
-`versions.json`.
+The 2023 column is not a guess, and it is not a semver range either. It is what
+`jbrowse-components` **resolved** at v2.4.0 (rev `78707a2bc3`, 2023-02-24) —
+the release the paper benchmarked as "jb2 parallel" and archived on Zenodo — read
+out of that tag's `yarn.lock`. A range would not do: v2.4.0 asks for `@gmod/bam`
+`^1.1.15` and ships 1.1.18. Exact tags and commit SHAs are in `versions.json`.
+
+Until 2026-08-18 this column was pinned to a different tree: `jbrowse-components`
+at its last commit before 2023-08-15, six months past the paper. That is a whole
+major line off on two of the five libraries — bam 2.0.0 where the paper shipped
+1.1.18, bbi 4.0.0 where it shipped 3.0.0 — so the table named the published
+version while measuring a later one, and understated the change by whatever those
+majors were worth. [`results/sweep.md`](results/sweep.md) is where to see how much
+that is: it measures every major line of each library, so both pins appear on the
+same curve.
 
 ## Results
 
 | case | 2023 | current | speedup |
 | --- | --- | --- | --- |
-| bam 20x shortread | 30.8 ms | 5.63 ms | 5.46x |
-| bam 20x longread | 191 ms | 71.1 ms | 2.69x |
-| bam 200x shortread | 243 ms | 63.8 ms | 3.80x |
-| bam 200x longread | 2713 ms | 503 ms | 5.40x |
-| bam 1000x shortread | 1305 ms | 246 ms | 5.30x |
-| bam 1000x longread | 20442 ms | 2807 ms | 7.28x |
-| bigwig 20x shortread | 1.52 ms | 1.15 ms | 1.32x |
-| bigwig 20x longread | 1.88 ms | 1.75 ms | 1.07x |
-| bigwig 200x shortread | 1.90 ms | 2.07 ms | 0.92x |
-| bigwig 200x longread | 2.06 ms | 2.19 ms | 0.94x |
-| bigwig 1000x shortread | 2.26 ms | 2.62 ms | 0.86x |
-| bigwig 1000x longread | 2.15 ms | 2.63 ms | 0.82x |
-| bgzf browser path 20x shortread | 104 ms | 18.4 ms | 5.63x |
-| bgzf node path 20x shortread | 44.0 ms | 17.8 ms | 2.47x |
-| bgzf browser path 20x longread | 121 ms | 38.5 ms | 3.13x |
-| bgzf node path 20x longread | 54.6 ms | 41.0 ms | 1.33x |
-| bgzf browser path 200x shortread | 1308 ms | 202 ms | 6.47x |
-| bgzf node path 200x shortread | 630 ms | 198 ms | 3.19x |
-| bgzf browser path 200x longread | 1567 ms | 368 ms | 4.26x |
-| bgzf node path 200x longread | 514 ms | 361 ms | 1.42x |
-| cram 20x shortread | 680 ms | 64.7 ms | 10.52x |
-| cram 20x longread | 538 ms | 44.1 ms | 12.21x |
-| cram 200x shortread | 863 ms | 208 ms | 4.15x |
-| cram 200x longread | 3311 ms | 307 ms | 10.80x |
-| cram 1000x shortread | 3419 ms | 606 ms | 5.64x |
-| cram 1000x longread | 15907 ms | 1280 ms | 12.43x |
-
-> **`@gmod/vcf` is missing from this table.** It was added to `versions.json` after the last `make time`; re-run it (or `make bench`) to fill the rows in.
+| bam 20x shortread | 32.8 ms | 8.44 ms | 3.89x |
+| bam 20x longread | 207 ms | 55.1 ms | 3.75x |
+| bam 200x shortread | 247 ms | 55.5 ms | 4.45x |
+| bam 200x longread | 2292 ms | 515 ms | 4.46x |
+| bam 1000x shortread | 1004 ms | 208 ms | 4.83x |
+| bam 1000x longread | 12751 ms | 2195 ms | 5.81x |
+| bigwig 20x shortread | 0.96 ms | 0.93 ms | 1.03x |
+| bigwig 20x longread | 1.24 ms | 1.57 ms | 0.79x |
+| bigwig 200x shortread | 1.41 ms | 1.71 ms | 0.82x |
+| bigwig 200x longread | 1.56 ms | 1.86 ms | 0.84x |
+| bigwig 1000x shortread | 1.63 ms | 1.77 ms | 0.92x |
+| bigwig 1000x longread | 1.71 ms | 1.94 ms | 0.88x |
+| bgzf browser path 20x shortread | 117 ms | 18.6 ms | 6.31x |
+| bgzf node path 20x shortread | 36.4 ms | 19.0 ms | 1.92x |
+| bgzf browser path 20x longread | 124 ms | 34.5 ms | 3.59x |
+| bgzf node path 20x longread | 48.2 ms | 37.4 ms | 1.29x |
+| bgzf browser path 200x shortread | 1032 ms | 187 ms | 5.52x |
+| bgzf node path 200x shortread | 466 ms | 210 ms | 2.22x |
+| bgzf browser path 200x longread | 1282 ms | 372 ms | 3.44x |
+| bgzf node path 200x longread | 421 ms | 333 ms | 1.26x |
+| cram 20x shortread | 898 ms | 91.7 ms | 9.79x |
+| cram 20x longread | 1129 ms | 114 ms | 9.88x |
+| cram 200x shortread | 1404 ms | 203 ms | 6.93x |
+| cram 200x longread | 4924 ms | 623 ms | 7.90x |
+| cram 1000x shortread | 9175 ms | 1079 ms | 8.50x |
+| cram 1000x longread | 28173 ms | 2309 ms | 12.20x |
+| vcf genotypes 100 samples gtonly | 23.3 ms | 5.13 ms | 4.54x |
+| vcf SAMPLES 100 samples gtonly | 27.7 ms | 8.26 ms | 3.36x |
+| vcf genotypes 1000 samples gtonly | 338 ms | 26.4 ms | 12.84x |
+| vcf SAMPLES 1000 samples gtonly | 204 ms | 54.8 ms | 3.72x |
+| vcf genotypes 3000 samples gtonly | 903 ms | 156 ms | 5.80x |
+| vcf SAMPLES 3000 samples gtonly | 613 ms | 181 ms | 3.39x |
+| vcf genotypes 100 samples wide | 95.1 ms | 5.57 ms | 17.07x |
+| vcf SAMPLES 100 samples wide | 137 ms | 44.2 ms | 3.11x |
+| vcf genotypes 1000 samples wide | 709 ms | 25.1 ms | 28.20x |
+| vcf SAMPLES 1000 samples wide | 797 ms | 427 ms | 1.87x |
+| vcf genotypes 3000 samples wide | 2827 ms | 113 ms | 24.97x |
+| vcf SAMPLES 3000 samples wide | 2908 ms | 1367 ms | 2.13x |
 
 
 The gains are largest where the data is largest: 1000x long read BAM falls from
-20.4 s to 2.8 s, and the same case in CRAM from
-15.9 s to 1.3 s.
+12.8 s to 2.2 s, and the same case in CRAM from
+28.2 s to 2.3 s.
 
-BigWig is the exception: 1.07x to 1.32x faster at
-20x, and 6 to 22% slower above it. These are
-1 to 3 ms operations on summary data, so the
+BigWig is the exception: 0.79x to 1.03x faster at
+20x, and 8 to 21% slower above it. These are
+0 to 2 ms operations on summary data, so the
 case may be too small to be informative rather than a regression, but it is
 reported as measured.
 
@@ -137,7 +158,7 @@ through the genotype scan, and reporting one would misdescribe the other.
 The three genotype readings answer three different questions:
 
 - **`vcf genotypes`** — every sample's GT, through the cheapest call each version
-  offers. v5.0.9 had only `SAMPLES`, which parses *every* FORMAT field of every
+  offers. v5.0.10 had only `SAMPLES`, which parses *every* FORMAT field of every
   sample to reach one; v7.2.0 has `GENOTYPES()`. That the new call is cheaper
   partly because the API grew is the point, not a confound — it is what a
   JBrowse upgrade actually buys.
@@ -385,7 +406,7 @@ shape no real file has. It needs `bedGraphToBigWig`, which
 
 ### Two deliberate adjustments
 
-`cram-js` 1.7.1 defaults `fetchSizeLimit` to 3 MB and throws past
+`cram-js` 1.7.3 defaults `fetchSizeLimit` to 3 MB and throws past
 it, which every long-read window here exceeds — so on its default settings the
 2023 CRAM reader cannot open these files at all. JBrowse 2 never ran that
 default: its `CramAdapter` set `fetchSizeLimit: 200_000_000`, commented "just
@@ -393,7 +414,7 @@ make this a large size to avoid hitting it". The benchmark passes the same
 value, so it measures what JBrowse actually ran rather than a limit no JBrowse
 user hit.
 
-`cram-js` 1.7.1 also imports `generic-filehandle` without
+`cram-js` 1.7.3 also imports `generic-filehandle` without
 declaring it anywhere in its `package.json`. Under npm's flat `node_modules` it
 resolved anyway, hoisted out of a transitive dependency; pnpm does not hoist, so
 the import fails. `setup.sh` installs `generic-filehandle@^3.0.0` into that
@@ -420,14 +441,14 @@ What the gate finds, all of it reported in `results/ecosystem.md`:
   are zero-length records: unmapped mates placed at their mate's coordinate,
   which `samtools` also returns. The current release is doing strictly more work
   here, not less.
-- **CRAM, long reads** — 1.7.1 derives a long read's reference
+- **CRAM, long reads** — 1.7.3 derives a long read's reference
   span wrongly. Against the BAM holding the same alignments, its `lengthOnRef`
   agrees for 0 of 36, 1 of 331 and 5 of 1667 reads; the current release agrees for every
   one. Short reads were always exact in both. A browser reading long-read CRAM
   in 2023 was drawing read ends in the wrong place.
 - **CRAM, window edge** — the current release omits a few reads that start
   before the window and end within a base or two of its start, which
-  1.7.1 returned.
+  1.7.3 returned.
 - **BigWig** — the current release drops exactly one feature in the long-read
   and 1000x cases: a bin spanning `123999-124000`, which ends exactly where the
   query starts and so does not overlap it. An off-by-one at the left edge, fixed.
@@ -446,9 +467,9 @@ wrong findings first:
 
 ## A trap worth knowing about
 
-`bgzf-filehandle` 1.4.3 shipped two decompressors and chose
+`bgzf-filehandle` 1.4.5 shipped two decompressors and chose
 between them at import time: in Node its `unzip` wraps `zlib.gunzip` (C++), and
-browsers got `pakoUnzip` (pure JS). 6.3.2 has a single
+browsers got `pakoUnzip` (pure JS). 6.6.0 has a single
 implementation, `pako-esm2`, everywhere.
 
 Benchmarking the two `unzip` exports against each other in Node therefore
@@ -456,8 +477,8 @@ compares C++ against JavaScript and says nothing about the library.
 `bgzf.bench.ts` measures both paths and reports them apart. The browser path —
 what a genome browser actually runs — is the headline. The Node path is included
 so the harder comparison is on the record rather than hidden, and it turns out
-the current pure-JS decompressor also beats 1.4.3's native-zlib
-path, by 1.33x to 3.19x, because that path
+the current pure-JS decompressor also beats 1.4.5's native-zlib
+path, by 1.26x to 2.22x, because that path
 spent its advantage on Buffer conversions and promisify wrapping.
 
 ## How does the parser compare to htslib? — `vcf-crosslang.json`
@@ -593,6 +614,19 @@ typed by hand:
 
 Edit `README.template.md`, never `README.md`. To pull a fresh run into the
 paper, run `make bench` here and then `make sync-benchmarks` in the paper repo.
+
+`report-extras.ts` writes the other two, from the two benchmarks that keep their
+own JSON and are not part of `make bench`:
+
+- `results/paper/parser-samtools.tex` — the 2019 cram-js benchmark re-run, as
+  the paper's table
+- `results/paper/parser-extras.tex` — its macros, plus the cohort panel's reads
+  per file
+
+It is a separate script because `report.ts` throws when `bench.json`'s arms are
+off-pin, which is the refusal the speedup table needs and would otherwise take
+the samtools numbers down with it — they are pinned by `sweep.json` and answer a
+different question.
 
 ## Layout
 
