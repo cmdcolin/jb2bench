@@ -43,12 +43,16 @@
 // Usage: profile.ts <url> [screenshotPath]
 // Prints: a single floating-point millisecond value on stdout (or "FAIL").
 import puppeteer from 'puppeteer'
+// POLL_MS and STABLE_POLLS come from the detector that uses them: the elapsed
+// correction below subtracts the settle window, and a local copy that drifted
+// from the real one would quietly bias every timing in the table.
+import {
+  POLL_MS,
+  STABLE_POLLS,
+  waitForRenderComplete,
+} from './rendercomplete.ts'
 import fs from 'fs'
 import path from 'path'
-
-const WAIT_TIMEOUT = 120000
-const POLL_MS = 100
-const STABLE_POLLS = 5
 
 const url = process.argv[2]
 const screenshotPath = process.argv[3]
@@ -93,95 +97,14 @@ try {
   // not run, and a build that 404s its config would report a very fast render of
   // nothing.
   //
-  // This mirrors `waitForSession` from `@jbrowse/capture`, which is the
-  // maintained implementation of the whole problem and has more stages than
-  // this (view phases, quiescence, a paint contract). It is NOT imported,
-  // because that package's `exports` resolves to `./src/index.ts` while its
-  // `files` ships only `esm/` — so the bare specifier lands on TypeScript
-  // inside node_modules, which node refuses to strip
-  // (ERR_UNSUPPORTED_NODE_MODULES_TYPE_STRIPPING), and the built output is
-  // unreachable through the exports map (ERR_PACKAGE_PATH_NOT_EXPORTED). If
-  // that is fixed — @jbrowse/img is the sibling that has it right — replace
-  // this block with `waitForSession(page, { timeout: WAIT_TIMEOUT })` and take
-  // the rest of its stages too.
-  await page.waitForFunction(
-    () => {
-      const session = (
-        globalThis as { JBrowseSession?: { views?: { initialized?: boolean }[] } }
-      ).JBrowseSession
-      const views = session?.views
-      if (!views?.length) {
-        return false
-      }
-      // `initialized` is an LGV getter; a view type without one is mounted
-      // content the moment it exists, so absent counts as initialized and only
-      // an explicit false is pending.
-      return !views.some(v => v.initialized === false)
-    },
-    { timeout: WAIT_TIMEOUT, polling: POLL_MS },
-  )
-
-  // Which render-complete contract does this build publish? The two generations
-  // are DISJOINT — see the header — so the contract is decided inside the poll
-  // rather than sampled before it. Sampling was the first attempt and it is
-  // wrong: at the moment the session gate opens no display has mounted, so
-  // neither signal is present yet and every build looks like it publishes
-  // nothing.
-  await page.waitForFunction(
-    ({ stableNeeded }: { stableNeeded: number }) => {
-      const w = window as unknown as {
-        __stable?: number
-        __last?: number
-        __mode?: string
-      }
-      const phaseNodes = document.querySelectorAll('[data-display-phase]').length
-      const legacyNodes = document.querySelectorAll(
-        '[data-testid$="-done"],[data-testid$="_done"]',
-      ).length
-
-      let ready: boolean
-      let count: number
-      if (phaseNodes > 0) {
-        // DisplayChrome publishes data-display-phase from the model's own
-        // mutually-exclusive DisplayPhase, whose `loading` covers the whole
-        // fetch, and data-display-drawn="false" until the canvas is painted.
-        // Both, because the first says the data arrived and the second says it
-        // was drawn.
-        w.__mode = 'phase'
-        count = phaseNodes
-        ready =
-          document.querySelector('[data-display-phase="loading"]') === null &&
-          document.querySelector('[data-display-drawn="false"]') === null
-      } else if (legacyNodes > 0) {
-        w.__mode = 'legacy'
-        count = legacyNodes
-        ready = true
-      } else {
-        // nothing has mounted yet — not "this build has no contract"
-        w.__stable = 0
-        w.__last = -1
-        return false
-      }
-      const loading =
-        document.querySelectorAll('[data-testid="loading-overlay"]').length > 0
-      ready = ready && !loading
-      if (ready && count === w.__last) {
-        w.__stable = (w.__stable ?? 0) + 1
-      } else {
-        w.__stable = 0
-        w.__last = count
-      }
-      return ready && (w.__stable ?? 0) >= stableNeeded
-    },
-    { timeout: WAIT_TIMEOUT, polling: POLL_MS },
-    { stableNeeded: STABLE_POLLS },
-  )
-  // Which one actually fired, so a row measured under a different contract than
-  // its neighbours is visible rather than silently incomparable. Goes to stderr:
+  // Both the session gate and the render-complete poll live in
+  // rendercomplete.ts, shared with interaction.ts. They were duplicated until
+  // 2026-08-23, and the copy that did not keep up silently stopped being able
+  // to measure the build under test.
+  const mode = await waitForRenderComplete(page)
+  // Which one fired, so a row measured under a different contract than its
+  // neighbours is visible rather than silently incomparable. Goes to stderr:
   // runner.ts reads the last line of stdout as the number.
-  const mode = await page.evaluate(
-    () => (window as unknown as { __mode?: string }).__mode ?? 'unknown',
-  )
   console.error(`render-complete contract: ${mode}`)
   // The positive content check. A readiness contract can only say the
   // application stopped working; this says it produced something.

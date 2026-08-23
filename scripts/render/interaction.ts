@@ -39,6 +39,7 @@
 // Usage: interaction.ts <url> [screenshotPath]     (MODE=in|out|pan, MAX_WAIT=ms)
 // Prints JSON with per-step time-to-content and redraw cost.
 import puppeteer from 'puppeteer'
+import { waitForRenderComplete } from './rendercomplete.ts'
 import fs from 'fs'
 import path from 'path'
 
@@ -91,26 +92,12 @@ const page = await browser.newPage()
 await page.setViewport({ width: 1280, height: 800 })
 await page.goto(url, { waitUntil: 'load' })
 
-// wait for initial render-complete (same quiescence detector as profile.ts)
-await page.waitForFunction(
-  () => {
-    const w = window as unknown as { __stable?: number; __last?: number }
-    const done = document.querySelectorAll(
-      '[data-testid$="-done"],[data-testid$="_done"]',
-    ).length
-    const loading =
-      document.querySelectorAll('[data-testid="loading-overlay"]').length > 0
-    const ready = done > 0 && !loading
-    if (ready && done === w.__last) {
-      w.__stable = (w.__stable ?? 0) + 1
-    } else {
-      w.__stable = 0
-      w.__last = done
-    }
-    return ready && (w.__stable ?? 0) >= 5
-  },
-  { timeout: 120000, polling: 100 },
-)
+// Wait for initial render-complete, through the shared detector. This used to
+// be a private copy of the legacy poll under a comment claiming it matched
+// profile.ts; it did not, and against a build that publishes the newer
+// data-display-phase contract it never fired. See rendercomplete.ts.
+const contract = await waitForRenderComplete(page)
+console.error(`render-complete contract: ${contract}`)
 
 // install a frame recorder for redraw-cost (max rAF gap)
 await page.evaluate(() => {
