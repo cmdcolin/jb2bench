@@ -67,6 +67,8 @@ console.log(`igv.js ${igvVersion}, GenomeSpy ${gsVersion}`)
 
 interface Tool {
   id: string
+  /** env var that has to be set for this arm to run at all */
+  optIn?: string
   label: string
   url: (track: string) => string
 }
@@ -115,21 +117,37 @@ const allTools: Tool[] = [
     // shared decoder, not as a whole-stack comparison — which is the opposite
     // of what the igv columns are, since igv maintains its own readers.
     //
-    // **Preflight this arm with `toolcheck.ts`.** The instrument is paint
-    // quiescence, and a harness page that throws settles immediately and
-    // reports a very small number: on 2026-08-23 this page was doing exactly
-    // that, drawing an error where the reads should be, and its own
-    // `__gsState.ready` was true throughout. Nothing had ever driven it.
+    // **Off by default, because the harness does not work.** The instrument is
+    // paint quiescence, and a page that throws settles immediately and reports
+    // a very small number — so a dead harness does not look dead, it looks
+    // fast. `crosstool/genomespy.html` is exactly that on 0.85.0: an empty plot
+    // frame, zero requests for the BAM, `__gsState.ready` true throughout. That
+    // header records what was tried and why each form fails.
+    //
+    // Set GENOMESPY=1 once `toolcheck.ts` reports the page drawing real bytes.
+    // The comment that used to sit here said "preflight this arm", which is a
+    // thing a person remembers to do once.
     id: 'genomespy',
+    optIn: 'GENOMESPY',
     label: `GenomeSpy ${gsVersion}`,
     url: t =>
       `http://localhost:${CROSSTOOL_PORT}/genomespy.html?loc=${LOC}&track=${t}`,
   },
 ]
 const toolFilter = process.env.TOOLS?.split(',')
-const tools = toolFilter
+const requested = toolFilter
   ? allTools.filter(t => toolFilter.includes(t.id))
   : allTools
+// An opt-in arm stays out even when TOOLS names it, and says so rather than
+// vanishing: a column that disappears silently is how the GenomeSpy harness
+// went unexercised for as long as it did.
+const tools = requested.filter(t => {
+  if (!t.optIn || process.env[t.optIn] === '1') {
+    return true
+  }
+  console.log(`skipping ${t.id}: set ${t.optIn}=1 once toolcheck.ts passes it`)
+  return false
+})
 
 const allCases: { id: string; track: string }[] = []
 for (const read of ['shortread', 'longread']) {

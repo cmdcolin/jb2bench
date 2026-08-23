@@ -20,6 +20,45 @@
   GenomeSpy reads its indexed formats through the same @gmod packages JBrowse
   does, which makes this a renderer comparison over a shared decoder rather than
   a whole-stack one. Say so wherever the numbers appear.
+
+  ## THIS PAGE DOES NOT WORK on @genome-spy/core 0.85.0, and the arm is off
+
+  It has never worked, and the 2026-08-23 attempt to fix it did not either. It
+  paints an empty plot frame, issues **zero** requests for the BAM or its index,
+  and reports `__gsState.ready === true` while doing so. Do not read a timing
+  off it; `scripts/crosstool/runner.ts` keeps the arm behind GENOMESPY=1 and
+  preflights it.
+
+  What is actually wrong, from reading the bundle rather than guessing:
+
+  - The app only *configures* genomes at startup — `configureGenomes(...)` off
+    the root spec, and nothing more.
+  - The only thing that *loads* one is the view-insertion preflight, which
+    collects assemblies by asking each x/y scale resolution for its assembly
+    requirement, and only a resolution that has already resolved to type
+    `locus` reports one.
+  - Our locus scale is not visible to it at that moment, so the preflight
+    collects nothing, loads nothing, and the first draw resolves the genome
+    against an empty store.
+
+  Three spec forms were tried against 0.85.0, each failing differently:
+
+  | form | result |
+  | --- | --- |
+  | root `genome` (deprecated) | "Genome hg19mod has not been loaded yet" |
+  | root `genomes` + `assembly` | identical — the deprecation notice points here, and it is no better |
+  | inline `scale.assembly` object | "No genomes have been configured!" |
+
+  A plain numeric domain was tried too, on the theory that the `{chrom, pos}`
+  domain forces genome resolution before the preflight — the stack says it does,
+  `getConfiguredDomain` → `fromComplexInterval` → `getLocusGenome` → `getGenome()`
+  with no argument — but removing it only changes which call arrives first.
+
+  Every one of these is silent. `embed()` resolves, its promise does not reject,
+  `__gsState.error` stays null, and GenomeSpy logs the exception to the console
+  itself, so `pageerror` never fires either. Four independent signals read clean
+  on a dead page; only the absence of data requests gives it away, which is why
+  `toolcheck.ts` counts bytes by URL *path*.
 -->
 <html lang="en">
   <head>
@@ -53,19 +92,23 @@
       const [chrom, range] = locus.split(':')
       const [start, end] = range.split('-').map(Number)
 
+      // The corpus assembly is a 250 kb slice of chr22 under a made-up contig
+      // name, so there is no published chrom.sizes to point at and no built-in
+      // assembly that matches. It is declared inline on the scale below rather
+      // than at the root, and that is a correctness requirement, not a style.
+      //
+      // Both root forms are dead ends in 0.85.0. Root `genome` is deprecated.
+      // Root `genomes` + `assembly` — what the deprecation notice points at —
+      // only *configures*: `getGenome` finds the name registered but not
+      // loaded and throws "Genome hg19mod has not been loaded yet. Call
+      // ensureAssembly(...)", and nothing on the `embed()` path ever calls it.
+      // The bundle's inline-object branch builds the genome synchronously
+      // instead, which is why the assembly lives on `x.scale` here.
+      //
+      // Every one of these failures is silent: `embed()` resolves, the promise
+      // does not reject, `__gsState.error` stays null, and the page paints an
+      // empty plot frame. Only the absence of data requests gives it away.
       const spec = {
-        // Root `genomes` + `assembly`, with inline contigs. The corpus assembly
-        // is a 250 kb slice of chr22 under a made-up contig name, so there is no
-        // published chrom.sizes to point at and no built-in assembly that
-        // matches.
-        //
-        // This was root `genome` until 2026-08-23, which GenomeSpy deprecated:
-        // 0.85.0 still ACCEPTS it, registers the assembly, and then never loads
-        // it, so the first draw throws "Genome hg19mod has not been loaded yet"
-        // — a failure that `embed()` does not reject on, so the harness's own
-        // `__gsState.ready` was true on a page displaying an error. The pair of
-        // keys is what `rootGenomeConfig.js` asks for now; the deprecated form
-        // is not merely noisy, it does not work.
         genomes: { hg19mod: { contigs: [{ name: 'chr22_mask', size: 250001 }] } },
         assembly: 'hg19mod',
         data: {
@@ -85,14 +128,8 @@
         encoding: {
           // The domain belongs on the channel's own scale, not in a root
           // `scales` block: a root block creates a scale resolution the
-          // assembly preflight does not walk.
-          //
-          // This comment used to add that "four genome-declaration forms were
-          // tested and all four work once the domain is here". That was wrong,
-          // and nothing caught it because no runner drives this page — with the
-          // domain here and the deprecated root `genome` above, 0.85.0 throws
-          // "Genome hg19mod has not been loaded yet" on the first draw. Putting
-          // the domain here is necessary and it is not sufficient.
+          // assembly preflight does not walk. Necessary, and not sufficient —
+          // see the header.
           x: {
             chrom: 'chrom',
             pos: 'start',
