@@ -81,9 +81,12 @@ function apparatusRoots(procs: Iterable<number>): number[] {
  * foreign process that exits between two samples takes its accumulated total
  * out of the second one, and the difference of the sums goes NEGATIVE. That is
  * not a hypothetical — the first version of this reported "-0.03 cores".
- * `foreignCpuBetween` differences per pid instead.
+ * {@link watchForeignCpu} differences per pid instead.
  */
-export function foreignCpuSnapshot(rootPid = process.pid): Map<number, number> {
+export function cpuSnapshot(rootPid = process.pid): {
+  foreign: Map<number, number>
+  ours: number[]
+} {
   const ppid = new Map<number, number>()
   const own = new Map<number, number>()
   const pids: number[] = []
@@ -117,31 +120,15 @@ export function foreignCpuSnapshot(rootPid = process.pid): Map<number, number> {
     return false
   }
   const foreign = new Map<number, number>()
+  const mine: number[] = []
   for (const pid of pids) {
-    if (pid !== rootPid && !isOurs(pid)) {
+    if (pid === rootPid || isOurs(pid)) {
+      mine.push(pid)
+    } else {
       foreign.set(pid, own.get(pid) ?? 0)
     }
   }
-  return foreign
-}
-
-/**
- * Foreign CPU seconds spent between two snapshots.
- *
- * A pid in `now` that was not in `then` is counted from zero: it is a process
- * that started during the window, and all of its CPU was spent inside it. A pid
- * that has since exited contributes nothing, so a short-lived foreign job is
- * the one case this reads low on — an undercount, never a negative.
- */
-export function foreignCpuBetween(
-  then: Map<number, number>,
-  now: Map<number, number>,
-): number {
-  let spent = 0
-  for (const [pid, cpu] of now) {
-    spent += Math.max(0, cpu - (then.get(pid) ?? 0))
-  }
-  return spent
+  return { foreign, ours: mine }
 }
 
 export interface LoadWindow {
@@ -197,40 +184,84 @@ const comm = (pid: number) => {
 }
 
 /**
- * The biggest foreign consumers over a window, as `comm cores`, largest first.
+ * How often the watcher re-reads /proc during a cell.
  *
- * Read the name and not only the number: `claude` or `node` at 0.2 cores is
- * someone working on the box and the run should be repeated, while `gnome-shell`
- * at 0.02 is the desktop and always there. This box idles at about 0.28 foreign
- * cores with nobody touching it — two other agent sessions, the terminal, and a
- * browser — so the ceiling is a budget over that floor, not over zero.
+ * It has to be short relative to one render, because the whole point is to see
+ * a Chrome process while its parent is still alive. A render is 2–20 s, so half
+ * a second gives several sightings of the shortest of them. Reading /proc for
+ * ~600 processes costs a few milliseconds, so the sampler spends well under 2%
+ * of a core — and that cost lands inside this run's own tree, where it belongs.
  */
-function topForeign(
-  then: Map<number, number>,
-  now: Map<number, number>,
-  wall: number,
-  n = 3,
-): string {
-  return [...now]
-    .map(([pid, cpu]) => [pid, (cpu - (then.get(pid) ?? cpu)) / wall] as const)
-    .filter(([, cores]) => cores > 0.01)
-    .sort((a, b) => b[1] - a[1])
-    .slice(0, n)
-    .map(([pid, cores]) => `${comm(pid)} ${cores.toFixed(2)}`)
-    .join(', ')
-}
+const SAMPLE_MS = 500
 
-/** Samples foreign CPU across a cell. Call `done()` when the cell finishes. */
-export function watchForeignCpu() {
+/**
+ * Samples foreign CPU across a cell.
+ *
+ * Two rules, both of which exist because a single before/after pair got this
+ * badly wrong on the heavy cases:
+ *
+ * **Once ours, always ours.** `execFileSync` returns when the per-render `node`
+ * exits, and the Chrome it launched can outlive it by a moment — at which point
+ * init adopts the orphan and ancestry no longer reaches this run. A pair of
+ * snapshots taken either side of the cell sees only the after-state and calls
+ * that Chrome a stranger. Sampling throughout catches it while its parent is
+ * still alive, and a pid classified as ours stays ours for the rest of the cell.
+ *
+ * **A pid is charged only from the moment it was first seen.** Counting a
+ * newly-appeared process from zero charges the window for CPU it burned before
+ * the window began, which for an adopted Chrome is an entire 1000x-longread
+ * render. That is how `1000x-longread-bam / current` came to report 1.41 foreign
+ * cores on an idle box while naming 0.11 cores of actual strangers — the
+ * benchmark billing itself for its own renderer, the same mistake the load
+ * average made. Charging from first sighting bounds the error to one sample
+ * interval and can only ever undercount.
+ *
+ * The total and the attribution come off the same two maps, so they cannot
+ * disagree the way they did when each had its own rule for an unseen pid.
+ */
+export function watchForeignCpu(intervalMs = SAMPLE_MS) {
   const t0 = Date.now()
-  const c0 = foreignCpuSnapshot()
+  const ours = new Set<number>()
+  const first = new Map<number, number>()
+  const last = new Map<number, number>()
+
+  const sample = () => {
+    const snap = cpuSnapshot()
+    for (const pid of snap.ours) {
+      ours.add(pid)
+    }
+    for (const [pid, cpu] of snap.foreign) {
+      if (ours.has(pid)) {
+        continue
+      }
+      if (!first.has(pid)) {
+        first.set(pid, cpu)
+      }
+      last.set(pid, cpu)
+    }
+  }
+
+  sample()
+  const timer = setInterval(sample, intervalMs)
+  timer.unref()
+
   return {
     done: () => {
+      clearInterval(timer)
+      sample()
       const wall = (Date.now() - t0) / 1000
-      const c1 = foreignCpuSnapshot()
+      const spent = [...last]
+        .map(([pid, cpu]) => [pid, Math.max(0, cpu - (first.get(pid) ?? cpu))] as const)
+        .filter(([, secs]) => secs > 0)
+        .sort((a, b) => b[1] - a[1])
+      const cores = (secs: number) => (wall > 0 ? secs / wall : 0)
       return {
-        cores: wall > 0 ? foreignCpuBetween(c0, c1) / wall : 0,
-        top: wall > 0 ? topForeign(c0, c1, wall) : '',
+        cores: cores(spent.reduce((t, [, secs]) => t + secs, 0)),
+        top: spent
+          .filter(([, secs]) => cores(secs) > 0.01)
+          .slice(0, 3)
+          .map(([pid, secs]) => `${comm(pid)} ${cores(secs).toFixed(2)}`)
+          .join(', '),
       }
     },
   }
