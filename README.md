@@ -355,49 +355,57 @@ mark where 2.12.1 had drawn eight — a timing difference, not a failure, and
 irrelevant to a runner that measures paint quiescence rather than counting
 canvases).
 
-#### GenomeSpy: BAM harness written, does not render yet
+#### GenomeSpy: BAM harness written, still does not render
 
-`crosstool/genomespy.html`, with `@genome-spy/core` pinned to **0.82.0** — the
-version the paper's design-space table was source-verified against, deliberately
-not `latest`.
+`crosstool/genomespy.html`, with `@genome-spy/core` at **0.85.0**. The arm is
+wired into `scripts/crosstool/runner.ts` but **opt-in behind `GENOMESPY=1`**,
+and it should stay that way until `make toolcheck` passes it. The instrument on
+those runs is paint quiescence, and a page that throws settles immediately — so
+a dead harness does not look broken, it reports the best number in the table.
 
-**Correction to an earlier note here: GenomeSpy does read alignments.** It has a
-native `bam` lazy data source (`src/data/sources/lazy/bamSource.js`, present in
-0.82.0), so the comparison can be run on the *same* BAM workload as igv.js and
-JBrowse rather than being pushed onto signal. Its transform registry carries
-`pileup`, `alignmentMismatches`, `flattenCigar` and `coverage`, so read layout
-and mismatch drawing are available too. The harness uses `pileup` to assign
-lanes, because comparing a laid-out stack against a single overplotted row would
-not be a comparison.
+**GenomeSpy does read alignments.** It has a native `bam` lazy data source, so
+the comparison can run on the *same* BAM workload as igv.js and JBrowse rather
+than being pushed onto signal. Its transform registry carries `pileup`,
+`alignmentMismatches`, `flattenCigar` and `coverage`. The harness uses `pileup`
+to assign lanes, because comparing a laid-out stack against a single
+overplotted row would not be a comparison.
 
-**It draws nothing.** `embed()` resolves and a canvas is created, but a
-`readPixels` sample of the plot area returns one distinct color, and the console
-carries `Error: Genome hg19mod has not been loaded yet. Call
-ensureAssembly("hg19mod")`. What has been ruled out:
+**It draws nothing**, verified against a running page on 2026-08-23: an empty
+plot frame and **zero** requests for the BAM or its index. Three declaration
+forms were tried on 0.85.0 and each fails differently — root `genome`
+(deprecated) and root `genomes` + `assembly` both give "Genome hg19mod has not
+been loaded yet", an inline `scale.assembly` object gives "No genomes have been
+configured!". A plain numeric domain only changes which call arrives first.
 
-- Not a spec-shape problem in the genome declaration. Four forms were tried —
-  root `genome: {name, contigs}`, root `genomes` + root `assembly`, `genomes` +
-  per-channel `scale.assembly`, and an inline object as `scale.assembly` — and
-  all four `embed()` without rejecting.
-- Not the root `scales` block, though that *was* one real bug: putting the
-  domain there instead of on the channel's own scale creates a scale resolution
-  the assembly preflight does not walk. Fixed; the domain is on the channel now.
-- Not a version issue. 0.84.0 behaves identically.
-- Not specific to a custom assembly: substituting the built-in `hg38` still
-  produces the error once.
-- Not a missing file. The only 404 in the run is `favicon.ico`.
+The mechanism, read out of the bundle rather than inferred:
 
-Reading the bundle, `assemblyPreflight` is awaited inside the embed path, but
-`BamSource` touches `this.genome` from its constructor, which runs earlier
-during view creation. That is a plausible account and **not a verified one** —
-GenomeSpy's own published BAM example presumably works, so the difference is
-something in our spec or our environment that has not been identified yet. Do
-not report this as an upstream bug on the strength of what is written here.
+- Startup only *configures* genomes — `configureGenomes()` off the root spec,
+  and nothing more.
+- The sole loader is the view-insertion preflight, which collects assemblies by
+  asking each x/y scale resolution for its assembly requirement, and only a
+  resolution already resolved to type `locus` reports one.
+- Our locus scale is not among them, so the preflight collects nothing, loads
+  nothing, and the first draw resolves the genome against an empty store.
 
-The corpus is a 250 kb slice under a made-up contig name (`chr22_mask`), which
-is worth knowing before debugging further: there is no published `chrom.sizes`
-to point at and no built-in assembly that matches, so this harness exercises
-GenomeSpy's inline-genome path, which its examples do not.
+This supersedes the earlier account that `BamSource` touches `this.genome` from
+its constructor before `assemblyPreflight` is awaited — which was closer than
+the declaration-form theory that briefly replaced it, but named the wrong
+trigger. The stack says the first access comes through `getConfiguredDomain` →
+`fromComplexInterval` → `getLocusGenome` → `getGenome()` with no argument.
+
+**Four independent signals read clean on the dead page**, which is why this
+survived so long: `embed()` resolves, its promise does not reject,
+`__gsState.error` stays null, and GenomeSpy logs the exception itself so
+`pageerror` never fires. Only the absence of data requests gives it away —
+hence `drewcheck.ts` counting bytes by URL *path*, since matching the whole URL
+matched the harness page's own `&track=….bam` query and credited its 5 kB to
+the corpus.
+
+What is owed is a spec form that puts the locus scale in front of the preflight.
+Do not report this upstream on the strength of what is written here: GenomeSpy's
+own published BAM examples presumably work, and the corpus is a 250 kb slice
+under a made-up contig name, so this harness exercises an inline-genome path
+those examples do not.
 
 #### HiGlass: `higlass-pileup` is the way in
 
@@ -408,7 +416,7 @@ all. No harness for it has been written yet.
 
 #### Both of them read our decoder
 
-`@genome-spy/core` 0.82.0 depends on `@gmod/bam ^7.1.19`, `@gmod/bbi ^9.2.0`,
+`@genome-spy/core` 0.85.0 depends on `@gmod/bam ^7.1.19`, `@gmod/bbi ^9.2.0`,
 `@gmod/bed`, `@gmod/indexedfasta`, `@gmod/tabix` and `@gmod/vcf`, and
 `higlass-pileup` 1.12.2 depends on `@gmod/bam 1.1.8`. Two consequences for how
 any resulting number should be read:
