@@ -91,12 +91,31 @@ did not:
 
 | tool | reads our corpus? | harness | state |
 | --- | --- | --- | --- |
-| igv.js 3.8.5 | yes, same indexed BAM over range requests | `crosstool/index.html` | **runs**, cold load and pan |
+| igv.js 3.8.5 | yes, same indexed BAM over range requests | `crosstool/index.html` | **runs**, cold load and pan. npm `latest` as of 2026-08-23, so this is the current release and not a trailing pin |
 | igv.js 2.12.1 | yes | same, `?igv=2.12.1` | loads; the version the 2023 paper timed |
-| GenomeSpy 0.82.0 | yes — native `bam` lazy source | `crosstool/genomespy.html` | **draws nothing**; five causes ruled out |
+| GenomeSpy 0.85.0 | yes — native `bam` lazy source | `crosstool/genomespy.html` | cause found and fix written 2026-08-23, **not yet verified against a running page**; wired as a column in `scripts/crosstool/runner.ts` |
 | HiGlass + `higlass-pileup` | yes, client-side indexed BAM | none written | not started |
+| Gosling 1.0.7 | yes — its own `bam` fetcher | none written | not started. See the note below on which parsers it ships |
 | JBrowse 1 v1.16.11 | yes | `~/src/dont_care/jb2profile/jb1web` | prior art, not wired up here |
 | `@jbrowse/react-linear-genome-view` | yes | `~/src/dont_care/jb2profile/jb2lgv` | prior art, not wired up here |
+
+**A harness page that draws nothing looks exactly like a fast one**, and the
+instrument for the non-JBrowse arms is paint quiescence, which settles
+immediately on a page showing an error. So preflight the tool arms with
+`scripts/crosstool/toolcheck.ts` the way `bailcheck.ts` preflights the JBrowse
+ones. That check has to walk shadow roots: igv 3.x calls
+`parentDiv.attachShadow()` and puts its whole UI inside, so
+`document.querySelectorAll('canvas')` returns zero on a page igv has drawn twelve
+canvases onto. `drawclock.ts` is unaffected, since patching the canvas
+prototypes catches a draw wherever the element lives.
+
+**Gosling 1.0.7 depends on `@gmod/bam` ^1.1.18, `@gmod/bbi` ^3.0.1 and
+`@gmod/vcf` ^5.0.10** — which are, to the version, the pins
+`ecosystem/versions.json` calls the *2023* side. So the two axes of this repo
+meet there: whatever `ecosystem/` measures as the parser speedup since 2023 is
+speedup a Gosling user has not had yet. That is a stronger statement than any
+render timing against Gosling would be, it needs no harness, and it should be
+re-checked rather than quoted, since a dependency range is not a lockfile.
 
 ### One layer down: the parser against other languages
 
@@ -274,15 +293,28 @@ genotype call, because that call appears partway along the axis. `bgzf` prefers
 decompressor at import time and sweeping `unzip` would report the end of that
 split as a regression.
 
-### 6. Unblock GenomeSpy, or write it up as blocked
+### 6. Verify the GenomeSpy fix against a running page
 
-It draws nothing, five causes are ruled out, and the leading account —
-`BamSource` touching `this.genome` in its constructor, before
-`assemblyPreflight` is awaited — is **plausible and unverified**. The corpus is
-a made-up contig with no published `chrom.sizes`, so this exercises an
-inline-genome path GenomeSpy's own examples do not. Next concrete step is to run
-GenomeSpy's *own* published BAM example unmodified, which separates "our spec"
-from "this version", and only then consider reporting upstream.
+**The cause is found.** The harness declared its assembly with root `genome`,
+which GenomeSpy deprecated: 0.85.0 accepts the key, registers the assembly, and
+never loads it, so the first draw throws "Genome hg19mod has not been loaded
+yet". `rootGenomeConfig.js` asks for root `genomes` plus root `assembly` instead,
+and the harness now uses that pair. The old leading account — `BamSource`
+touching `this.genome` before `assemblyPreflight` is awaited — was close: the
+assembly is indeed unloaded at first access, but the reason is the declaration
+form and not the ordering.
+
+Two things made this survive: nothing drove the page, so no run ever failed on
+it, and `embed()` resolves *before* the first draw, so the harness's own
+`__gsState.ready` was true the whole time it was displaying an error. A tool's
+self-reported readiness is not a completion signal — the same lesson
+`scripts/crosstool/quiescence.ts` opens with, arrived at from a third direction.
+
+What is owed is one run of `scripts/crosstool/toolcheck.ts` against the fixed
+page, which reports canvases painted and bytes fetched, and then a cold-load
+matrix with `TOOLS=jbrowse,genomespy`. The fix was written while the render
+matrix owned the box; **do not quote a GenomeSpy number until that check has
+passed.**
 
 ### 7. Error bars on the interaction table
 
