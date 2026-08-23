@@ -39,6 +39,20 @@ for l in builds/*; do
         --config '{"displayDefaults":{"colorBy":{"type":"modifications"}}}' >/dev/null
     fi
   done
+  # One file per non-alignment format, for the capability matrix
+  # (`scripts/crosstool/formatsupport.ts`) rather than for any timing run. They
+  # are small and nothing times them; what they establish is that JBrowse was
+  # pointed at the same file on the same static host as every other tool, so a
+  # `no` in that table is about the tool and not about a track nobody added.
+  #
+  # These landed after the 2026-08-23 render matrix. They add roughly a kilobyte
+  # to a config.json that is fetched once per page load, which is why that
+  # matrix was not re-measured for them.
+  for extra in 20x.shortread.bw variants.browser.vcf.gz; do
+    if [ -f "data/$extra" ]; then
+      jbrowse add-track "data/$extra" --load symlink --out "$l" --trackId "$extra" --force -a hg19mod >/dev/null
+    fi
+  done
   # Two adapter settings `add-track` cannot express: fetchSizeLimit, which
   # otherwise refuses the heavy windows outright, and the sequenceAdapter a 2.x
   # CRAM track needs. See shell/patch_adapters.js for what each looks like when

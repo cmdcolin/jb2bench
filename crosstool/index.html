@@ -62,7 +62,29 @@
       const locus = params.get('loc') ?? 'chr22_mask:124000-143000'
       const depth = params.get('depth')
       const height = Number(params.get('height') ?? 600)
-      const isCram = track.endsWith('.cram')
+      // The format axis, for the capability matrix rather than for the timing
+      // runs, which stay on alignments. Each entry is what igv.js needs to open
+      // that format from a plain static host: a track type, and an index where
+      // the format requires one. `undefined` index means the format is
+      // self-indexing (BigWig carries its own R-tree), which is a real
+      // difference between formats and not a gap in this table.
+      const FORMATS = [
+        { ext: '.bam', type: 'alignment', format: 'bam', index: '.bai' },
+        { ext: '.cram', type: 'alignment', format: 'cram', index: '.crai' },
+        { ext: '.bw', type: 'wig', format: 'bigwig' },
+        { ext: '.vcf.gz', type: 'variant', format: 'vcf', index: '.tbi' },
+      ]
+      // Longest extension first, so `.vcf.gz` is not matched by a hypothetical
+      // `.gz` entry and `.bam` does not shadow `.bam.bai`.
+      const fmt = [...FORMATS]
+        .sort((a, b) => b.ext.length - a.ext.length)
+        .find(f => track.endsWith(f.ext))
+      if (!fmt) {
+        throw new Error(
+          `no igv format for "${track}" — known: ${FORMATS.map(f => f.ext).join(' ')}`,
+        )
+      }
+      const isCram = fmt.format === 'cram'
 
       const alignmentTrack = {}
       if (depth) {
@@ -84,10 +106,10 @@
         showCenterGuide: false,
         tracks: [
           {
-            type: 'alignment',
-            format: isCram ? 'cram' : 'bam',
+            type: fmt.type,
+            format: fmt.format,
             url: `./data/${track}`,
-            indexURL: `./data/${track}${isCram ? '.crai' : '.bai'}`,
+            ...(fmt.index ? { indexURL: `./data/${track}${fmt.index}` } : {}),
             name: track,
             height,
             // the whole window must be inside the visibility window or igv
