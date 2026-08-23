@@ -35,19 +35,21 @@ export const loadavg = () =>
 const CLOCK_TICK = 100 // CONFIG_HZ on every kernel this repo runs on
 
 /**
- * CPU time consumed so far by every process that is NOT part of this run.
+ * CPU seconds consumed so far, per process, by everything that is NOT part of
+ * this run.
  *
  * "This run" is the process tree rooted at us: the runner, the per-cell
  * `profile.ts` children it spawns, and the Chrome those launch. Everything else
  * — another agent's build, a browser someone left open, a backup job — is
  * foreign, and foreign CPU is the thing that actually corrupts a timing.
  *
- * Returns total foreign CPU in seconds since boot, so two samples subtract to
- * give the foreign CPU spent over an interval. Processes that exit between
- * samples drop out and their partial time is lost, which undercounts slightly;
- * a short-lived foreign job is the one case this reads low on.
+ * Keyed by pid rather than summed, because a sum cannot be differenced: a
+ * foreign process that exits between two samples takes its accumulated total
+ * out of the second one, and the difference of the sums goes NEGATIVE. That is
+ * not a hypothetical — the first version of this reported "-0.03 cores".
+ * `foreignCpuBetween` differences per pid instead.
  */
-export function foreignCpuSeconds(rootPid = process.pid): number {
+export function foreignCpuSnapshot(rootPid = process.pid): Map<number, number> {
   const ppid = new Map<number, number>()
   const own = new Map<number, number>()
   const pids: number[] = []
@@ -79,13 +81,32 @@ export function foreignCpuSeconds(rootPid = process.pid): number {
     }
     return false
   }
-  let foreign = 0
+  const foreign = new Map<number, number>()
   for (const pid of pids) {
     if (pid !== rootPid && !isOurs(pid)) {
-      foreign += own.get(pid) ?? 0
+      foreign.set(pid, own.get(pid) ?? 0)
     }
   }
   return foreign
+}
+
+/**
+ * Foreign CPU seconds spent between two snapshots.
+ *
+ * A pid in `now` that was not in `then` is counted from zero: it is a process
+ * that started during the window, and all of its CPU was spent inside it. A pid
+ * that has since exited contributes nothing, so a short-lived foreign job is
+ * the one case this reads low on — an undercount, never a negative.
+ */
+export function foreignCpuBetween(
+  then: Map<number, number>,
+  now: Map<number, number>,
+): number {
+  let spent = 0
+  for (const [pid, cpu] of now) {
+    spent += Math.max(0, cpu - (then.get(pid) ?? 0))
+  }
+  return spent
 }
 
 export interface LoadWindow {
@@ -125,11 +146,11 @@ export const FOREIGN_CORE_CEILING = 0.5
 /** Samples foreign CPU across a cell. Call `done()` when the cell finishes. */
 export function watchForeignCpu() {
   const t0 = Date.now()
-  const c0 = foreignCpuSeconds()
+  const c0 = foreignCpuSnapshot()
   return {
     done: () => {
       const wall = (Date.now() - t0) / 1000
-      return wall > 0 ? (foreignCpuSeconds() - c0) / wall : 0
+      return wall > 0 ? foreignCpuBetween(c0, foreignCpuSnapshot()) / wall : 0
     },
   }
 }
