@@ -18,7 +18,5 @@ Region `chr22_mask:124000-143000` (19kb). In-page navigation→render-complete t
 | 20x-longread-cram | 1907 ±44 | 2369 ±3 | 2358 ±26 | 3847 ±59 | 1.24× | 2.02× | 2026-08-23 | 0.11 | — | 2.1 |
 | 200x-longread-bam | 2326 ±42 | 5679 ±101 | 5911 ±59 | 7165 ±121 | 2.44× | 3.08× | 2026-08-23 | 0.10 | — | 1.6 |
 | 200x-longread-cram | 2427 ±44 | 3569 ±41 | 3771 ±40 | 5214 ±127 | 1.47× | 2.15× | 2026-08-23 | 0.10 | — | 2.0 |
-| 1000x-longread-bam | 4609 ±50 | 20375 ±105 | 20314 ±1370 | 21607 ±116 | **unusable** | **unusable** | 2026-08-23 | 0.56 | — | 1.8 |
-| 1000x-longread-cram | 4814 ±122 | 9111 ±176 | 8878 ±203 | 17915 ±621 | **unusable** | **unusable** | 2026-08-23 | 0.55 | — | 1.7 |
-
-> **1000x-longread-bam, 1000x-longread-cram** were measured while something else was using the machine, and the timings are not usable. The medians are left in the table because they are what was measured, not because they mean anything; re-run with `CASES=1000x-longread-bam,1000x-longread-cram` on an idle box, and read the `by` column first — if it names the operator's own tooling, the fix is to leave the box alone for the length of the run rather than to find another machine. Judge that the box is idle from `uptime` before starting, not from the load at the moment the run begins — on 2026-08-05 a run that started at load 3.15 was at 35 by the time it finished.
+| 1000x-longread-bam | 4515 ±68 | 17168 ±1334 | 20495 ±630 | 21636 ±260 | 3.80× | 4.79× | 2026-08-23 | 0.10 | claude 0.02, firefox 0.01 | 2.8 |
+| 1000x-longread-cram | 4859 ±123 | 8890 ±173 | 9091 ±141 | 17526 ±1379 | 1.83× | 3.61× | 2026-08-23 | 0.08 | — | 2.0 |
