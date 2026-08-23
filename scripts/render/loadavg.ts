@@ -35,13 +35,47 @@ export const loadavg = () =>
 const CLOCK_TICK = 100 // CONFIG_HZ on every kernel this repo runs on
 
 /**
+ * The corpus http-servers, which are this benchmark's apparatus and not
+ * contention.
+ *
+ * `make serve` starts them outside any runner, so ancestry alone puts them in
+ * the foreign column — where they bias every verdict in the direction of
+ * condemning a row, and bias it hardest on the heavy cases, since serving
+ * 268 MB of BAM costs more than serving 3 MB. Measured 2026-08-23 they run at
+ * 0.05 cores during a 1000x-longread cell, a tenth of the ceiling. Small, but
+ * it is the benchmark's own work and the load average's mistake was exactly
+ * this one.
+ *
+ * Matched on the command line of the `npm exec`/`sh -c` parents; the worker
+ * process itself has a bare `http-server` cmdline with no arguments, so it is
+ * picked up as their descendant rather than directly.
+ */
+const APPARATUS = /http-server\s+(builds|crosstool)/
+
+function apparatusRoots(procs: Iterable<number>): number[] {
+  const roots: number[] = []
+  for (const pid of procs) {
+    try {
+      const cmd = fs.readFileSync(`/proc/${pid}/cmdline`, 'utf8').replace(/\0/g, ' ')
+      if (APPARATUS.test(cmd)) {
+        roots.push(pid)
+      }
+    } catch {
+      /* exited */
+    }
+  }
+  return roots
+}
+
+/**
  * CPU seconds consumed so far, per process, by everything that is NOT part of
  * this run.
  *
- * "This run" is the process tree rooted at us: the runner, the per-cell
- * `profile.ts` children it spawns, and the Chrome those launch. Everything else
- * — another agent's build, a browser someone left open, a backup job — is
- * foreign, and foreign CPU is the thing that actually corrupts a timing.
+ * "This run" is the process tree rooted at us — the runner, the per-cell
+ * `profile.ts` children it spawns, and the Chrome those launch — plus the
+ * corpus servers, which no runner is an ancestor of. Everything else — another
+ * agent's build, a browser someone left open, a backup job — is foreign, and
+ * foreign CPU is the thing that actually corrupts a timing.
  *
  * Keyed by pid rather than summed, because a sum cannot be differenced: a
  * foreign process that exits between two samples takes its accumulated total
@@ -73,9 +107,10 @@ export function foreignCpuSnapshot(rootPid = process.pid): Map<number, number> {
     own.set(pid, (Number(rest[11]) + Number(rest[12])) / CLOCK_TICK)
     pids.push(pid)
   }
+  const roots = new Set([rootPid, ...apparatusRoots(pids)])
   const isOurs = (pid: number) => {
     for (let p = pid, hops = 0; p > 1 && hops < 64; p = ppid.get(p) ?? 0, hops++) {
-      if (p === rootPid) {
+      if (roots.has(p)) {
         return true
       }
     }
@@ -123,6 +158,16 @@ export interface LoadWindow {
    * is not recoverable from them.
    */
   foreignCores?: number
+  /**
+   * Who burned it: the largest few foreign consumers, as `comm cores`.
+   *
+   * A bare number cannot be acted on. The first two rows this metric condemned
+   * reported 0.55 cores and nothing else, and answering "0.55 of what" meant
+   * re-deriving it by hand against a live run — where it turned out to be the
+   * operator's own shell commands, run against the box while the run was in
+   * flight. That is a fixable mistake and the scalar hid it.
+   */
+  foreignTop?: string
 }
 
 /** the load figure to judge a cell by: the worse of its two endpoints */
@@ -143,6 +188,38 @@ export const foreign = (l: LoadWindow) => l.foreignCores ?? Number.NaN
  */
 export const FOREIGN_CORE_CEILING = 0.5
 
+const comm = (pid: number) => {
+  try {
+    return fs.readFileSync(`/proc/${pid}/comm`, 'utf8').trim()
+  } catch {
+    return 'exited'
+  }
+}
+
+/**
+ * The biggest foreign consumers over a window, as `comm cores`, largest first.
+ *
+ * Read the name and not only the number: `claude` or `node` at 0.2 cores is
+ * someone working on the box and the run should be repeated, while `gnome-shell`
+ * at 0.02 is the desktop and always there. This box idles at about 0.28 foreign
+ * cores with nobody touching it — two other agent sessions, the terminal, and a
+ * browser — so the ceiling is a budget over that floor, not over zero.
+ */
+function topForeign(
+  then: Map<number, number>,
+  now: Map<number, number>,
+  wall: number,
+  n = 3,
+): string {
+  return [...now]
+    .map(([pid, cpu]) => [pid, (cpu - (then.get(pid) ?? cpu)) / wall] as const)
+    .filter(([, cores]) => cores > 0.01)
+    .sort((a, b) => b[1] - a[1])
+    .slice(0, n)
+    .map(([pid, cores]) => `${comm(pid)} ${cores.toFixed(2)}`)
+    .join(', ')
+}
+
 /** Samples foreign CPU across a cell. Call `done()` when the cell finishes. */
 export function watchForeignCpu() {
   const t0 = Date.now()
@@ -150,7 +227,11 @@ export function watchForeignCpu() {
   return {
     done: () => {
       const wall = (Date.now() - t0) / 1000
-      return wall > 0 ? foreignCpuBetween(c0, foreignCpuSnapshot()) / wall : 0
+      const c1 = foreignCpuSnapshot()
+      return {
+        cores: wall > 0 ? foreignCpuBetween(c0, c1) / wall : 0,
+        top: wall > 0 ? topForeign(c0, c1, wall) : '',
+      }
     },
   }
 }

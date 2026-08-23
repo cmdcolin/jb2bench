@@ -182,7 +182,8 @@ for (const c of cases) {
       process.stdout.write(Number.isFinite(v) ? `${v.toFixed(0)} ` : 'FAIL ')
     }
     const ok = runs.filter(Number.isFinite)
-    const load = { before, after: loadavg(), foreignCores: cpu.done() }
+    const { cores, top } = cpu.done()
+    const load = { before, after: loadavg(), foreignCores: cores, foreignTop: top }
     const cell: Cell = {
       median: ok.length ? median(ok) : Number.NaN,
       mean: ok.length ? mean(ok) : Number.NaN,
@@ -195,7 +196,7 @@ for (const c of cases) {
     process.stdout.write(
       `=> median ${cell.median.toFixed(0)}ms ` +
         `(load ${load.before.toFixed(1)}→${load.after.toFixed(1)}, ` +
-        `foreign ${load.foreignCores.toFixed(2)} cores)\n`,
+        `foreign ${cores.toFixed(2)} cores${top ? `: ${top}` : ''})\n`,
     )
   }
 }
@@ -231,15 +232,15 @@ md += `Speedup = ${baseline} median ÷ ${UNDER_TEST} median.\n\n`
 // from different runs. Date each row rather than letting the page imply one
 // sitting, and carry the load it was taken under, since that is what decides
 // whether a row is worth believing.
-md += `\`measured\` is when each row was taken. \`foreign\` is the most CPU any of its cells saw burned by processes **outside this benchmark's own process tree**, in cores; a row above ${FOREIGN_CORE_CEILING} reports **unusable** in place of a speedup rather than a number that looks like a result.\n\n`
+md += `\`measured\` is when each row was taken. \`foreign\` is the most CPU any of its cells saw burned by processes **outside this benchmark**, in cores — outside the runner's process tree, and outside the corpus http-servers, which serve the bytes under test and are apparatus rather than contention. A row above ${FOREIGN_CORE_CEILING} reports **unusable** in place of a speedup rather than a number that looks like a result, and \`by\` names what burned it, because a bare 0.55 cannot be acted on. This box idles near 0.28 foreign cores with nobody using it — other agent sessions, a terminal, a browser — so the ceiling is a budget over that floor and not over zero. **Running shell commands against the box during a run spends that budget**; two rows were condemned on 2026-08-23 by the operator's own \`find\` and \`node\` invocations.\n\n`
 md += `\`load\` is the highest 1-minute load average across the row's cells, kept as context and **not** as the verdict. It counts this benchmark's own threads, so a heavy cell inflates it by working: 1000x-shortread-bam on release-2.4.0 took it from 2.1 to 10.3 on an otherwise idle box, and the next cell started at 10.3 having inherited work this benchmark did itself. Judging by load called clean rows unusable, and the heavier the case the more certainly it did. Rows measured before 2026-08-23 have no foreign-CPU figure — they show \`?\` and are judged the old way, by load against ${LOAD_CEILING.toFixed(1)}, which is the best that can be done with what they recorded.\n\n`
 // The published version is the 2023 paper's, resolved from port 8004 rather than
 // by name so a restaged ports table cannot silently point this column at a
 // different build. Its speedup is the one a reader of that paper is asking for;
 // the baseline column answers the narrower "what did this release change".
 const published = builds.find(b => b.port === 8004)?.name
-md += `| case | ${builds.map(b => b.name).join(' | ')} | speedup vs ${baseline} |${published ? ` speedup vs ${published} |` : ''} measured | foreign | load |\n`
-md += `|---|${builds.map(() => '---:').join('|')}|---:|${published ? '---:|' : ''}---|---:|---:|\n`
+md += `| case | ${builds.map(b => b.name).join(' | ')} | speedup vs ${baseline} |${published ? ` speedup vs ${published} |` : ''} measured | foreign | by | load |\n`
+md += `|---|${builds.map(() => '---:').join('|')}|---:|${published ? '---:|' : ''}---|---:|---|---:|\n`
 const unusable: string[] = []
 // A build column can be missing from a row rather than merely stale: adding
 // release-2.4.0 gave every previously-recorded row a cell it never had, and
@@ -265,6 +266,13 @@ for (const c of allCases) {
   // measured falls back to the load rule, which is wrong in the direction of
   // calling clean rows dirty — the safe direction for a verdict to be wrong in.
   const rowForeign = foreigns.length ? Math.max(...foreigns) : Number.NaN
+  // The attribution that belongs beside the number is the one from the cell the
+  // number came from, not a merge across the row: a row is condemned by its
+  // worst cell, so that cell is the one to explain.
+  const worst = cells
+    .filter(cell => foreign(cell.load ?? { before: 0, after: 0 }) === rowForeign)
+    .map(cell => cell.load?.foreignTop)
+    .find(Boolean)
   const over = Number.isFinite(rowForeign)
     ? rowForeign > FOREIGN_CORE_CEILING
     : rowLoad > LOAD_CEILING
@@ -276,10 +284,10 @@ for (const c of allCases) {
   const pubCell = published
     ? ` ${fmt(cellOf(published) && test ? cellOf(published)!.median / test.median : Number.NaN)} |`
     : ''
-  md += `| ${c.id} | ${row.join(' | ')} | ${fmt(sp)} |${pubCell} ${measuredAt[c.id] ?? 'unknown'} | ${Number.isFinite(rowForeign) ? rowForeign.toFixed(2) : '?'} | ${rowLoad ? rowLoad.toFixed(1) : '?'} |\n`
+  md += `| ${c.id} | ${row.join(' | ')} | ${fmt(sp)} |${pubCell} ${measuredAt[c.id] ?? 'unknown'} | ${Number.isFinite(rowForeign) ? rowForeign.toFixed(2) : '?'} | ${worst ?? '—'} | ${rowLoad ? rowLoad.toFixed(1) : '?'} |\n`
 }
 if (unusable.length) {
-  md += `\n> **${unusable.join(', ')}** ${unusable.length === 1 ? 'was' : 'were'} measured while something else was using the machine, and the timings are not usable. The medians are left in the table because they are what was measured, not because they mean anything; re-run with \`CASES=${unusable.join(',')}\` on an idle box. Judge that the box is idle from \`uptime\` before starting, not from the load at the moment the run begins — on 2026-08-05 a run that started at load 3.15 was at 35 by the time it finished.\n`
+  md += `\n> **${unusable.join(', ')}** ${unusable.length === 1 ? 'was' : 'were'} measured while something else was using the machine, and the timings are not usable. The medians are left in the table because they are what was measured, not because they mean anything; re-run with \`CASES=${unusable.join(',')}\` on an idle box, and read the \`by\` column first — if it names the operator's own tooling, the fix is to leave the box alone for the length of the run rather than to find another machine. Judge that the box is idle from \`uptime\` before starting, not from the load at the moment the run begins — on 2026-08-05 a run that started at load 3.15 was at 35 by the time it finished.\n`
 }
 fs.writeFileSync('results/alignments.md', md)
 console.log('\n' + md)
