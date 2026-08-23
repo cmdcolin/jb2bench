@@ -7,7 +7,13 @@ import { execFileSync } from 'child_process'
 import fs from 'fs'
 import { enumerateCases, migrateCaseKeys, selectCases } from './cases.ts'
 import { resolveBuild } from './servedbuild.ts'
-import { loadavg, outliers, peak, type LoadWindow } from './loadavg.ts'
+import {
+  loadavg,
+  outliers,
+  peak,
+  watchForeignCpu,
+  type LoadWindow,
+} from './loadavg.ts'
 
 const LOC = 'chr22_mask:124000-143000'
 
@@ -198,15 +204,21 @@ for (const c of cases) {
       const what = mode === 'pan' ? 'pan' : `zoom-${mode}`
       process.stdout.write(`${c.id} / ${b.name} / ${what}: `)
       const before = loadavg()
+      // Foreign CPU rather than the load average, for the reason the cold-load
+      // runner switched: the load average counts this benchmark's own threads,
+      // so a heavy cell disqualifies itself by working. See loadavg.ts.
+      const cpu = watchForeignCpu()
       const r = run(b, c.track, mode)
-      const load = { before, after: loadavg() }
+      const { cores, top } = cpu.done()
+      const load = { before, after: loadavg(), foreignCores: cores, foreignTop: top }
       r.load = load
       results[c.id]![mode][b.role] = r
       measured.push({ key: `${c.id} / ${b.name} / ${what}`, load, value: r })
       process.stdout.write(
         `time-to-content ${cell(r)} (loading=${r.loadingEverSeen}, steps=${r.stepsMeasured}` +
           `${r.stepsCensored ? `, censored=${r.stepsCensored}` : ''}` +
-          `, load=${load.before.toFixed(1)}→${load.after.toFixed(1)})` +
+          `, load=${load.before.toFixed(1)}→${load.after.toFixed(1)}` +
+          `, foreign ${cores.toFixed(2)}${top ? `: ${top}` : ''})` +
           // the loci are the audit trail that a pan actually moved into ground
           // neither build had already fetched
           `${mode === 'pan' ? ` [${r.steps.map(s => s.locus).join(' → ')}]` : ''}\n`,
@@ -280,6 +292,22 @@ const MAX_WAIT_NOTE = `${
 let md = `# Zoom interaction benchmark\n\n`
 md += `Region \`${LOC}\`. **time-to-content** = ms a loading indicator ("Downloading alignments...") is shown after a zoom before correct content returns; median over the measured steps. `
 md += `redraw = longest frame (ms) of the GPU redraw. A \`≥\` prefix marks a censored value: the step was still loading at MAX_WAIT (${MAX_WAIT_NOTE}), so the true figure is larger.\n\n`
+// Contamination for the run rather than per cell: this table is three modes
+// deep and has no room for a column, but a reader still has to be able to tell
+// a quiet sitting from a busy one. Cells carry the per-cell figure in the JSON.
+{
+  const fresh = measured
+    .map(m => m.load.foreignCores)
+    .filter((v): v is number => Number.isFinite(v))
+  if (fresh.length) {
+    const worst = measured.reduce((a, b) =>
+      (b.load.foreignCores ?? -1) > (a.load.foreignCores ?? -1) ? b : a,
+    )
+    md += `Contamination, over the cells measured this run: worst **${Math.max(...fresh).toFixed(2)} foreign cores** `
+    md += `(\`${worst.key}\`${worst.load.foreignTop ? ` — ${worst.load.foreignTop}` : ''}), median ${fresh.sort((a, b) => a - b)[Math.floor(fresh.length / 2)]!.toFixed(2)}. `
+    md += `That is CPU burned by processes outside this benchmark — its own tree and the corpus servers excluded. This box floors near 0.28 with nobody using it, so read the ceiling as a budget over that floor. Cells not measured this run keep their recorded figure and are absent from these two numbers.\n\n`
+  }
+}
 
 // Modes can be re-measured independently (MODES=pan), so the table can hold
 // numbers from different runs. Say when each one was taken rather than letting
