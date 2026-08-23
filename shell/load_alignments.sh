@@ -39,10 +39,11 @@ for l in builds/*; do
         --config '{"displayDefaults":{"colorBy":{"type":"modifications"}}}' >/dev/null
     fi
   done
-  # CRAM decodes against the reference, and a 2.x build wants that adapter named
-  # in the track config -- see shell/cram_seqadapter.js for what it looks like
-  # when it is missing.
-  node shell/cram_seqadapter.js "$l"
+  # Two adapter settings `add-track` cannot express: fetchSizeLimit, which
+  # otherwise refuses the heavy windows outright, and the sequenceAdapter a 2.x
+  # CRAM track needs. See shell/patch_adapters.js for what each looks like when
+  # it is missing.
+  node shell/patch_adapters.js "$l"
   echo "  tracks loaded"
 done
 echo "DONE loading alignments"

@@ -77,11 +77,14 @@ except the reference is untracked and regenerable — roughly 750 MB.
   Until 2026-08-11 there was no modBAM here at all, so the base-modification
   path was exercised by nothing; the first profile of it found one function
   taking a third of the RPC worker (`flame/WORKER_FINDINGS.md`).
-- `*.bw` — BigWig coverage tracks at the same coverages. Unused by the
-  alignments benchmark, but they are the corpus the GenomeSpy harness reads,
-  since signal is the only workload a tool with no alignment track can share
-  with igv.js and JBrowse. `test.bw` is a byte-identical copy of
-  `200x.shortread.bw`, kept as a generic fixture name.
+- `*.bw` — BigWig coverage tracks at the same coverages. Nothing in the render
+  or cross-tool benchmarks currently reads them: the GenomeSpy harness reads
+  BAM, through that tool's own lazy BAM source and `pileup` transform, so all
+  three tools share the alignment workload rather than falling back to signal.
+  This bullet claimed the opposite until 2026-08-23 — "signal is the only
+  workload a tool with no alignment track can share" — which was true of an
+  earlier harness design and never true of the file. `test.bw` is a
+  byte-identical copy of `200x.shortread.bw`, kept as a generic fixture name.
 - `R103.model` — the pbsim error model for the long-read simulation. Tracked.
 - `hg19_17.chrom.sizes` — chr17's size, left over from the variant-matrix work.
   Nothing in this repo currently reads it.
@@ -871,31 +874,48 @@ MODES=in CASES=20x-shortread,200x-longread node scripts/render/runner-interactio
 node scripts/render/report.ts > results/report.html
 ```
 
-**Check `fetchSizeLimit` before trusting a 1000x row — but check it, do not
-assume it.** `shell/load_alignments.sh` wires the tracks with adapter defaults,
-and `BamAdapter`/`CramAdapter` still default the slot to 5 MB
-(`plugins/alignments/src/BamAdapter/configSchema.ts`), while the 19 kb window
-over 1000x coverage is a 28.1 MB fetch. When it does fire, the track renders
-"Requested too much data (28.1 Mb). Zoom in to see features, or force load" and
+**`fetchSizeLimit` is raised by the config pass, and that is not optional.**
+`BamAdapter`/`CramAdapter` default the slot to 5 MB
+(`plugins/alignments/src/BamAdapter/configSchema.ts`). Over it, the track renders
+"Requested too much data (N Mb). Zoom in to see features, or force load" and
 never fetches: nothing errors, the page loads, the chrome paints, and the run
-happily measures an empty browser — the same family of failure as "a config that
+either measures an empty browser or — as it does now — burns the full 120 s
+timeout on a display that never mounts. Same family of failure as "a config that
 404s photographs perfectly", which `flame/WORKER_FINDINGS.md` hit.
 
-**It does not currently fire on `builds/current`, which sets the slot nowhere.**
-Verified 2026-08-16 by loading `1000x.shortread.bam` and `1000x.longread.bam` at
-the benchmark window and watching the network: 13 and 15 data requests
-respectively, and no refusal text anywhere on the page. So the config pass this
-section used to demand is not owed for that build, and an hour spent on it would
-buy nothing.
+`shell/patch_adapters.js` sets the slot to 1e10 on every alignment track of
+every build, as a pass over the generated `config.json` that
+`shell/load_alignments.sh` runs. It has to be a separate pass because
+`add-track --config` shallow-merges and naming `adapter` in it would drop
+`bamLocation`.
 
-Why the 28.1 MB figure does not translate into a refusal here has not been
-established — the limit is checked against an estimate the adapter computes, and
-that estimate is evidently not the whole-window byte count. Treat this as
-"measured, unexplained", and re-check after any adapter change rather than
-trusting either the warning or this correction:
+**This section said the opposite until 2026-08-23, and the correction is the
+reason the pass exists.** It read "it does not currently fire on
+`builds/current`, which sets the slot nowhere", verified 2026-08-16 against the
+build staged then. `builds/current` was restaged 2026-08-18 (main @ `7fbb075ee5`)
+and it fires on that build. Measured across all twelve tracks and all four
+builds, before the pass:
+
+| build | tracks refusing |
+| --- | --- |
+| `current` | **5 of 12** — `1000x.shortread.bam`, both `200x.longread`, both `1000x.longread` |
+| `release-4.3.0` | 0 of 12 |
+| `release-4.1.15` | 0 of 12 |
+| `release-2.4.0` | 0 of 12 |
+
+Two things in that table matter more than the count. **Only the build under test
+refused**, so every heavy row would have compared a refusal against a real
+render — and a refusal is not a fast render. And at `1000x.shortread` **BAM
+refused where CRAM did not**, because the estimate is of compressed bytes: the
+gate lands on one format and not the other at the same coverage, which makes an
+unpatched format axis not a format axis. Estimates at the benchmark window on
+`current`: `200x.longread.bam` 55.3 MB, `200x.longread.cram` 21.0 MB.
+
+Re-check after any adapter change rather than trusting this text either:
 
 ```bash
 node --experimental-strip-types scripts/render/bailcheck.ts   # PORT=8000 by default
+bash scripts/render/bailmatrix.sh                             # all 12 tracks x all 4 builds
 ```
 
 It loads each track, counts data-file responses, greps the page for the refusal

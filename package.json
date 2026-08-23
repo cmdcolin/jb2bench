@@ -6,7 +6,7 @@
     "typecheck": "tsc --noEmit -p tsconfig.json"
   },
   "dependencies": {
-    "@genome-spy/core": "0.82.0",
+    "@genome-spy/core": "0.85.0",
     "http-server": "^14.1.0",
     "igv": "3.8.5",
     "puppeteer": "24.43.1",

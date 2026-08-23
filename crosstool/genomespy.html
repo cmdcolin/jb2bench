@@ -6,21 +6,20 @@
   runs is a URL parameter, so the runner can drive this page exactly as it drives
   a JBrowse build.
 
-    ?track=1000x.shortread.bw     file in ./data
+    ?track=1000x.shortread.bam    file in ./data
     ?loc=chr22_mask:124000-143000 the shared benchmark window
-    ?ppb=N                        pixelsPerBin; omit for GenomeSpy's default
+    ?window=N                     GenomeSpy's lazy-source windowSize (default 30000)
 
-  The workload is BigWig signal, not BAM alignments, and that is forced rather
-  than chosen. GenomeSpy has no alignment track, so the only way to put it on the
-  same bench as igv.js and JBrowse is a format all three read natively over HTTP
-  range requests with no server and no preprocessing. The corpus already carries
-  one BigWig per coverage beside every BAM, so this reads the same reads at the
-  same depths over the same window.
+  The workload is BAM alignments, read through GenomeSpy's own `lazy` BAM source
+  and laid out by its `pileup` transform — so all three tools read the same bytes
+  off the same disk with no server and no preprocessing. The header here used to
+  claim the workload was BigWig signal "because GenomeSpy has no alignment
+  track"; the spec below has read BAM since it was written, and GenomeSpy does
+  have a pileup. The claim was stale, not a description of this file.
 
-  Read the resulting numbers as a signal-rendering comparison and nothing wider.
-  A tool that declines to draw alignments is not slower at drawing alignments; it
-  is out of scope for that workload, and the design-space table rather than a
-  timing run is the honest answer there.
+  GenomeSpy reads its indexed formats through the same @gmod packages JBrowse
+  does, which makes this a renderer comparison over a shared decoder rather than
+  a whole-stack one. Say so wherever the numbers appear.
 -->
 <html lang="en">
   <head>
@@ -47,8 +46,6 @@
       const params = new URLSearchParams(location.search)
       const track = params.get('track') ?? '20x.shortread.bam'
       const locus = params.get('loc') ?? 'chr22_mask:124000-143000'
-      const ppb = params.get('ppb')
-
       // "chr22_mask:124000-143000" -> ["chr22_mask", 124000, 143000]. The
       // corpus is one contig, so the size is a constant read from the .fai
       // rather than fetched; if the fixture ever grows a second contig this
@@ -57,10 +54,20 @@
       const [start, end] = range.split('-').map(Number)
 
       const spec = {
-        // Root `genome` with inline contigs. The corpus assembly is a 250 kb
-        // slice of chr22 under a made-up contig name, so there is no published
-        // chrom.sizes to point at and no built-in assembly that matches.
-        genome: { name: 'hg19mod', contigs: [{ name: 'chr22_mask', size: 250001 }] },
+        // Root `genomes` + `assembly`, with inline contigs. The corpus assembly
+        // is a 250 kb slice of chr22 under a made-up contig name, so there is no
+        // published chrom.sizes to point at and no built-in assembly that
+        // matches.
+        //
+        // This was root `genome` until 2026-08-23, which GenomeSpy deprecated:
+        // 0.85.0 still ACCEPTS it, registers the assembly, and then never loads
+        // it, so the first draw throws "Genome hg19mod has not been loaded yet"
+        // — a failure that `embed()` does not reject on, so the harness's own
+        // `__gsState.ready` was true on a page displaying an error. The pair of
+        // keys is what `rootGenomeConfig.js` asks for now; the deprecated form
+        // is not merely noisy, it does not work.
+        genomes: { hg19mod: { contigs: [{ name: 'chr22_mask', size: 250001 }] } },
+        assembly: 'hg19mod',
         data: {
           lazy: {
             type: 'bam',
@@ -77,11 +84,15 @@
         mark: { type: 'rect', minWidth: 1 },
         encoding: {
           // The domain belongs on the channel's own scale, not in a root
-          // `scales` block. A root block creates a scale resolution that the
-          // assembly preflight does not walk, so the genome is registered but
-          // never loaded and the first draw throws "Genome hg19mod has not
-          // been loaded yet". Four genome-declaration forms were tested and
-          // all four work once the domain is here.
+          // `scales` block: a root block creates a scale resolution the
+          // assembly preflight does not walk.
+          //
+          // This comment used to add that "four genome-declaration forms were
+          // tested and all four work once the domain is here". That was wrong,
+          // and nothing caught it because no runner drives this page — with the
+          // domain here and the deprecated root `genome` above, 0.85.0 throws
+          // "Genome hg19mod has not been loaded yet" on the first draw. Putting
+          // the domain here is necessary and it is not sufficient.
           x: {
             chrom: 'chrom',
             pos: 'start',

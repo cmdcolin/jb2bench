@@ -23,6 +23,17 @@
 // That package is the maintained implementation of this problem — prefer adding
 // stages from it over hand-rolling more waits here.
 //
+// Behind all of them sits one more positive check: a track that drew something
+// has a canvas, and a track that drew nothing has none. Measured on all three
+// build generations, the canvas element does not exist until there is content in
+// it — sampled mid-load at 0.7 s and 2.2 s, with megabytes of BAM already
+// fetched, `document.querySelectorAll('canvas')` is still empty. So counting
+// canvases separates "drew" from "declined to draw" without a pixel threshold
+// to tune, and it catches the failure the readiness contracts cannot see:
+// release-4.3.0 asked for the whole contig reports done, with bytes fetched and
+// zero canvases, which is the refusal `results/interaction.md` records as its
+// best-looking column.
+//
 // Runs headless by default but still on the real hardware GPU: on this box
 // `--use-angle=gl` makes headless Chrome render WebGL2 through ANGLE on the Mesa
 // Intel UHD 630 (verified via scripts/gpucheck.ts), not the SwiftShader
@@ -61,6 +72,16 @@ const browser = await puppeteer.launch({
 })
 const page = await browser.newPage()
 await page.setViewport({ width: 1280, height: 800 })
+
+// Alignment bytes actually pulled over the wire, so "it drew nothing" can be
+// told apart from "it fetched nothing". Both are failures; they have different
+// causes, and the message should not have to guess which.
+let dataBytes = 0
+page.on('response', r => {
+  if (/\.(bam|bai|cram|crai)(\?|$)/.test(r.url())) {
+    dataBytes += Number(r.headers()['content-length'] ?? 0)
+  }
+})
 
 const t0 = Date.now()
 await page.goto(url, { waitUntil: 'load' })
@@ -162,6 +183,19 @@ try {
     () => (window as unknown as { __mode?: string }).__mode ?? 'unknown',
   )
   console.error(`render-complete contract: ${mode}`)
+  // The positive content check. A readiness contract can only say the
+  // application stopped working; this says it produced something.
+  const canvases = await page.evaluate(
+    () => document.querySelectorAll('canvas').length,
+  )
+  if (canvases === 0) {
+    throw new Error(
+      `render reported complete with no canvas — nothing was drawn ` +
+        `(${(dataBytes / 1e6).toFixed(1)} MB of alignment data fetched). ` +
+        `A build that declines to draw is not a build that drew fast.`,
+    )
+  }
+  console.error(`canvases: ${canvases}, data: ${(dataBytes / 1e6).toFixed(1)} MB`)
   // subtract the quiescence settle window so the number reflects time to the
   // last paint, not the detector's confirmation delay (constant, but removing
   // it makes the metric mean what it says)
