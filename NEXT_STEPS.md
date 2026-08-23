@@ -45,18 +45,29 @@ exist until something is drawn — measured on all three build generations,
 sampled mid-load at 0.7 s and 2.2 s with megabytes already fetched — so counting
 canvases separates "drew" from "declined to draw" with no threshold to tune.
 
-**The GenomeSpy harness had never worked, and nothing drove it.** Its root
-`genome` key is deprecated in GenomeSpy 0.85.0: the tool accepts it, registers
-the assembly, never loads it, and the first draw throws "Genome hg19mod has not
-been loaded yet" — while the harness's own `__gsState.ready` stays true, because
-`embed()` resolves before the draw. The spec now uses root `genomes` + root
-`assembly`. Two stale claims went with it: the header said the workload was
+**The GenomeSpy harness has never worked, and the 2026-08-23 fix did not fix
+it.** Verified against a running page this time: it paints an empty plot frame
+and issues **zero** requests for the BAM or its index. Root `genomes` + root
+`assembly` — what the deprecation notice for root `genome` points at — fails
+identically to the deprecated form; an inline `scale.assembly` object fails
+differently; a plain numeric domain only changes which call arrives first. The
+cause, read out of the bundle: startup only *configures* genomes, the sole
+loader is the view-insertion preflight, and that preflight collects assemblies
+from x/y scale resolutions that have already resolved to type `locus` — ours is
+not visible to it then, so nothing loads and the first draw resolves against an
+empty store. `crosstool/genomespy.html`'s header has the full account.
+
+The arm is **opt-in behind `GENOMESPY=1`** in `scripts/crosstool/runner.ts`
+rather than on with a comment asking for a manual preflight. Paint quiescence
+cannot tell a dead harness from a fast one — a page that throws settles
+immediately and reports a very small number — so leaving it on risks a wrong
+column, not a missing one.
+
+Two stale claims went with the first attempt: the header said the workload was
 BigWig signal "because GenomeSpy has no alignment track" (the spec has read BAM
 since it was written, through that tool's own lazy BAM source and `pileup`), and
 an inline comment said four genome-declaration forms had been tested and all
-four worked. **The fix is written but NOT yet verified against a running page** —
-it was made while the render matrix owned the box. Verify with
-`scripts/crosstool/toolcheck.ts` before believing any GenomeSpy number.
+four worked.
 
 **A probe that queries the DOM for canvases misses igv.js entirely.** igv 3.x
 calls `parentDiv.attachShadow()` and puts its whole UI inside, so

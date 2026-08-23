@@ -93,7 +93,7 @@ did not:
 | --- | --- | --- | --- |
 | igv.js 3.8.5 | yes, same indexed BAM over range requests | `crosstool/index.html` | **runs**, cold load and pan. npm `latest` as of 2026-08-23, so this is the current release and not a trailing pin |
 | igv.js 2.12.1 | yes | same, `?igv=2.12.1` | loads; the version the 2023 paper timed |
-| GenomeSpy 0.85.0 | yes — native `bam` lazy source | `crosstool/genomespy.html` | cause found and fix written 2026-08-23, **not yet verified against a running page**; wired as a column in `scripts/crosstool/runner.ts` |
+| GenomeSpy 0.85.0 | yes — native `bam` lazy source | `crosstool/genomespy.html` | **does not draw**; verified against a running page 2026-08-23, zero data requests. Arm is opt-in behind `GENOMESPY=1` — see §6 |
 | HiGlass + `higlass-pileup` | yes, client-side indexed BAM | none written | not started |
 | Gosling 1.0.7 | yes — its own `bam` fetcher | none written | not started. See the note below on which parsers it ships |
 | JBrowse 1 v1.16.11 | yes | `~/src/dont_care/jb2profile/jb1web` | prior art, not wired up here |
@@ -293,28 +293,31 @@ genotype call, because that call appears partway along the axis. `bgzf` prefers
 decompressor at import time and sweeping `unzip` would report the end of that
 split as a regression.
 
-### 6. Verify the GenomeSpy fix against a running page
+### 6. Make the GenomeSpy harness draw at all
 
-**The cause is found.** The harness declared its assembly with root `genome`,
-which GenomeSpy deprecated: 0.85.0 accepts the key, registers the assembly, and
-never loads it, so the first draw throws "Genome hg19mod has not been loaded
-yet". `rootGenomeConfig.js` asks for root `genomes` plus root `assembly` instead,
-and the harness now uses that pair. The old leading account — `BamSource`
-touching `this.genome` before `assemblyPreflight` is awaited — was close: the
-assembly is indeed unloaded at first access, but the reason is the declaration
-form and not the ordering.
+**Still broken, and now verified broken rather than assumed fixed.** Checked
+against a running page on 2026-08-23: an empty plot frame and zero requests for
+the BAM. The declaration form is not the fix — root `genomes` + `assembly` fails
+exactly as the deprecated root `genome` did, an inline `scale.assembly` object
+fails differently, and a plain numeric domain only reorders the failure. The
+earlier account here, that `BamSource` touches the genome before
+`assemblyPreflight` is awaited, was closer than the declaration-form theory that
+replaced it: startup only *configures* genomes, and the sole loader is the
+view-insertion preflight, which collects assemblies from x/y scale resolutions
+already resolved to type `locus`. Ours is not among them, so nothing loads.
 
-Two things made this survive: nothing drove the page, so no run ever failed on
-it, and `embed()` resolves *before* the first draw, so the harness's own
-`__gsState.ready` was true the whole time it was displaying an error. A tool's
-self-reported readiness is not a completion signal — the same lesson
+Two things made this survive as long as it did: nothing drove the page, so no
+run ever failed on it, and *four* independent signals read clean on a dead page
+— `embed()` resolves, its promise does not reject, `__gsState.error` stays null,
+and GenomeSpy logs the exception itself so `pageerror` never fires. A tool's
+self-reported readiness is not a completion signal, the same lesson
 `scripts/crosstool/quiescence.ts` opens with, arrived at from a third direction.
 
-What is owed is one run of `scripts/crosstool/toolcheck.ts` against the fixed
-page, which reports canvases painted and bytes fetched, and then a cold-load
-matrix with `TOOLS=jbrowse,genomespy`. The fix was written while the render
-matrix owned the box; **do not quote a GenomeSpy number until that check has
-passed.**
+The arm is opt-in behind `GENOMESPY=1`. What is owed is a spec form that gets
+the locus scale in front of the preflight; `toolcheck.ts` is the gate, and it
+now counts data bytes by URL *path*, because matching the whole URL matched the
+harness page's own `&track=…bam` query and credited its 5 kB to the corpus —
+which is how this page reported `ok` while fetching nothing.
 
 ### 7. Error bars on the interaction table
 
