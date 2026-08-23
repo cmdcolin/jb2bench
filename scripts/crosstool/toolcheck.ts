@@ -33,7 +33,19 @@ const tracks = (process.env.TRACKS ?? '20x.shortread.bam,200x.shortread.bam').sp
   ',',
 )
 
-const DATA = /\.(bam|bai|cram|crai|bw)(\?|$)/
+// Matched against the URL *path*, never the whole URL. The harness URL carries
+// the track name in its query string and ends `&track=200x.shortread.bam`, so a
+// whole-URL match counts the 5 kB of harness HTML as data and every page clears
+// a `bytes > 0` bar without fetching anything. That is not hypothetical: it is
+// how a GenomeSpy page that issued zero data requests reported `ok`.
+const DATA = /\.(bam|bai|cram|crai|bw)$/
+const isData = (url: string) => {
+  try {
+    return DATA.test(new URL(url).pathname)
+  } catch {
+    return false
+  }
+}
 
 const browser = await puppeteer.launch({
   headless: process.env.HEADLESS !== '0',
@@ -48,9 +60,15 @@ for (const harness of pages) {
     let bytes = 0
     const errors: string[] = []
     page.on('response', r => {
-      if (DATA.test(r.url())) bytes += Number(r.headers()['content-length'] ?? 0)
+      if (isData(r.url())) bytes += Number(r.headers()['content-length'] ?? 0)
     })
     page.on('pageerror', e => errors.push(String(e).split('\n')[0]!.slice(0, 120)))
+    // A tool that catches its own exception and logs it never raises pageerror.
+    // GenomeSpy does exactly that — `embed()` resolves, `__gsState.error` stays
+    // null, and the only trace of a page that drew no data is a console error.
+    page.on('console', m => {
+      if (m.type() === 'error') errors.push(m.text().split('\n')[0]!.slice(0, 120))
+    })
     const url = `http://localhost:${PORT}/${harness}?loc=${LOC}&track=${track}`
     try {
       await page.goto(url, { waitUntil: 'load' })
