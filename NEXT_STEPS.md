@@ -94,70 +94,76 @@ Items are ordered by what blocks what, not by size.
 
 ---
 
-## 1. Re-measure the `1000x-longread` initial-render row — needs an idle box
+## 1. ~~The cold-load matrix~~ — closed 2026-08-23
 
-**This is the one item with a correctness consequence, and it needs a machine
-this one currently is not.**
+**All twelve rows are measured and usable, CRAM included.** That had never been
+true: every BAM row was previously taken at load 14–35 and every CRAM row was
+blank, so the format axis the 2023 Fig 8 is built on had never been measured
+here at all. `results/alignments.md` now carries 12 rows x 4 builds, every cell
+at 0.05–0.12 foreign cores.
 
-The row is contaminated and `results/alignments.md` marks it `unusable` rather
-than reporting a speedup. It was attempted twice on 2026-08-05:
+The headline is the row that had been unusable since June. `1000x-longread-bam`
+is **3.80x** over release-4.3.0 and **4.79x** over the published v2.4.0, the
+largest speedups in the table — so the case the paper's framing most wants was
+also the one the instrument kept throwing away.
 
-| attempt | peak load | current | release-4.3.0 | release-4.1.15 |
-| --- | ---: | ---: | ---: | ---: |
-| June (reference) | — | 11733 | 17277 | 21682 |
-| 09:00 | 31.9 | 8267 | 34736 | 25187 |
-| 09:31 | 35.4 | 7350 | 36171 | 56452 |
+What made it measurable was fixing the contamination metric three times, each
+time for the same underlying mistake — **the metric counting the benchmark's own
+work** — and each fix condemning fewer clean rows than the last:
 
-release-4.1.15 returned 25187 ms and then 56452 ms for identical work. That 2.2×
-spread between two measurements of one unchanged build is the whole argument for
-throwing the row out.
+1. **The load average counts our own threads.** `1000x-shortread-bam` on
+   release-2.4.0 takes 15.4 s a render and drove load 2.1 → 10.3 by itself on an
+   idle box; the next cell then began at 10.3, having inherited a trailing
+   average of work this benchmark did. Under a fixed 4.0 ceiling both rows
+   report `unusable` on a quiet machine, and the heavier the case the more
+   certainly it disqualifies itself. Replaced by foreign CPU — processes outside
+   this run's tree — with load kept beside it as context.
+2. **The corpus http-servers were foreign by ancestry.** They serve the bytes
+   under test and no runner is their parent. Only 0.05 cores, but it scales with
+   case weight, so it biased hardest on exactly the heavy cases. They are
+   apparatus now.
+3. **An orphaned Chrome billed us for a whole render.** `execFileSync` returns
+   when the per-render `node` exits, and the Chrome it launched can outlive it —
+   init adopts the orphan, ancestry stops reaching the run, and a before/after
+   snapshot pair sees only the after-state, where an unrecognised pid is charged
+   from zero. `1000x-longread-bam / current` reported **1.41 foreign cores** on
+   an idle box while naming 0.11 cores of actual strangers. The watcher now
+   samples /proc twice a second, keeps `once ours, always ours`, and charges a
+   pid only from its first sighting. Same cell, same timings, 0.14 cores.
+
+Two things worth carrying forward. **A contamination number needs an
+attribution**, which is what made (3) findable: the total and the top consumers
+disagreed, and a bare 0.55 had hidden the same disagreement for a day. The table
+prints a `by` column now. And **this box floors at ~0.28 foreign cores
+untouched** — two other agent sessions, a terminal, a browser — so the 0.5
+ceiling is a budget over that floor, not over zero. Running shell commands
+against the box during a run spends it.
+
+Still owed on this table: the ten rows measured earlier on 2026-08-23 predate
+the `by` column and show `—` there. They are clean (0.08–0.12) and do not need
+re-running for their numbers, only for their attribution.
+
+## 1a. Fill the rest of the three-version matrix — needs an idle box
+
+The cold-load table is done (§1). What is left, cheapest first, all four builds
+serving from `make serve`:
 
 ```bash
-CASES=1000x-longread node scripts/render/runner.ts   # ~8 min, rewrites only this row
+FORMATS=cram node scripts/render/runner-interaction.ts   # the six new CRAM zoom/pan cells
+make crosstool-versions                                  # igv.js against v2.4.0, 4.3.0 and main — the paper's own Fig 8
 ```
 
-**Do not gate this on a load-average dip.** That was tried: a run gated on three
-consecutive samples below 4.0 started at 3.15 and was at 35 by the time it
-finished, because load is a trailing average and the other agents had not
-actually stopped. Check that the box is genuinely quiet — `pgrep -c claude`,
-not just `uptime` — or run it when nothing else is scheduled.
+Two things to know before starting:
 
-It is also worth knowing what was ruled out: the row does **not** generate its
-own load. Sampling during a single 1000x-longread render found load already at
-35 with `chrome=0` and nothing in uninterruptible sleep, and that render took
-62319 ms against June's 21682 ms. The load is entirely external.
-
-Expect this row to stay the noisiest thing in the repo regardless; it is 268 MB
-of BAM. The same case on the *interaction* benchmark moved 13913 → 15321 ms
-between two runs an hour apart.
-
-## 1a. Fill the three-version matrix — needs the same idle box
-
-Everything a reader of the 2023 paper would ask for is now *wired* and mostly
-un-measured. [`COMPARISONS.md`](COMPARISONS.md) has the coverage table; this is
-the run list, cheapest first, all four serving from `make serve`:
-
-```bash
-node scripts/render/runner-interaction.ts   # fills the missing v2.4.0 column
-node scripts/render/runner.ts               # every BAM row is currently unusable, and no CRAM row exists
-make crosstool-versions                     # igv.js against v2.4.0, 4.3.0 and main — the paper's own Fig 8
-```
-
-Three things to know before starting:
-
-- **The interaction table has never had its published column**, though
-  `runner-interaction.ts` has carried the arm since 2026-08-11 and
-  `scripts/render/report.ts` already reads it. Nothing is missing but a run with
-  port 8004 served. The `published` role is optional precisely so that a run
-  without it still produces the narrower table, which is why the omission was
-  quiet for a week.
-- **The cold-load table is the one with the worst numbers and the widest
-  coverage.** All four columns exist; every BAM row was measured at load 14–35
-  and every CRAM row is blank, so the format axis the 2023 Fig 8 is built on has
-  never been measured here at all.
-- **`builds/current` is main @ `7fbb075ee5`, staged 2026-08-18.** The numbers
-  recorded before that date under the name `current` are a different build — the
-  2026-08-11 HEAD — which is why the build now carries a `BUILD_INFO.txt`.
+- **Zoom and pan gained the format axis on 2026-08-23** and have not been run on
+  it. Both runners now enumerate cases from `scripts/render/cases.ts`, so the
+  two tables cannot drift the way they did — cold load gained CRAM on
+  2026-08-16 and interaction did not. Adding the CRAM cases also reproduced a
+  missing-cell crash that had been killing report generation outright; that is
+  guarded now.
+- **`builds/current` is main @ `7fbb075ee5`, staged 2026-08-18.** Numbers
+  recorded before that date under the name `current` are a different build —
+  the 2026-08-11 HEAD — which is why the build carries a `BUILD_INFO.txt`.
 
 ## 2. Re-run `make bench` before quoting any ecosystem number
 
