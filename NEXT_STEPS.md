@@ -165,44 +165,39 @@ Two things to know before starting:
   recorded before that date under the name `current` are a different build —
   the 2026-08-11 HEAD — which is why the build carries a `BUILD_INFO.txt`.
 
-## 2. Re-run `make bench` before quoting any ecosystem number
+## 2. Give the ecosystem bench a contamination instrument
 
-Unchanged from the previous two handoffs, and still not done. Two things have
-been added since that make it more urgent rather than less:
+**The timings themselves are done** — re-measured 2026-08-23 against the pins
+`versions.json` holds, so `make report` no longer refuses and
+`ecosystem/results/ecosystem.md` is current. `@gmod/vcf` has timing rows for the
+first time (up to 28.2x on the genotype scan). CRAM runs 6.9–12.2x, BAM
+3.8–5.8x, and BigWig is 0.79–1.03x — a regression on four of six cells, which is
+what measuring a per-file cost once looks like and why the cohort benchmark
+exists.
 
-- **`@gmod/vcf` still has no rows in the timing table**, though it now has
-  equivalence rows: `make verify` on 2026-08-18 covered all six VCF cases for
-  the first time and both sides return identical records. `results/ecosystem.md`
-  still prints its derived warning about the missing timings, which removes
-  itself on the next full run.
-- **Both pins moved on 2026-08-18, so every recorded number is now off-pin.**
-  The old side is the versions `jbrowse-components` resolved at **v2.4.0** — the
-  release the paper archived — read out of that tag's `yarn.lock`: bam 1.1.18,
-  cram 1.7.3, bbi 3.0.0, vcf 5.0.10, bgzf 1.4.5. It used to be a tree from six
-  months later, a whole major line off on bam and bbi. The new side is npm
-  latest (bam 8.11.0, cram 13.4.1, bbi 11.2.2, vcf 7.2.0, bgzf 6.6.0), which is
-  also what main's ranges resolve to; it used to trail by up to three majors.
-- **`report.ts` now refuses to run against off-pin numbers.** It compares the
-  version in each `bench.json` arm label against `versions.json` and throws, so
-  `make report` cannot relabel v2.0.0 timings as v1.1.18. That refusal is the
-  current state: try it and it names all eight stale arms. Arm labels are read
-  from `versions.json` by `lib/arms.ts` rather than typed into each bench file,
-  which is how the two drifted apart in the first place.
+What is owed is the instrument, not the numbers. **`ecosystem/` has no
+equivalent of `scripts/render/loadavg.ts`**, so nothing records what else the
+box was doing, and the render side has now been wrong about that three separate
+times (§1). Two facts about the 2026-08-23 run make the gap concrete: the
+operator was editing files and running `tsc` throughout it, and the noisiest
+cells are noisy enough to notice — `cram 1000x longread` reports ±42.0% on the
+current side and ±27.8% on the 2023 side, `cram 200x shortread` ±19.9%/±18.6%.
+The 7–12x CRAM gaps are far too large for that to reverse them, so read the
+direction and the magnitude as safe and the third significant figure as not.
 
-**`./setup.sh` and `make verify` are done — only the timings are owed.** All
-twelve builds are at their pinned tags and their SHAs match `versions.json`, and
-the gate passes 32/32. Running `make time` is what is left, and it is the part
-that needs an idle box.
+The fix is a vitest `globalSetup` that runs `watchForeignCpu()` across the file
+and writes the result beside `bench.json`, so the report can carry the figure
+the way `results/alignments.md` does. Note `ecosystem/` installs with
+`--ignore-workspace`, so importing `scripts/render/loadavg.ts` means a relative
+path and a `tsconfig` include, not a package reference.
 
-The gate found one thing worth carrying into the write-up. Moving the current
-side to bam 8.11.0 and cram 13.4.1 changed which records come back at the
-**window edge**: 200x shortread returns 31133 where 7.8.1/10.4.0 returned 31134
-and 31131, and 1000x shortread 153677 where they returned 153686 and 153669. The
-records dropped all straddle the boundary — `chr22_mask_123498_124000_…` ends
-exactly at the window start — and `lostInterior` stays 0 everywhere, which is
-what the gate actually asserts. Read it as an edge-inclusion change and not as
-data loss, and note that **BAM and CRAM now agree exactly** where the previous
-pair disagreed by 3 and 17 records.
+One warning to leave alone: `read attempted beyond end of buffer, file seems
+truncated` on stderr throughout the CRAM benchmarks. It comes from **v1.7.3
+only**, in `CramSlice._fetchRecords`, and it costs no records — the gate passes
+32/32 including both CRAM checks. It tracks the v1.7.3 long-read
+reference-span defect the equivalence table already quantifies: 0/36, 1/331 and
+5/1667 spans agree with the BAM, against the current release reproducing it
+exactly.
 
 `ecosystem/vitest.config.ts` asked for a single worker as
 `poolOptions: { forks: { singleFork: true } }`. Vitest 4 removed `poolOptions`
@@ -212,20 +207,25 @@ did nothing. The fairness property the ecosystem README states —
 > **One worker.** Two library builds competing for the same cores and page cache
 > would make this a scheduling measurement.
 
-— was therefore not in effect when the numbers currently in `ecosystem/results/`
-were produced. It is in effect now (`fileParallelism: false`, `maxWorkers: 1`),
-but the recorded numbers predate the fix.
+— was therefore not in effect for numbers recorded before 2026-08-18. It is in
+effect now (`fileParallelism: false`, `maxWorkers: 1`), and the 2026-08-23 run
+is the first full set taken under it.
+
+### `pnpm exec` will not run without a TTY when the modules dir drifts
+
+`make time` failed on 2026-08-23 with `ERR_PNPM_ABORTED_REMOVE_MODULES_DIR_NO_TTY`
+before running anything: `pnpm exec` runs a deps-status check, decided
+`node_modules` had to be recreated, and refused to do it unattended. Passing
+`--ignore-workspace` to the exec does not help — the check runs either way.
 
 ```bash
-cd ecosystem && make bench     # gate + timings + regenerates results/ and README.md
+cd ecosystem && CI=true pnpm install --ignore-workspace   # 2.4 s, no lockfile change
 ```
 
-Budget roughly 10–20 minutes. **How to tell whether it mattered:** diff the new
-`ecosystem/results/bench.json` against the committed one. If the *2023 side*
-moved more than the current side, that is the signature of the old run having
-been contaminated by parallel files, since the slow side has more wall-clock in
-which to collide. Note `ecosystem/README.md` is generated from
-`README.template.md` by `report.ts`; do not hand-edit it.
+Worth knowing that **`ecosystem/node_modules` and `ecosystem/.libs` are symlinks
+into the primary checkout**, so that install rewrites a directory every worktree
+shares. It reinstalled the same three dev dependencies, but a heavier one would
+be felt by every session at once.
 
 ## 3. Re-profile the flamegraphs — they now describe a fixed problem
 
