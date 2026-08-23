@@ -24,7 +24,8 @@ LOGDIR := results/logs
 
 .PHONY: help gate counts timings all figures report serve serve-stop \
         corpus corpus-paper render interaction crosstool crosstool-versions \
-        parsers parsers-count cram-samtools multibam backends clean-logs
+        parsers parsers-count cram-samtools multibam backends clean-logs \
+        formats toolcheck
 
 help:
 	@echo "preflight"
@@ -38,6 +39,8 @@ help:
 	@echo ""
 	@echo "measure — no idle box needed"
 	@echo "  make counts          parser equivalence gate + request-shape counts"
+	@echo "  make formats         tool x format capability matrix"
+	@echo "  make toolcheck       do the cross-tool harness pages still draw?"
 	@echo ""
 	@echo "measure — needs an idle box (make gate first)"
 	@echo "  make timings         render, interaction, cross-tool, parsers"
@@ -100,6 +103,17 @@ counts: | $(LOGDIR)
 	$(MAKE) -C ecosystem verify 2>&1 | tee $(LOGDIR)/equivalence-$(STAMP).log
 	MODE=count $(MAKE) -C ecosystem sweep 2>&1 | tee $(LOGDIR)/sweep-count-$(STAMP).log
 	$(MAKE) -C ecosystem cohort 2>&1 | tee $(LOGDIR)/cohort-$(STAMP).log
+	$(MAKE) formats 2>&1 | tee $(LOGDIR)/format-support-$(STAMP).log
+
+# Which tool opens which format off a plain static host. It drives a browser,
+# but the answer is a boolean and not a duration, so a loaded box gives the same
+# table a quiet one does — which is why it sits with the counts. `make toolcheck`
+# is the narrower question behind it: do the harness pages still work at all.
+formats:
+	$(NODE) scripts/crosstool/formatsupport.ts
+
+toolcheck:
+	$(NODE) scripts/crosstool/toolcheck.ts
 
 # ------------------------------------------------------- timings (idle box)
 

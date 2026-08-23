@@ -31,6 +31,16 @@ coverage legible:
 | **compute substrate** | `results/ld-gpu-vs-cpu.md` | is the LD compute shader worth it? |
 | **implementation language** | `ecosystem/vcf-crosslang.json` (transcribed), `ecosystem/results/cram-samtools.md` (run here) | how does our parser stand beside htslib? |
 | **the instrument itself** | `results/quiescence.md` | which completion detector, and how far apart are they? |
+| **tool x format** | `results/format-support.md` | which tools open which formats off a plain static host? |
+
+The **tool x format** row is the only one that reports a boolean rather than a
+duration, and it is the only one that stands on a busy machine. It exists
+because the paper's design-space table is hand-curated, and most of that table
+has to stay that way — what a tool is for, how it composes, what its plugin
+story is are judgement calls no harness settles. Exactly one row of it is not a
+judgement call, and `make formats` generates that one, so the prose table can
+cite a run for the checkable part and keep prose for the rest. Read it as a
+floor: a cell says the tool opened the file, not that it rendered it well.
 
 Two of those rows are the reason the set is worth having rather than a single
 headline. The **two-point** and **every-major** parser comparisons answer
