@@ -45,15 +45,25 @@ const LOAD_CEILING = 4.0
 const DEEP = 10000
 
 const JBROWSE_PORT = 8000
-const IGV_PORT = 8003
+// One port serves every non-JBrowse harness page; the page is chosen by path.
+const CROSSTOOL_PORT = Number(process.env.CROSSTOOL_PORT ?? 8003)
+const IGV_PORT = CROSSTOOL_PORT
 
 const jbrowseBuild = await resolveBuild(JBROWSE_PORT)
 console.log(`port ${JBROWSE_PORT} is serving builds/${jbrowseBuild}`)
 
+// Read from the installed package rather than typed in, so a bump cannot leave
+// the column labelled with the version it used to be. igv 3.8.5 is npm `latest`
+// as of 2026-08-23, so this column is the current release and not a trailing
+// pin; the 2023 paper's igv 2.12.1 is vendored beside the harness and selected
+// by URL when that comparison is the one wanted.
 const igvVersion = JSON.parse(
   fs.readFileSync('node_modules/igv/package.json', 'utf8'),
 ).version as string
-console.log(`igv.js ${igvVersion}`)
+const gsVersion = JSON.parse(
+  fs.readFileSync('node_modules/@genome-spy/core/package.json', 'utf8'),
+).version as string
+console.log(`igv.js ${igvVersion}, GenomeSpy ${gsVersion}`)
 
 interface Tool {
   id: string
@@ -97,6 +107,23 @@ const allTools: Tool[] = [
     id: 'igv-h600ctl',
     label: `igv.js ${igvVersion}, 600 px track (control arm)`,
     url: t => `http://localhost:${IGV_PORT}/?loc=${LOC}&track=${t}`,
+  },
+  {
+    // GenomeSpy, on the same BAM through its own lazy BAM source and `pileup`
+    // transform. It reads its indexed formats through the same @gmod packages
+    // JBrowse does, so read this column as renderer-against-renderer over a
+    // shared decoder, not as a whole-stack comparison — which is the opposite
+    // of what the igv columns are, since igv maintains its own readers.
+    //
+    // **Preflight this arm with `toolcheck.ts`.** The instrument is paint
+    // quiescence, and a harness page that throws settles immediately and
+    // reports a very small number: on 2026-08-23 this page was doing exactly
+    // that, drawing an error where the reads should be, and its own
+    // `__gsState.ready` was true throughout. Nothing had ever driven it.
+    id: 'genomespy',
+    label: `GenomeSpy ${gsVersion}`,
+    url: t =>
+      `http://localhost:${CROSSTOOL_PORT}/genomespy.html?loc=${LOC}&track=${t}`,
   },
 ]
 const toolFilter = process.env.TOOLS?.split(',')

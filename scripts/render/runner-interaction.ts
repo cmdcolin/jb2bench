@@ -5,6 +5,7 @@
 // re-projects loaded reads instantly.
 import { execFileSync } from 'child_process'
 import fs from 'fs'
+import { enumerateCases, migrateCaseKeys, selectCases } from './cases.ts'
 import { resolveBuild } from './servedbuild.ts'
 import { loadavg, outliers, peak, type LoadWindow } from './loadavg.ts'
 
@@ -50,30 +51,18 @@ for (const b of builds) {
   console.log(`${b.role}: port ${b.port} is serving builds/${b.name}`)
 }
 const hasPublished = builds.some(b => b.role === 'published')
-const allCases: { id: string; track: string }[] = []
-for (const read of ['shortread', 'longread']) {
-  for (const cov of ['20x', '200x', '1000x']) {
-    allCases.push({ id: `${cov}-${read}`, track: `${cov}.${read}.bam` })
-  }
-}
+// Both formats, from the shared enumeration `runner.ts` uses. This matrix was
+// BAM-only until 2026-08-23, so zoom and pan had no format axis at all while
+// cold load had carried one since 2026-08-16 — the gap `cases.ts` exists to
+// close. `FORMATS=bam` restores the six-case run.
+const allCases = enumerateCases()
 
 // CASES=20x-shortread,200x-longread re-measures a subset, the same way MODES
 // narrows by mode -- the heavy long-read cells cost minutes each, so a full
 // sweep is not always affordable. Cases not selected keep their recorded values,
 // which means a filtered run mixes vintages; the report dates each mode for
 // exactly that reason.
-const selectedCases = process.env.CASES?.split(',')
-const cases =
-  process.env.CASES === 'none'
-    ? []
-    : selectedCases
-      ? allCases.filter(c => selectedCases.includes(c.id))
-      : allCases
-if (!cases.length && process.env.CASES !== 'none') {
-  throw new Error(
-    `CASES matched nothing; known: ${allCases.map(c => c.id).join(',')}`,
-  )
-}
+const cases = selectCases(allCases)
 
 // in  — the new view is a subset of loaded data, so only the old renderer
 //       refetches. The GPU branch's best case.
@@ -144,7 +133,15 @@ function run(
 //   censored   — still loading at MAX_WAIT, so the value is a lower bound
 // Reporting a bail as "91ms" is what previously made a refusal to render look
 // like the fastest result in the table.
-const cell = (r: Result) => {
+const cell = (r: Result | undefined) => {
+  // A row can be absent rather than merely stale: adding the CRAM cases gave
+  // every previously-recorded row six siblings that were never measured, and
+  // indexing them blind threw before any markdown was written — so a run that
+  // had measured fine produced no table at all. runner.ts learned this when
+  // release-2.4.0 was added as a column.
+  if (!r) {
+    return '—'
+  }
   if (r.allBailed) {
     return '_bail_'
   }
@@ -155,6 +152,13 @@ const cell = (r: Result) => {
   return `${r.censored ? '≥' : ''}${r.zoomTimeToContentMs.toFixed(0)}ms${bail}`
 }
 
+// The same absent-row guard for the two columns that are not a time. Every row
+// builder below reads them, so each one would otherwise need its own check.
+const gapCell = (r: Result | undefined) =>
+  r && Number.isFinite(r.zoomRedrawGapMs) ? `${r.zoomRedrawGapMs.toFixed(0)}ms` : 'n/a'
+const stepsCell = (r: Result | undefined) =>
+  r ? `${r.stepsMeasured}/${r.stepsAttempted}` : '—'
+
 // Modes not selected this time keep whatever the last run recorded, so a
 // filtered re-run does not blank out the rest of the report.
 interface Saved {
@@ -162,9 +166,13 @@ interface Saved {
   measuredAt?: Partial<Record<Mode, string>>
   builds?: Partial<Record<Role, string>>
 }
-const prior: Saved = fs.existsSync('results/interaction.json')
+const priorRaw: Saved = fs.existsSync('results/interaction.json')
   ? (JSON.parse(fs.readFileSync('results/interaction.json', 'utf8')) as Saved)
   : {}
+// Every row recorded while this matrix was BAM-only was keyed `<cov>-<read>`.
+// Relabelling them `-bam` keeps them on the same axis as the new CRAM rows
+// instead of stranding them under names the report no longer looks up.
+const prior: Saved = { ...priorRaw, results: migrateCaseKeys(priorRaw.results) }
 
 const stamp = new Date().toISOString().slice(0, 10)
 const measuredAt = { ...prior.measuredAt }
@@ -284,9 +292,9 @@ md += `The new view is a strict subset of already-loaded reads, so the GPU branc
 md += `| case | ${NEW} | ${BASE} |${pubHead} ${NEW} redraw frame |\n`
 md += `|---|---:|---:|${hasPublished ? '---:|' : ''}---:|\n`
 for (const c of allCases) {
-  const w = results[c.id]!.in.new!
-  const r = results[c.id]!.in.baseline!
-  md += `| ${c.id} | ${cell(w)} | ${cell(r)} |${pubCell(results[c.id]!.in)} ${w.zoomRedrawGapMs.toFixed(0)}ms |\n`
+  const w = results[c.id]?.in.new
+  const r = results[c.id]?.in.baseline
+  md += `| ${c.id} | ${cell(w)} | ${cell(r)} |${pubCell(results[c.id]!.in)} ${gapCell(w)} |\n`
 }
 
 md += `\n## Zoom OUT — mostly refused, not measured\n\n`
@@ -296,12 +304,9 @@ md += `The honest reading: for anything heavier than 20x shortread, this compari
 md += `| case | ${NEW} | ${BASE} |${pubHead} ${NEW} redraw frame | drew/attempted |\n`
 md += `|---|---:|---:|${hasPublished ? '---:|' : ''}---:|---:|\n`
 for (const c of allCases) {
-  const w = results[c.id]!.out.new!
-  const r = results[c.id]!.out.baseline!
-  const gap = Number.isFinite(w.zoomRedrawGapMs)
-    ? `${w.zoomRedrawGapMs.toFixed(0)}ms`
-    : 'n/a'
-  md += `| ${c.id} | ${cell(w)} | ${cell(r)} |${pubCell(results[c.id]!.out)} ${gap} | ${w.stepsMeasured}/${w.stepsAttempted} |\n`
+  const w = results[c.id]?.out.new
+  const r = results[c.id]?.out.baseline
+  md += `| ${c.id} | ${cell(w)} | ${cell(r)} |${pubCell(results[c.id]!.out)} ${gapCell(w)} | ${stepsCell(w)} |\n`
 }
 
 md += `\n## PAN at constant zoom — both builds refetch\n\n`
@@ -312,10 +317,12 @@ md += `The pan runs **leftward** from the benchmark locus. pbsim's long reads ru
 md += `| case | ${NEW} | ${BASE} | ratio |${pubHead} ${NEW} redraw frame | steps |\n`
 md += `|---|---:|---:|---:|${hasPublished ? '---:|' : ''}---:|---:|\n`
 for (const c of allCases) {
-  const w = results[c.id]!.pan.new!
-  const r = results[c.id]!.pan.baseline!
+  const w = results[c.id]?.pan.new
+  const r = results[c.id]?.pan.baseline
   // a ratio is only meaningful between two cells that are both real timings
   const comparable =
+    w !== undefined &&
+    r !== undefined &&
     !w.allBailed &&
     !r.allBailed &&
     !w.censored &&
@@ -326,10 +333,7 @@ for (const c of allCases) {
   const ratio = comparable
     ? `${(r.zoomTimeToContentMs / w.zoomTimeToContentMs).toFixed(2)}×`
     : '—'
-  const gap = Number.isFinite(w.zoomRedrawGapMs)
-    ? `${w.zoomRedrawGapMs.toFixed(0)}ms`
-    : 'n/a'
-  md += `| ${c.id} | ${cell(w)} | ${cell(r)} | ${ratio} |${pubCell(results[c.id]!.pan)} ${gap} | ${w.stepsMeasured}/${w.stepsAttempted} |\n`
+  md += `| ${c.id} | ${cell(w)} | ${cell(r)} | ${ratio} |${pubCell(results[c.id]!.pan)} ${gapCell(w)} | ${stepsCell(w)} |\n`
 }
 fs.writeFileSync('results/interaction.md', md)
 console.log('\n' + md)

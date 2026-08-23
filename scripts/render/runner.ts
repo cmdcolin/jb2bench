@@ -4,6 +4,7 @@
 // and writes a markdown comparison table + raw JSON to results/.
 import { execFileSync } from 'child_process'
 import fs from 'fs'
+import { enumerateCases, migrateCaseKeys, selectCases } from './cases.ts'
 import { resolveBuild } from './servedbuild.ts'
 import { loadavg, outliers, peak, type LoadWindow } from './loadavg.ts'
 
@@ -54,15 +55,7 @@ const UNDER_TEST = builds[0]!.name
 // -based decode, and which side of that trade wins is the whole point of
 // plotting them beside each other. shell/load_alignments.sh has always staged
 // the CRAM tracks; until 2026-08-16 nothing measured them.
-const FORMATS = process.env.FORMATS?.split(',') ?? ['bam', 'cram']
-const allCases: { id: string; track: string }[] = []
-for (const read of ['shortread', 'longread']) {
-  for (const cov of ['20x', '200x', '1000x']) {
-    for (const fmt of FORMATS) {
-      allCases.push({ id: `${cov}-${read}-${fmt}`, track: `${cov}.${read}.${fmt}` })
-    }
-  }
-}
+const allCases = enumerateCases()
 
 // CASES=1000x-longread re-measures one row without spending 20 minutes on the
 // other five. Rows not selected keep their previous values, so the table is not
@@ -72,18 +65,7 @@ for (const read of ['shortread', 'longread']) {
 // to 32 and had to be redone on its own.
 // CASES=none measures nothing and just regenerates the report from the recorded
 // JSON, for when the presentation changes but the numbers do not.
-const selected = process.env.CASES?.split(',')
-const cases =
-  process.env.CASES === 'none'
-    ? []
-    : selected
-      ? allCases.filter(c => selected.includes(c.id))
-      : allCases
-if (!cases.length && process.env.CASES !== 'none') {
-  throw new Error(
-    `CASES matched nothing; known: ${allCases.map(c => c.id).join(',')}`,
-  )
-}
+const cases = selectCases(allCases)
 
 // Above this 1-minute load average a row is not comparable to one measured on a
 // quiet box, and the report says so instead of printing a speedup. A clean run
@@ -153,21 +135,9 @@ const priorRaw: Saved = fs.existsSync('results/alignments.json')
   ? (JSON.parse(fs.readFileSync('results/alignments.json', 'utf8')) as Saved)
   : {}
 
-// Every row recorded before 2026-08-16 was keyed `<cov>-<read>` and was BAM,
-// since BAM was all the runner enumerated. Renaming those keys to carry the
-// format they always described keeps three years of measurements on the same
-// axis as the CRAM rows rather than stranding them under names nothing reads.
-// It relabels, never re-values.
-function migrate<T>(byCase: Record<string, T> | undefined) {
-  const out: Record<string, T> = {}
-  for (const [k, v] of Object.entries(byCase ?? {})) {
-    out[/-(bam|cram)$/.test(k) ? k : `${k}-bam`] = v
-  }
-  return out
-}
 const prior: Saved = {
-  results: migrate(priorRaw.results),
-  measuredAt: migrate(priorRaw.measuredAt),
+  results: migrateCaseKeys(priorRaw.results),
+  measuredAt: migrateCaseKeys(priorRaw.measuredAt),
 }
 
 const stamp = new Date().toISOString().slice(0, 10)
