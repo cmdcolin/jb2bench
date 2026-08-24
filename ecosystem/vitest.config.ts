@@ -43,7 +43,15 @@ export default defineConfig({
       // run outright. The default exclude covers node_modules and dist, neither
       // of which `.libs/` is.
       include: ['*.bench.ts'],
-      outputJson: 'results/bench.json',
+      // A BROWSER=1 run is a different measurement, not a better version of the
+      // same one: the 2023 arms inflate with pako there and with native zlib
+      // here. Writing both to one path would mean whichever ran last silently
+      // became "the" parser result, and the figures could not say which
+      // resolution produced them.
+      outputJson:
+        process.env.BROWSER === '1'
+          ? 'results/bench-browser.json'
+          : 'results/bench.json',
       reporters: ['default'],
     },
   },
