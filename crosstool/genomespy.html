@@ -23,42 +23,67 @@
 
   ## THIS PAGE DOES NOT WORK on @genome-spy/core 0.85.0, and the arm is off
 
-  It has never worked, and the 2026-08-23 attempt to fix it did not either. It
-  paints an empty plot frame, issues **zero** requests for the BAM or its index,
-  and reports `__gsState.ready === true` while doing so. Do not read a timing
-  off it; `scripts/crosstool/runner.ts` keeps the arm behind GENOMESPY=1 and
-  preflights it.
+  It paints an empty plot frame, issues **zero** requests for the BAM or its
+  index, and reports `__gsState.ready === true` while doing so. Do not read a
+  timing off it; `scripts/crosstool/runner.ts` keeps the arm behind GENOMESPY=1.
 
-  What is actually wrong, from reading the bundle rather than guessing:
+  The spec below is deliberately shaped like GenomeSpy's own published BAM
+  example (https://genomespy.app/docs/examples/genomic-data/bam-read-alignments/)
+  — root `scales` for the domain, `resolve` + a container root, and an identical
+  `x`/`x2` encoding — so that whoever picks this up starts from upstream's form
+  rather than from a guess. It still fails.
 
-  - The app only *configures* genomes at startup — `configureGenomes(...)` off
-    the root spec, and nothing more.
-  - The only thing that *loads* one is the view-insertion preflight, which
-    collects assemblies by asking each x/y scale resolution for its assembly
-    requirement, and only a resolution that has already resolved to type
-    `locus` reports one.
-  - Our locus scale is not visible to it at that moment, so the preflight
-    collects nothing, loads nothing, and the first draw resolves the genome
-    against an empty store.
+  ### What the published example settles, and what it cannot
 
-  Three spec forms were tried against 0.85.0, each failing differently:
+  It disproved a comment that used to sit in this file, claiming the domain
+  belongs on the channel because "a root `scales` block creates a scale
+  resolution the assembly preflight does not walk". That is backwards. Upstream
+  puts the domain in a root `scales` block, and reading the bundle, such a block
+  is precisely what attaches view-level scale props and creates the resolution.
+
+  **But that example cannot show how a custom assembly loads, because it never
+  loads one.** It declares `assembly: "hg38"`, a *built-in*. Tracing
+  `getGenome` in the bundle, a built-in name takes a branch that constructs the
+  genome on demand and caches it, so the loader is never involved. A
+  *configured* genome — ours, `genomes: { hg19mod: { contigs } }` — takes a
+  different branch that refuses with "has not been loaded yet" unless something
+  has called `ensureAssembly`. Nothing on the embed path does, for any spec
+  shape tried.
+
+  ### Forms tried against 0.85.0, all failing
 
   | form | result |
   | --- | --- |
   | root `genome` (deprecated) | "Genome hg19mod has not been loaded yet" |
-  | root `genomes` + `assembly` | identical — the deprecation notice points here, and it is no better |
-  | inline `scale.assembly` object | "No genomes have been configured!" |
+  | root `genomes` + `assembly` | identical |
+  | inline `scale.assembly` on the channel | "No genomes have been configured!" |
+  | inline `assembly` in root `scales.x` | "No genomes have been configured!" |
+  | domain on the channel vs in root `scales` | no change |
+  | unit view at root vs `vconcat` + `resolve` | no change |
 
-  A plain numeric domain was tried too, on the theory that the `{chrom, pos}`
-  domain forces genome resolution before the preflight — the stack says it does,
-  `getConfiguredDomain` → `fromComplexInterval` → `getLocusGenome` → `getGenome()`
-  with no argument — but removing it only changes which call arrives first.
+  The assembly loader itself is not the problem: a `contigs`-only configured
+  genome is built synchronously once `ensureAssembly` runs. The problem is that
+  it never runs, because the preflight collects assemblies from x/y scale
+  resolutions that have resolved to type `locus`, and ours is not among them.
 
-  Every one of these is silent. `embed()` resolves, its promise does not reject,
-  `__gsState.error` stays null, and GenomeSpy logs the exception to the console
-  itself, so `pageerror` never fires either. Four independent signals read clean
-  on a dead page; only the absence of data requests gives it away, which is why
-  `toolcheck.ts` counts bytes by URL *path*.
+  ### The next thing to try
+
+  Give the corpus a real contig name. The 250 kb slice sits under a made-up
+  `chr22_mask`, which forces a custom assembly and therefore the branch that
+  does not work. Regenerated onto real `chr22` coordinates it could use
+  `assembly: "hg38"` exactly as the example does, and bypass the loader the same
+  way. That is a corpus change touching every other benchmark, so it is a
+  decision rather than a fix.
+
+  ### Every failure here is silent
+
+  `embed()` resolves, its promise does not reject, `__gsState.error` stays null,
+  and GenomeSpy logs the exception itself so `pageerror` never fires. Four
+  independent signals read clean on a dead page. Only the absence of data
+  requests gives it away, which is why `drewcheck.ts` counts bytes by URL
+  *path*. The one 404 in a run is `favicon.ico`, confirmed 2026-08-24 — not a
+  missing genome file.
+
 -->
 <html lang="en">
   <head>
@@ -111,6 +136,20 @@
       const spec = {
         genomes: { hg19mod: { contigs: [{ name: 'chr22_mask', size: 250001 }] } },
         assembly: 'hg19mod',
+        // The domain goes in a ROOT `scales` block, which is what GenomeSpy's
+        // published BAM example does. An earlier version of this file moved it
+        // onto the channel under a comment asserting the opposite — that a root
+        // block "creates a scale resolution the assembly preflight does not
+        // walk". Backwards: a root `scales` block is precisely what attaches
+        // view-level scale props and creates that resolution.
+        scales: {
+          x: { domain: [{ chrom, pos: start }, { chrom, pos: end }] },
+        },
+        // A CONTAINER root, not a bare unit view, mirroring that example's
+        // `resolve` + `vconcat`. The preflight collects assemblies by asking
+        // each x/y scale *resolution* for its requirement, and a shared
+        // resolution is what a container creates.
+        resolve: { scale: { x: 'shared' } },
         data: {
           lazy: {
             type: 'bam',
@@ -124,21 +163,16 @@
         // JBrowse also perform; leaving it out would compare a stack of reads
         // against a single overplotted row.
         transform: [{ type: 'pileup', start: 'start', end: 'end', as: 'lane' }],
-        mark: { type: 'rect', minWidth: 1 },
-        encoding: {
-          // The domain belongs on the channel's own scale, not in a root
-          // `scales` block: a root block creates a scale resolution the
-          // assembly preflight does not walk. Necessary, and not sufficient —
-          // see the header.
-          x: {
-            chrom: 'chrom',
-            pos: 'start',
-            type: 'locus',
-            scale: { domain: [{ chrom, pos: start }, { chrom, pos: end }] },
+        vconcat: [
+          {
+            mark: { type: 'rect', minWidth: 1 },
+            encoding: {
+              x: { chrom: 'chrom', pos: 'start', type: 'locus' },
+              x2: { chrom: 'chrom', pos: 'end' },
+              y: { field: 'lane', type: 'index', scale: { zoom: false } },
+            },
           },
-          x2: { chrom: 'chrom', pos: 'end' },
-          y: { field: 'lane', type: 'index', scale: { zoom: false } },
-        },
+        ],
       }
 
       window.__gsState = { ready: false, error: null }
