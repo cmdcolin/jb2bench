@@ -78,6 +78,14 @@ flame/*.svg
 /results/backends.json
 /results/backends.md
 
+# The indexed VCF the browser benchmarks read. shell/generate_indexed_vcf.sh
+# writes it from data/variants.1000.wide.vcf, so it is regenerable like the rest
+# of the corpus -- it was tracked by accident, and a 1.3 MB binary that a script
+# produces does not belong in a repo whose whole data policy is that the corpus
+# is generated.
+/data/variants.browser.vcf.gz
+/data/variants.browser.vcf.gz.tbi
+
 # The eight library versions ecosystem/ compares: each is a clone of a GMOD repo
 # at a tag pinned in ecosystem/versions.json, carrying its own .git and its own
 # node_modules. ecosystem/setup.sh rebuilds them in a few minutes.
