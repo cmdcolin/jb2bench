@@ -531,20 +531,35 @@ It replaces `zoomrunner.ts`, which polled screenshots every 100 ms, could not
 resolve anything faster than that, and published a number the README had to
 retract. What was wrong was the instrument and not the interaction.
 
-**JBrowse's zoom time-to-content is almost entirely a timer.** It comes back at a
-flat ~505 ms at every coverage, every read type and every container — 504, 505,
-506 across steps — which is not the shape of work. It is the 500 ms
-`LGVCoarseDynamicBlocks` debounce; the drawing inside it takes **0.6 ms**, since
-the pileup is already on the GPU and a zoom is a change of projection. igv.js
-waits for nothing and spends the whole of its number drawing, which is why its
-steps *fall* — 310, 140, 81, 53, 37 ms — as the window narrows and there is less
-to draw.
+**Nothing refetches on a zoom.** Across all 60 cells of the run of record — three
+JBrowse arms and two igv arms over twelve cases — not one issued a data request
+on any zoom step. Both tools hold the surrounding window client-side, so every
+difference below is a difference in drawing and not in network. An earlier
+version of this section predicted the old renderer would refetch; it does not.
 
-So the report prints two tables and the figure set two panels: what the user
-waits for, and what the renderer did. Quoting either alone is how this benchmark
-went wrong the first time. The honest summary is that JBrowse's zoom redraw is
-three orders of magnitude cheaper than igv's and its users do not get any of that
-back, because a constant sits in front of it.
+**The current build's zoom time-to-content is almost entirely a timer.** It comes
+back flat at 504–532 ms across every coverage, read type and container, which is
+not the shape of work. It is the 500 ms `LGVCoarseDynamicBlocks` debounce, and
+the drawing inside it takes **0.2–0.6 ms**, since the pileup is already on the
+GPU and a zoom is a change of projection.
+
+The releases have no such constant and pay real cost instead: v4.3.0 and v2.4.0
+run 1.1 s at 20x short read and **9.7 s and 8.0 s at 1000x long read**. igv waits
+for nothing and spends its whole number drawing, from 39 ms at 20x short read to
+1.4 s on the long-read cases.
+
+So the comparison splits, and it is worth stating in the direction that does not
+flatter this work: **igv is faster on every short-read case and at 20x long read**,
+because half a second of constant loses to real work when the work is small. The
+current build wins the heavy long-read cases 2.2–2.7×, and beats both releases
+everywhere by 2–19×.
+
+The report prints two tables and the figure set two panels — what the user waits
+for, and what the renderer did — because quoting either alone is how this
+benchmark went wrong the first time. Read the redraw table with its dagger: the
+block renderer paints in a worker and the main thread blits the tiles, so
+`drawclock` times a composite for the two release arms and not a render. v2.4.0
+reads 0.1 ms there, underneath a 9.7 s wait.
 
 At rest the page is idle: 95.7% idle over a 6 s CPU profile, ~1 ms of
 JavaScript, no draws. [`flame/ZOOM_SETTLE.md`](flame/ZOOM_SETTLE.md) has the
