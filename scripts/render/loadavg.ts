@@ -230,7 +230,7 @@ export function foreignNow(windowMs = 1000) {
  * genuinely busy should still produce a measurement marked as such rather than
  * hanging forever.
  */
-export function waitForQuiet({ ceiling = FOREIGN_CORE_CEILING, maxMs = 60000 } = {}) {
+export function waitForQuiet({ ceiling = FOREIGN_CORE_CEILING, maxMs = 30000 } = {}) {
   const t0 = Date.now()
   let reading = foreignNow()
   while (reading.cores > ceiling && Date.now() - t0 < maxMs) {
