@@ -114,6 +114,8 @@ interface Result {
   stepsCensored: number
   censored: boolean
   allBailed: boolean
+  /** the renderer process died partway through this cell */
+  crashed?: boolean
   maxWaitMs: number
   steps: { locus: string; loadingSeen: boolean }[]
   /** load average either side of this cell — filled in here, not by the child */
@@ -170,6 +172,9 @@ const cell = (r: Result | undefined) => {
   // release-2.4.0 was added as a column.
   if (!r) {
     return '—'
+  }
+  if (r.crashed) {
+    return '_crash_'
   }
   if (r.allBailed) {
     return '_bail_'

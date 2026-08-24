@@ -324,15 +324,36 @@ if (MODE === 'in') {
   await interactStep()
 }
 const steps: StepMetric[] = []
+// A crashed tab is an OUTCOME, not a harness error. release-4.3.0 kills its
+// renderer zooming out of 1000x shortread CRAM, which reaches puppeteer as
+// "Attempted to use detached Frame" from whatever call happens to be next —
+// a message about the instrument, describing something the build did. Recorded
+// as `crashed` so the table can say so, for the same reason a refusal to fetch
+// is recorded rather than averaged in: neither is a render time.
+let crashed = false
+page.on('error', e => {
+  crashed = true
+  console.error(`page crashed: ${String(e).split('\n')[0]}`)
+})
+const detached = (e: unknown) => /detached Frame|Target closed|Session closed/i.test(String(e))
 for (let i = 0; i < STEPS; i++) {
-  const s = await interactStep()
+  let s: StepMetric
+  try {
+    s = await interactStep()
+  } catch (e) {
+    if (crashed || detached(e)) {
+      crashed = true
+      break
+    }
+    throw e
+  }
   if (!s.applied) {
     break // out of contig; further steps would be no-ops
   }
   steps.push(s)
 }
 
-if (screenshotPath) {
+if (screenshotPath && !crashed) {
   await page.screenshot({ path: screenshotPath })
 }
 
@@ -352,6 +373,9 @@ const summary = {
   censored: censoredSteps > 0,
   // nothing was ever drawn: there is no timing here at all
   allBailed: steps.length > 0 && drew.length === 0,
+  // the renderer process died partway through; whatever steps completed are
+  // not comparable with a cell that survived
+  crashed,
   zoomTimeToContentMs: median(drew.map(s => s.timeToContentMs)),
   zoomRedrawGapMs: median(drew.map(s => s.redrawGapMs)),
   loadingEverSeen: drew.some(s => s.loadingSeen),
