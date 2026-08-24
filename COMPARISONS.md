@@ -19,7 +19,7 @@ coverage legible:
 | --- | --- | --- |
 | **request shape** | `ecosystem/results/sweep.md` (counts), `cohort-bw.md` | how many reads and bytes, and how does that change with version and with file count? |
 | **JBrowse version** | `results/alignments.md`, `results/interaction.md` | what did this release, and the three years since the published one, do for a user? |
-| **renderer backend** | `results/backends.md` | how much of that is the GPU path rather than everything else? |
+| **renderer backend** | `results/backends-chrome.md`, `results/backends-firefox.md` | how much of that is the GPU path rather than everything else? |
 | **library version, 2 points** | `ecosystem/results/ecosystem.md` | how much faster are the parsers than in 2023? |
 | **library version, every major** | `ecosystem/results/sweep.md` | *where along the way* did that happen? |
 | **one library change** | `ecosystem/results/vcf-scan.md`, `gff3-lazy.md` | what did this specific rewrite buy? |
@@ -67,7 +67,7 @@ not the same three at both layers:
 | `results/interaction.md` — zoom, pan | **absent** | column | column | the runner has had the arm since 2026-08-11 and no run has served port 8004 |
 | `results/crosstool-pan.md` — vs igv.js | **absent** | **absent** | column | `make crosstool` runs all three arms over all three motions; the paper's own Fig 8 is this comparison at v2.4.0 |
 | `results/crosstool.md` — cold load vs igv.js | **absent** | **absent** | column | superseded by the pan; the cold load folds in application boot |
-| `results/backends.md` | n/a | n/a | column | one build, one variable: the `?renderer=` rung |
+| `results/backends-{chrome,firefox}.md` | n/a | n/a | column | one build, one variable: the `?renderer=` rung |
 | `results/multibam-pan.md` | n/a | n/a | two branch builds | track count is the axis, not version |
 | `ecosystem/` — parser libraries | pinned, unmeasured | n/a | pinned, unmeasured | repinned 2026-08-18 to v2.4.0's lockfile and npm latest; see gap 3 |
 
