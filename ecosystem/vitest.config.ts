@@ -1,6 +1,23 @@
 import { defineConfig } from 'vitest/config'
 
 export default defineConfig({
+  // BROWSER=1 makes vite resolve each package's `browser` field, which is the
+  // difference between measuring these libraries as JBrowse runs them and
+  // measuring them in the one runtime where the old arm gets a decompressor it
+  // would never have.
+  //
+  // @gmod/bbi 3.0.0, @gmod/bgzf-filehandle 1.4.5 and @gmod/cram 1.7.3 all map
+  // `./esm/unzip.js` to `./esm/unzip-pako.js` for browsers. Under plain node they
+  // inflate with native zlib instead; their current versions inflate with wasm
+  // unconditionally. So the default run pits native C against wasm -- which is
+  // why the single-file BigWig comparison is a wash, and slightly negative -- and
+  // a browser would pit pako against wasm, which is what the wasm was written
+  // for. `scripts/render/charts.R` and ecosystem/README.md both have to say which
+  // resolution produced a number, because the two answer different questions.
+  resolve:
+    process.env.BROWSER === '1'
+      ? { conditions: ['browser'], mainFields: ['browser', 'module', 'main'] }
+      : undefined,
   test: {
     // Each case opens files up to 268 MB and the 1000x parses are seconds long.
     testTimeout: 600_000,

@@ -9,8 +9,89 @@
 // real resolver has already failed; the second produces a superset of the named
 // exports node would have found by itself.
 
+import fs from 'node:fs'
 import { createRequire } from 'node:module'
+import path from 'node:path'
 import { fileURLToPath, pathToFileURL } from 'node:url'
+
+// ---------------------------------------------------------------- browser ---
+//
+// BROWSER=1 resolves each package's `browser` field, and without it the BigWig
+// comparison measures the opposite of what it claims to.
+//
+// @gmod/bbi 3.0.0 ships `"browser": {"./esm/unzip.js": "./esm/unzip-pako.js"}`.
+// So the 2023 arm inflates with **node's native zlib** under plain node and with
+// **pako, pure JavaScript,** in a browser. @gmod/bbi 11.2.2 has no browser field:
+// it inflates through wasm everywhere, and the wasm call fuses decompression with
+// parsing.
+//
+// Under node, then, the comparison is native C against wasm, which is the one
+// matchup the wasm cannot win -- and JBrowse never runs there. In a browser it is
+// pako against wasm, which is the matchup the wasm was written for. The recorded
+// single-file BigWig numbers are a wash for exactly this reason: 0.93 ms against
+// 0.96 ms at 20x short read, the current arm slightly SLOWER on five of six cases.
+// That is not the library failing to improve, it is the harness handing the old
+// arm a decompressor it would never have in production.
+//
+// @gmod/bgzf-filehandle 1.4.5 and @gmod/cram 1.7.3 carry the same swap, so BAM and
+// CRAM are affected too -- their speedups are understated rather than erased,
+// since 4x to 12x survives the handicap.
+//
+// Only string redirects are applied. cram-js 1.7.3 also maps
+// `"./esm/io/localFile.js": false`, which a bundler turns into an empty module;
+// stubbing a filesystem reader in a benchmark that reads files from disk would
+// measure nothing, so those entries are skipped and traced.
+const browserMapCache = new Map()
+
+function browserMapFor(dir) {
+  if (browserMapCache.has(dir)) {
+    return browserMapCache.get(dir)
+  }
+  let found
+  for (let d = dir; ; d = path.dirname(d)) {
+    const pkg = path.join(d, 'package.json')
+    if (fs.existsSync(pkg)) {
+      try {
+        const parsed = JSON.parse(fs.readFileSync(pkg, 'utf8'))
+        const map = parsed.browser
+        found = map && typeof map === 'object' ? { root: d, map } : undefined
+      } catch {
+        found = undefined
+      }
+      break
+    }
+    const up = path.dirname(d)
+    if (up === d) {
+      break
+    }
+  }
+  browserMapCache.set(dir, found)
+  return found
+}
+
+function browserRedirect(url) {
+  if (!url.startsWith('file:')) {
+    return undefined
+  }
+  const file = fileURLToPath(url)
+  const entry = browserMapFor(path.dirname(file))
+  if (!entry) {
+    return undefined
+  }
+  const rel = `./${path.relative(entry.root, file).split(path.sep).join('/')}`
+  const target = entry.map[rel]
+  if (typeof target !== 'string') {
+    if (target === false && process.env.SWEEP_TRACE_BROWSER) {
+      process.stderr.write(`BROWSER skip (false) ${rel}\n`)
+    }
+    return undefined
+  }
+  const redirected = pathToFileURL(path.resolve(entry.root, target)).href
+  if (process.env.SWEEP_TRACE_BROWSER) {
+    process.stderr.write(`BROWSER ${rel} -> ${target}\n`)
+  }
+  return redirected
+}
 
 // ------------------------------------------------------------- specifier ---
 //
@@ -28,7 +109,14 @@ import { fileURLToPath, pathToFileURL } from 'node:url'
 // cannot drift from what a 2023 bundler did.
 export async function resolve(specifier, context, next) {
   try {
-    return await next(specifier, context)
+    const resolved = await next(specifier, context)
+    if (process.env.BROWSER === '1') {
+      const redirected = browserRedirect(resolved.url)
+      if (redirected) {
+        return { ...resolved, url: redirected }
+      }
+    }
+    return resolved
   } catch (err) {
     const parent = context.parentURL
     if (!parent?.startsWith('file:')) {
