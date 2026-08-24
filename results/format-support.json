@@ -1,0 +1,152 @@
+{
+  "loc": "chr22_mask:124000-143000",
+  "measuredAt": "2026-08-24",
+  "formats": [
+    {
+      "id": "BAM",
+      "track": "20x.shortread.bam"
+    },
+    {
+      "id": "CRAM",
+      "track": "20x.shortread.cram"
+    },
+    {
+      "id": "BigWig",
+      "track": "20x.shortread.bw",
+      "note": "self-indexing, no sidecar"
+    },
+    {
+      "id": "VCF",
+      "track": "variants.browser.vcf.gz",
+      "note": "bgzip + tabix"
+    }
+  ],
+  "tools": [
+    {
+      "id": "jbrowse",
+      "label": "JBrowse (builds/current)"
+    },
+    {
+      "id": "igv",
+      "label": "igv.js 3.8.5"
+    },
+    {
+      "id": "genomespy",
+      "label": "GenomeSpy 0.85.0"
+    }
+  ],
+  "results": {
+    "jbrowse": {
+      "BAM": {
+        "canvases": 1,
+        "painted": 1,
+        "bytes": 1914470,
+        "errors": [],
+        "declared": null,
+        "drew": true
+      },
+      "CRAM": {
+        "canvases": 1,
+        "painted": 1,
+        "bytes": 524399,
+        "errors": [],
+        "declared": null,
+        "drew": true
+      },
+      "BigWig": {
+        "canvases": 1,
+        "painted": 1,
+        "bytes": 262144,
+        "errors": [],
+        "declared": null,
+        "drew": true
+      },
+      "VCF": {
+        "canvases": 1,
+        "painted": 1,
+        "bytes": 1336516,
+        "errors": [],
+        "declared": null,
+        "drew": true
+      }
+    },
+    "igv": {
+      "BAM": {
+        "canvases": 12,
+        "painted": 3,
+        "bytes": 650494,
+        "errors": [
+          "Failed to load resource: the server responded with a status of 404 (Not Found)"
+        ],
+        "declared": null,
+        "drew": true
+      },
+      "CRAM": {
+        "canvases": 12,
+        "painted": 3,
+        "bytes": 307788,
+        "errors": [],
+        "declared": null,
+        "drew": true
+      },
+      "BigWig": {
+        "canvases": 12,
+        "painted": 3,
+        "bytes": 57863,
+        "errors": [],
+        "declared": null,
+        "drew": true
+      },
+      "VCF": {
+        "canvases": 12,
+        "painted": 2,
+        "bytes": 1345572,
+        "errors": [],
+        "declared": null,
+        "drew": true
+      }
+    },
+    "genomespy": {
+      "BAM": {
+        "canvases": 1,
+        "painted": 1,
+        "bytes": 0,
+        "errors": [
+          "Error: Genome hg19mod has not been loaded yet. Call ensureAssembly(\"hg19mod\") before accessing it."
+        ],
+        "declared": null,
+        "drew": false
+      },
+      "CRAM": {
+        "canvases": 1,
+        "painted": 1,
+        "bytes": 0,
+        "errors": [
+          "Error: Genome hg19mod has not been loaded yet. Call ensureAssembly(\"hg19mod\") before accessing it."
+        ],
+        "declared": null,
+        "drew": false
+      },
+      "BigWig": {
+        "canvases": 1,
+        "painted": 1,
+        "bytes": 0,
+        "errors": [
+          "Error: Genome hg19mod has not been loaded yet. Call ensureAssembly(\"hg19mod\") before accessing it."
+        ],
+        "declared": null,
+        "drew": false
+      },
+      "VCF": {
+        "canvases": 1,
+        "painted": 1,
+        "bytes": 0,
+        "errors": [
+          "Error: Genome hg19mod has not been loaded yet. Call ensureAssembly(\"hg19mod\") before accessing it."
+        ],
+        "declared": null,
+        "drew": false
+      }
+    }
+  }
+}
