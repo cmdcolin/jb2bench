@@ -26,8 +26,8 @@ range request and a round trip.
 
 | version | N | reads | bytes | reads per file |
 | --- | ---: | ---: | ---: | ---: |
-| v4.0.0 (2023) | 100 | 500 | 1649 KB | 5.0 |
-| v10.0.2 (current) | 100 | 600 | 1649 KB | 6.0 |
+| v3.0.0 (2023) | 100 | 500 | 1649 KB | 5.0 |
+| v11.2.2 (current) | 100 | 600 | 1649 KB | 6.0 |
 
 Full sizes are in `results/cohort-bw.json`. Reads per file is flat across N in
 every row, which is the finding: this cost is per-file and does not amortize —
@@ -40,20 +40,20 @@ through the same layout, so this is the pattern each version repeats N times.
 
 | version | reads, in order (bytes) |
 | --- | --- |
-| v4.0.0 (2023) | 2000, 56, 48, 8196, 6647 |
-| v10.0.2 (current) | 2000, 32, 22, 48, 8196, 6647 |
+| v3.0.0 (2023) | 2000, 56, 48, 8196, 6647 |
+| v11.2.2 (current) | 2000, 32, 22, 48, 8196, 6647 |
 
 ## Time
 
 Sequential opens, one process per version, version order rotated every round,
-each arm best-of-1 and the table the median over 1 rounds.
+each arm best-of-3 and the table the median over 5 rounds.
 
-> **This half is not a run of record. Peak 1-minute load was 5.6**, against the 4.0 this repo treats as the ceiling for a quotable absolute. Do not quote a millisecond from this table. The request counts above are unaffected — they are counts, not timings, and they are the same on an idle box and a loaded one.
+> **This half is not a run of record. Peak 1-minute load was 10.8**, against the 4.0 this repo treats as the ceiling for a quotable absolute. Do not quote a millisecond from this table. The request counts above are unaffected — they are counts, not timings, and they are the same on an idle box and a loaded one.
 
 | version | N=1 | N=10 | N=100 |
 | --- | ---: | ---: | ---: |
-| v4.0.0 (2023) | 1.5 ms | 16.1 ms | 94.4 ms |
-| v10.0.2 (current) | 1.1 ms | 6.6 ms | 80.4 ms |
+| v3.0.0 (2023) | 1.6 ms | 10.5 ms | 79.8 ms |
+| v11.2.2 (current) | 1.1 ms | 11.7 ms | 82.6 ms |
 
 A browser opens its tracks concurrently, so this is not the wall clock a user
 sees. What concurrency hides is precisely the per-file cost the table is about,

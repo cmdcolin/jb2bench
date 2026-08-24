@@ -327,10 +327,20 @@ if (file.exists(eco_path)) {
       lo = speedup * (1 - rel),
       hi = speedup * (1 + rel)
     ) |>
-    filter(lib %in% c("bam", "cram", "bigwig")) |>
+    # BigWig is deliberately absent, and its absence is the honest reading.
+    # Coverage is not an axis for it: a BigWig holds binned signal, so the 19 kb
+    # window returns about the same intervals whatever the read depth behind it
+    # -- 13168, 17676, 18495 across 20x/200x/1000x, against BAM's 3079, 31126,
+    # 153652 over the same steps. Six sub-2 ms numbers that barely move were
+    # being drawn as a coverage trend, and there is no trend to draw.
+    #
+    # The cost @gmod/bbi actually carries is PER FILE, paid once per sample and
+    # invisible when measured once. `make cohort` is where it becomes legible --
+    # 100 files, one window -- and results/figures/cohort-bw.png plots it.
+    filter(lib %in% c("bam", "cram")) |>
     mutate(
-      lib = factor(lib, levels = c("bam", "cram", "bigwig"),
-                   labels = c("@gmod/bam", "@gmod/cram", "@gmod/bbi (BigWig)")),
+      lib = factor(lib, levels = c("bam", "cram"),
+                   labels = c("@gmod/bam", "@gmod/cram")),
       read = factor(sub("^.* ", "", case), levels = c("shortread", "longread"),
                     labels = c("short read", "long read")),
       coverage = factor(sub("^[a-z]+ ([0-9]+x) .*$", "\\1", case),
@@ -356,13 +366,15 @@ if (file.exists(eco_path)) {
     scale_y_log10(breaks = c(0.5, 1, 2, 5, 10, 20),
                   labels = c("0.5×", "1×", "2×", "5×", "10×", "20×"),
                   expand = expansion(mult = c(0.08, 0.26))) +
-    scale_colour_manual(values = c("#12796e", "#7a5ea8", "#b08a3e"), guide = "none") +
+    scale_colour_manual(values = c("#12796e", "#7a5ea8"), guide = "none") +
     labs(
       title = "The parser layer underneath, 2023 release vs current",
       subtitle = "Decode only — no browser, no GPU. Same corpus and window as the render benchmarks.",
       x = "coverage", y = "speedup (2023 mean ÷ current mean, log scale)",
       caption = paste0(
         "Both sides built from source from a pinned tag with the same toolchain, so the difference is library code.\n",
+        "@gmod/bbi is not here: coverage is not an axis for BigWig, whose binned signal returns the same intervals at any read depth.\n",
+        "Its cost is per file — see the cohort panel, where 100 samples pay it 100 times.\n",
         "An equivalence gate runs first: a timing comparison between two libraries returning different records is not a comparison."
       )
     ) +
@@ -420,3 +432,85 @@ if (file.exists(eco_path)) {
 
 cat("wrote:\n")
 cat(paste0("  ", list.files("results/figures", full.names = TRUE), "\n"), sep = "")
+
+# ------------------------------------------------------- cohort BigWig panel
+# Where @gmod/bbi's cost is actually legible.
+#
+# The single-file BigWig comparison reads 1-2 ms and flat, which looks like "the
+# library did not improve" and is really "a per-file cost measured once is
+# invisible". Coverage is not an axis for it either: binned signal returns about
+# the same intervals at any read depth. The axis that matters is HOW MANY FILES,
+# because answering one BigWig query means reading the header, walking the
+# chromosome B+ tree and descending the R-tree before a byte of data is touched,
+# and a hundred-sample panel pays all of that a hundred times.
+#
+# Counts, not milliseconds. Each read is a range request and a round trip on the
+# network, and a count is exact on any machine -- which is why this figure is
+# worth drawing on a box too busy to time anything.
+cohort_path <- "ecosystem/results/cohort-bw.json"
+if (file.exists(cohort_path)) {
+  co <- fromJSON(cohort_path, simplifyVector = FALSE)
+  co_df <- do.call(rbind, lapply(co$rows, function(r) {
+    data.frame(build = r$build, n = r$n, reads = r$reads,
+               per_file = r$reads / r$n)
+  }))
+  builds <- unique(co_df$build)
+  co_df$build <- factor(co_df$build, levels = builds)
+  co_col <- setNames(c("#c2452d", "#12796e")[seq_along(builds)], builds)
+
+  p_n <- ggplot(co_df, aes(n, reads, colour = build, group = build)) +
+    geom_line(linewidth = 0.8) +
+    geom_point(size = 2.2) +
+    geom_text(aes(label = reads), hjust = -0.35, vjust = 0.3, size = 3, show.legend = FALSE) +
+    scale_x_log10(breaks = unlist(co$sizes), labels = unlist(co$sizes),
+                  expand = expansion(mult = c(0.12, 0.18))) +
+    scale_y_log10(expand = expansion(mult = c(0.10, 0.16))) +
+    scale_colour_manual(values = co_col, name = NULL) +
+    labs(title = "Range requests grow with the panel, not with the window",
+         x = "BigWig files in the panel", y = "read() calls (log)") +
+    paper_theme() +
+    theme(legend.position = "top")
+
+  # The per-file read sequence, which is where the extra request comes from:
+  # one 56-byte header read in v3.0.0 is two reads of 32 and 22 in v11.2.2.
+  # Equal-width boxes rather than widths proportional to bytes, because the
+  # point is the COUNT of round trips; the 8 kB data read is not eight times
+  # more expensive than the 48-byte one over a network.
+  pat_df <- do.call(rbind, lapply(co$rows, function(r) {
+    if (r$n != max(unlist(co$sizes))) return(NULL)
+    data.frame(build = r$build, i = seq_along(r$pattern),
+               bytes = unlist(r$pattern))
+  }))
+  pat_df$build <- factor(pat_df$build, levels = builds)
+
+  p_pat <- ggplot(pat_df, aes(i, build, fill = build)) +
+    geom_tile(width = 0.92, height = 0.62, alpha = 0.85, show.legend = FALSE) +
+    geom_text(aes(label = ifelse(bytes >= 1000,
+                                 sprintf("%.1fk", bytes / 1000),
+                                 as.character(bytes))),
+              size = 2.9, colour = "white", fontface = "bold") +
+    scale_x_continuous(breaks = seq_len(max(pat_df$i)),
+                       expand = expansion(mult = c(0.03, 0.03))) +
+    scale_fill_manual(values = co_col) +
+    labs(title = "What one file costs, read by read",
+         subtitle = "Every sample repeats this exact sequence",
+         x = "read number within a single file", y = NULL) +
+    paper_theme()
+
+  p_co <- patchwork::wrap_plots(p_n, p_pat, ncol = 1, heights = c(1.35, 1)) +
+    patchwork::plot_annotation(
+      title = "Opening a cohort of BigWigs: the cost is per file and does not amortize",
+      subtitle = sprintf(
+        "Window %s. Counts of read() calls, exact on any machine — each one is a range request and a round trip.",
+        co$window),
+      caption = paste0(
+        "Measured ", co$measured, ". Reads per file is flat across N: the hundredth sample costs what the first did.\n",
+        "The current release issues one MORE request per file than the 2023 one for identical bytes — a 56-byte header read split into 32 and 22.\n",
+        "Timings are omitted deliberately: a browser opens tracks concurrently, and concurrency hides exactly the per-file cost this measures."
+      ),
+      theme = paper_theme()
+    )
+
+  ggsave("results/figures/cohort-bw.png", p_co, width = 10, height = 7.2, dpi = 150)
+  cat("  results/figures/cohort-bw.png\n")
+}
