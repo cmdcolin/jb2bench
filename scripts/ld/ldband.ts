@@ -15,10 +15,33 @@
 // same data with only the window changed.
 //
 // The CPU column is the same statistic computed by the shipped CPU path's inner
-// loop (@jbrowse/ld-core calculateLDStatsPhasedBits — bit-packed haplotype
-// popcounts), banded identically. Rows whose predicted CPU time exceeds
-// --cpu-budget are extrapolated from a measured per-cell rate rather than run,
-// and are marked so in the output; nothing is silently capped.
+// loop (@jbrowse/ld-core calculateLDStatsPhasedBits / calculateLDStatsDosageBits
+// — bit-packed popcounts either way), banded identically. Rows whose predicted
+// CPU time exceeds --cpu-budget are extrapolated from a measured per-cell rate
+// rather than run, and are marked so in the output; nothing is silently capped.
+//
+// --- the second axis: what a phased file is read AS -------------------------
+//
+// Every row runs under both LD methods the app implements, against ONE cohort
+// packed two ways, so the pair differs in the estimator and nothing else:
+//
+//   phased    haplotypic r2 over 2*numSamples haplotypes (ldPhasedCompute)
+//   composite Weir (1979) r2 over numSamples genotype dosages (ldCompute)
+//
+// This is the LD twin of the clustering benchmark's 2,504-samples against
+// 5,008-haplotypes pair, and it is worth measuring because the same modelling
+// choice lands somewhere completely different here. Clustering builds a
+// samples-by-samples matrix, so phasing doubles n and QUADRUPLES the work. LD
+// builds a variants-by-variants matrix: phasing doubles the depth of each
+// cell's reduction and leaves the output matrix byte-for-byte the same size, so
+// none of the binding-limit story above moves. Bit-packed, it barely costs
+// anything at all — the phased kernel spends 8 popcounts per 32-sample word and
+// the composite one 9, because the two haplotype planes ride through the same
+// word loop.
+//
+// Dosages here are the haplotype pair collapsed, g = altH1 + altH2, which is
+// what composite LD does with a phased file — so this measures the choice a
+// reader of ONE file faces, not two different files.
 //
 // The output-buffer ceiling that decides which rows run at all is a DEVICE
 // limit, and a device does not inherit its adapter's. A bare requestDevice()
@@ -28,13 +51,15 @@
 // requestAppLikeDevice in ldkernel.ts.
 //
 // Usage: node --experimental-strip-types scripts/ld/ldband.ts [numSamples] [numSnps]
-//          [--cpu-budget=SECONDS] [--label=NAME] [--headless] [--allow-software]
+//          [--cpu-budget=SECONDS] [--method=phased|composite|both] [--label=NAME]
+//          [--headless] [--allow-software]
 //   results/ld-band[-LABEL].md + .json
 import { writeFileSync } from 'node:fs'
 
 import { tablemark } from 'tablemark'
 
 import {
+  LD_COMPUTE_WGSL,
   LD_PHASED_COMPUTE_WGSL,
   assertHardwareAdapter,
   launchGpuPage,
@@ -49,22 +74,64 @@ const labelArg = process.argv.find(a => a.startsWith('--label='))
 const LABEL = labelArg ? `-${labelArg.split('=')[1]}` : ''
 const budgetArg = process.argv.find(a => a.startsWith('--cpu-budget='))
 const CPU_BUDGET_MS = Number(budgetArg?.split('=')[1] ?? 45) * 1000
+const methodArg = process.argv.find(a => a.startsWith('--method='))?.split('=')[1]
+if (methodArg && !['phased', 'composite', 'both'].includes(methodArg)) {
+  throw new Error(`--method must be phased, composite or both, got '${methodArg}'`)
+}
+const METHODS =
+  methodArg === 'phased' || methodArg === 'composite'
+    ? [methodArg]
+    : ['phased', 'composite']
 
 // 0 means the full triangle — the control this whole table is against.
-const WINDOWS = [0, 2000, 1000, 500, 200]
+// Ascending, so each row's prediction can be anchored on the largest row
+// actually measured before it. Presentation order is restored in the figure.
+const WINDOWS = [200, 500, 1000, 2000, 0]
 // Small enough to always run, big enough to time honestly.
 const CALIBRATION_N = 1200
 
-const code = loadWgsl(LD_PHASED_COMPUTE_WGSL)
-const offsets = loadUniformOffsets(LD_PHASED_COMPUTE_WGSL)
-const uniformsSize = loadUniformsSize(LD_PHASED_COMPUTE_WGSL)
-for (const field of ['numSnps', 'numWords', 'band', 'dispatchRowStride']) {
-  if (!(field in offsets)) {
-    throw new Error(
-      `${LD_PHASED_COMPUTE_WGSL} has no '${field}' uniform — regenerate shaders, or this kernel predates the band`,
-    )
-  }
-}
+// One descriptor per method, each carrying the shader the app ships and the
+// uniform layout read out of its generated iface. Both kernels now take three
+// or four bit planes and the same uniforms, differing only in how many planes
+// and what they mean; `requires` is what keeps that assumption honest, throwing
+// before the dispatch if a kernel's genotype layout moves out from under the
+// packing below rather than letting the run report a fast wrong number. It has
+// already earned itself once: the composite kernel used to be byte-packed.
+const KERNELS = {
+  phased: {
+    path: LD_PHASED_COMPUTE_WGSL,
+    entry: 'computeLDPhased',
+    requires: ['numSnps', 'numWords', 'band', 'dispatchRowStride'],
+  },
+  composite: {
+    path: LD_COMPUTE_WGSL,
+    entry: 'computeLD',
+    requires: ['numSnps', 'numWords', 'band', 'dispatchRowStride'],
+  },
+} as const
+
+const KERNEL_SPECS = Object.fromEntries(
+  METHODS.map(m => {
+    const k = KERNELS[m as keyof typeof KERNELS]
+    const offsets = loadUniformOffsets(k.path)
+    for (const field of k.requires) {
+      if (!(field in offsets)) {
+        throw new Error(
+          `${k.path} has no '${field}' uniform — regenerate shaders, or this kernel's genotype layout changed and the packing in this script no longer matches it`,
+        )
+      }
+    }
+    return [
+      m,
+      {
+        code: loadWgsl(k.path),
+        entry: k.entry,
+        offsets,
+        uniformsSize: loadUniformsSize(k.path),
+      },
+    ]
+  }),
+)
 
 // Headed by default: a GPU timing off a headless software adapter is a CPU
 // timing wearing a GPU's name. --headless is available for a machine with no
@@ -76,14 +143,13 @@ const { page, close } = await launchGpuPage({ headed: HEADED })
 
 const out = await page.evaluate(
   async ({
-    code,
+    KERNEL_SPECS,
+    METHODS,
     NUM_SAMPLES,
     NUM_SNPS,
     WINDOWS,
     CALIBRATION_N,
     CPU_BUDGET_MS,
-    offsets,
-    uniformsSize,
   }) => {
     const adapter = (await navigator.gpu.requestAdapter())!
     // Field by field: GPUAdapterInfo exposes getters on the prototype, so a
@@ -158,6 +224,30 @@ const out = await page.evaluate(
     }
     const snp = (i: number) => POOL[i % POOL.length]!
 
+    // The same cohort read as unphased genotypes: dosage is the haplotype pair
+    // collapsed, which is the whole content of "compute composite LD on a
+    // phased file". Three planes rather than four, and disjoint the way
+    // packDosages builds them — het and homAlt are subsets of valid, and dosage
+    // 0 is a sample in valid and in neither.
+    interface Dosed {
+      het: Uint32Array
+      homAlt: Uint32Array
+      valid: Uint32Array
+    }
+    const DOSED: Dosed[] = POOL.map(h => {
+      const het = new Uint32Array(WORDS)
+      const homAlt = new Uint32Array(WORDS)
+      const valid = new Uint32Array(WORDS)
+      for (let w = 0; w < WORDS; w++) {
+        const v = h.validH1[w]! & h.validH2[w]!
+        valid[w] = v
+        het[w] = (h.altH1[w]! ^ h.altH2[w]!) & v
+        homAlt[w] = h.altH1[w]! & h.altH2[w]! & v
+      }
+      return { het, homAlt, valid }
+    })
+    const dosed = (i: number) => DOSED[i % DOSED.length]!
+
     function popcount32(v: number) {
       v = v | 0
       v -= (v >>> 1) & 0x55555555
@@ -203,12 +293,71 @@ const out = await page.evaluate(
       return Math.min(1, Math.max(0, r * r))
     }
 
-    function cpuBand(n: number, k: number) {
+    // calculateLDStatsDosageBits' inner loop, r2 only: the composite (Weir 1979)
+    // estimator as nine popcounts per word against the phased path's eight,
+    // which is the whole per-cell cost difference between the two methods once
+    // both are bit-packed.
+    function cpuPairDosage(a: Dosed, b: Dosed) {
+      let n = 0
+      let het1 = 0
+      let homAlt1 = 0
+      let het2 = 0
+      let homAlt2 = 0
+      let hetHet = 0
+      let hetHom = 0
+      let homHet = 0
+      let homHom = 0
+      for (let w = 0; w < WORDS; w++) {
+        const h1 = a.het[w]!
+        const m1 = a.homAlt[w]!
+        const v1 = a.valid[w]!
+        const h2 = b.het[w]!
+        const m2 = b.homAlt[w]!
+        const v2 = b.valid[w]!
+        n += popcount32(v1 & v2)
+        het1 += popcount32(h1 & v2)
+        homAlt1 += popcount32(m1 & v2)
+        het2 += popcount32(h2 & v1)
+        homAlt2 += popcount32(m2 & v1)
+        hetHet += popcount32(h1 & h2)
+        hetHom += popcount32(h1 & m2)
+        homHet += popcount32(m1 & h2)
+        homHom += popcount32(m1 & m2)
+      }
+      if (n < 2) return 0
+      const s1 = het1 + 2 * homAlt1
+      const s2 = het2 + 2 * homAlt2
+      const s1sq = het1 + 4 * homAlt1
+      const s2sq = het2 + 4 * homAlt2
+      const sprod = hetHet + 2 * hetHom + 2 * homHet + 4 * homHom
+      const pA = s1 / (2 * n)
+      const pB = s2 / (2 * n)
+      if (pA <= 0 || pA >= 1 || pB <= 0 || pB >= 1) return 0
+      const mean1 = s1 / n
+      const mean2 = s2 / n
+      const var1 = s1sq / n - mean1 * mean1
+      const var2 = s2sq / n - mean2 * mean2
+      if (!(var1 > 0 && var2 > 0)) return 0
+      const cov = sprod / n - mean1 * mean2
+      const r = cov / Math.sqrt(var1 * var2)
+      return Math.min(1, Math.max(0, r * r))
+    }
+
+    function cpuBand(method: string, n: number, k: number) {
       const vals = new Float32Array(cellCount(n, k))
       let idx = 0
-      for (let i = 1; i < n; i++) {
-        const a = snp(i)
-        for (let j = firstCol(i, k); j < i; j++) vals[idx++] = cpuPair(a, snp(j))
+      if (method === 'phased') {
+        for (let i = 1; i < n; i++) {
+          const a = snp(i)
+          for (let j = firstCol(i, k); j < i; j++) vals[idx++] = cpuPair(a, snp(j))
+        }
+      } else {
+        for (let i = 1; i < n; i++) {
+          const a = dosed(i)
+          for (let j = firstCol(i, k); j < i; j++) {
+            vals[idx++] = cpuPairDosage(a, dosed(j))
+          }
+        }
       }
       return vals
     }
@@ -216,31 +365,84 @@ const out = await page.evaluate(
     // --- CPU per-cell rate, measured, for the rows too big to run ---
     const calN = CALIBRATION_N
     const calK = resolveBand(calN, 0)
-    let calMs = Infinity
-    for (let r = 0; r < 3; r++) {
-      const t = performance.now()
-      cpuBand(calN, calK)
-      calMs = Math.min(calMs, performance.now() - t)
+    const calibration: Record<string, { ms: number; nsPerCell: number }> = {}
+    for (const method of METHODS) {
+      let calMs = Infinity
+      for (let r = 0; r < 3; r++) {
+        const t = performance.now()
+        cpuBand(method, calN, calK)
+        calMs = Math.min(calMs, performance.now() - t)
+      }
+      calibration[method] = {
+        ms: +calMs.toFixed(1),
+        nsPerCell: (calMs * 1e6) / cellCount(calN, calK),
+      }
     }
-    const nsPerCell = (calMs * 1e6) / cellCount(calN, calK)
 
-    const pipeline = await device.createComputePipelineAsync({
-      layout: device.createPipelineLayout({
-        bindGroupLayouts: [
-          device.createBindGroupLayout({
-            entries: [
-              { binding: 0, visibility: GPUShaderStage.COMPUTE, buffer: { type: 'read-only-storage' } },
-              { binding: 1, visibility: GPUShaderStage.COMPUTE, buffer: { type: 'storage' } },
-              { binding: 2, visibility: GPUShaderStage.COMPUTE, buffer: { type: 'uniform' } },
-            ],
-          }),
-        ],
-      }),
-      compute: { module: device.createShaderModule({ code }), entryPoint: 'computeLDPhased' },
-    })
-    const bgl = pipeline.getBindGroupLayout(0)
+    // Both kernels take the same three bindings — genotypes in, matrix out,
+    // uniforms — so only the module, the entry point and the uniform layout
+    // vary by method.
+    const pipelines: Record<string, GPUComputePipeline> = {}
+    for (const method of METHODS) {
+      const spec = KERNEL_SPECS[method]!
+      pipelines[method] = await device.createComputePipelineAsync({
+        layout: device.createPipelineLayout({
+          bindGroupLayouts: [
+            device.createBindGroupLayout({
+              entries: [
+                { binding: 0, visibility: GPUShaderStage.COMPUTE, buffer: { type: 'read-only-storage' } },
+                { binding: 1, visibility: GPUShaderStage.COMPUTE, buffer: { type: 'storage' } },
+                { binding: 2, visibility: GPUShaderStage.COMPUTE, buffer: { type: 'uniform' } },
+              ],
+            }),
+          ],
+        }),
+        compute: {
+          module: device.createShaderModule({ code: spec.code }),
+          entryPoint: spec.entry,
+        },
+      })
+    }
 
-    async function gpuBand(n: number, k: number) {
+    // The genotype buffer depends only on the method and the variant count, not
+    // on the window, so it is built once per method rather than once per row —
+    // at 50,000 variants and 2,504 samples it is 63 MB as four haplotype planes
+    // and 47 MB as three dosage planes, which is enough to dominate the timing
+    // if rebuilt five times.
+    const inputs: Record<string, Uint32Array<ArrayBuffer>> = {}
+    const inputFor = (method: string, n: number) => {
+      const cached = inputs[method]
+      if (cached) return cached
+      let buf: Uint32Array<ArrayBuffer>
+      if (method === 'phased') {
+        // Layout per SNP: [altH1, validH1, altH2, validH2], each numWords long.
+        buf = new Uint32Array(n * 4 * WORDS)
+        for (let i = 0; i < n; i++) {
+          const h = snp(i)
+          const base = i * 4 * WORDS
+          buf.set(h.altH1, base)
+          buf.set(h.validH1, base + WORDS)
+          buf.set(h.altH2, base + WORDS * 2)
+          buf.set(h.validH2, base + WORDS * 3)
+        }
+      } else {
+        // Layout per SNP: [het, homAlt, valid], each numWords long, matching
+        // getWord in ldCompute.slang. The same planes the CPU twin reads, so
+        // both sides of the parity check are provably the same genotypes.
+        buf = new Uint32Array(n * 3 * WORDS)
+        for (let i = 0; i < n; i++) {
+          const d = dosed(i)
+          const base = i * 3 * WORDS
+          buf.set(d.het, base)
+          buf.set(d.homAlt, base + WORDS)
+          buf.set(d.valid, base + WORDS * 2)
+        }
+      }
+      inputs[method] = buf
+      return buf
+    }
+
+    async function gpuBand(method: string, n: number, k: number) {
       const cells = cellCount(n, k)
       const groups = Math.ceil(cells / WG)
       const width = Math.min(groups, MAXD)
@@ -251,24 +453,22 @@ const out = await page.evaluate(
       if (height > MAXD || outBytes > MAXBIND || outBytes > MAXBUF) {
         return { declined: true as const, cells, outBytes }
       }
-      const haps = new Uint32Array(n * 4 * WORDS)
-      for (let i = 0; i < n; i++) {
-        const s = snp(i)
-        const base = i * 4 * WORDS
-        haps.set(s.altH1, base)
-        haps.set(s.validH1, base + WORDS)
-        haps.set(s.altH2, base + WORDS * 2)
-        haps.set(s.validH2, base + WORDS * 3)
-      }
-      const inB = device.createBuffer({ size: haps.byteLength, usage: GPUBufferUsage.STORAGE | GPUBufferUsage.COPY_DST })
+      const spec = KERNEL_SPECS[method]!
+      const pipeline = pipelines[method]!
+      const bgl = pipeline.getBindGroupLayout(0)
+      const input = inputFor(method, n)
+      const inB = device.createBuffer({ size: input.byteLength, usage: GPUBufferUsage.STORAGE | GPUBufferUsage.COPY_DST })
       const outB = device.createBuffer({ size: outBytes, usage: GPUBufferUsage.STORAGE | GPUBufferUsage.COPY_SRC })
-      const uB = device.createBuffer({ size: uniformsSize, usage: GPUBufferUsage.UNIFORM | GPUBufferUsage.COPY_DST })
+      const uB = device.createBuffer({ size: spec.uniformsSize, usage: GPUBufferUsage.UNIFORM | GPUBufferUsage.COPY_DST })
       const readB = device.createBuffer({ size: outBytes, usage: GPUBufferUsage.MAP_READ | GPUBufferUsage.COPY_DST })
-      const uni = new Uint32Array(uniformsSize / 4)
-      uni[offsets.numSnps!] = n
-      uni[offsets.numWords!] = WORDS
-      uni[offsets.band!] = k
-      uni[offsets.dispatchRowStride!] = width * WG
+      // Left zeroed: ldMetric 0 with signedLD 0 is r2 in ldFinalize, which is
+      // what both kernels are being measured on.
+      const uni = new Uint32Array(spec.uniformsSize / 4)
+      const o = spec.offsets
+      uni[o.numSnps!] = n
+      uni[o.numWords!] = WORDS
+      uni[o.band!] = k
+      uni[o.dispatchRowStride!] = width * WG
       const bind = device.createBindGroup({
         layout: bgl,
         entries: [
@@ -277,7 +477,7 @@ const out = await page.evaluate(
           { binding: 2, resource: { buffer: uB } },
         ],
       })
-      device.queue.writeBuffer(inB, 0, haps)
+      device.queue.writeBuffer(inB, 0, input)
       device.queue.writeBuffer(uB, 0, uni)
       // An over-limit dispatch fails ASYNCHRONOUSLY: mapAsync still resolves and
       // the readback is a plausible all-zero matrix. Without this scope the row
@@ -307,19 +507,62 @@ const out = await page.evaluate(
       return { declined: false as const, cells, outBytes, ms, values, error: err?.message ?? null }
     }
 
-    const rows = []
+    // The window sweep, run once per method. Methods outer so each one's CPU
+    // rate re-anchors within its own column: the two do different work per
+    // cell, so a prediction for a composite row must not be anchored on a
+    // measured phased one.
+    // Written out rather than inferred from the pushes below: `anchor` reads
+    // back out of this array to re-anchor the CPU rate, so an inferred element
+    // type would be defined in terms of itself.
+    interface Row {
+      method: string
+      units: number
+      unitName: string
+      window: string
+      band: number
+      cells: number
+      outputMiB: number
+      gpuMs: number | null
+      declined: boolean
+      gpuError: string | null
+      cpuMs: number
+      cpuMeasured: boolean
+      cpuRateNsPerCell: number
+      speedup: number | null
+      maxAbsDiff: number | null
+    }
+    const rows: Row[] = []
+    // r2 for the narrowest window under each method, kept so the two estimators
+    // can be compared to each other at the end. Narrowest because it is the one
+    // window certain to have been RUN on the CPU under any budget, and because
+    // holding two of the wide ones would be 400 MB of f32.
+    const narrowest = Math.min(...WINDOWS.filter(w => w > 0))
+    const agreement: Record<string, Float32Array> = {}
+    for (const method of METHODS) {
     for (const sep of WINDOWS) {
       const k = resolveBand(NUM_SNPS, sep)
       const cells = cellCount(NUM_SNPS, k)
-      const g = await gpuBand(NUM_SNPS, k)
-      const cpuPredictedMs = (nsPerCell * cells) / 1e6
+      const g = await gpuBand(method, NUM_SNPS, k)
+      // Predict from the LARGEST row already measured, not from the small
+      // calibration matrix. The calibration fits in cache and the real ones do
+      // not, so its rate ran ~2x optimistic — which put an estimated row to the
+      // LEFT of a measured row for a narrower window, i.e. visibly out of order
+      // on the chart. Rows measured here re-anchor the rate as they complete.
+      const anchor = rows.filter(r => r.cpuMeasured && r.method === method).pop()
+      const rate = anchor
+        ? (anchor.cpuMs * 1e6) / anchor.cells
+        : calibration[method]!.nsPerCell
+      const cpuPredictedMs = (rate * cells) / 1e6
       const runCpu = cpuPredictedMs <= CPU_BUDGET_MS
       let cpuMs = cpuPredictedMs
       let cpuValues: Float32Array | null = null
       if (runCpu) {
         const t = performance.now()
-        cpuValues = cpuBand(NUM_SNPS, k)
+        cpuValues = cpuBand(method, NUM_SNPS, k)
         cpuMs = performance.now() - t
+      }
+      if (cpuValues && sep === narrowest) {
+        agreement[method] = cpuValues
       }
       let maxDiff: number | null = null
       if (cpuValues && !g.declined && g.values) {
@@ -328,6 +571,12 @@ const out = await page.evaluate(
         maxDiff = m
       }
       rows.push({
+        method,
+        // What the estimator reduces over per cell, and the number the figure
+        // names: phasing splits every sample into two haplotypes, which is the
+        // same 2,504-into-5,008 step the clustering benchmark takes.
+        units: method === 'phased' ? NUM_SAMPLES * 2 : NUM_SAMPLES,
+        unitName: method === 'phased' ? 'haplotypes' : 'genotypes',
         window: sep === 0 ? 'full triangle' : String(sep),
         band: k,
         cells,
@@ -337,19 +586,49 @@ const out = await page.evaluate(
         gpuError: g.declined ? null : g.error,
         cpuMs: Math.round(cpuMs),
         cpuMeasured: runCpu,
+        cpuRateNsPerCell: +rate.toFixed(1),
         speedup: g.declined || !g.ms ? null : +(cpuMs / g.ms).toFixed(1),
         maxAbsDiff: maxDiff,
       })
+    }
+    }
+
+    // How far apart the two estimators are on identical genotypes. This is NOT
+    // a parity check — haplotypic and composite r2 are different statistics and
+    // are only expected to coincide under Hardy-Weinberg, which the synthetic
+    // cohort satisfies exactly because its two haplotype planes are drawn
+    // independently. On real data they diverge, so this number is a floor on
+    // the difference rather than a bound.
+    let methodAgreement = null
+    const [mA, mB] = Object.keys(agreement)
+    if (mA && mB) {
+      const a = agreement[mA]!
+      const b = agreement[mB]!
+      let maxDiff = 0
+      let sumDiff = 0
+      for (let i = 0; i < a.length; i++) {
+        const dd = Math.abs(a[i]! - b[i]!)
+        if (dd > maxDiff) maxDiff = dd
+        sumDiff += dd
+      }
+      methodAgreement = {
+        between: [mA, mB],
+        window: narrowest,
+        cells: a.length,
+        maxAbsDiff: maxDiff,
+        meanAbsDiff: sumDiff / a.length,
+      }
     }
 
     return {
       adapter: info,
       limits: { maxStorageBufferBindingSize: MAXBIND, maxBufferSize: MAXBUF, maxComputeWorkgroupsPerDimension: MAXD },
-      calibration: { n: calN, cells: cellCount(calN, calK), ms: +calMs.toFixed(1), nsPerCell: +nsPerCell.toFixed(1) },
+      calibration: { n: calN, cells: cellCount(calN, calK), perMethod: calibration },
+      methodAgreement,
       rows,
     }
   },
-  { code, NUM_SAMPLES, NUM_SNPS, WINDOWS, CALIBRATION_N, CPU_BUDGET_MS, offsets, uniformsSize },
+  { KERNEL_SPECS, METHODS, NUM_SAMPLES, NUM_SNPS, WINDOWS, CALIBRATION_N, CPU_BUDGET_MS },
 )
 
 await close()
@@ -357,6 +636,8 @@ await close()
 assertHardwareAdapter(out.adapter, ALLOW_SOFTWARE)
 
 const table = out.rows.map(r => ({
+  method: r.method,
+  units: `${r.units.toLocaleString()} ${r.unitName}`,
   window: r.window,
   band: r.band,
   cells: r.cells.toExponential(2),
@@ -367,6 +648,8 @@ const table = out.rows.map(r => ({
   parity: r.maxAbsDiff === null ? '—' : r.maxAbsDiff.toExponential(1),
 }))
 const COLUMNS = [
+  { name: 'method' },
+  { name: 'reduces over' },
   { name: 'window' },
   { name: 'band k' },
   { name: 'cells' },
@@ -380,7 +663,13 @@ const COLUMNS = [
 const md = [
   '# LD matrix: banded vs full triangle, GPU vs CPU',
   '',
-  `${NUM_SNPS.toLocaleString()} variants, ${NUM_SAMPLES.toLocaleString()} samples, phased (haplotype popcount kernel), r².`,
+  `${NUM_SNPS.toLocaleString()} variants, ${NUM_SAMPLES.toLocaleString()} samples, r².`,
+  '',
+  'One cohort, read two ways: `phased` is haplotypic LD over the 2n haplotypes ' +
+    '(ldPhasedCompute), `composite` is the Weir (1979) estimator over the n ' +
+    'genotype dosages (ldCompute), the dosages being the same haplotypes ' +
+    'collapsed. The output matrix is the same size either way — phasing changes ' +
+    'the depth of each cell\'s reduction, not the number of cells.',
   '',
   `Adapter: ${out.adapter.vendor} ${out.adapter.architecture} ${out.adapter.device} ${out.adapter.description}`.trim(),
   `Headed: ${HEADED} (a headless run can substitute a software adapter; see assertHardwareAdapter)`,
@@ -389,11 +678,20 @@ const md = [
   tablemark(table, { columns: COLUMNS }),
   '',
   '- **window** is `maxVariantSeparation` (plink `--ld-window`); "full triangle" is the slot default, 0.',
-  `- **cpu ms** marked \`(est)\` exceeded the ${CPU_BUDGET_MS / 1000}s budget and is extrapolated from a measured rate of ` +
-    `${out.calibration.nsPerCell} ns/cell (${out.calibration.cells.toLocaleString()} cells in ${out.calibration.ms} ms at n=${out.calibration.n}). ` +
-    'Nothing is capped silently.',
+  `- **cpu ms** marked \`(est)\` exceeded the ${CPU_BUDGET_MS / 1000}s budget and is extrapolated from a rate measured ` +
+    `per method at n=${out.calibration.n} (${out.calibration.cells.toLocaleString()} cells): ` +
+    Object.entries(out.calibration.perMethod)
+      .map(([m, c]) => `${m} ${c.nsPerCell.toFixed(1)} ns/cell in ${c.ms} ms`)
+      .join(', ') +
+    '. Nothing is capped silently.',
   '- **DECLINED** means `planDispatch` refuses the output buffer, so the app falls back to the CPU column.',
-  '- **max|gpu-cpu|** is f32-vs-f64 only; it is the parity check that the banded decode addresses the same cells on both sides.',
+  '- **max|gpu-cpu|** is f32-vs-f64 only; it is the parity check that the banded decode addresses the same cells on both sides. It compares a kernel against ITS OWN CPU twin, never one method against the other.',
+  out.methodAgreement
+    ? `- **phased vs composite** on identical genotypes at window ${out.methodAgreement.window}: ` +
+      `max |diff| ${out.methodAgreement.maxAbsDiff.toExponential(1)}, mean ${out.methodAgreement.meanAbsDiff.toExponential(1)} ` +
+      `over ${out.methodAgreement.cells.toLocaleString()} cells. Not a parity check — these are different estimators, ` +
+      'equal only under Hardy-Weinberg, which this synthetic cohort satisfies exactly. Real data diverges further.'
+    : '',
   '',
   `Generated by \`scripts/ld/ldband.ts\` on ${new Date().toISOString()}`,
   '',
