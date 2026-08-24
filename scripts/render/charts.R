@@ -98,10 +98,12 @@ cold_rows <- do.call(rbind, lapply(names(cold$results), function(case) {
     cell <- per[[b]]
     if (is.null(cell$median) || !is.finite(cell$median)) return(NULL)
     ld <- if (is.null(cell$load)) NA_real_ else max(cell$load$before, cell$load$after)
+    fg <- if (is.null(cell$load$foreignCores)) NA_real_ else cell$load$foreignCores
     data.frame(
       case = case, build = b,
       median = cell$median / 1000, sd = cell$stddev / 1000,
-      load = ld, measured = cold$measuredAt[[case]] %||% NA_character_
+      load = ld, foreign = fg,
+      measured = cold$measuredAt[[case]] %||% NA_character_
     )
   }))
 }))
@@ -126,6 +128,16 @@ dropped <- setdiff(unique(cold_df$case), complete)
 cold_df <- cold_df |> filter(case %in% complete)
 
 peak_load <- max(cold_df$load, na.rm = TRUE)
+# Contention is foreign CPU, not the load average. The load average counts this
+# benchmark's own threads, so a heavy cell inflates it by working -- and this
+# caption used to declare the figure unquotable whenever it passed 4.0, which on
+# 2026-08-24 meant condemning a run whose worst cell saw 0.36 foreign cores. The
+# offender was 200x-shortread-cram at load 4.2 and foreign 0.18: the benchmark
+# reading its own six renders back.
+FOREIGN_MAX <- 0.5
+peak_foreign <- suppressWarnings(max(cold_df$foreign, na.rm = TRUE))
+has_foreign <- is.finite(peak_foreign)
+quotable <- has_foreign && peak_foreign <= FOREIGN_MAX
 dates <- paste(sort(unique(na.omit(cold_df$measured))), collapse = ", ")
 
 # A format with no rows yet is named in the caption rather than drawn as an
@@ -156,10 +168,19 @@ p_cold <- ggplot(cold_df, aes(coverage, median, colour = program, group = progra
     },
     x = "coverage", y = "time (s)",
     caption = paste0(
-      "Measured ", dates, " on one workstation, peak 1-min load ",
-      sprintf("%.1f", peak_load),
-      " — far above the 4.0 this repo treats as usable, so the absolute seconds are not quotable.\n",
-      "Builds are measured back to back within each case, so a load spike lands on all four at once and the ratios between them survive it better than the values do.\n",
+      "Measured ", dates, " on one workstation. ",
+      if (!has_foreign) {
+        sprintf(paste0("Peak 1-min load %.1f, against the 4.0 this repo treated as usable before it measured contention directly; ",
+                       "these rows predate that, so the absolute seconds are not quotable.\n"), peak_load)
+      } else if (quotable) {
+        sprintf(paste0("Worst cell saw %.2f cores of foreign CPU — work by processes outside this benchmark — against a %.1f ceiling, ",
+                       "so the absolute seconds stand. Peak 1-min load was %.1f, which counts this benchmark's own six renders and is context, not a verdict.\n"),
+                peak_foreign, FOREIGN_MAX, peak_load)
+      } else {
+        sprintf(paste0("Worst cell saw %.2f cores of foreign CPU against a %.1f ceiling, so the absolute seconds are not quotable.\n"),
+                peak_foreign, FOREIGN_MAX)
+      },
+      "Builds are measured back to back within each case, so contention lands on all four at once and the ratios between them survive it better than the values do.\n",
       if (length(missing_fmt)) {
         paste0("No ", paste(missing_fmt, collapse = " or "),
                " row: those cases have not been run since the runner started enumerating formats.\n")
@@ -289,36 +310,57 @@ if (file.exists(eco_path)) {
       old <- Filter(function(b) grepl("2023", b$name), bs)
       new <- Filter(function(b) !grepl("2023", b$name), bs)
       if (!length(old) || !length(new)) return(NULL)
-      data.frame(case = nm, old = old[[1]]$mean, new = new[[1]]$mean)
+      data.frame(case = nm, old = old[[1]]$mean, new = new[[1]]$mean,
+                 old_rme = old[[1]]$rme %||% NA_real_,
+                 new_rme = new[[1]]$rme %||% NA_real_)
     }))
   }))
   eco_df <- rows |>
     mutate(
       lib = sub(" .*$", "", case),
-      speedup = old / new
+      speedup = old / new,
+      # Both sides carry a relative margin of error, so the ratio carries their
+      # sum in quadrature. Without it this figure invites exactly the question
+      # it cannot answer -- why CRAM dips at 200x and rebounds at 1000x -- when
+      # those two cells are the noisiest in the set.
+      rel = sqrt(old_rme^2 + new_rme^2) / 100,
+      lo = speedup * (1 - rel),
+      hi = speedup * (1 + rel)
     ) |>
     filter(lib %in% c("bam", "cram", "bigwig")) |>
-    mutate(lib = factor(lib, levels = c("bam", "cram", "bigwig"),
-                        labels = c("@gmod/bam", "@gmod/cram", "@gmod/bbi (BigWig)")),
-           # fixed order across facets: reorder() sorts on the global speedup,
-           # which leaves each panel looking unsorted
-           label = factor(sub("^[a-z]+ ", "", case),
-                          levels = rev(c("20x shortread", "200x shortread", "1000x shortread",
-                                         "20x longread", "200x longread", "1000x longread"))))
+    mutate(
+      lib = factor(lib, levels = c("bam", "cram", "bigwig"),
+                   labels = c("@gmod/bam", "@gmod/cram", "@gmod/bbi (BigWig)")),
+      read = factor(sub("^.* ", "", case), levels = c("shortread", "longread"),
+                    labels = c("short read", "long read")),
+      coverage = factor(sub("^[a-z]+ ([0-9]+x) .*$", "\\1", case),
+                        levels = rev(c("20x", "200x", "1000x")))
+    )
 
-  p_eco <- ggplot(eco_df, aes(label, speedup, fill = lib)) +
-    geom_col(width = 0.66, show.legend = FALSE) +
+  # A lollipop from the 1x line rather than a bar from zero, on ONE shared log
+  # axis. Bars with a free x scale per library were actively misleading: BigWig
+  # is a REGRESSION at 0.8-1.0x and its bar ran the full width of its panel,
+  # reading as an achievement next to CRAM's 12x. On a shared log scale a
+  # regression points left of the dashed line and cannot be mistaken for one.
+  # Log also lets 0.8x and 12.2x share an axis without flattening the middle,
+  # which a shared linear scale would.
+  p_eco <- ggplot(eco_df, aes(coverage, speedup, colour = lib)) +
     geom_hline(yintercept = 1, linetype = "dashed", colour = "grey30") +
-    geom_text(aes(label = sprintf("%.1f×", speedup)),
-              hjust = -0.15, size = 3.1, colour = "grey15") +
-    facet_wrap(~lib, scales = "free_x", nrow = 1) +
+    geom_linerange(aes(ymin = pmin(speedup, 1), ymax = pmax(speedup, 1)),
+                   linewidth = 1.6, alpha = 0.65) +
+    geom_pointrange(aes(ymin = lo, ymax = hi), size = 0.42, linewidth = 0.5) +
+    geom_text(aes(y = hi, label = sprintf("%.1f×", speedup)),
+              hjust = -0.25, size = 2.9, colour = "grey15") +
+    facet_grid(read ~ lib) +
     coord_flip() +
-    scale_y_continuous(expand = expansion(mult = c(0, 0.22))) +
-    scale_fill_manual(values = c("#12796e", "#7a5ea8", "#b08a3e")) +
+    scale_y_log10(breaks = c(0.5, 1, 2, 5, 10, 20),
+                  labels = c("0.5×", "1×", "2×", "5×", "10×", "20×"),
+                  expand = expansion(mult = c(0.08, 0.26))) +
+    scale_colour_manual(values = c("#12796e", "#7a5ea8", "#b08a3e"), guide = "none") +
     labs(
       title = "The parser layer underneath, 2023 release vs current",
       subtitle = "Decode only — no browser, no GPU. Same corpus and window as the render benchmarks.",
-      x = NULL, y = "speedup (2023 mean ÷ current mean)",
+      x = "coverage", y = "speedup (2023 mean ÷ current mean, log scale)",
       caption = paste0(
         "Both sides built from source from a pinned tag with the same toolchain, so the difference is library code.\n",
         "An equivalence gate runs first: a timing comparison between two libraries returning different records is not a comparison."
@@ -326,7 +368,7 @@ if (file.exists(eco_path)) {
     ) +
     paper_theme()
 
-  ggsave("results/figures/parsers.png", p_eco, width = 12, height = 4.4, dpi = 150)
+  ggsave("results/figures/parsers.png", p_eco, width = 11.5, height = 5.6, dpi = 150)
 
   # The same data in the paper's Fig 8 layout — time against coverage, one line
   # per version, faceted format x read type. The bar chart above answers "how
