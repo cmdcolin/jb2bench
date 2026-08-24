@@ -6,12 +6,13 @@
   "rows": {
     "20x-shortread-bam": {
       "jbrowse": {
-        "median": 685.0999999642372,
-        "fetchedMedian": 688.1999999880791,
+        "median": 650.3999999985099,
+        "drawMedian": 2.5,
+        "fetchedMedian": 656.4500000011176,
         "runs": [
-          687.0999999642372,
-          685.0999999642372,
-          661
+          649.8000000007451,
+          654.8999999985099,
+          650.3999999985099
         ],
         "appliedSteps": [
           5,
@@ -36,18 +37,19 @@
           "chr22_mask:28,997..47,997"
         ],
         "load": {
-          "before": 1.08,
-          "after": 1.27
+          "before": 1.37,
+          "after": 0.77
         },
         "failures": []
       },
       "igv": {
-        "median": 536.8000000119209,
-        "fetchedMedian": 536.8000000119209,
+        "median": 505.4000000022352,
+        "drawMedian": 139.40000000223517,
+        "fetchedMedian": 505.4000000022352,
         "runs": [
-          514.8999999761581,
-          538.8000000119209,
-          536.8000000119209
+          500.5,
+          529.6000000014901,
+          505.4000000022352
         ],
         "appliedSteps": [
           5,
@@ -72,8 +74,119 @@
           "chr22_mask:28999-48000"
         ],
         "load": {
-          "before": 1.08,
-          "after": 1.27
+          "before": 1.37,
+          "after": 0.77
+        },
+        "failures": []
+      },
+      "jbrowse-release-4.3.0": {
+        "median": 1187,
+        "drawMedian": 48.100000001490116,
+        "fetchedMedian": 1190.9500000011176,
+        "runs": [
+          1165.800000000745,
+          1187,
+          1188.5
+        ],
+        "appliedSteps": [
+          5,
+          5,
+          5
+        ],
+        "cachedSteps": 3,
+        "requests": 4,
+        "bytes": 1572864,
+        "drawsPerStep": [
+          16,
+          10,
+          16,
+          10,
+          16
+        ],
+        "loci": [
+          "chr22_mask:105,001..124,001",
+          "chr22_mask:86,000..105,000",
+          "chr22_mask:66,999..85,999",
+          "chr22_mask:47,998..66,998",
+          "chr22_mask:28,997..47,997"
+        ],
+        "load": {
+          "before": 1.37,
+          "after": 0.77
+        },
+        "failures": []
+      },
+      "jbrowse-release-2.4.0": {
+        "median": 1456.199999999255,
+        "drawMedian": 89.19999999925494,
+        "fetchedMedian": 1481.75,
+        "runs": [
+          1452.5,
+          1456.3999999985099,
+          1456.199999999255
+        ],
+        "appliedSteps": [
+          5,
+          5,
+          5
+        ],
+        "cachedSteps": 1,
+        "requests": 4,
+        "bytes": 952320,
+        "drawsPerStep": [
+          9,
+          5,
+          9,
+          5,
+          9
+        ],
+        "loci": [
+          "chr22_mask:105,001..124,001",
+          "chr22_mask:86,000..105,000",
+          "chr22_mask:66,999..85,999",
+          "chr22_mask:47,998..66,998",
+          "chr22_mask:28,997..47,997"
+        ],
+        "load": {
+          "before": 1.37,
+          "after": 0.77
+        },
+        "failures": []
+      },
+      "igv-deep": {
+        "median": 521.3999999985099,
+        "drawMedian": 142.89999999850988,
+        "fetchedMedian": 521.3999999985099,
+        "runs": [
+          500,
+          524.3000000007451,
+          521.3999999985099
+        ],
+        "appliedSteps": [
+          5,
+          5,
+          5
+        ],
+        "cachedSteps": 0,
+        "requests": 7,
+        "bytes": 1019266,
+        "drawsPerStep": [
+          95096,
+          95329,
+          94626,
+          94252,
+          94199
+        ],
+        "loci": [
+          "chr22_mask:104999-124000",
+          "chr22_mask:85999-105000",
+          "chr22_mask:66999-86000",
+          "chr22_mask:47999-67000",
+          "chr22_mask:28999-48000"
+        ],
+        "load": {
+          "before": 1.37,
+          "after": 0.77
         },
         "failures": []
       }
@@ -494,13 +607,16 @@
     },
     "20x-shortread-cram": {
       "jbrowse": {
-        "median": 663.2999999821186,
+        "median": 666.2999999970198,
+        "drawMedian": 2.600000001490116,
         "fetchedMedian": null,
         "runs": [
-          653.2999999523163,
-          673.3000000119209
+          666.2999999970198,
+          659.5,
+          666.8000000007451
         ],
         "appliedSteps": [
+          5,
           5,
           5
         ],
@@ -522,19 +638,22 @@
           "chr22_mask:28,997..47,997"
         ],
         "load": {
-          "before": 1.24,
-          "after": 1.25
+          "before": 0.77,
+          "after": 1.09
         },
         "failures": []
       },
       "igv": {
-        "median": 512.4000000059605,
-        "fetchedMedian": 583.8499999940395,
+        "median": 463.8999999985099,
+        "drawMedian": 129.19999999925494,
+        "fetchedMedian": 506.9000000022352,
         "runs": [
-          507,
-          517.8000000119209
+          473.8999999985099,
+          463.8999999985099,
+          458.1000000014901
         ],
         "appliedSteps": [
+          5,
           5,
           5
         ],
@@ -556,8 +675,119 @@
           "chr22_mask:28999-48000"
         ],
         "load": {
-          "before": 1.24,
-          "after": 1.25
+          "before": 0.77,
+          "after": 1.09
+        },
+        "failures": []
+      },
+      "jbrowse-release-4.3.0": {
+        "median": 1157.199999999255,
+        "drawMedian": 52.5,
+        "fetchedMedian": null,
+        "runs": [
+          1154.6000000014901,
+          1174.300000000745,
+          1157.199999999255
+        ],
+        "appliedSteps": [
+          5,
+          5,
+          5
+        ],
+        "cachedSteps": 5,
+        "requests": 0,
+        "bytes": 0,
+        "drawsPerStep": [
+          16,
+          10,
+          16,
+          10,
+          16
+        ],
+        "loci": [
+          "chr22_mask:105,001..124,001",
+          "chr22_mask:86,000..105,000",
+          "chr22_mask:66,999..85,999",
+          "chr22_mask:47,998..66,998",
+          "chr22_mask:28,997..47,997"
+        ],
+        "load": {
+          "before": 0.77,
+          "after": 1.09
+        },
+        "failures": []
+      },
+      "jbrowse-release-2.4.0": {
+        "median": 1432.9000000022352,
+        "drawMedian": 85.29999999701977,
+        "fetchedMedian": 1474.5,
+        "runs": [
+          1458.800000000745,
+          1432.9000000022352,
+          1432.9000000022352
+        ],
+        "appliedSteps": [
+          5,
+          5,
+          5
+        ],
+        "cachedSteps": 4,
+        "requests": 4,
+        "bytes": 111104,
+        "drawsPerStep": [
+          9,
+          5,
+          9,
+          5,
+          9
+        ],
+        "loci": [
+          "chr22_mask:105,001..124,001",
+          "chr22_mask:86,000..105,000",
+          "chr22_mask:66,999..85,999",
+          "chr22_mask:47,998..66,998",
+          "chr22_mask:28,997..47,997"
+        ],
+        "load": {
+          "before": 0.77,
+          "after": 1.09
+        },
+        "failures": []
+      },
+      "igv-deep": {
+        "median": 485.6000000014901,
+        "drawMedian": 132.60000000149012,
+        "fetchedMedian": 532.5999999977648,
+        "runs": [
+          468.80000000074506,
+          492.3999999985099,
+          485.6000000014901
+        ],
+        "appliedSteps": [
+          5,
+          5,
+          5
+        ],
+        "cachedSteps": 4,
+        "requests": 2,
+        "bytes": 180611,
+        "drawsPerStep": [
+          95096,
+          95327,
+          94626,
+          94235,
+          94182
+        ],
+        "loci": [
+          "chr22_mask:104999-124000",
+          "chr22_mask:85999-105000",
+          "chr22_mask:66999-86000",
+          "chr22_mask:47999-67000",
+          "chr22_mask:28999-48000"
+        ],
+        "load": {
+          "before": 0.77,
+          "after": 1.09
         },
         "failures": []
       }
@@ -910,15 +1140,21 @@
     "20x-longread": "2026-08-16",
     "200x-longread": "2026-08-16",
     "1000x-longread": "2026-08-16",
-    "20x-shortread-cram": "2026-08-16",
+    "20x-shortread-cram": "2026-08-24",
     "200x-shortread-cram": "2026-08-16",
     "1000x-shortread-cram": "2026-08-16",
     "20x-longread-cram": "2026-08-16",
     "200x-longread-cram": "2026-08-16",
-    "1000x-longread-cram": "2026-08-16"
+    "1000x-longread-cram": "2026-08-16",
+    "20x-shortread-bam": "2026-08-24"
   },
   "locusMismatch": {
     "1000x-shortread": "step counts differ: jbrowse 5, igv 4",
     "200x-longread-cram": "step counts differ: jbrowse 5, igv 2"
+  },
+  "jbrowseBuilds": {
+    "jbrowse": "current",
+    "jbrowse-release-4.3.0": "release-4.3.0",
+    "jbrowse-release-2.4.0": "release-2.4.0"
   }
 }

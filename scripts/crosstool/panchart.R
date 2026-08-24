@@ -73,6 +73,12 @@ read_motion <- function(path, motion) {
         ms = if (motion == "Zoom in" || is.null(fetched)) num1(cell$median) else num1(fetched),
         cached_only = motion == "Pan" && is.null(fetched),
         draw_ms = num1(cell$drawMedian),
+        # Median main-thread draws per step. A handful of calls means the arm
+        # rasterized somewhere this instrument cannot see -- see main_thread below.
+        draws = {
+          dd <- unlist(cell$drawsPerStep)
+          if (length(dd)) stats::median(dd) else NA_real_
+        },
         refetched = num1(cell$requests) > 0,
         igv_version = igv_v %||% NA_character_,
         stringsAsFactors = FALSE
@@ -190,7 +196,26 @@ paper_fig(p_time, "results/figures/interaction.png", width = 13, height = 7.4)
 # from every other panel here: not "how long did the user wait" but "how much of
 # that wait was work". Publishing the first without the second is what got the
 # earlier zoom benchmark retracted.
-redraw <- d2 |> filter(motion == "Zoom in", is.finite(draw_ms))
+# Only the arms that rasterize where the instrument can see it.
+#
+# The old block renderer paints in a worker and the main thread blits the
+# finished tiles, so drawclock -- which patches the page's canvas prototypes and
+# cannot reach a worker's global scope -- times a composite rather than a render.
+# Plotting release-2.4.0's 0.1 ms beside the current renderer's 0.6 ms would say
+# the 2023 release redraws six times faster than the GPU path.
+#
+# Decided from the renderer, not from the draw count, and the counts are why: at
+# 20x short read the current build issues 20 draws a step, release-4.3.0 issues
+# 12 to 18, release-2.4.0 issues 6 to 12. Twenty WebGL draw calls and a dozen
+# drawImage blits, indistinguishable by number. An earlier version of this script
+# thresholded on the count and dropped cells at random.
+redraw <- d2 |>
+  filter(motion == "Zoom in", is.finite(draw_ms), !arm %in% ARM_BUILD[c("release-2.4.0", "release-4.3.0")])
+offthread <- d2 |>
+  filter(motion == "Zoom in", arm %in% ARM_BUILD[c("release-2.4.0", "release-4.3.0")]) |>
+  distinct(arm) |>
+  pull(arm) |>
+  as.character()
 
 if (nrow(redraw)) {
   p_draw <- ggplot(redraw, aes(coverage, draw_ms, colour = arm, group = arm)) +
@@ -209,6 +234,11 @@ if (nrow(redraw)) {
         "Read this against the zoom panels of interaction.png, never instead of them. There, JBrowse waits a flat ~505 ms at every",
         "depth -- the 500 ms LGVCoarseDynamicBlocks debounce -- and igv waits nothing at all. Here is what each did with the time.",
         "The gap between the two figures is JBrowse's to close: the drawing is already sub-millisecond, and the wait is a constant.",
+        if (length(offthread)) paste0(
+          "Absent on purpose: ", paste(offthread, collapse = ", "),
+          ". The block renderer rasterizes in a worker and blits the result, so the main thread shows a drawImage -- 0.1 ms under a 9.7 s wait.",
+          "\nThat is a composite being timed, not a render, and this instrument cannot reach a worker's canvas. Their waits are in interaction.png, which is the number that matters for them."
+        ) else "",
         sep = "\n"
       )
     ) +

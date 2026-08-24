@@ -491,12 +491,12 @@ const lines: string[] = [
   '',
   ...(isZoom
     ? [
-        '**What a zoom prices, and the trap in it.** Neither tool should need the',
-        'network: both hold the surrounding window client-side, so a 2x zoom-in is a',
-        'redraw. So the interesting columns are two. One is whether a tool went to',
-        'the network anyway — the older renderer does, and that is a refetch a user',
-        'waits through for data already in memory. The other is how long the redraw',
-        'itself took.',
+        '**What a zoom prices.** Neither tool needs the network: both hold the',
+        'surrounding window client-side, so a 2x zoom-in is a redraw. The run confirms',
+        'it rather than assuming it — across every arm and every case, **no cell issued',
+        'a single data request on any zoom step**. An earlier draft of this section',
+        'predicted that the older renderer would refetch and it does not; what the old',
+        'renderer does is re-rasterize, which is a different cost and is priced below.',
         '',
         '**Time-to-content on JBrowse here is mostly a timer, and this report will not',
         'let it read as drawing.** A JBrowse zoom step comes back at a flat ~505 ms at',
@@ -575,12 +575,34 @@ for (const c of allCases) {
 // draw of the burst it belongs to. Printed for the zoom because there the wait is
 // a configured 500 ms constant and quoting it as render cost is the mistake this
 // benchmark was retracted for once already.
-const drawCell = (c: Cell | undefined) =>
-  c && Number.isFinite(c.drawMedian)
-    ? c.drawMedian < 10
-      ? `${c.drawMedian.toFixed(1)} ms`
-      : `${Math.round(c.drawMedian)} ms`
-    : '—'
+/**
+ * Which arms rasterize where the instrument can see it.
+ *
+ * The old block renderer paints in a worker and the main thread blits the
+ * finished tiles, so `drawclock` — which patches the page's canvas prototypes and
+ * cannot reach a worker's own global scope — times a composite rather than a
+ * render. At 1000x long read that is 0.1 ms sitting underneath a 9.7 s wait.
+ *
+ * This is decided from the renderer each arm uses, not from its draw count, and
+ * the counts are the reason why: at 20x short read the current build issues 20
+ * draws a step, release-4.3.0 issues 12 to 18 and release-2.4.0 issues 6 to 12.
+ * Same order of magnitude, opposite meanings — twenty WebGL draw calls against a
+ * dozen `drawImage` blits. A threshold over those numbers separates nothing, and
+ * an earlier version of this function used one and daggered cells at random.
+ *
+ * The build under test is driven with `renderer=webgl` and draws on the main
+ * thread; every recorded release arm predates that renderer and does not.
+ */
+const rastersOffThread = (toolId: string) => toolId.startsWith('jbrowse-')
+
+const drawCell = (c: Cell | undefined, toolId: string) => {
+  if (!c || !Number.isFinite(c.drawMedian)) {
+    return '—'
+  }
+  const text =
+    c.drawMedian < 10 ? `${c.drawMedian.toFixed(1)} ms` : `${Math.round(c.drawMedian)} ms`
+  return rastersOffThread(toolId) ? `${text} ‡` : text
+}
 
 const drawTable = isZoom
   ? [
@@ -590,6 +612,20 @@ const drawTable = isZoom
       'else in the column above is a tool waiting — a debounce for JBrowse, nothing at',
       'all for igv, which starts drawing immediately.',
       '',
+      '**`‡` is not a fast redraw, it is a blit.** The block renderer paints in a worker',
+      'and the main thread only composites the finished tiles, so what is timed there is',
+      'a `drawImage` and not the rendering — 0.1 ms sitting underneath a 9.7 s wait.',
+      '`drawclock` patches the page\'s canvas prototypes and cannot reach a worker\'s own',
+      'global scope. **Compare only the un-daggered cells with each other**: the current',
+      'renderer draws on the main thread through WebGL and igv draws there through the 2D',
+      'API, so for those two this column is the rasterization itself.',
+      '',
+      'The daggers are assigned from which renderer each arm uses, and the draw counts in',
+      'the table below are why they have to be. At 20x short read the current build issues',
+      '20 draws a step, release-4.3.0 issues 12 to 18, release-2.4.0 issues 6 to 12 — the',
+      'same order of magnitude for twenty WebGL draw calls and a dozen blits. Nothing in',
+      'the count distinguishes them.',
+      '',
       `| case | ${shownTools.map(t => t.label).join(' | ')} |`,
       `| --- | ${shownTools.map(() => '---:').join(' | ')} |`,
       ...allCases
@@ -597,18 +633,19 @@ const drawTable = isZoom
         .map(
           c =>
             `| ${c.id} | ${shownTools
-              .map(t => drawCell(prior.rows[c.id]![t.id]))
+              .map(t => drawCell(prior.rows[c.id]![t.id], t.id))
               .join(' | ')} |`,
         ),
       '',
-      'Two readings, and they point opposite ways. JBrowse draws in a fraction of a',
-      'millisecond because the pileup is already on the GPU and a zoom is a change of',
-      'projection — but the user still waits half a second, so the win is unclaimed',
-      "and the debounce is worth revisiting. igv's redraw is real CPU work and shrinks",
-      'as the window narrows and there is less to draw, which is why its column falls',
-      'step by step where JBrowse\'s is flat.',
+      'Between the two arms this column can compare, it points opposite ways. The',
+      'current renderer draws in a fraction of a millisecond, because the pileup is',
+      'already on the GPU and a zoom is a change of projection — but the user still',
+      'waits half a second, so the win is unclaimed and the debounce is what stands',
+      "between them and it. igv's redraw is real CPU work and shrinks as the window",
+      'narrows and there is less left to draw, which is why its steps fall away',
+      'where the current renderer\'s stay flat.',
       '',
-      '**Neither column is a time a user experiences.** The one above is.',
+      '**No number in this table is a time a user experiences.** The table above is.',
       '',
     ]
   : []
@@ -648,12 +685,11 @@ lines.push(
   '',
   ...(isZoom
     ? [
-        'The column that carries the finding is `requests`. A 2x zoom-in stays inside',
-        'data the tool already holds, so a tool that issues no request is behaving',
-        'correctly and a tool that issues one is making the user wait for bytes that',
-        'were already in memory. `cached` counts the steps that needed nothing, and on',
-        'a zoom a high count is the good outcome — the opposite of what it means on the',
-        'pan page.',
+        'Every arm reads `cached` on every step and `requests` zero throughout, which',
+        'is the check that this page measures what it claims to: a zoom stayed inside',
+        'held data for all of them, so none of the differences above is a network',
+        'difference. On the pan page a high `cached` count means the opposite — there it',
+        'marks a step that was not the comparison the table wanted.',
       ]
     : [
         'This table is not supporting detail; it is the reason the one above is',
