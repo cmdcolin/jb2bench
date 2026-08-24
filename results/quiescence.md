@@ -65,6 +65,9 @@ Peak 1-minute load during this run: 3.4.
   a constant applied to both columns.
 - **Interaction comparisons must not.** `results/crosstool-pan.md` uses
   `draws` plus a network gate for this reason.
-- Anything measuring an interaction by screenshot polling inherits the bias,
-  and `results/crosstool-zoom.md` is the standing example of what that looks
-  like from the outside.
+- Anything measuring an interaction by screenshot polling inherits the bias.
+  The cross-tool zoom was the standing example: polled at 100 ms, it could not
+  see inside JBrowse's 500 ms navigation debounce and published the debounce as
+  a render time, which the README retracted. It is measured on the draws clock
+  now, so `results/crosstool-zoom.md` is no longer that example -- it is what
+  the replacement produced, and the retraction lives in the README.
