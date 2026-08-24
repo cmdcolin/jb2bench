@@ -79,15 +79,14 @@ as_matrix_facets <- function(df) {
 cov_axis <- scale_x_log10(breaks = c(20, 200, 1000),
                           labels = c("20x", "200x", "1000x"))
 
-# One row of four, so the panels sit side by side and a reader compares them by
-# moving along a line rather than across a grid. The 2023 paper drew its four as
-# separate plots for the same reason.
+# 2x2, the same shape as the parser matrix, so the two figures line up when read
+# together. The 2023 paper drew its four as separate plots.
 #
 # facet_wrap rather than facet_grid, and this is the part that matters: facet_grid
 # shares a y scale down each column, which would put every short-read panel on the
 # floor of the long-read axis and flatten the shape the figure exists to show.
 # facet_wrap with free_y gives each panel its own.
-matrix_facets <- facet_wrap(vars(fmt, read), nrow = 1, scales = "free_y",
+matrix_facets <- facet_wrap(vars(fmt, read), nrow = 2, scales = "free_y",
                             labeller = label_wrap_gen(multi_line = FALSE))
 
 # ---------------------------------------------------------------- cold load
@@ -219,7 +218,7 @@ p_cold <- ggplot(cold_df, aes(coverage, median, colour = program, group = progra
   ) +
   paper_theme()
 
-paper_fig(p_cold, "results/figures/cold-load.png", width = 13, height = 4.2, dpi = 200)
+paper_fig(p_cold, "results/figures/cold-load.png", width = 9.5, height = 6.6, dpi = 200)
 
 # Speedup against the published version, which is the question the paper's
 # readers are actually asking. Drawn as bars because a ratio has a meaningful

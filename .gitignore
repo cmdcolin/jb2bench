@@ -81,4 +81,9 @@ flame/*.svg
 # The eight library versions ecosystem/ compares: each is a clone of a GMOD repo
 # at a tag pinned in ecosystem/versions.json, carrying its own .git and its own
 # node_modules. ecosystem/setup.sh rebuilds them in a few minutes.
-ecosystem/.libs/
+# No trailing slash, deliberately. `ecosystem/.libs/` ignores a DIRECTORY of that
+# name and not a SYMLINK of that name, and in a git worktree .libs is a symlink to
+# the primary checkout's copy. So the symlink was not ignored, got committed, and
+# the day that commit reached the primary checkout it replaced the real directory
+# with a link pointing at itself -- destroying every built library arm in it.
+ecosystem/.libs
