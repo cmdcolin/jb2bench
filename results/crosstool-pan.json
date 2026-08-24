@@ -4,7 +4,7 @@
   "panDir": "left",
   "steps": 5,
   "rows": {
-    "20x-shortread": {
+    "20x-shortread-bam": {
       "jbrowse": {
         "median": 685.0999999642372,
         "fetchedMedian": 688.1999999880791,
@@ -78,7 +78,7 @@
         "failures": []
       }
     },
-    "200x-shortread": {
+    "200x-shortread-bam": {
       "jbrowse": {
         "median": 914.5,
         "fetchedMedian": 914.5,
@@ -180,7 +180,7 @@
         "failures": []
       }
     },
-    "1000x-shortread": {
+    "1000x-shortread-bam": {
       "jbrowse": {
         "median": 2023.300000011921,
         "fetchedMedian": 2023.300000011921,
@@ -284,7 +284,7 @@
         "failures": []
       }
     },
-    "20x-longread": {
+    "20x-longread-bam": {
       "jbrowse": {
         "median": 701.6999999880791,
         "fetchedMedian": null,
@@ -358,7 +358,7 @@
         "failures": []
       }
     },
-    "200x-longread": {
+    "200x-longread-bam": {
       "jbrowse": {
         "median": 1016.4000000357628,
         "fetchedMedian": null,
@@ -432,7 +432,7 @@
         "failures": []
       }
     },
-    "1000x-longread": {
+    "1000x-longread-bam": {
       "jbrowse": {
         "median": 4169,
         "fetchedMedian": 4375.3499999940395,

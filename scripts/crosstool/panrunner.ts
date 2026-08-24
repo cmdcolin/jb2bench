@@ -38,6 +38,7 @@
 //   RUNS=3 STEPS=5 PAN_DIR=left
 import { execFileSync } from 'child_process'
 import fs from 'fs'
+import { enumerateCases, selectCases } from '../render/cases.ts'
 
 import { loadavg, outliers, peak, type LoadWindow } from '../render/loadavg.ts'
 import { resolveBuild } from '../render/servedbuild.ts'
@@ -122,24 +123,14 @@ const tools = toolFilter ? allTools.filter(t => toolFilter.includes(t.id)) : all
 // different benchmark. It is worth having because the container is where the
 // decode cost lives: CRAM trades bytes on the wire for CPU at read time, which is
 // the opposite trade from BAM and should move the two tools differently.
-const allCases: { id: string; track: string }[] = []
-for (const read of ['shortread', 'longread']) {
-  for (const cov of ['20x', '200x', '1000x']) {
-    allCases.push({ id: `${cov}-${read}`, track: `${cov}.${read}.bam` })
-  }
-}
-for (const read of ['shortread', 'longread']) {
-  for (const cov of ['20x', '200x', '1000x']) {
-    allCases.push({ id: `${cov}-${read}-cram`, track: `${cov}.${read}.cram` })
-  }
-}
-const selected = process.env.CASES?.split(',')
-const cases =
-  process.env.CASES === 'none'
-    ? []
-    : selected
-      ? allCases.filter(c => selected.includes(c.id))
-      : allCases
+// From the shared enumeration, so every id carries its format. This file used
+// to build the list twice: BAM as a bare `20x-shortread` and CRAM as
+// `20x-shortread-cram`, in adjacent loops. One format implicit and the other
+// explicit, in the same array, is how a reader ends up guessing what a row
+// measured — and how downstream consumers grow fallbacks that try the bare name
+// and then `-bam`, quietly substituting one format for another.
+const allCases = enumerateCases()
+const cases = selectCases(allCases)
 
 const median = (a: number[]) => {
   const s = [...a].sort((x, y) => x - y)

@@ -2,7 +2,7 @@
   "igvVersion": "3.8.5",
   "jbrowseBuild": "current",
   "rows": {
-    "20x-shortread": {
+    "20x-shortread-bam": {
       "jbrowse": {
         "median": 2419,
         "mean": 2384,
@@ -46,7 +46,7 @@
         }
       }
     },
-    "200x-shortread": {
+    "200x-shortread-bam": {
       "jbrowse": {
         "median": 2475,
         "mean": 2508.3333333333335,
@@ -118,7 +118,7 @@
         }
       }
     },
-    "1000x-shortread": {
+    "1000x-shortread-bam": {
       "jbrowse": {
         "median": 5944,
         "mean": 6723,
@@ -190,7 +190,7 @@
         }
       }
     },
-    "20x-longread": {
+    "20x-longread-bam": {
       "jbrowse": {
         "median": 2755,
         "mean": 2708.3333333333335,
@@ -234,7 +234,7 @@
         }
       }
     },
-    "200x-longread": {
+    "200x-longread-bam": {
       "jbrowse": {
         "median": 3623,
         "mean": 3896.6666666666665,
@@ -278,7 +278,7 @@
         }
       }
     },
-    "1000x-longread": {
+    "1000x-longread-bam": {
       "jbrowse": {
         "median": 8273,
         "mean": 7747,

@@ -31,6 +31,7 @@
 //   RUNS=3 WARMUP=1
 import { execFileSync } from 'child_process'
 import fs from 'fs'
+import { enumerateCases, selectCases } from '../render/cases.ts'
 import { loadavg, outliers, peak, type LoadWindow } from '../render/loadavg.ts'
 import { resolveBuild } from '../render/servedbuild.ts'
 
@@ -149,19 +150,17 @@ const tools = requested.filter(t => {
   return false
 })
 
-const allCases: { id: string; track: string }[] = []
-for (const read of ['shortread', 'longread']) {
-  for (const cov of ['20x', '200x', '1000x']) {
-    allCases.push({ id: `${cov}-${read}`, track: `${cov}.${read}.bam` })
-  }
-}
-const selected = process.env.CASES?.split(',')
-const cases =
-  process.env.CASES === 'none'
-    ? []
-    : selected
-      ? allCases.filter(c => selected.includes(c.id))
-      : allCases
+// From the shared enumeration, which spells the format into every id. This was
+// a private BAM-only loop emitting bare `20x-shortread`, while the cold-load and
+// interaction matrices had moved to `20x-shortread-bam` — so the three recorded
+// files disagreed about what a case is called, and the paper's extractor grew a
+// fallback to paper over it.
+//
+// FORMATS defaults to bam here rather than to both: the igv.js harness is
+// exercised on BAM in this benchmark, and widening it is a measurement decision
+// rather than a rename.
+const allCases = enumerateCases({ ...process.env, FORMATS: process.env.FORMATS ?? 'bam' })
+const cases = selectCases(allCases)
 
 const median = (a: number[]) => {
   const s = [...a].sort((x, y) => x - y)
