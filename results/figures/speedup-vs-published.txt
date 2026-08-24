@@ -1,0 +1,19 @@
+# speedup-vs-published.png
+
+Text that used to be drawn inside the figure. Written here so a paper
+caption can be built from it and so the caveats survive the image.
+
+## title
+
+How much faster than the version the 2023 paper benchmarked
+
+## subtitle
+
+Cold-load median of v2.4.0 (2023 paper) ÷ median of 5.0.0 (main). Dashed line is parity.
+
+## caveats
+
+Cumulative, not isolated: three years separate v2.4.0 from this tree and almost none of it is the renderer. Same corpus and same simulation commands
+as the paper's methods; 19 kb window against its 10 kb. Worst cell saw 2.32 cores of foreign CPU against a 0.5 ceiling. Both arms of a ratio are
+measured back to back and took the contention together, so read these as approximate rather than as a run of record.
+

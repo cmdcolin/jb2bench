@@ -1,0 +1,20 @@
+# parsers.png
+
+Text that used to be drawn inside the figure. Written here so a paper
+caption can be built from it and so the caveats survive the image.
+
+## title
+
+The parser layer underneath, 2023 release vs current
+
+## subtitle
+
+Decode only — no browser, no GPU. Same corpus and window as the render benchmarks.
+
+## caveats
+
+Both sides built from source from a pinned tag with the same toolchain, so the difference is library code.
+@gmod/bbi is not here: coverage is not an axis for BigWig, whose binned signal returns the same intervals at any read depth.
+Its cost is per file — see the cohort panel, where 100 samples pay it 100 times.
+An equivalence gate runs first: a timing comparison between two libraries returning different records is not a comparison.
+

@@ -1,0 +1,15 @@
+# cohort-bw.png
+
+## title
+
+Opening a cohort of BigWigs: the cost is per file and does not amortize
+
+## subtitle
+
+Window chr22_mask:124000-143000. Left: read() calls against panel size. Right: what one file costs, read by read -- every sample repeats this exact sequence. Counts, exact on any machine; each one is a range request and a round trip.
+
+## caveats
+
+Measured 2026-08-24. Reads per file is flat across N: the hundredth sample costs what the first did.
+The current release issues one MORE request per file than the 2023 one for identical bytes -- a 56-byte header read split into 32 and 22.
+Timings are omitted deliberately: a browser opens tracks concurrently, and concurrency hides exactly the per-file cost this measures.

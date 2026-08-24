@@ -183,7 +183,7 @@ p_time <- ggplot(timed, aes(coverage, ms, colour = arm, group = arm)) +
   ) +
   pan_theme()
 
-ggsave("results/figures/interaction.png", p_time, width = 9.5, height = 9, dpi = 200)
+paper_fig(p_time, "results/figures/interaction.png", width = 13, height = 7.4)
 
 # ---- the zoom, with the waiting taken out --------------------------------
 # Its own figure rather than a panel, because it answers a different question
@@ -214,7 +214,7 @@ if (nrow(redraw)) {
     ) +
     pan_theme()
 
-  ggsave("results/figures/zoom-redraw.png", p_draw, width = 9.5, height = 5.6, dpi = 200)
+  paper_fig(p_draw, "results/figures/zoom-redraw.png", width = 13, height = 4.2)
 }
 
 # The draws figure this file used to write. Removed rather than left stale: a

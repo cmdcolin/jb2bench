@@ -22,6 +22,13 @@ suppressPackageStartupMessages({
 source("scripts/arms.R")
 dir.create("results/figures", showWarnings = FALSE, recursive = TRUE)
 
+# ggplot does not wrap a caption, it clips it. Every caption here is several
+# sentences of provenance, so they are wrapped at a width that fits the widest
+# figure rather than trusted to fit.
+wrap_caption <- function(...) {
+  paste(strwrap(paste(..., collapse = " "), width = 150), collapse = "\n")
+}
+
 paper_theme <- function(base = 13) {
   theme_grey(base_size = base) +
     theme(
@@ -67,11 +74,15 @@ as_matrix_facets <- function(df) {
 cov_axis <- scale_x_log10(breaks = c(20, 200, 1000),
                           labels = c("20x", "200x", "1000x"))
 
-# facet_wrap rather than facet_grid, for the reason the paper drew four separate
-# plots: facet_grid shares a y scale down each row, which puts every short-read
-# panel on the floor of its row's long-read axis and hides the shape the figure
-# exists to show. facet_wrap gives each panel its own.
-matrix_facets <- facet_wrap(vars(fmt, read), nrow = 2, scales = "free_y",
+# One row of four, so the panels sit side by side and a reader compares them by
+# moving along a line rather than across a grid. The 2023 paper drew its four as
+# separate plots for the same reason.
+#
+# facet_wrap rather than facet_grid, and this is the part that matters: facet_grid
+# shares a y scale down each column, which would put every short-read panel on the
+# floor of the long-read axis and flatten the shape the figure exists to show.
+# facet_wrap with free_y gives each panel its own.
+matrix_facets <- facet_wrap(vars(fmt, read), nrow = 1, scales = "free_y",
                             labeller = label_wrap_gen(multi_line = FALSE))
 
 # ---------------------------------------------------------------- cold load
@@ -175,8 +186,8 @@ p_cold <- ggplot(cold_df, aes(coverage, median, colour = program, group = progra
       "\nThe instrument belongs to neither tool: igv.js hides its spinner before it draws, so its own loading state would credit it with a render it has not done."
     ),
     x = "coverage", y = "time (s)",
-    caption = paste0(
-      "Measured ", dates, " on one workstation. ",
+    caption = wrap_caption(
+      paste0("Measured ", dates, " on one workstation. "),
       if (!has_foreign) {
         sprintf(paste0("Peak 1-min load %.1f, against the 4.0 this repo treated as usable before it measured contention directly; ",
                        "these rows predate that, so the absolute seconds are not quotable.\n"), peak_load)
@@ -203,8 +214,7 @@ p_cold <- ggplot(cold_df, aes(coverage, median, colour = program, group = progra
   ) +
   paper_theme()
 
-ggsave("results/figures/cold-load.png", p_cold,
-       width = 11, height = if (length(missing_fmt)) 5.2 else 7.6, dpi = 150)
+paper_fig(p_cold, "results/figures/cold-load.png", width = 13, height = 4.2, dpi = 200)
 
 # Speedup against the published version, which is the question the paper's
 # readers are actually asking. Drawn as bars because a ratio has a meaningful
@@ -232,22 +242,30 @@ p_sp <- ggplot(sp, aes(factor(coverage, labels = c("20x", "200x", "1000x")), spe
     title = "How much faster than the version the 2023 paper benchmarked",
     subtitle = sprintf("Cold-load median of %s ÷ median of %s. Dashed line is parity.", PAPER_ARM, HEAD_ARM),
     x = "coverage", y = "speedup vs v2.4.0",
-    caption = paste0(
-      "Cumulative, not isolated: three years separate v2.4.0 from this tree and almost none of it is the renderer.\n",
-      "Same corpus and same simulation commands as the paper's methods; 19 kb window against its 10 kb.\n",
-      # Same cold_df the panel above plots, so the same load caveat applies. A
-      # ratio survives a loaded machine better than a duration does, since both
-      # builds are measured back to back, but it does not survive it untouched.
-      if (peak_load > 4) {
-        sprintf(paste("Measured at peak 1-min load %.1f, over the 4.0 gate:",
-                      "both builds took the spike together, so read these as",
-                      "approximate."), peak_load)
+    caption = wrap_caption(
+      "Cumulative, not isolated: three years separate v2.4.0 from this tree and almost none of it is the renderer.",
+      "Same corpus and same simulation commands as the paper's methods; 19 kb window against its 10 kb.",
+      # Judged by foreign CPU, not by the load average, for the reason the panel
+      # above spells out: load counts this benchmark's own renders, and the 1000x
+      # cells drive it into the tens on an idle box. This caption used to call
+      # itself approximate whenever load passed 4.0, which condemned a run whose
+      # worst cell saw a third of a core of outside work. A ratio also survives
+      # contention better than a duration, since both arms take the spike
+      # together -- but it does not survive it untouched, so a contended run is
+      # still named.
+      if (quotable) {
+        sprintf("Worst cell saw %.2f cores of foreign CPU against a %.1f ceiling, so these ratios stand.",
+                peak_foreign, FOREIGN_MAX)
+      } else if (has_foreign) {
+        sprintf(paste("Worst cell saw %.2f cores of foreign CPU against a %.1f ceiling.",
+                      "Both arms of a ratio are measured back to back and took the contention together, so read these as approximate rather than as a run of record."),
+                peak_foreign, FOREIGN_MAX)
       } else ""
     )
   ) +
   paper_theme()
 
-ggsave("results/figures/speedup-vs-published.png", p_sp, width = 9.5, height = 4.6, dpi = 150)
+paper_fig(p_sp, "results/figures/speedup-vs-published.png", width = 9.5, height = 4.2, dpi = 200)
 
 # -------------------------------------------------------------- interaction
 #
@@ -349,7 +367,7 @@ if (file.exists(eco_path)) {
     ) +
     paper_theme()
 
-  ggsave("results/figures/parsers.png", p_eco, width = 11.5, height = 5.6, dpi = 150)
+  paper_fig(p_eco, "results/figures/parsers.png", width = 11.5, height = 5.0, dpi = 200)
 
   # The same data in the paper's Fig 8 layout — time against coverage, one line
   # per version, faceted format x read type. The bar chart above answers "how
@@ -396,7 +414,7 @@ if (file.exists(eco_path)) {
     ) +
     paper_theme()
 
-  ggsave("results/figures/parser-matrix.png", p_mat, width = 11, height = 7.2, dpi = 150)
+  paper_fig(p_mat, "results/figures/parser-matrix.png", width = 13, height = 4.2, dpi = 200)
 }
 
 cat("wrote:\n")
@@ -466,20 +484,33 @@ if (file.exists(cohort_path)) {
          x = "read number within a single file", y = NULL) +
     paper_theme()
 
-  p_co <- patchwork::wrap_plots(p_n, p_pat, ncol = 1, heights = c(1.35, 1)) +
-    patchwork::plot_annotation(
-      title = "Opening a cohort of BigWigs: the cost is per file and does not amortize",
-      subtitle = sprintf(
-        "Window %s. Counts of read() calls, exact on any machine — each one is a range request and a round trip.",
-        co$window),
-      caption = paste0(
-        "Measured ", co$measured, ". Reads per file is flat across N: the hundredth sample costs what the first did.\n",
-        "The current release issues one MORE request per file than the 2023 one for identical bytes — a 56-byte header read split into 32 and 22.\n",
-        "Timings are omitted deliberately: a browser opens tracks concurrently, and concurrency hides exactly the per-file cost this measures."
-      ),
-      theme = paper_theme()
-    )
+  # patchwork's annotations are not the plot's own labels, so paper_fig cannot
+  # reach them. Both panels and the wrapper are built bare and the prose is
+  # written to the sidecar by hand.
+  p_co <- patchwork::wrap_plots(
+    p_n + labs(title = NULL, subtitle = NULL),
+    p_pat + labs(title = NULL, subtitle = NULL),
+    ncol = 2, widths = c(1.1, 1)
+  )
 
-  ggsave("results/figures/cohort-bw.png", p_co, width = 10, height = 7.2, dpi = 150)
+  writeLines(c(
+    "# cohort-bw.png",
+    "",
+    "## title",
+    "",
+    "Opening a cohort of BigWigs: the cost is per file and does not amortize",
+    "",
+    "## subtitle",
+    "",
+    sprintf("Window %s. Left: read() calls against panel size. Right: what one file costs, read by read -- every sample repeats this exact sequence. Counts, exact on any machine; each one is a range request and a round trip.", co$window),
+    "",
+    "## caveats",
+    "",
+    paste0("Measured ", co$measured, ". Reads per file is flat across N: the hundredth sample costs what the first did."),
+    "The current release issues one MORE request per file than the 2023 one for identical bytes -- a 56-byte header read split into 32 and 22.",
+    "Timings are omitted deliberately: a browser opens tracks concurrently, and concurrency hides exactly the per-file cost this measures."
+  ), "results/figures/cohort-bw.txt")
+
+  ggsave("results/figures/cohort-bw.png", p_co, width = 13, height = 4.2, dpi = 200)
   cat("  results/figures/cohort-bw.png\n")
 }

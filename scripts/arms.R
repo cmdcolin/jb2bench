@@ -74,3 +74,35 @@ arm_colours <- function(igv_version = NULL) {
 }
 
 `%||%` <- function(a, b) if (is.null(a) || length(a) == 0 || is.na(a)) b else a
+
+#' Save a figure for a paper: no title, no subtitle, no caption.
+#'
+#' Every figure here used to carry its provenance inside the image -- what was
+#' measured, when, on what, and which caveats travel with it. That was right
+#' while the figures were the deliverable and a slide might quote one out of
+#' context. It is wrong once the figures go into a paper, which gives each one a
+#' real caption and where a title baked into the raster competes with it.
+#'
+#' So the prose is not deleted, it is moved: this writes it to a `.txt` beside
+#' the `.png`, which is the text to draw a caption from. A figure whose caveats
+#' exist nowhere is how "not quotable at 2.32 foreign cores" becomes a number in
+#' a table with no asterisk.
+paper_fig <- function(p, path, width, height, dpi = 200) {
+  lab <- tryCatch(p@labels, error = function(e) p$labels)
+  side <- sub("\\.png$", ".txt", path)
+  writeLines(
+    c(
+      paste0("# ", basename(path)),
+      "",
+      "Text that used to be drawn inside the figure. Written here so a paper",
+      "caption can be built from it and so the caveats survive the image.",
+      "",
+      if (!is.null(lab$title)) c("## title", "", lab$title, "") else NULL,
+      if (!is.null(lab$subtitle)) c("## subtitle", "", lab$subtitle, "") else NULL,
+      if (!is.null(lab$caption)) c("## caveats", "", lab$caption, "") else NULL
+    ),
+    side
+  )
+  ggsave(path, p + labs(title = NULL, subtitle = NULL, caption = NULL),
+         width = width, height = height, dpi = dpi)
+}
