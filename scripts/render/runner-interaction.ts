@@ -11,6 +11,7 @@ import {
   loadavg,
   outliers,
   peak,
+  waitForQuiet,
   watchForeignCpu,
   type LoadWindow,
 } from './loadavg.ts'
@@ -125,12 +126,29 @@ function run(
   mode: Mode,
 ): Result {
   const url = `http://localhost:${build.port}/?loc=${LOC}&assembly=hg19mod&tracks=${track}${build.extra}`
-  const out = execFileSync('node', ['scripts/render/interaction.ts', url], {
-    encoding: 'utf8',
-    stdio: ['ignore', 'pipe', 'ignore'],
-    env: { ...process.env, DISPLAY: process.env.DISPLAY || ':0', MODE: mode },
-  })
-  return JSON.parse(out.trim().split('\n').pop()!) as Result
+  // stderr is CAPTURED, not discarded. The child prints which render-complete
+  // contract and which loading detector it chose there, and those are the two
+  // things that explain an inexplicable cell. Discarding them cost an hour on
+  // 2026-08-23: the child was timing out because it could not see the build's
+  // contract at all, and the failure reached the operator as an execFileSync
+  // error with `output: [null, '', null]` — a stack trace naming no cause.
+  try {
+    const out = execFileSync('node', ['scripts/render/interaction.ts', url], {
+      encoding: 'utf8',
+      stdio: ['ignore', 'pipe', 'pipe'],
+      env: { ...process.env, DISPLAY: process.env.DISPLAY || ':0', MODE: mode },
+    })
+    return JSON.parse(out.trim().split('\n').pop()!) as Result
+  } catch (e) {
+    const { stdout, stderr } = e as { stdout?: string; stderr?: string }
+    const why = (stderr ?? '').trim().split('\n').filter(Boolean).slice(-4)
+    throw new Error(
+      `interaction.ts failed for ${track} / ${build.name} / ${mode}\n` +
+        `  url: ${url}\n` +
+        (why.length ? why.map(l => `  child: ${l}`).join('\n') : '  child said nothing') +
+        (stdout?.trim() ? `\n  stdout: ${stdout.trim().slice(-200)}` : ''),
+    )
+  }
 }
 
 // Three things that are NOT a time, and must not be printed as one:
@@ -203,13 +221,20 @@ for (const c of cases) {
     for (const b of builds) {
       const what = mode === 'pan' ? 'pan' : `zoom-${mode}`
       process.stdout.write(`${c.id} / ${b.name} / ${what}: `)
+      // Let the previous cell's Chrome finish dying before starting this one.
+      // Without it a cell inherits the teardown of the cell before it and
+      // reports roughly double. See waitForQuiet.
+      const quiet = waitForQuiet()
+      if (quiet.waitedMs > 1500) {
+        process.stdout.write(`[settled ${(quiet.waitedMs / 1000).toFixed(1)}s] `)
+      }
       const before = loadavg()
       // Foreign CPU rather than the load average, for the reason the cold-load
       // runner switched: the load average counts this benchmark's own threads,
       // so a heavy cell disqualifies itself by working. See loadavg.ts.
       const cpu = watchForeignCpu()
       const r = run(b, c.track, mode)
-      const { cores, top } = cpu.done()
+      const { cores, top } = await cpu.done()
       const load = { before, after: loadavg(), foreignCores: cores, foreignTop: top }
       r.load = load
       results[c.id]![mode][b.role] = r

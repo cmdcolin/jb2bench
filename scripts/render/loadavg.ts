@@ -27,6 +27,7 @@
 // this run's own tree — and the load average is kept beside it as context
 // rather than as the verdict.
 import fs from 'fs'
+import { Worker } from 'worker_threads'
 
 /** 1-minute load average */
 export const loadavg = () =>
@@ -175,7 +176,7 @@ export const foreign = (l: LoadWindow) => l.foreignCores ?? Number.NaN
  */
 export const FOREIGN_CORE_CEILING = 0.5
 
-const comm = (pid: number) => {
+const commOf = (pid: number) => {
   try {
     return fs.readFileSync(`/proc/${pid}/comm`, 'utf8').trim()
   } catch {
@@ -183,84 +184,112 @@ const comm = (pid: number) => {
   }
 }
 
-/**
- * How often the watcher re-reads /proc during a cell.
- *
- * It has to be short relative to one render, because the whole point is to see
- * a Chrome process while its parent is still alive. A render is 2–20 s, so half
- * a second gives several sightings of the shortest of them. Reading /proc for
- * ~600 processes costs a few milliseconds, so the sampler spends well under 2%
- * of a core — and that cost lands inside this run's own tree, where it belongs.
- */
-const SAMPLE_MS = 500
+/** Blocks this thread for `ms`, with no child process to account for. */
+const blockingSleep = (ms: number) =>
+  Atomics.wait(new Int32Array(new SharedArrayBuffer(4)), 0, 0, ms)
 
 /**
- * Samples foreign CPU across a cell.
+ * One synchronous reading of foreign CPU, over a short window.
  *
- * Two rules, both of which exist because a single before/after pair got this
- * badly wrong on the heavy cases:
- *
- * **Once ours, always ours.** `execFileSync` returns when the per-render `node`
- * exits, and the Chrome it launched can outlive it by a moment — at which point
- * init adopts the orphan and ancestry no longer reaches this run. A pair of
- * snapshots taken either side of the cell sees only the after-state and calls
- * that Chrome a stranger. Sampling throughout catches it while its parent is
- * still alive, and a pid classified as ours stays ours for the rest of the cell.
- *
- * **A pid is charged only from the moment it was first seen.** Counting a
- * newly-appeared process from zero charges the window for CPU it burned before
- * the window began, which for an adopted Chrome is an entire 1000x-longread
- * render. That is how `1000x-longread-bam / current` came to report 1.41 foreign
- * cores on an idle box while naming 0.11 cores of actual strangers — the
- * benchmark billing itself for its own renderer, the same mistake the load
- * average made. Charging from first sighting bounds the error to one sample
- * interval and can only ever undercount.
- *
- * The total and the attribution come off the same two maps, so they cannot
- * disagree the way they did when each had its own rule for an unseen pid.
+ * Deliberately synchronous and deliberately charging an unseen pid from zero:
+ * this is used *between* cells, where a process that appeared during the window
+ * is the very thing being waited out.
  */
-export function watchForeignCpu(intervalMs = SAMPLE_MS) {
-  const t0 = Date.now()
-  const ours = new Set<number>()
-  const first = new Map<number, number>()
-  const last = new Map<number, number>()
-
-  const sample = () => {
-    const snap = cpuSnapshot()
-    for (const pid of snap.ours) {
-      ours.add(pid)
-    }
-    for (const [pid, cpu] of snap.foreign) {
-      if (ours.has(pid)) {
-        continue
-      }
-      if (!first.has(pid)) {
-        first.set(pid, cpu)
-      }
-      last.set(pid, cpu)
-    }
-  }
-
-  sample()
-  const timer = setInterval(sample, intervalMs)
-  timer.unref()
-
+export function foreignNow(windowMs = 1000) {
+  const a = cpuSnapshot().foreign
+  blockingSleep(windowMs)
+  const b = cpuSnapshot().foreign
+  const wall = windowMs / 1000
+  const spent = [...b]
+    .map(([pid, cpu]) => [pid, Math.max(0, cpu - (a.get(pid) ?? 0)) / wall] as const)
+    .filter(([, cores]) => cores > 0.01)
+    .sort((x, y) => y[1] - x[1])
   return {
-    done: () => {
-      clearInterval(timer)
-      sample()
+    cores: spent.reduce((t, [, c]) => t + c, 0),
+    top: spent
+      .slice(0, 3)
+      .map(([pid, c]) => `${commOf(pid)} ${c.toFixed(2)}`)
+      .join(', '),
+  }
+}
+
+/**
+ * Waits for the box to go quiet before a cell is measured.
+ *
+ * **A cell contaminates the cell after it.** `execFileSync` returns when the
+ * per-cell `node` exits, but the Chrome it launched is still tearing down —
+ * reparented to init, so no longer ours, and burning real CPU into whatever
+ * runs next. Measured 2026-08-23: run back to back, `200x-shortread-bam / pan`
+ * reported 908 / 2485 / 0 ms at load 9.9→16.4; the identical cell run on a
+ * settled box reported 523 / 1195 / 2007 ms at load 1.0→1.6. The batch was
+ * inflating its own numbers by roughly two, and the last build's `0 ms` was not
+ * a fast render at all.
+ *
+ * Waiting is cheap next to a cell and it is bounded: past `maxMs` the run
+ * proceeds and the cell records what it saw, because a machine that is
+ * genuinely busy should still produce a measurement marked as such rather than
+ * hanging forever.
+ */
+export function waitForQuiet({ ceiling = FOREIGN_CORE_CEILING, maxMs = 60000 } = {}) {
+  const t0 = Date.now()
+  let reading = foreignNow()
+  while (reading.cores > ceiling && Date.now() - t0 < maxMs) {
+    reading = foreignNow()
+  }
+  return { ...reading, waitedMs: Date.now() - t0 }
+}
+
+/**
+ * Samples foreign CPU across a cell, from a worker thread.
+ *
+ * **The thread is not an optimisation, it is the only way this works.** Both
+ * runners drive a cell with `execFileSync`, which blocks the event loop until
+ * the child exits, so a main-thread `setInterval` fires zero times across the
+ * entire cell — measured, not assumed: 0 ticks of a 100 ms interval across a
+ * 3 s synchronous child. A sampler that cannot sample degenerates to the
+ * before/after pair it was written to replace, and carries that pair's bug: an
+ * orphaned Chrome, absent from the opening snapshot, charged its whole lifetime
+ * of the benchmark's own render CPU. That is how a pan cell reported **14.54
+ * foreign cores** on an idle box while naming `chrome 9.57, chrome 4.82`.
+ *
+ * The worker shares the process id, so `cpuSnapshot`'s ancestry test means the
+ * same thing on either thread.
+ *
+ * `done()` is async because the reply comes back over a message port. The main
+ * thread is free at that moment — it is between children.
+ */
+export function watchForeignCpu() {
+  const t0 = Date.now()
+  const worker = new Worker(new URL('./foreignsampler.ts', import.meta.url))
+  // Do not hold the process open on our account; the runner decides when to
+  // exit, and a stray sampler must never be the reason it cannot.
+  worker.unref()
+  return {
+    done: async () => {
       const wall = (Date.now() - t0) / 1000
-      const spent = [...last]
-        .map(([pid, cpu]) => [pid, Math.max(0, cpu - (first.get(pid) ?? cpu))] as const)
-        .filter(([, secs]) => secs > 0)
-        .sort((a, b) => b[1] - a[1])
+      const spent = await new Promise<[number, number, string][]>(resolve => {
+        // A sampler that has died must not hang the run: report zero
+        // contamination rather than blocking, and let the cell stand on the
+        // load average beside it.
+        const bail = setTimeout(() => resolve([]), 5000)
+        worker.once('message', (m: [number, number, string][]) => {
+          clearTimeout(bail)
+          resolve(m)
+        })
+        worker.once('error', () => {
+          clearTimeout(bail)
+          resolve([])
+        })
+        worker.postMessage('report')
+      })
+      await worker.terminate()
       const cores = (secs: number) => (wall > 0 ? secs / wall : 0)
       return {
         cores: cores(spent.reduce((t, [, secs]) => t + secs, 0)),
         top: spent
           .filter(([, secs]) => cores(secs) > 0.01)
           .slice(0, 3)
-          .map(([pid, secs]) => `${comm(pid)} ${cores(secs).toFixed(2)}`)
+          .map(([, secs, name]) => `${name} ${cores(secs).toFixed(2)}`)
           .join(', '),
       }
     },

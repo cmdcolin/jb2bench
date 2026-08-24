@@ -12,6 +12,7 @@ import {
   loadavg,
   outliers,
   peak,
+  waitForQuiet,
   watchForeignCpu,
   type LoadWindow,
 } from './loadavg.ts'
@@ -167,6 +168,12 @@ for (const c of cases) {
   measuredAt[c.id] = stamp
   for (const b of builds) {
     process.stdout.write(`${c.id} / ${b.name}: `)
+    // Same settle the interaction matrix takes, and for the same reason: the
+    // previous cell's Chrome is still tearing down when execFileSync returns.
+    const quiet = waitForQuiet()
+    if (quiet.waitedMs > 1500) {
+      process.stdout.write(`[settled ${(quiet.waitedMs / 1000).toFixed(1)}s] `)
+    }
     const before = loadavg()
     for (let i = 0; i < WARMUP; i++) {
       runOnce(b, c.track)
@@ -182,7 +189,7 @@ for (const c of cases) {
       process.stdout.write(Number.isFinite(v) ? `${v.toFixed(0)} ` : 'FAIL ')
     }
     const ok = runs.filter(Number.isFinite)
-    const { cores, top } = cpu.done()
+    const { cores, top } = await cpu.done()
     const load = { before, after: loadavg(), foreignCores: cores, foreignTop: top }
     const cell: Cell = {
       median: ok.length ? median(ok) : Number.NaN,
