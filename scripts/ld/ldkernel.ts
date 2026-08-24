@@ -23,15 +23,26 @@ import type { Browser, Page } from 'puppeteer'
 export const JBROWSE =
   process.env.JBROWSE ?? path.join(os.homedir(), 'src/jbrowse-components')
 
-// WebGPU in headless Chrome on this box needs the Vulkan backend; the default
-// (--use-angle=gl, as scripts/gpucheck.ts uses for WebGL) does not expose it.
-export const GPU_ARGS = [
-  '--no-sandbox',
-  '--ignore-gpu-blocklist',
-  '--enable-unsafe-webgpu',
-  '--enable-features=Vulkan',
-  '--use-angle=vulkan',
-]
+// WebGPU in headless Chrome needs a backend the platform actually has.
+//
+// On Linux that means forcing Vulkan: the default (--use-angle=gl, as
+// scripts/gpucheck.ts uses for WebGL) does not expose WebGPU at all.
+//
+// On macOS it means NOT forcing it. WebGPU there is Metal, and passing
+// --use-angle=vulkan makes `requestAdapter()` resolve to **null** while
+// `navigator.gpu` stays truthy — so the page looks WebGPU-capable right up
+// until the adapter is missing, and the failure reads as "no GPU on this
+// machine" rather than "wrong flags".
+export const GPU_ARGS =
+  os.platform() === 'darwin'
+    ? ['--no-sandbox', '--ignore-gpu-blocklist', '--enable-unsafe-webgpu']
+    : [
+        '--no-sandbox',
+        '--ignore-gpu-blocklist',
+        '--enable-unsafe-webgpu',
+        '--enable-features=Vulkan',
+        '--use-angle=vulkan',
+      ]
 
 export function chromePath(): string {
   if (process.env.PUPPETEER_EXECUTABLE_PATH) {
@@ -86,13 +97,105 @@ export function loadWgsl(generatedRelPath: string): string {
 export const LD_COMPUTE_WGSL =
   'plugins/variants/src/LDDisplay/components/shaders/ldCompute.generated.ts'
 
+export const LD_PHASED_COMPUTE_WGSL =
+  'plugins/variants/src/LDDisplay/components/shaders/ldPhasedCompute.generated.ts'
+
+/**
+ * Word indices of a compute kernel's uniform fields, read out of the generated
+ * `.iface` file rather than restated here.
+ *
+ * Worth the parse: a benchmark that hardcodes the field order keeps running
+ * after someone reorders the struct, and reports a plausible number computed
+ * from a band written into the ldMetric slot. There is no error to notice —
+ * which is the same failure shape ldlimits.ts exists to document.
+ */
+export function loadUniformOffsets(
+  generatedRelPath: string,
+): Record<string, number> {
+  const ifacePath = generatedRelPath.replace(
+    /\.generated\.ts$/,
+    '.iface.generated.ts',
+  )
+  const src = readFileSync(path.join(JBROWSE, ifacePath), 'utf8')
+  const block = /UNIFORM_OFFSET_U32 = \{([^}]*)\}/.exec(src)
+  if (!block) {
+    throw new Error(`no UNIFORM_OFFSET_U32 in ${ifacePath}`)
+  }
+  const offsets: Record<string, number> = {}
+  for (const m of block[1]!.matchAll(/(\w+):\s*(\d+)/g)) {
+    offsets[m[1]!] = Number(m[2]!)
+  }
+  return offsets
+}
+
+/** Uniform buffer size in bytes, likewise read from the generated iface. */
+export function loadUniformsSize(generatedRelPath: string): number {
+  const ifacePath = generatedRelPath.replace(
+    /\.generated\.ts$/,
+    '.iface.generated.ts',
+  )
+  const src = readFileSync(path.join(JBROWSE, ifacePath), 'utf8')
+  const m = /UNIFORMS_SIZE_BYTES = (\d+)/.exec(src)
+  if (!m) {
+    throw new Error(`no UNIFORMS_SIZE_BYTES in ${ifacePath}`)
+  }
+  return Number(m[1]!)
+}
+
+export interface AdapterInfo {
+  vendor: string
+  architecture: string
+  device: string
+  description: string
+  isFallbackAdapter: boolean
+}
+
+/** Substrings that mark a software rasterizer standing in for a GPU. */
+const SOFTWARE_MARKERS = [
+  'swiftshader',
+  'lavapipe',
+  'llvmpipe',
+  'software',
+  'warp',
+  'microsoft basic',
+]
+
+/**
+ * Refuse to report a GPU timing measured on a software adapter.
+ *
+ * This is not hypothetical: headless Chrome without a usable hardware backend
+ * silently substitutes SwiftShader, and every WebGPU call keeps working. The
+ * benchmark then prints a GPU column that is a CPU, and it looks like a slow
+ * GPU rather than like a mistake.
+ */
+export function assertHardwareAdapter(info: AdapterInfo, allowSoftware = false) {
+  const hay = `${info.vendor} ${info.architecture} ${info.device} ${info.description}`.toLowerCase()
+  const marker = SOFTWARE_MARKERS.find(m => hay.includes(m))
+  if ((marker || info.isFallbackAdapter) && !allowSoftware) {
+    throw new Error(
+      `refusing to report GPU timings from a software adapter (${marker ?? 'isFallbackAdapter'}: ${JSON.stringify(info)}).\n` +
+        'Re-run headed, or pass --allow-software to record it deliberately.',
+    )
+  }
+}
+
 export interface GpuSession {
   page: Page
   browser: Browser
   close: () => Promise<void>
 }
 
-export async function launchGpuPage(): Promise<GpuSession> {
+/**
+ * `headed: true` runs a real browser window. Prefer it for anything whose number
+ * is a GPU timing: headless Chrome can hand back a SOFTWARE adapter
+ * (SwiftShader / lavapipe) that answers every WebGPU call correctly and is one
+ * to two orders of magnitude slower, so the run succeeds and the figure is of a
+ * CPU emulating a GPU. `assertHardwareAdapter` below is the other half of not
+ * being fooled by it.
+ */
+export async function launchGpuPage(
+  opts: { headed?: boolean } = {},
+): Promise<GpuSession> {
   const srv = http.createServer((_q, s) => {
     s.writeHead(200, { 'Content-Type': 'text/html' })
     s.end('<html></html>')
@@ -102,7 +205,7 @@ export async function launchGpuPage(): Promise<GpuSession> {
   })
   const { port } = srv.address() as { port: number }
   const browser = await puppeteer.launch({
-    headless: true,
+    headless: !opts.headed,
     executablePath: chromePath(),
     args: GPU_ARGS,
   })
@@ -117,11 +220,23 @@ export async function launchGpuPage(): Promise<GpuSession> {
     )
   })
   await page.goto(`http://localhost:${port}/`)
-  const ok = await page.evaluate(() => !!navigator.gpu)
-  if (!ok) {
+  // Both halves are checked, because they fail for different reasons and a
+  // script that only asks the first one reports the wrong cause: `navigator.gpu`
+  // absent is "WebGPU not enabled in this Chrome", while an adapter of null past
+  // that is almost always the wrong backend flags for this platform (see
+  // GPU_ARGS).
+  const probe = await page.evaluate(async () => ({
+    hasGpu: !!navigator.gpu,
+    hasAdapter: !!(await navigator.gpu?.requestAdapter()),
+  }))
+  if (!probe.hasGpu || !probe.hasAdapter) {
     await browser.close()
     srv.close()
-    throw new Error('navigator.gpu unavailable — WebGPU not enabled in this Chrome')
+    throw new Error(
+      probe.hasGpu
+        ? `navigator.gpu present but requestAdapter() returned null on ${os.platform()} — check GPU_ARGS for this platform`
+        : 'navigator.gpu unavailable — WebGPU not enabled in this Chrome',
+    )
   }
   return {
     page,

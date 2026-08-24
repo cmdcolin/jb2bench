@@ -261,6 +261,7 @@ ships. No JBrowse build or server needed.
 ```bash
 node --experimental-strip-types scripts/ld/ldbench.ts [numSamples] [maxN]
 node --experimental-strip-types scripts/ld/ldlimits.ts [--1d]
+node --experimental-strip-types scripts/ld/ldband.ts [numSamples] [numSnps] [--cpu-budget=SECONDS] [--label=NAME]
 ```
 
 **`ldbench.ts`** → `results/ld-gpu-vs-cpu.md`: GPU vs a CPU mirror of
@@ -277,16 +278,55 @@ here". Run with `--1d` to reproduce the pre-fix behaviour (zeros past n=2896,
 max diff 3.5e-1 vs the CPU reference); without it the shipped 2D dispatch stays
 correct to ~4e-7.
 
-Two gotchas if you write more WebGPU here:
+**`ldband.ts`** → `results/ld-band.md`: the banded matrix
+(`maxVariantSeparation`, plink's `--ld-window`) against the full triangle, GPU
+and plain CPU side by side. This is the scale argument: the LD matrix is
+materialized in full and shipped to the renderer, so it costs n(n-1)/2 cells, and
+at 50,000 variants that is 1.25e9 cells = 4.66 GiB — no adapter allocates it,
+`planDispatch` refuses, and the CPU fallback is ~59 minutes. Restricting pairs to
+a separation of at most k makes the matrix n·k cells, i.e. **linear in the
+variant count**. Measured at 50,000 variants x 2,000 samples on amd rdna-1:
+
+| window | cells | output | GPU | CPU | CPU/GPU |
+| --- | --- | --- | --- | --- | --- |
+| full triangle | 1.25e9 | 4768 MiB | DECLINED | ~59 min (est) | — |
+| 2000 | 9.80e7 | 374 MiB | DECLINED | ~278 s (est) | — |
+| 1000 | 4.95e7 | 189 MiB | DECLINED | ~141 s (est) | — |
+| 500 | 2.49e7 | 95 MiB | **1407 ms** | ~70.6 s (est) | 50x |
+| 200 | 9.98e6 | 38 MiB | **503 ms** | 27.9 s | 55x |
+
+Rows marked `(est)` exceeded `--cpu-budget` and are extrapolated from a measured
+per-cell rate rather than run; nothing is capped silently. The three DECLINED
+rows are the point — the band is what brings 50,000 variants inside a 128 MiB
+output buffer at all.
+
+Three gotchas if you write more WebGPU here:
 
 - **WebGPU needs a secure context.** On `about:blank`, `navigator.gpu` is
   `undefined` — indistinguishable from "no WebGPU support". `scripts/ld/ldkernel.ts`
   serves a blank page over `http://localhost` for this reason. `scripts/gpucheck.ts`
   evaluates on the default `about:blank` and so reports `navigator.gpu: false`
   even on this box, which does support it.
-- **WebGPU needs the Vulkan ANGLE backend here** (`--use-angle=vulkan`), not the
-  `--use-angle=gl` the WebGL benchmarks use. This box exposes an `amd gcn-4`
+- **WebGPU needs the Vulkan ANGLE backend on LINUX** (`--use-angle=vulkan`), not
+  the `--use-angle=gl` the WebGL benchmarks use. That box exposes an `amd gcn-4`
   adapter to WebGPU, distinct from the Mesa Intel UHD 630 the WebGL path names.
+  **On macOS you must NOT force it**: WebGPU there is Metal, and
+  `--use-angle=vulkan` makes `requestAdapter()` resolve to `null` while
+  `navigator.gpu` stays truthy — so it reads as "this machine has no GPU" rather
+  than as wrong flags. `GPU_ARGS` in `ldkernel.ts` branches on the platform, and
+  `launchGpuPage` now checks the adapter, not just `navigator.gpu`.
+- **Run GPU timings HEADED.** Headless Chrome can substitute a software adapter
+  (SwiftShader / lavapipe) that answers every WebGPU call correctly and is one to
+  two orders of magnitude slower, so the run succeeds and the "GPU" column is a
+  CPU. `ldband.ts` is headed by default and calls `assertHardwareAdapter`, which
+  refuses to report a timing from a fallback adapter unless `--allow-software`
+  says to.
+- **The output-buffer ceiling is a browser-build property too.** On one macOS
+  machine (amd rdna-1) the Chrome puppeteer pins reports
+  `maxStorageBufferBindingSize` = 128 MiB, the WebGPU spec floor, while the
+  system Chrome reports 2 GiB — same hardware, 16x apart, and a different set of
+  matrix sizes admitted. Always record which browser produced a row
+  (`PUPPETEER_EXECUTABLE_PATH` selects one, `--label` names the output).
 
 ### Cross-tool: JBrowse vs igv.js
 

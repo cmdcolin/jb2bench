@@ -1,0 +1,90 @@
+{
+  "numSamples": 2000,
+  "numSnps": 50000,
+  "cpuBudgetMs": 45000,
+  "adapter": {
+    "vendor": "amd",
+    "architecture": "rdna-1",
+    "device": "",
+    "description": "",
+    "isFallbackAdapter": false
+  },
+  "limits": {
+    "maxStorageBufferBindingSize": 134217728,
+    "maxBufferSize": 268435456,
+    "maxComputeWorkgroupsPerDimension": 65535
+  },
+  "calibration": {
+    "n": 1200,
+    "cells": 719400,
+    "ms": 2042.9,
+    "nsPerCell": 2839.7
+  },
+  "rows": [
+    {
+      "window": "full triangle",
+      "band": 49999,
+      "cells": 1249975000,
+      "outputMiB": 4768.3,
+      "gpuMs": null,
+      "declined": true,
+      "gpuError": null,
+      "cpuMs": 3549588,
+      "cpuMeasured": false,
+      "speedup": null,
+      "maxAbsDiff": null
+    },
+    {
+      "window": "2000",
+      "band": 2000,
+      "cells": 97999000,
+      "outputMiB": 373.8,
+      "gpuMs": null,
+      "declined": true,
+      "gpuError": null,
+      "cpuMs": 278290,
+      "cpuMeasured": false,
+      "speedup": null,
+      "maxAbsDiff": null
+    },
+    {
+      "window": "1000",
+      "band": 1000,
+      "cells": 49499500,
+      "outputMiB": 188.8,
+      "gpuMs": null,
+      "declined": true,
+      "gpuError": null,
+      "cpuMs": 140565,
+      "cpuMeasured": false,
+      "speedup": null,
+      "maxAbsDiff": null
+    },
+    {
+      "window": "500",
+      "band": 500,
+      "cells": 24874750,
+      "outputMiB": 94.9,
+      "gpuMs": 1407,
+      "declined": false,
+      "gpuError": null,
+      "cpuMs": 70638,
+      "cpuMeasured": false,
+      "speedup": 50.2,
+      "maxAbsDiff": null
+    },
+    {
+      "window": "200",
+      "band": 200,
+      "cells": 9979900,
+      "outputMiB": 38.1,
+      "gpuMs": 503,
+      "declined": false,
+      "gpuError": null,
+      "cpuMs": 27890,
+      "cpuMeasured": true,
+      "speedup": 55.4,
+      "maxAbsDiff": 1.210719347000122e-8
+    }
+  ]
+}
