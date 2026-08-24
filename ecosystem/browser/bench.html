@@ -1,0 +1,104 @@
+<!doctype html>
+<meta charset="utf-8">
+<title>parser bench, in a browser, over a network</title>
+<!--
+  The parser benchmark in the runtime JBrowse actually uses, reading over HTTP
+  from a server with a round trip you choose.
+
+  Everything the node benchmark cannot see is here. Under node the corpus is a
+  local file, so a read costs a memcpy and the NUMBER of reads is free: a library
+  issuing six reads per file where another issues five looks identical. Over a
+  50 ms link that difference is 50 ms per file, and five seconds across a
+  hundred-sample panel. And the 2023 arms resolve their `browser` field in this
+  bundle, so they inflate with pako rather than node's native zlib -- which is the
+  decompressor the current arms' wasm was written to replace.
+
+  Driven entirely by URL parameters, the way crosstool/index.html is, so the
+  runner stays a loop rather than a protocol:
+
+    ?arm=bbi-js-new&file=20x.shortread.bw&iters=10&n=1&corpus=http://localhost:9000
+
+    arm     bundle under browser/bundles, minus the .js
+    file    corpus filename, or a %d pattern for a cohort: cohort/sample%d.bw
+    n       how many files to open at once, for the cohort case; default 1
+    iters   measured iterations after one warmup; default 5
+    ref/start/end   the query window; defaults are this repo's benchmark window
+
+  Results land on window.__benchResult and the page then sets window.__benchDone.
+  Nothing here is formatted for a human: this page is an instrument.
+-->
+<body style="font:13px/1.5 ui-monospace,monospace;padding:1rem">
+<pre id="out">running…</pre>
+<script type="module">
+const q = new URLSearchParams(location.search)
+const arm = q.get('arm')
+const file = q.get('file') ?? '20x.shortread.bw'
+const n = Number(q.get('n') ?? 1)
+const iters = Number(q.get('iters') ?? 5)
+const corpus = q.get('corpus') ?? 'http://localhost:9000'
+const ref = q.get('ref') ?? 'chr22_mask'
+const start = Number(q.get('start') ?? 124000)
+const end = Number(q.get('end') ?? 143000)
+
+const out = document.getElementById('out')
+
+// The files this run reads. A cohort case takes a %d pattern so the harness does
+// not need to know how the corpus is named.
+const urls = Array.from({ length: n }, (_, i) =>
+  `${corpus}/${file.includes('%d') ? file.replace('%d', String(i + 1)) : file}`)
+
+try {
+  const mod = await import(`./bundles/${arm}.js`)
+  // Both arms export BigWig, and both constructors take { url } and build their
+  // own RemoteFile -- so this is one call on either side, not two code paths that
+  // could differ by more than the library.
+  const Ctor = mod.BigWig
+  if (!Ctor) {
+    throw new Error(`bundle ${arm} exports no BigWig: ${Object.keys(mod)}`)
+  }
+
+  // One query per file, each from a freshly constructed instance, which is what
+  // opening a track does -- header read, B+ tree, R-tree, then data. Opened
+  // concurrently, because that is what a browser does with a panel of tracks;
+  // serializing them would measure N times one file rather than a panel.
+  const once = async () => {
+    const t0 = performance.now()
+    await Promise.all(urls.map(async url => {
+      const bw = new Ctor({ url })
+      await bw.getFeatures(ref, start, end)
+    }))
+    return performance.now() - t0
+  }
+
+  // Warmup pays wasm instantiation and HTTP connection setup, neither of which
+  // is per-query cost. It is thrown away rather than reported.
+  await once()
+
+  const ms = []
+  for (let i = 0; i < iters; i++) {
+    await fetch(`${corpus}/__reset`).catch(() => {})
+    ms.push(await once())
+  }
+  const stats = await fetch(`${corpus}/__stats`).then(r => r.json()).catch(() => null)
+
+  const sorted = [...ms].sort((a, b) => a - b)
+  window.__benchResult = {
+    arm, file, n, iters, ref, start, end,
+    ms,
+    median: sorted[sorted.length >> 1],
+    min: sorted[0],
+    // Requests and bytes for the LAST iteration only, since __reset runs before
+    // each one. Not the headline -- the milliseconds are -- but the thing that
+    // explains them when two arms move identical bytes in different times.
+    requests: stats?.requests ?? null,
+    bytes: stats?.bytes ?? null,
+    rtt: stats?.rtt ?? null,
+  }
+  out.textContent = JSON.stringify(window.__benchResult, null, 1)
+  window.__benchDone = true
+} catch (e) {
+  window.__benchResult = { arm, error: String(e?.stack ?? e?.message ?? e) }
+  window.__benchDone = true
+  out.textContent = `error: ${window.__benchResult.error}`
+}
+</script>

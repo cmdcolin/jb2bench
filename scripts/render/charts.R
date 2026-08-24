@@ -427,8 +427,7 @@ if (file.exists(eco_path)) {
     facet_wrap(vars(fmt, read), nrow = 2,
                labeller = label_wrap_gen(multi_line = FALSE)) +
     cov_axis +
-    scale_y_log10(labels = label_number(accuracy = 0.01, drop0trailing = TRUE),
-                  breaks = c(0.01, 0.1, 1, 10, 30)) +
+    scale_y_continuous(limits = c(0, NA), labels = label_number(accuracy = 0.1)) +
     scale_colour_manual(values = c("2023 release" = "#c1462f",
                                    "current release" = "#12796e"),
                         name = "library") +
