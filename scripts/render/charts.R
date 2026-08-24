@@ -38,7 +38,12 @@ paper_theme <- function(base = 13) {
       plot.caption  = element_text(colour = "grey35", size = rel(0.72),
                                    hjust = 0, margin = margin(t = 10)),
       strip.text    = element_text(face = "bold", size = rel(0.9)),
-      legend.key.height = unit(1.1, "lines")
+      legend.key.height = unit(1.1, "lines"),
+      # The default is 5.5pt, which is not enough room for two adjacent panels
+      # whose outermost x labels are "1000x" and "20x": they touch, and a reader
+      # cannot tell which axis either belongs to.
+      panel.spacing.x = unit(1.1, "lines"),
+      panel.spacing.y = unit(0.7, "lines")
     )
 }
 
@@ -353,7 +358,13 @@ if (file.exists(eco_path)) {
     scale_y_log10(breaks = c(0.5, 1, 2, 5, 10, 20),
                   labels = c("0.5×", "1×", "2×", "5×", "10×", "20×"),
                   expand = expansion(mult = c(0.08, 0.26))) +
-    scale_colour_manual(values = c("#12796e", "#7a5ea8"), guide = "none") +
+    # Deliberately one neutral colour and no legend. In the composite below, the
+    # other panel colours by VERSION -- red for 2023, teal for current -- and a
+    # figure where teal means "current release" in one panel and "@gmod/bam" in
+    # the other is a figure that cannot be read. The facet strips already name
+    # the library, and a speedup is a ratio of the two versions rather than
+    # either one, so it gets a colour that means nothing.
+    scale_colour_manual(values = c("#4a5568", "#4a5568"), guide = "none") +
     labs(
       title = "The parser layer underneath, 2023 release vs current",
       subtitle = "Decode only — no browser, no GPU. Same corpus and window as the render benchmarks.",
@@ -367,7 +378,7 @@ if (file.exists(eco_path)) {
     ) +
     paper_theme()
 
-  paper_fig(p_eco, "results/figures/parsers.png", width = 11.5, height = 5.0, dpi = 200)
+  # p_eco is panel A of the composite written below, not a figure of its own.
 
   # The same data in the paper's Fig 8 layout — time against coverage, one line
   # per version, faceted format x read type. The bar chart above answers "how
@@ -393,13 +404,32 @@ if (file.exists(eco_path)) {
     ) |>
     as_matrix_facets()
 
+  # One shared log y across all four panels, not a free linear one per panel.
+  #
+  # Free scales answered "how does each format's cost grow with depth" and hid the
+  # question next to it: how the two formats compare at all. The panels span 8.4 ms
+  # (BAM 20x short read, current) to 28.2 s (CRAM 1000x long read, 2023) -- a
+  # factor of 3350 -- so a shared LINEAR axis is not the alternative: it would put
+  # every BAM cell on the floor of the CRAM long-read axis, which is the reason
+  # the scales were freed in the first place.
+  #
+  # Log fixes both. A ratio is a constant vertical distance whatever the depth, so
+  # CRAM's decode penalty is legible as the gap between panels -- 11x over BAM at
+  # 20x short read, and 1.05x at 1000x long read, which is the finding free scales
+  # made invisible. Growth with depth still reads as slope.
   p_mat <- ggplot(matrix_rows,
                   aes(coverage, secs, colour = version, group = version)) +
     geom_line(linewidth = 0.7) +
     geom_point(size = 2.1) +
-    matrix_facets +
+    # 2x2, unlike the cold-load matrix's single row. That figure has one panel per
+    # (format, read type) and nothing else, so a row of four reads as one
+    # sequence; this one sits beside a 2x2 speedup panel in the composite below,
+    # and two grids of the same shape line up where a row and a grid do not.
+    facet_wrap(vars(fmt, read), nrow = 2,
+               labeller = label_wrap_gen(multi_line = FALSE)) +
     cov_axis +
-    scale_y_continuous(limits = c(0, NA), labels = label_number(accuracy = 0.1)) +
+    scale_y_log10(labels = label_number(accuracy = 0.01, drop0trailing = TRUE),
+                  breaks = c(0.01, 0.1, 1, 10, 30)) +
     scale_colour_manual(values = c("2023 release" = "#c1462f",
                                    "current release" = "#12796e"),
                         name = "library") +
@@ -414,7 +444,45 @@ if (file.exists(eco_path)) {
     ) +
     paper_theme()
 
-  paper_fig(p_mat, "results/figures/parser-matrix.png", width = 13, height = 4.2, dpi = 200)
+  # One figure, two panels, because they answer halves of one question and a
+  # reader who sees only the speedups cannot tell whether a 12x is 12x of
+  # something that mattered. A is the ratio; B is the cost the ratio is of.
+  p_parsers <- patchwork::wrap_plots(
+    p_eco + labs(title = NULL, subtitle = NULL, caption = NULL),
+    p_mat + labs(title = NULL, subtitle = NULL, caption = NULL),
+    ncol = 2, widths = c(1, 1.05)
+  ) +
+    patchwork::plot_annotation(tag_levels = "A") &
+    theme(plot.tag = element_text(face = "bold", size = 13))
+
+  writeLines(c(
+    "# parsers.png",
+    "",
+    "Two panels. Text for a paper caption; nothing below is drawn in the image.",
+    "",
+    "## title",
+    "",
+    "The parser layer underneath JBrowse, 2023 release against current",
+    "",
+    "## subtitle",
+    "",
+    "(A) Speedup, 2023 mean divided by current mean, log scale; the dashed line is parity and a point left of it is a regression.",
+    "(B) The times that ratio is of, on one shared log axis. Decode only -- no browser, no GPU -- over the same 19 kb window as the render benchmarks.",
+    "",
+    "## caveats",
+    "",
+    "Both sides built from source from a pinned tag with the same toolchain, so the difference is library code and not a change of transpiler target or module format.",
+    "An equivalence gate runs first: a timing comparison between two libraries returning different records is not a comparison.",
+    "@gmod/bbi is absent on purpose. Coverage is not an axis for BigWig, whose binned signal returns about the same intervals at any read depth -- 13168, 17676 and 18495 intervals across 20x/200x/1000x, against BAM's 3079, 31126 and 153652. Its cost is per FILE; see cohort-bw.png, where 100 samples pay it 100 times.",
+    "Panel B shares one log axis rather than giving each panel its own. The cells span 8.4 ms to 28.2 s, a factor of 3350, so a shared linear axis would put every BAM cell on the floor of the CRAM long-read panel. On log, the BAM-to-CRAM gap is a readable vertical distance: CRAM costs 11x BAM at 20x short read and 1.05x at 1000x long read, so its decode penalty all but vanishes at depth.",
+    "Panel A uses one neutral colour on purpose. Panel B colours by version, and teal cannot mean 'current release' in one panel and '@gmod/bam' in the other.",
+    "In panel A, error bars are the two sides' relative margins of error added in quadrature; the CRAM 200x and 1000x cells are the noisiest in the set.",
+    "Mean of the vitest bench iterations."
+  ), "results/figures/parsers.txt")
+
+  ggsave("results/figures/parsers.png", p_parsers, width = 15, height = 5.6, dpi = 200)
+  unlink("results/figures/parser-matrix.png")
+  unlink("results/figures/parser-matrix.txt")
 }
 
 cat("wrote:\n")
