@@ -150,7 +150,7 @@ serving from `make serve`:
 
 ```bash
 FORMATS=cram node scripts/render/runner-interaction.ts   # the six new CRAM zoom/pan cells
-make crosstool-versions                                  # igv.js against v2.4.0, 4.3.0 and main — the paper's own Fig 8
+make crosstool                                           # igv.js against v2.4.0, 4.3.0 and main, cold load + zoom + pan
 ```
 
 Two things to know before starting:

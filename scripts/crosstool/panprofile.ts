@@ -1,16 +1,28 @@
-// Cross-tool pan: scroll sideways one full viewport at constant scale, and time
-// how long each tool takes to put correct pixels back.
+// Cross-tool interaction: move the view, and time how long each tool takes to
+// put correct pixels back. Two motions, one instrument.
 //
-// Why a pan, and why this is the cross-tool measurement worth having. Every
-// igv.js number in `results/crosstool.md` is a cold load, which folds together
-// application boot, assembly resolution, fetch and draw — and boot is the part
-// that has nothing to do with what a renderer does. A zoom is no better here:
-// `results/crosstool-zoom.md` measures a JBrowse debounce rather than JBrowse's
-// drawing (see the README section that retracts it). A pan at constant
-// `bpPerPx` is the one interaction where **both** tools must go to the network
-// for a region neither holds, the byte volume per step equals the initial
-// render's, and the application is already up. What is left is the cost of
-// turning bytes into pixels.
+//   MOTION=pan (default) — scroll sideways one full viewport at constant scale.
+//   MOTION=zoom          — halve the visible width about the view's centre.
+//
+// The motions ask different questions and neither answers the other's. A pan
+// makes both tools go to the network for a region neither holds, so it prices
+// fetch-plus-draw. A zoom stays inside data both tools already have, so it
+// prices redraw alone — which is where a batched GPU pass and a per-read 2D
+// pass differ most, and where the older JBrowse renderer refetches instead.
+//
+// Why either of these and not a cold load. Every igv.js number in
+// `results/crosstool.md` is a cold load, which folds together application boot,
+// assembly resolution, fetch and draw — and boot is the part that has nothing
+// to do with what a renderer does. Both motions here run against an application
+// that is already up, so far less of the number is startup.
+//
+// The zoom used to be unmeasurable, and the reason is worth keeping. An earlier
+// `zoomprofile.ts` polled screenshots every 100 ms and timed what turned out to
+// be JBrowse's 500 ms navigation debounce rather than JBrowse's drawing; the
+// README retracted the table it produced. What was wrong was the instrument,
+// not the interaction, so the zoom is measured here on the draws-plus-network
+// gate below, which resolves hundreds of microseconds rather than hundreds of
+// milliseconds.
 //
 // The instrument belongs to neither tool. Same paint-quiescence idea as
 // `paintprofile.ts`: poll a screenshot, hash it, call the step done when the
@@ -22,18 +34,22 @@
 //
 // The two tools are driven differently on purpose:
 //
-//   JBrowse — `horizontalScroll(±width)`, exactly what the JBrowse-vs-JBrowse
-//     pan in `scripts/render/interaction.ts` does. Reusing the proven mechanism
-//     avoids depending on a navigation API across four builds of differing
-//     vintage.
-//   igv — `search(locus)` against the locus sequence computed from the same
-//     start and width.
+//   JBrowse — `horizontalScroll(±width)` to pan, `zoomTo(bpPerPx / 2)` to zoom.
+//     The pan mechanism is exactly what the JBrowse-vs-JBrowse pan in
+//     `scripts/render/interaction.ts` does; both avoid depending on a
+//     locus-navigation API across builds of differing vintage.
+//   igv — `search(locus)` to pan, against the locus computed from the same
+//     start and width; `zoomIn()` to zoom.
+//
+// Both zoom drives halve the visible width about the centre, so the two tools
+// land on the same region by construction in the same way the pan does.
 //
 // Both therefore visit the same regions by construction, and the run records
 // where each actually landed so the claim is checkable rather than assumed. A
 // step whose two tools disagree about the locus is reported, not averaged in.
 //
 // Usage: panprofile.ts <url> <jbrowse|igv> [screenshotDir]
+//   MOTION=pan|zoom   which interaction to time (default pan)
 // Prints JSON: per-step ms and landed locus.
 import crypto from 'crypto'
 import fs from 'fs'
@@ -78,12 +94,20 @@ const INSTRUMENT = process.env.INSTRUMENT === 'paint' ? 'paint' : 'draws'
 // arrived. See drawclock.ts for the trace that forced the distinction.
 const QUIET_MS = Number(process.env.QUIET_MS ?? DEFAULT_QUIET_MS)
 
+const MOTION = process.env.MOTION === 'zoom' ? 'zoom' : 'pan'
+
 // Pan LEFT, for the reason interaction.ts documents at length: pbsim's long
 // reads run off both ends of chr22_mask, so long-read depth tapers there, and
 // panning right from the benchmark locus puts two of five steps on thinned data
 // in both tools at once — which reads as a shared speedup rather than as a
 // corpus artefact. Leftward keeps four of five inside the plateau.
 const PAN_SIGN = process.env.PAN_DIR === 'right' ? 1 : -1
+
+// A zoom step halves the width, so five steps take 19 kb to 594 bp. That floor
+// matters: below roughly a hundred bases both tools switch to drawing letters
+// rather than reads, which is a different workload and not the one being
+// compared. The step loop stops rather than crossing it.
+const MIN_WIDTH = Number(process.env.MIN_WIDTH ?? 200)
 
 // The benchmark window, and the step size that follows from it. One full
 // viewport per step means the new region is disjoint from the old, so neither
@@ -191,6 +215,7 @@ async function drawsSettled(t0: number) {
     const got = (await page.evaluate(DRAW_CLOCK_READ)) as {
       count: number
       ms: number
+      burstMs: number
       sinceLast: number
     }
     // The draw clock runs on page time and the network events on wall clock;
@@ -273,6 +298,13 @@ interface Step {
   ms: number
   /** canvas draws under INSTRUMENT=draws; detector polls under =paint */
   polls: number
+  /**
+   * How long the final draw burst itself took: `ms` minus the first draw of
+   * that burst. The rest of `ms` is waiting — a debounce on a zoom, a fetch on
+   * a pan — and separating the two is the difference between reporting a
+   * renderer and reporting a timer.
+   */
+  drawMs: number
   /** data-file responses during this step — 0 means it was served from cache */
   requests: number
   /** their content-length total */
@@ -322,14 +354,22 @@ try {
   let reference = await shot()
 
   for (let i = 1; i <= STEPS; i++) {
-    const targetStart = START + PAN_SIGN * WIDTH * i
-    const targetEnd = targetStart + WIDTH
-    const target = `${REF}:${targetStart}-${targetEnd}`
+    // Where this step is supposed to land, computed the same way for both tools
+    // so the locus check afterwards has something to check against.
+    const stepWidth = MOTION === 'zoom' ? WIDTH / 2 ** i : WIDTH
+    const targetStart =
+      MOTION === 'zoom'
+        ? Math.round((START + END) / 2 - stepWidth / 2)
+        : START + PAN_SIGN * WIDTH * i
+    const targetEnd = targetStart + stepWidth
+    const target = `${REF}:${Math.round(targetStart)}-${Math.round(targetEnd)}`
 
-    // Stop rather than clamp. JBrowse's maxOffset allows scrolling until only
-    // ~200px of genome remains on screen, and a mostly-empty viewport scores
-    // fast for the same reason a refusal does.
-    if (targetStart < 0 || targetEnd > CONTIG_LENGTH) {
+    // Stop rather than clamp, in both motions and for the same reason: a view
+    // holding almost nothing scores fast the way a refusal does. Panning off
+    // the contig empties it — JBrowse's maxOffset allows scrolling until only
+    // ~200px of genome remains — and zooming past MIN_WIDTH crosses into
+    // base-letter rendering, which is a different workload from a pileup.
+    if (MOTION === 'zoom' ? stepWidth < MIN_WIDTH : targetStart < 0 || targetEnd > CONTIG_LENGTH) {
       break
     }
 
@@ -341,23 +381,36 @@ try {
     lastNetworkAt = Date.now()
     const tStep = Date.now()
     const applied = await page.evaluate(
-      ({ tool, sign, locus }) => {
+      ({ tool, sign, locus, motion }) => {
         if (tool === 'igv') {
           const b = (window as any).igvBrowser
-          // Deliberately NOT awaited: search resolves on igv's own notion of
-          // done, and the whole point of this instrument is not to ask a tool
-          // when it has finished.
+          // Deliberately NOT awaited: neither call resolves on anything this
+          // instrument should trust — the whole point is not to ask a tool when
+          // it has finished.
+          if (motion === 'zoom') {
+            // igv's own 2x, centre-preserving, and the counterpart of
+            // JBrowse's zoomTo below. Driving it by locus instead would go
+            // through igv's search path and time a parse as well as a redraw.
+            b.zoomIn()
+            return true
+          }
           ;(window as any).__panPromise = b.search(locus).catch((e: unknown) => {
             ;(window as any).__panError = String(e)
           })
           return true
         }
         const v = (window as any).JBrowseSession.views[0]
+        if (motion === 'zoom') {
+          const before = v.bpPerPx
+          // Second argument defaults to width/2, so this zooms about the centre.
+          v.zoomTo(v.bpPerPx / 2)
+          return v.bpPerPx !== before
+        }
         const before = v.offsetPx
         v.horizontalScroll(sign * v.width)
         return v.offsetPx !== before
       },
-      { tool, sign: PAN_SIGN, locus: target },
+      { tool, sign: PAN_SIGN, locus: target, motion: MOTION },
     )
 
     if (!applied) {
@@ -365,6 +418,7 @@ try {
         step: i,
         ms: Number.NaN,
         polls: 0,
+        drawMs: Number.NaN,
         requests: 0,
         bytes: 0,
         locus: '',
@@ -376,10 +430,12 @@ try {
 
     let ms: number
     let polls = 0
+    let drawMs = Number.NaN
     if (INSTRUMENT === 'draws') {
       const got = await drawsSettled(tStep)
       ms = got.ms
       polls = got.count
+      drawMs = got.burstMs
     } else {
       const settled = await settle(tStep, reference)
       ms = settled.ms
@@ -407,6 +463,7 @@ try {
       step: i,
       ms,
       polls,
+      drawMs,
       requests: stepRequests,
       bytes: stepBytes,
       locus,
@@ -438,10 +495,15 @@ console.log(
   JSON.stringify({
     tool,
     url,
+    motion: MOTION,
     panDir: PAN_SIGN < 0 ? 'left' : 'right',
     steps,
     appliedSteps: done.length,
     medianMs: done.length ? median(done.map(s => s.ms)) : null,
+    // The drawing alone, with the wait taken out. On a JBrowse zoom this is the
+    // few milliseconds inside a flat ~504 ms, and quoting the 504 as a render
+    // cost would be quoting a debounce.
+    medianDrawMs: done.length ? median(done.map(s => s.drawMs)) : null,
     // Steps that issued no data request at all. Not a footnote: a step served
     // from cache is not the "both tools must fetch" case this benchmark claims
     // to be, and the report refuses to call such a row a comparison.

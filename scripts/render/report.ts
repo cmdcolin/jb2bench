@@ -553,10 +553,11 @@ const html = `<title>JBrowse 2 Since v2.4.0</title>
 
   <section>
     <h2>The figures</h2>
-    ${figure('cold-load.png', 'Cold load to rendered reads, by coverage and read type. Laid out like Fig 8 of the 2023 paper so the two can be read side by side.')}
-    ${figure('speedup-vs-published.png', 'Cold-load speedup of current HEAD over v2.4.0, the version the paper benchmarked.')}
-    ${figure('interaction.png', 'Time-to-content after a zoom and after a pan. Zoom-in is the current renderer’s best case; pan is its worst.')}
-    ${figure('parsers.png', 'The parser libraries, 2023 release against current. BigWig is the honest exception.')}
+    ${figure('cold-load.png', 'Cold load to rendered reads, by coverage and read type, across all four arms — v2.4.0, v4.3.0, the build under test and igv.js. Laid out like Fig 8 of the 2023 paper so the two can be read side by side.')}
+    ${figure('speedup-vs-published.png', 'Cold-load speedup of the build under test over v2.4.0, the version the paper benchmarked.')}
+    ${figure('interaction.png', 'Time-to-content after a zoom and after a pan, same four arms. A zoom needs no network from either tool; a pan needs one from both.')}
+    ${figure('zoom-redraw.png', 'The zoom redraw with the waiting removed. Read it only beside the zoom panels above: JBrowse waits a flat 500 ms navigation debounce there and draws for under a millisecond here, so neither number alone describes the interaction.')}
+    ${figure('parsers.png', 'The parser libraries, 2023 release against current. BigWig is absent on purpose — coverage is not an axis for it.')}
   </section>
 
   <section>

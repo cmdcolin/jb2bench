@@ -31,7 +31,7 @@ const WARN_ONLY = process.argv.includes('--warn')
 // Ports and the builds the README stages on them. Checked by content hash
 // rather than by name, so a restaged port fails here instead of mislabelling a
 // column.
-const PORTS = [8000, 8001, 8002, 8004]
+const PORTS = [8000, 8001, 8004]
 
 interface Check {
   name: string

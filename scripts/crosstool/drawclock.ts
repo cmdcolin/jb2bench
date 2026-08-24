@@ -45,10 +45,17 @@
  */
 export const DRAW_CLOCK_INIT = `(() => {
   const w = window;
-  w.__drawClock = { count: 0, last: 0, started: performance.now() };
+  w.__drawClock = { count: 0, last: 0, burstStart: 0, started: performance.now() };
+  // A gap this long between two draws starts a new burst. Draws inside one
+  // render land microseconds apart; the gap being separated from them is
+  // JBrowse's ~500 ms debounce, so 100 ms is nowhere near either.
+  const BURST_GAP = 100;
   const mark = () => {
-    w.__drawClock.count++;
-    w.__drawClock.last = performance.now();
+    const c = w.__drawClock;
+    const t = performance.now();
+    if (c.count === 0 || t - c.last > BURST_GAP) c.burstStart = t;
+    c.count++;
+    c.last = t;
   };
   // 2D and both WebGL levels. Only the calls that can change pixels — state
   // setters are not draws, and counting them would make "quiet" unreachable on
@@ -77,6 +84,7 @@ export const DRAW_CLOCK_RESET = `(() => {
   const c = window.__drawClock;
   c.count = 0;
   c.last = 0;
+  c.burstStart = 0;
   c.started = performance.now();
   return c.started;
 })()`
@@ -164,12 +172,22 @@ export const DEFAULT_QUIET_MS = 1500
  * Read the result: time from reset to the last draw, how many there were, and
  * how long ago the last one was. `sinceLast` is computed in page time so the
  * caller never has to reconcile two clocks.
+ *
+ * `burstMs` is the last draw minus the first draw of the burst it belongs to,
+ * and it exists because time-to-content on a JBrowse zoom is almost all waiting.
+ * A zoom step there reads a flat ~504 ms at every coverage and read type, which
+ * is the 500 ms LGVCoarseDynamicBlocks debounce plus a few milliseconds of
+ * drawing. Reporting only the 504 would invite the reader to compare a timer
+ * against igv's actual redraw; reporting both says which is which. On a pan,
+ * where the wait is a fetch rather than a timer, the two differ for a different
+ * reason and the same split is still the honest one.
  */
 export const DRAW_CLOCK_READ = `(() => {
   const c = window.__drawClock;
   return {
     count: c.count,
     ms: c.last - c.started,
+    burstMs: c.count === 0 ? 0 : c.last - c.burstStart,
     sinceLast: c.count === 0 ? 0 : performance.now() - c.last,
   };
 })()`

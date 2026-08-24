@@ -1,86 +1,104 @@
 #!/usr/bin/env Rscript
-# Figures for the cross-tool pan, drawn from results/crosstool-pan.json so a
+# The interaction figure: what a zoom and a pan cost, across four arms.
+#
+# Drawn from results/crosstool-pan.json and results/crosstool-zoom.json so a
 # slide cannot quote a number no run produced -- the rule scripts/render/charts.R
 # and ecosystem/report.ts both follow.
 #
-# Two panels, because the run says two different things and reading them as one
-# would be wrong:
+#   results/figures/interaction.png       time to content, zoom and pan
+#   results/figures/zoom-redraw.png       the zoom with the waiting taken out
 #
-#   (a) time to content against coverage. The headline, and the thing that
-#       crosses: igv is faster at 20x short read and JBrowse is an order of
-#       magnitude faster at 1000x.
-#   (b) canvas draw calls per pan step. The mechanism, and the sturdier
-#       measurement -- it repeats to within ~1% across runs because it depends
-#       on the data and the code rather than on the machine.
+# Two things this file used to draw and does not any more, both removed on
+# 2026-08-24:
 #
-# Both axes are log10. Time spans 537 ms to 27 s and draws span 42 to 1.6
-# million; on a linear axis every point but the largest collapses onto the floor.
+#   Canvas draw calls per step. It was the sturdiest measurement here -- it
+#   repeats to within 1% because it depends on the data and the code rather than
+#   the machine -- and it was still a bad figure. A batched renderer issues a
+#   fixed handful of GPU draws whatever the depth, so the JBrowse series was a
+#   flat line at 50 by construction, against igv at a quarter of a million. That
+#   is a description of which drawing API each tool calls, not a result either
+#   earned, and a log axis spanning four decades made it look like the headline.
+#   The counts are still recorded, still in results/crosstool-pan.md, and still
+#   doing the two jobs that need them: separating a cache hit from an abandoned
+#   step, and controlling for downsampling.
 #
-# Palette is the house one from the paper's figures/perf.R, not a new one:
-# #2a78d6 for this work and #1baf7a for igv, validated as a pair (worst CVD dE
-# 23.1 protan / 9.6 tritan, normal-vision 24.0). The green sits below 3:1 on
-# white, so every series carries a direct label as well as a legend entry and the
-# numbers also exist as a table in results/crosstool-pan.md.
-#
-#   Rscript scripts/crosstool/panchart.R    # -> results/figures/crosstool-pan-*.png
+#   "did not complete" crosses at the end of a series. Where a cell has no
+#   number the series simply stops, and results/crosstool-pan.md says in prose
+#   what was diagnosed -- igv.js at 1000x long read reaches 2.3 GB of renderer
+#   heap. A cross drawn at a neighbouring cell's height invited the reader to
+#   read a position off it, which was never a measurement.
 suppressPackageStartupMessages({
   library(jsonlite)
   library(ggplot2)
   library(dplyr)
+  library(tidyr)
   library(scales)
 })
 
+source("scripts/arms.R")
 dir.create("results/figures", showWarnings = FALSE, recursive = TRUE)
 
-d <- fromJSON("results/crosstool-pan.json", simplifyVector = FALSE)
-
-TOOL <- c(jbrowse = "JBrowse (this work)", igv = "igv.js 3.8.5")
-TOOL_COL <- c("JBrowse (this work)" = "#2a78d6", "igv.js 3.8.5" = "#1baf7a")
-
-# A cell the run could not measure has null for both medians, and `as.numeric`
-# of NULL is a zero-length vector rather than NA — which makes data.frame() fail
+# A cell the run could not measure has null for its medians, and `as.numeric` of
+# NULL is a zero-length vector rather than NA -- which makes data.frame() fail
 # with "arguments imply differing number of rows" instead of carrying a gap.
 num1 <- function(x) if (is.null(x) || length(x) == 0) NA_real_ else as.numeric(x)
 
-rows <- list()
-for (case_id in names(d$rows)) {
-  # `20x-shortread` or `20x-shortread-cram`; BAM ids stay bare so results
-  # recorded before CRAM was added are not orphaned.
-  parts <- strsplit(case_id, "-", fixed = TRUE)[[1]]
-  fmt <- if (length(parts) >= 3 && parts[3] == "cram") "CRAM" else "BAM"
-  for (tool_id in names(d$rows[[case_id]])) {
-    if (!tool_id %in% names(TOOL)) next
-    cell <- d$rows[[case_id]][[tool_id]]
-    draws <- unlist(cell$drawsPerStep)
-    fetched <- cell$fetchedMedian
-    rows[[length(rows) + 1]] <- data.frame(
-      case = case_id,
-      coverage = as.numeric(sub("x$", "", parts[1])),
-      read = if (parts[2] == "shortread") "short reads" else "long reads",
-      format = fmt,
-      tool = unname(TOOL[tool_id]),
-      # A cell where the tool fetched on no step has no comparable median. Keep
-      # it, flagged, rather than dropping it: at 20x/200x long read JBrowse
-      # rendered fully every step while fetching nothing, and a gap in the line
-      # would read as a failed measurement instead of a finding.
-      ms = if (is.null(fetched)) num1(cell$median) else num1(fetched),
-      cached_only = is.null(fetched),
-      draws = if (length(draws)) stats::median(draws) else NA_real_,
-      stringsAsFactors = FALSE
-    )
+read_motion <- function(path, motion) {
+  if (!file.exists(path)) return(NULL)
+  d <- fromJSON(path, simplifyVector = FALSE)
+  under_test <- d$jbrowseBuilds$jbrowse %||% d$jbrowseBuild
+  igv_v <- d$igvVersion
+  rows <- list()
+  for (case_id in names(d$rows)) {
+    parts <- strsplit(case_id, "-", fixed = TRUE)[[1]]
+    for (tool_id in names(d$rows[[case_id]])) {
+      lab <- arm_label(tool_id, under_test, igv_v)
+      # igv-deep and the height controls are controls, not arms. They belong in
+      # the table that discusses them, not in a figure with four series.
+      if (is.na(lab)) next
+      cell <- d$rows[[case_id]][[tool_id]]
+      fetched <- cell$fetchedMedian
+      rows[[length(rows) + 1]] <- data.frame(
+        motion = motion,
+        case = case_id,
+        coverage = as.numeric(sub("x$", "", parts[1])),
+        read = if (parts[2] == "shortread") "short reads" else "long reads",
+        format = if (length(parts) >= 3 && parts[3] == "cram") "CRAM" else "BAM",
+        arm = lab,
+        # On a pan the comparable number is the median over steps that fetched:
+        # JBrowse reads in 256 KiB blocks, so some of its pan steps are served
+        # from what it already holds, and averaging a cache hit into a fetch is
+        # how a benchmark ends up calling the difference "rendering". On a zoom
+        # nothing is supposed to fetch, so every step counts.
+        ms = if (motion == "Zoom in" || is.null(fetched)) num1(cell$median) else num1(fetched),
+        cached_only = motion == "Pan" && is.null(fetched),
+        draw_ms = num1(cell$drawMedian),
+        refetched = num1(cell$requests) > 0,
+        igv_version = igv_v %||% NA_character_,
+        stringsAsFactors = FALSE
+      )
+    }
   }
+  bind_rows(rows)
 }
-# Deliberately NOT filtered to measured rows. A cell that produced neither a
-# time nor a draw count is the one worth seeing — igv at 1000x-longread reaches
-# 2.3 GB of renderer heap and does not reliably finish — and dropping it here
-# leaves a line that simply stops, which reads as "not run".
-d2 <- bind_rows(rows)
-d2$tool <- factor(d2$tool, levels = unname(TOOL))
-d2$read <- factor(d2$read, levels = c("short reads", "long reads"))
 
-# Cells the run could not measure at all. Drawn as an annotation rather than
-# omitted, because "this tool did not finish" is the result in the heaviest row.
-missing <- d2 |> filter(!is.finite(ms))
+pan <- read_motion("results/crosstool-pan.json", "Pan")
+zoom <- read_motion("results/crosstool-zoom.json", "Zoom in")
+d2 <- bind_rows(zoom, pan)
+if (!nrow(d2)) stop("no recorded cross-tool interaction rows")
+
+igv_v <- unique(na.omit(d2$igv_version))[1]
+d2 <- d2 |>
+  mutate(
+    arm = factor(arm, levels = arm_levels(igv_v)),
+    read = factor(read, levels = c("short reads", "long reads")),
+    # Zoom first: it is the interaction that isolates drawing, and the pan is the
+    # one that adds the fetch back.
+    motion = factor(motion, levels = c("Zoom in", "Pan"))
+  ) |>
+  filter(!is.na(arm))
+
+ARMS <- arm_colours(igv_v)
 
 pan_theme <- function(base = 12) {
   theme_minimal(base_size = base) +
@@ -101,103 +119,108 @@ pan_theme <- function(base = 12) {
 cov_scale <- scale_x_log10(breaks = c(20, 200, 1000),
                            labels = c("20x", "200x", "1000x"))
 
-# Per row, not a single peak. Rows here were measured on different days and
-# loads -- the CRAM ones were added after the BAM ones -- and quoting the worst
-# minute over the whole figure would condemn cells taken at load 1.2 because a
-# later partial run happened at 10.
-row_peak <- sapply(d$rows, function(r)
-  suppressWarnings(max(unlist(lapply(r, function(cc) unlist(cc$load))))))
-hot <- names(row_peak)[is.finite(row_peak) & row_peak > 4]
-load_note <- if (length(hot)) sprintf(
-  "Measured %s. %d of %d rows ran above the 4.0 load ceiling and their absolutes are\nnot a run of record: %s.\nThe rest were measured below it.",
-  d$dates[[1]], length(hot), length(row_peak),
-  paste(strwrap(paste(hot, collapse = ", "), width = 80), collapse = "\n")
-) else sprintf("Measured %s. Every row below the 4.0 load ceiling.", d$dates[[1]])
-
-# ---- panel (a): time to content ------------------------------------------
-timed <- d2 |> filter(is.finite(ms))
-p_time <- ggplot(timed, aes(coverage, ms, colour = tool, group = tool)) +
-  geom_line(linewidth = 0.8) +
-  geom_point(aes(shape = cached_only), size = 2.6) +
-  # Direct labels on the heaviest point of each series, so identity never rests
-  # on colour alone -- the green is below 3:1 on this surface.
-  geom_text(
-    data = timed |> group_by(tool, read, format) |> slice_max(coverage, n = 1),
-    aes(label = ifelse(ms >= 1000, sprintf("%.1f s", ms / 1000), sprintf("%.0f ms", ms))),
-    hjust = -0.15, vjust = -0.5, size = 3, show.legend = FALSE
-  ) +
-  scale_shape_manual(values = c(`FALSE` = 16, `TRUE` = 1),
-                     labels = c(`FALSE` = "fetched", `TRUE` = "served from cache"),
-                     name = NULL) +
-  scale_colour_manual(values = TOOL_COL) +
-  cov_scale +
-  # Headroom for the direct labels, which otherwise collide with the facet strip.
-  scale_y_log10(labels = label_number(scale_cut = cut_short_scale()),
-                expand = expansion(mult = c(0.06, 0.22))) +
-  facet_grid(format ~ read) +
-  labs(
-    title = "Time to content after a pan, one viewport at constant scale",
-    subtitle = "Median over the steps where that tool actually fetched. Hollow points fetched on no step.",
-    x = "coverage", y = "ms (log scale)",
-    caption = paste(load_note,
-      "Instrument: the last canvas draw before draws and network both go still.",
-      "Neither tool's own loading state is consulted -- igv hides its spinner",
-      "before it draws, and JBrowse's indicator wording moves between releases.",
-      sep = "\n")
-  ) +
-  pan_theme() +
-  expand_limits(x = 2200)
-
-if (nrow(missing)) {
-  # Marked at the tool's own last measured level so the eye continues the line
-  # into the gap, with a cross rather than a filled point so it cannot be read
-  # as a datum.
-  anchor <- timed |>
-    group_by(tool, read, format) |>
-    summarise(y = max(ms), .groups = "drop")
-  missing2 <- missing |> select(-ms) |> inner_join(anchor, by = c("tool", "read", "format"))
-  p_time <- p_time +
-    geom_point(data = missing2, aes(x = coverage, y = y), shape = 4, size = 3.2,
-               stroke = 1.1, show.legend = FALSE) +
-    geom_text(data = missing2, aes(x = coverage, y = y),
-              label = "did not\ncomplete", size = 2.6, vjust = -0.35, hjust = 0.5,
-              lineheight = 0.9, colour = "grey25", show.legend = FALSE)
+# Per row, not a single peak. Rows are measured on different days and loads, and
+# quoting the worst minute over the whole figure would condemn cells taken at
+# load 1.2 because a later partial run happened at 10.
+load_note <- function(path) {
+  if (!file.exists(path)) return("")
+  d <- fromJSON(path, simplifyVector = FALSE)
+  row_peak <- sapply(d$rows, function(r)
+    suppressWarnings(max(unlist(lapply(r, function(cc) unlist(cc$load))))))
+  hot <- names(row_peak)[is.finite(row_peak) & row_peak > 4]
+  if (length(hot)) {
+    sprintf("%d of %d rows ran above the 4.0 load ceiling and their absolutes are not a run of record: %s.",
+            length(hot), length(row_peak),
+            paste(hot, collapse = ", "))
+  } else {
+    "Every row below the 4.0 load ceiling."
+  }
 }
 
-ggsave("results/figures/crosstool-pan-time.png", p_time,
-       width = 8.2, height = 5.6, dpi = 200)
+dates <- function(path) {
+  if (!file.exists(path)) return(NA_character_)
+  d <- fromJSON(path, simplifyVector = FALSE)
+  paste(sort(unique(unlist(d$dates))), collapse = ", ")
+}
 
-# ---- panel (b): draw calls -----------------------------------------------
-drawn <- d2 |> filter(is.finite(draws))
-p_draws <- ggplot(drawn, aes(coverage, draws, colour = tool, group = tool)) +
-  geom_line(linewidth = 0.8) +
-  geom_point(size = 2.6) +
-  geom_text(
-    data = drawn |> group_by(tool, read, format) |> slice_max(coverage, n = 1),
-    aes(label = label_number(scale_cut = cut_short_scale())(draws)),
-    hjust = -0.15, vjust = -0.5, size = 3, show.legend = FALSE
+# ---- time to content, both motions ---------------------------------------
+timed <- d2 |> filter(is.finite(ms))
+
+p_time <- ggplot(timed, aes(coverage, ms, colour = arm, group = arm)) +
+  geom_line(linewidth = 0.75) +
+  # Hollow for a pan step that fetched nothing. Kept because it is a real
+  # finding -- at 20x long read JBrowse served all five steps from one 256 KiB
+  # block -- but the legend now says what it means rather than saying "cache".
+  geom_point(aes(shape = cached_only), size = 2.5) +
+  facet_grid(motion + format ~ read, scales = "free_y") +
+  scale_shape_manual(
+    values = c(`FALSE` = 16, `TRUE` = 1),
+    labels = c(`FALSE` = "went to the network for this region",
+               `TRUE`  = "already had the region in memory"),
+    name = NULL
   ) +
-  scale_colour_manual(values = TOOL_COL) +
+  scale_colour_manual(values = ARMS, drop = FALSE) +
   cov_scale +
-  # Headroom for the direct labels, which otherwise collide with the facet strip.
   scale_y_log10(labels = label_number(scale_cut = cut_short_scale()),
-                expand = expansion(mult = c(0.06, 0.22))) +
-  facet_grid(format ~ read) +
+                expand = expansion(mult = c(0.08, 0.2))) +
   labs(
-    title = "Canvas draw calls per pan step",
-    subtitle = "The architecture in one measurement: per-read 2D drawing against a batched GPU pass.",
-    x = "coverage", y = "draw calls (log scale)",
+    title = "What an interaction costs you",
+    subtitle = paste(
+      "Time to content: from the interaction to the last canvas draw before the page stops drawing and stops fetching.",
+      "\nZoom in — the region is already in memory, so this is redraw. Pan — one full viewport at constant scale, so this is fetch and redraw."
+    ),
+    x = "coverage", y = "ms (log scale)",
     caption = paste(
-      "Repeats to within ~1% across runs: it depends on the data and the code, not",
-      "the machine, so it survives a contaminated run. igv's count saturates near",
-      "250k above 200x, and NOT because of downsampling -- at samplingDepth 10000,",
-      "which clips nothing on this corpus, draws and time are both unchanged.",
-      sep = "\n")
+      sprintf("Zoom measured %s; pan measured %s.", dates("results/crosstool-zoom.json"), dates("results/crosstool-pan.json")),
+      paste("Pan:", load_note("results/crosstool-pan.json")),
+      "Instrument: the last canvas draw before draws and network both go still. Neither tool's own loading state is consulted --",
+      "igv hides its spinner before it draws, and JBrowse's indicator wording moves between releases.",
+      "A series that stops has a cell with no measurement; results/crosstool-pan.md says which and why.",
+      "IMPORTANT: JBrowse's zoom row is flat at ~505 ms at every depth because 500 ms of it is a navigation debounce, not drawing.",
+      "results/figures/zoom-redraw.png separates the two.",
+      sep = "\n"
+    )
   ) +
-  pan_theme() +
-  expand_limits(x = 2200)
+  pan_theme()
 
-ggsave("results/figures/crosstool-pan-draws.png", p_draws,
-       width = 8.2, height = 5.6, dpi = 200)
+ggsave("results/figures/interaction.png", p_time, width = 9.5, height = 9, dpi = 200)
 
-cat("wrote results/figures/crosstool-pan-time.png and crosstool-pan-draws.png\n")
+# ---- the zoom, with the waiting taken out --------------------------------
+# Its own figure rather than a panel, because it answers a different question
+# from every other panel here: not "how long did the user wait" but "how much of
+# that wait was work". Publishing the first without the second is what got the
+# earlier zoom benchmark retracted.
+redraw <- d2 |> filter(motion == "Zoom in", is.finite(draw_ms))
+
+if (nrow(redraw)) {
+  p_draw <- ggplot(redraw, aes(coverage, draw_ms, colour = arm, group = arm)) +
+    geom_line(linewidth = 0.75) +
+    geom_point(size = 2.5) +
+    facet_grid(format ~ read, scales = "free_y") +
+    scale_colour_manual(values = ARMS, drop = FALSE) +
+    cov_scale +
+    scale_y_log10(labels = label_number(scale_cut = cut_short_scale()),
+                  expand = expansion(mult = c(0.08, 0.2))) +
+    labs(
+      title = "The zoom redraw itself, with the waiting removed",
+      subtitle = "The final draw burst of each step: its last canvas draw minus its first. Nothing here is a time a user experiences.",
+      x = "coverage", y = "ms of drawing (log scale)",
+      caption = paste(
+        "Read this against the zoom panels of interaction.png, never instead of them. There, JBrowse waits a flat ~505 ms at every",
+        "depth -- the 500 ms LGVCoarseDynamicBlocks debounce -- and igv waits nothing at all. Here is what each did with the time.",
+        "The gap between the two figures is JBrowse's to close: the drawing is already sub-millisecond, and the wait is a constant.",
+        sep = "\n"
+      )
+    ) +
+    pan_theme()
+
+  ggsave("results/figures/zoom-redraw.png", p_draw, width = 9.5, height = 5.6, dpi = 200)
+}
+
+# The draws figure this file used to write. Removed rather than left stale: a
+# figure nothing regenerates is a figure that gets quoted after the run it came
+# from stopped being true.
+unlink(c("results/figures/crosstool-pan-draws.png",
+         "results/figures/crosstool-pan-time.png"))
+
+cat("wrote results/figures/interaction.png and zoom-redraw.png\n")

@@ -19,23 +19,8 @@ suppressPackageStartupMessages({
   library(scales)
 })
 
+source("scripts/arms.R")
 dir.create("results/figures", showWarnings = FALSE, recursive = TRUE)
-
-# Programs are ordered oldest to newest so the legend reads as a timeline, and
-# named the way a reader of the paper would name them: v2.4.0 is the version it
-# benchmarked as "jb2 parallel".
-PROG <- c(
-  "release-2.4.0"  = "v2.4.0 (2023 paper)",
-  "release-4.1.15" = "v4.1.15",
-  "release-4.3.0"  = "v4.3.0",
-  "current"        = "current (HEAD)"
-)
-PROG_COL <- c(
-  "v2.4.0 (2023 paper)" = "#c1462f",
-  "v4.1.15"             = "#b08a3e",
-  "v4.3.0"              = "#6a7fa8",
-  "current (HEAD)"      = "#12796e"
-)
 
 paper_theme <- function(base = 13) {
   theme_grey(base_size = base) +
@@ -90,42 +75,71 @@ matrix_facets <- facet_wrap(vars(fmt, read), nrow = 2, scales = "free_y",
                             labeller = label_wrap_gen(multi_line = FALSE))
 
 # ---------------------------------------------------------------- cold load
-cold <- fromJSON("results/alignments.json", simplifyVector = FALSE)
+#
+# From results/crosstool.json, not results/alignments.json, since 2026-08-24.
+#
+# The two matrices measure the same interaction with different instruments, and
+# only one of them can carry igv.js. alignments.json watches for JBrowse's own
+# render-complete testid -- finer, but a signal no other tool emits -- while
+# crosstool.json polls the pixels, which is the same question asked of any page.
+# A figure that wants four arms including another tool has to be drawn from the
+# instrument all four share. The cost is a few hundred ms of settle folded into
+# every cell, and it is folded into all of them equally.
+#
+# results/alignments.md keeps the JBrowse-only matrix and its finer instrument.
+# It is the better place to read small differences between our own builds; it
+# just cannot be a cross-tool figure.
+cold <- fromJSON("results/crosstool.json", simplifyVector = FALSE)
+cold_under_test <- cold$jbrowseBuilds$jbrowse %||% cold$jbrowseBuild
+cold_igv <- cold$igvVersion
 
-cold_rows <- do.call(rbind, lapply(names(cold$results), function(case) {
-  per <- cold$results[[case]]
-  do.call(rbind, lapply(names(per), function(b) {
-    cell <- per[[b]]
+cold_rows <- do.call(rbind, lapply(names(cold$rows), function(case) {
+  per <- cold$rows[[case]]
+  do.call(rbind, lapply(names(per), function(tool) {
+    cell <- per[[tool]]
+    lab <- arm_label(tool, cold_under_test, cold_igv)
+    if (is.na(lab)) return(NULL)
     if (is.null(cell$median) || !is.finite(cell$median)) return(NULL)
     ld <- if (is.null(cell$load)) NA_real_ else max(cell$load$before, cell$load$after)
     fg <- if (is.null(cell$load$foreignCores)) NA_real_ else cell$load$foreignCores
     data.frame(
-      case = case, build = b,
+      case = case, build = tool, arm = lab,
       median = cell$median / 1000, sd = cell$stddev / 1000,
       load = ld, foreign = fg,
-      measured = cold$measuredAt[[case]] %||% NA_character_
+      measured = cold$dates[[case]] %||% NA_character_
     )
   }))
 }))
 
-`%||%` <- function(a, b) if (is.null(a)) b else a
+ARMS <- arm_colours(cold_igv)
 
 cold_df <- cold_rows |>
   left_join(split_case(unique(cold_rows$case)), by = "case") |>
-  mutate(program = factor(PROG[build], levels = unname(PROG))) |>
+  mutate(program = factor(arm, levels = arm_levels(cold_igv))) |>
   filter(!is.na(program)) |>
   as_matrix_facets()
 
-# Only cases where all four builds were measured. 1000x-longread has no v2.4.0
-# cell and its baselines are the 2026-08-05 pair taken at load 35 -- 36 s and
-# 56 s for the same work -- so plotting it would put the run's least trustworthy
-# numbers where they dominate the longread panel and flatter HEAD most.
+# Only cases where every arm was measured. A case missing one arm draws a line
+# that stops, which reads as "this tool got slower and then failed" rather than
+# "nobody ran it"; the caption names what was dropped instead.
+n_arms <- length(arm_levels(cold_igv))
 complete <- cold_df |>
   count(case) |>
-  filter(n == length(PROG)) |>
+  filter(n == n_arms) |>
   pull(case)
 dropped <- setdiff(unique(cold_df$case), complete)
 cold_df <- cold_df |> filter(case %in% complete)
+
+# A clear refusal rather than a ggplot faceting error twelve frames deep. The
+# usual cause is a matrix measured with only one JBrowse arm served: run
+# `make crosstool-cold` with JBROWSE_PORTS set, or `make serve` first.
+if (!nrow(cold_df)) {
+  stop(sprintf(
+    "no case in results/crosstool.json has all %d arms (%s); recorded arms: %s",
+    n_arms, paste(arm_levels(cold_igv), collapse = ", "),
+    paste(sort(unique(cold_rows$arm)), collapse = ", ")
+  ))
+}
 
 peak_load <- max(cold_df$load, na.rm = TRUE)
 # Contention is foreign CPU, not the load average. The load average counts this
@@ -153,19 +167,13 @@ p_cold <- ggplot(cold_df, aes(coverage, median, colour = program, group = progra
   matrix_facets +
   cov_axis +
   scale_y_continuous(limits = c(0, NA), labels = label_number(accuracy = 1)) +
-  scale_colour_manual(values = PROG_COL, name = "program") +
+  scale_colour_manual(values = ARMS, name = NULL, drop = FALSE) +
   labs(
     title = "Cold load to rendered reads — single track, 19 kb region",
-    # A one-run spike has no spread to report, so it says so rather than
-    # printing "median of 1 runs" and implying a median of anything.
-    subtitle = if (cold$runs == 1) {
-      "In-page navigation→render-complete, one run per cell after a warmup. Lower is better."
-    } else {
-      sprintf(
-        "In-page navigation→render-complete, median of %d runs after a warmup. Lower is better.",
-        cold$runs
-      )
-    },
+    subtitle = paste(
+      "Navigation to the last frame in which the pixels change, median of the run's replicates after a warmup. Lower is better.",
+      "\nThe instrument belongs to neither tool: igv.js hides its spinner before it draws, so its own loading state would credit it with a render it has not done."
+    ),
     x = "coverage", y = "time (s)",
     caption = paste0(
       "Measured ", dates, " on one workstation. ",
@@ -180,14 +188,16 @@ p_cold <- ggplot(cold_df, aes(coverage, median, colour = program, group = progra
         sprintf(paste0("Worst cell saw %.2f cores of foreign CPU against a %.1f ceiling, so the absolute seconds are not quotable.\n"),
                 peak_foreign, FOREIGN_MAX)
       },
-      "Builds are measured back to back within each case, so contention lands on all four at once and the ratios between them survive it better than the values do.\n",
+      "Arms are measured back to back within each case, so contention lands on all of them at once and the ratios between them survive it better than the values do.\n",
+      "igv.js parses alignments on the main thread where JBrowse decodes in a worker, and JBrowse boots an application shell where igv mounts a widget. Both are inside these numbers, and a cold load is where they weigh most — results/figures/interaction.png is the same four arms with startup out of the number.\n",
       if (length(missing_fmt)) {
         paste0("No ", paste(missing_fmt, collapse = " or "),
                " row: those cases have not been run since the runner started enumerating formats.\n")
       } else "",
       if (length(dropped)) {
-        paste0("Excluded: ", paste(dropped, collapse = ", "),
-               " — no v2.4.0 cell, and its baselines are the pair that read 36 s and 56 s for identical work.")
+        paste0("Excluded, because not every arm has a cell there: ",
+               paste(dropped, collapse = ", "),
+               ". igv.js at 1000x long read reaches 2.3 GB of renderer heap and does not reliably finish — see results/crosstool.md.")
       } else ""
     )
   ) +
@@ -199,14 +209,20 @@ ggsave("results/figures/cold-load.png", p_cold,
 # Speedup against the published version, which is the question the paper's
 # readers are actually asking. Drawn as bars because a ratio has a meaningful
 # zero and a meaningful 1.0, neither of which a line chart shows.
+# Keyed by arm label rather than by build directory, so the pivot cannot silently
+# produce an empty frame the day a build is re-staged under a different name.
+PAPER_ARM <- unname(ARM_BUILD["release-2.4.0"])
+HEAD_ARM <- unname(ARM_BUILD["current"])
 sp <- cold_df |>
-  select(case, fmt, read, coverage, build, median) |>
-  pivot_wider(names_from = build, values_from = median) |>
-  filter(!is.na(`release-2.4.0`), !is.na(current)) |>
-  mutate(speedup = `release-2.4.0` / current)
+  select(case, fmt, read, coverage, program, median) |>
+  mutate(program = as.character(program)) |>
+  filter(program %in% c(PAPER_ARM, HEAD_ARM)) |>
+  pivot_wider(names_from = program, values_from = median) |>
+  filter(!is.na(.data[[PAPER_ARM]]), !is.na(.data[[HEAD_ARM]])) |>
+  mutate(speedup = .data[[PAPER_ARM]] / .data[[HEAD_ARM]])
 
 p_sp <- ggplot(sp, aes(factor(coverage, labels = c("20x", "200x", "1000x")), speedup)) +
-  geom_col(fill = "#12796e", width = 0.62) +
+  geom_col(fill = unname(ARM_COL["5.0.0 (main)"]), width = 0.62) +
   geom_hline(yintercept = 1, linetype = "dashed", colour = "grey30") +
   geom_text(aes(label = sprintf("%.2f×", speedup)),
             vjust = -0.45, size = 3.5, colour = "grey15") +
@@ -214,10 +230,10 @@ p_sp <- ggplot(sp, aes(factor(coverage, labels = c("20x", "200x", "1000x")), spe
   scale_y_continuous(limits = c(0, max(sp$speedup) * 1.18), expand = c(0, 0)) +
   labs(
     title = "How much faster than the version the 2023 paper benchmarked",
-    subtitle = "Cold-load median of v2.4.0 ÷ median of current HEAD. Dashed line is parity.",
+    subtitle = sprintf("Cold-load median of %s ÷ median of %s. Dashed line is parity.", PAPER_ARM, HEAD_ARM),
     x = "coverage", y = "speedup vs v2.4.0",
     caption = paste0(
-      "Cumulative, not isolated: three years separate v2.4.0 from HEAD and almost none of it is the renderer.\n",
+      "Cumulative, not isolated: three years separate v2.4.0 from this tree and almost none of it is the renderer.\n",
       "Same corpus and same simulation commands as the paper's methods; 19 kb window against its 10 kb.\n",
       # Same cold_df the panel above plots, so the same load caveat applies. A
       # ratio survives a loaded machine better than a duration does, since both
@@ -234,68 +250,21 @@ p_sp <- ggplot(sp, aes(factor(coverage, labels = c("20x", "200x", "1000x")), spe
 ggsave("results/figures/speedup-vs-published.png", p_sp, width = 9.5, height = 4.6, dpi = 150)
 
 # -------------------------------------------------------------- interaction
-inter <- fromJSON("results/interaction.json", simplifyVector = FALSE)
-roles <- unlist(inter$builds)
-
-inter_rows <- do.call(rbind, lapply(names(inter$results), function(case) {
-  do.call(rbind, lapply(c("in", "pan"), function(mode) {
-    per <- inter$results[[case]][[mode]]
-    if (is.null(per)) return(NULL)
-    do.call(rbind, lapply(names(per), function(role) {
-      r <- per[[role]]
-      if (is.null(r$zoomTimeToContentMs) || isTRUE(r$allBailed)) return(NULL)
-      v <- r$zoomTimeToContentMs
-      if (!is.finite(v)) return(NULL)
-      data.frame(case = case, mode = mode, build = roles[[role]],
-                 secs = v / 1000, censored = isTRUE(r$censored))
-    }))
-  }))
-}))
-
-inter_df <- inter_rows |>
-  left_join(split_case(unique(inter_rows$case)), by = "case") |>
-  mutate(
-    program = factor(PROG[build], levels = unname(PROG)),
-    read = factor(read,
-                  levels = c("shortread", "longread"),
-                  labels = c("BAM shortread", "BAM longread")),
-    mode = factor(mode, levels = c("in", "pan"),
-                  labels = c("Zoom in", "Pan"))
-  ) |>
-  filter(!is.na(program))
-
-# current is 0 on every zoom-in cell: it shows no loading state at all. A zero
-# bar is invisible, so it gets its own label rather than being left to look like
-# missing data.
-zero_lab <- inter_df |> filter(secs == 0)
-
-p_int <- ggplot(inter_df,
-                aes(factor(coverage, labels = c("20x", "200x", "1000x")),
-                    secs, fill = program)) +
-  geom_col(position = position_dodge(width = 0.78), width = 0.7) +
-  geom_text(data = zero_lab, aes(label = "none"),
-            position = position_dodge(width = 0.78),
-            vjust = -0.35, size = 2.9, colour = "#12796e", fontface = "bold") +
-  facet_grid(mode ~ read) +
-  scale_fill_manual(values = PROG_COL, name = "program") +
-  scale_y_continuous(limits = c(0, NA), expand = expansion(mult = c(0, 0.13))) +
-  labs(
-    title = "What an interaction costs you",
-    subtitle = paste(
-      "Time-to-content: seconds a loading indicator sits on the track after the interaction before correct content is back.",
-      "\nZoom in — only the old renderer refetches.  Pan — the region is new to both, so both pay the fetch."
-    ),
-    x = "coverage", y = "time-to-content (s)",
-    caption = paste0(
-      "Measured ", inter$measuredAt$`in`, " (zoom) and ", inter$measuredAt$pan, " (pan). ",
-      "Zoom-in is the current renderer's best case and pan its worst: on a pan the region is new to both,\n",
-      "so both pay the fetch and what is left is render cost rather than avoided network. ",
-      "v2.4.0 is absent here — see the note in results/interaction.md."
-    )
-  ) +
-  paper_theme()
-
-ggsave("results/figures/interaction.png", p_int, width = 11, height = 6.4, dpi = 150)
+#
+# Not drawn here any more, and the reason is the figure it used to draw.
+#
+# It plotted results/interaction.json -- JBrowse against older JBrowse, zoom and
+# pan, timed by watching for a loading indicator to clear. On every zoom-in cell
+# the build under test showed no loading indicator at all, so the bar was zero,
+# so the figure labelled it "none". That label was the instrument's, not the
+# renderer's: "no loading state was observed" is not a duration, and printing it
+# beside real seconds invited the reader to treat it as an unbeatable one.
+#
+# scripts/crosstool/panchart.R draws the replacement from the draws-and-network
+# clock, which measures the same two interactions without asking either tool
+# whether it thinks it is finished. What the zero cells actually cost is 505 ms
+# of navigation debounce and 0.8 ms of drawing -- two real numbers where there
+# used to be a word -- and it carries igv.js and the two older releases as well.
 
 # ----------------------------------------------------------------- parsers
 # The layer under the browser, and the other half of the "since the paper"

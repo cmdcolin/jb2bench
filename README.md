@@ -31,7 +31,7 @@ numbers describe the same bytes.
 | `ecosystem/` | the parser-library benchmarks, self-contained |
 | `screenshots/` | puppeteer verify/probe output (untracked) |
 | `Makefile`, `scripts/gate.ts` | every benchmark in one place, and the preflight that decides whether a timing is worth keeping |
-| `results/figures/` | the ggplot2 figures, laid out like the 2023 paper's Fig 8: format × read type, time against coverage |
+| `results/figures/` | the ggplot2 figures, laid out like the 2023 paper's Fig 8: format × read type, time against coverage. Every one draws the same four arms — v2.4.0, v4.3.0, the build under test, igv.js — from `scripts/arms.R` |
 
 ## Where the conclusions are
 
@@ -50,6 +50,7 @@ Every number lives in a file; nothing is summarized only here.
 | [`flame/WORKER_FINDINGS.md`](flame/WORKER_FINDINGS.md) | which worker-side plugin optimizations are worth doing? |
 | [`results/crosstool.md`](results/crosstool.md) | how does the render time compare against igv.js? |
 | [`results/crosstool-pan.md`](results/crosstool-pan.md) | and how does a *pan* compare, with startup out of the number? |
+| [`results/crosstool-zoom.md`](results/crosstool-zoom.md) | and a *zoom*, where nothing has to be fetched at all? |
 | [`results/quiescence.md`](results/quiescence.md) | which completion detector, and what does being wrong cost? |
 | [`ecosystem/README.md`](ecosystem/README.md) | how much faster did the parser libraries get since 2023? |
 | [`ecosystem/results/sweep.md`](ecosystem/results/sweep.md) | *where* along the majors did the parsers get faster? |
@@ -290,7 +291,13 @@ Two gotchas if you write more WebGPU here:
 ### Cross-tool: JBrowse vs igv.js
 
 `scripts/crosstool/runner.ts` → `results/crosstool.md`. The only comparison here
-that leaves the JBrowse family. Both tools read the same indexed BAMs out of
+that leaves the JBrowse family, and since 2026-08-24 it runs three JBrowse arms
+rather than one: the build under test, the last release, and the version the 2023
+paper benchmarked. The paper's own Fig 8 is igv.js against v2.4.0, so a matrix
+with only a current-JBrowse column answers half of what a reader of it is asking.
+It is also what `results/figures/cold-load.png` is drawn from — a figure carrying
+another tool has to come from the instrument all the arms share, and only this one
+does. Both tools read the same indexed BAMs out of
 `data/` over HTTP range requests and draw a pileup, so the workload is genuinely
 shared; `crosstool/index.html` is an igv.js page driven entirely by URL
 parameters, the way the runners drive a JBrowse build.
@@ -333,10 +340,15 @@ be undone from `results/crosstool-h600-backup.json`.
 
 ```bash
 npx http-server crosstool -p 8003 -s --cors &
-RUNS=3 node scripts/crosstool/runner.ts          # → results/crosstool.{md,json}
-TOOLS=igv-h600ctl,igv-h300 CASES=200x-shortread node scripts/crosstool/runner.ts
-node scripts/crosstool/zoomrunner.ts             # → results/crosstool-zoom.{md,json}
-RUNS=3 node scripts/crosstool/panrunner.ts       # → results/crosstool-pan.{md,json}
+# Every cross-tool matrix takes one JBrowse arm per port, so all three JBrowse
+# versions and igv.js land in one interleaved round. `make crosstool` does all
+# three motions with the arms already set.
+ARMS="JBROWSE_PORTS=8000,8001,8004 TOOLS=jbrowse,jbrowse-release-4.3.0,jbrowse-release-2.4.0,igv,igv-deep"
+
+env $ARMS RUNS=3 node scripts/crosstool/runner.ts              # → results/crosstool.{md,json}
+env $ARMS MOTION=zoom node scripts/crosstool/panrunner.ts      # → results/crosstool-zoom.{md,json}
+env $ARMS MOTION=pan  node scripts/crosstool/panrunner.ts      # → results/crosstool-pan.{md,json}
+TOOLS=igv-h600ctl,igv-h300 CASES=200x-shortread-bam node scripts/crosstool/runner.ts
 ```
 
 #### igv.js is now version-selectable
@@ -479,8 +491,9 @@ draw burst; an abandoned step shows the 10-draw re-projection of stale content
 and nothing else.
 
 Figures: `Rscript scripts/crosstool/panchart.R` →
-`results/figures/crosstool-pan-time.png` and `-draws.png`, drawn from the run's
-JSON so a slide cannot quote a number no run produced.
+`results/figures/interaction.png` (zoom and pan, all four arms) and
+`zoom-redraw.png`, drawn from the run's JSON so a slide cannot quote a number no
+run produced.
 
 **The numbers live in [`results/crosstool-pan.md`](results/crosstool-pan.md) and
 are deliberately not repeated here.** An earlier draft of this section did copy
@@ -495,26 +508,43 @@ JBrowse's rises under 3× over the same range. An earlier version of this sectio
 claimed JBrowse led everywhere; that came from the detector bug below, which
 truncated JBrowse's steps and flattered it.
 
-The mechanism behind the widening gap is in the per-step table, and it is the
-sturdiest figure in the file: **canvas draw calls per step repeat to within ~1%
-across runs**, because they depend on the data and the code rather than on the
-machine. Like the parser request counts, they survive a contaminated run. Three
-to four orders of magnitude separate a tool drawing through the 2D canvas API
-from one batching the pileup into a handful of GPU draws.
+The per-step table still counts canvas draw calls, and the count is the most
+reproducible number in the file — it repeats to within ~1% across runs, because
+it depends on the data and the code rather than on the machine. It does two jobs
+worth having: it separates a genuine cache hit from a step the detector abandoned,
+and at `samplingDepth=10000` it shows igv is not winning any row by drawing less.
 
-It is **not** one call per read — about 30 per read at 20x and 8 at 200x, so the
-count grows much more slowly than the read count, and nothing here explains that
-shape. Quote the magnitude, not a per-read rate.
+**It was also a figure, and it should not have been.** Until 2026-08-24
+`panchart.R` drew draws-per-step as a chart of its own: a JBrowse line pinned
+flat near 50 at every coverage against an igv line at a quarter of a million, on
+a log axis spanning four decades. A batched renderer issues a fixed handful of
+GPU draws whatever the depth, so that flat line is a description of which drawing
+API each tool calls and not a result either one earned — and drawn at that scale
+it read as the headline. The figure is gone; the column stays where its two jobs
+are.
 
-### The zoom result is not what it looks like
+### The zoom, and the timer inside it
 
-`results/crosstool-zoom.md` says igv.js settles a 2x zoom-in in ~340 ms against
-JBrowse's ~800 ms. **That is not a drawing comparison.** Measured from inside the
-page with no screenshots at all, JBrowse's real post-zoom tail is 505 ms — 505,
-505 and 506 ms across three runs, which is a timer and not work. It is the
-500 ms `LGVCoarseDynamicBlocks` autorun; the track's own pixels are correct at
-the first frame. The rest of the 0.8 s is `zoomprofile.ts` under-subtracting its
-own settle window, since each poll costs a screenshot.
+The zoom is measured again, on the same draws-and-network clock as the pan:
+`MOTION=zoom node scripts/crosstool/panrunner.ts` → `results/crosstool-zoom.md`.
+It replaces `zoomrunner.ts`, which polled screenshots every 100 ms, could not
+resolve anything faster than that, and published a number the README had to
+retract. What was wrong was the instrument and not the interaction.
+
+**JBrowse's zoom time-to-content is almost entirely a timer.** It comes back at a
+flat ~505 ms at every coverage, every read type and every container — 504, 505,
+506 across steps — which is not the shape of work. It is the 500 ms
+`LGVCoarseDynamicBlocks` debounce; the drawing inside it takes **0.6 ms**, since
+the pileup is already on the GPU and a zoom is a change of projection. igv.js
+waits for nothing and spends the whole of its number drawing, which is why its
+steps *fall* — 310, 140, 81, 53, 37 ms — as the window narrows and there is less
+to draw.
+
+So the report prints two tables and the figure set two panels: what the user
+waits for, and what the renderer did. Quoting either alone is how this benchmark
+went wrong the first time. The honest summary is that JBrowse's zoom redraw is
+three orders of magnitude cheaper than igv's and its users do not get any of that
+back, because a constant sits in front of it.
 
 At rest the page is idle: 95.7% idle over a 6 s CPU profile, ~1 ms of
 JavaScript, no draws. [`flame/ZOOM_SETTLE.md`](flame/ZOOM_SETTLE.md) has the
@@ -585,7 +615,7 @@ symlinks into `data/`, staged by hand and wired up with
 | `webgl-poc-current` | a fresh build of the same branch (2026-07-10), used for `results/interaction-cpu.md` |
 | `webgl-poc-fixed` | the branch plus the tooltip-clear-on-zoom fix `ce1e168b71`, measured perf-neutral |
 | `release-4.3.0` | last release, old block renderer — the baseline every speedup is against |
-| `release-4.1.15` | older release, for the release-over-release trend |
+| `release-4.1.15` | retired as an arm on 2026-08-24 — it sat between two releases and moved no conclusion. Still staged; nothing serves it. |
 | `release-2.4.0` | **the version the 2023 Genome Biology paper describes** — see below |
 
 ### `release-2.4.0`, the published baseline
@@ -633,16 +663,16 @@ were 2.0× (1000x-shortread), 2.4× (20x-shortread) and 3.6× (200x-longread).
 The cold-load measurement on an idle box is still owed, and it is the one worth
 having, since a contaminated row can only be re-run and not repaired.
 
-**It is wired into all three runners** on port 8004 — `runner.ts` (cold load),
-`runner-interaction.ts` (zoom, zoom-out, pan) and, since 2026-08-18,
-`panrunner.ts` (against igv.js, via `JBROWSE_PORTS` or `make crosstool-versions`).
+**It is wired into every runner** on port 8004 — `runner.ts` (JBrowse-only cold
+load), `runner-interaction.ts` (JBrowse-only zoom, zoom-out, pan) and the
+cross-tool pair, `crosstool/runner.ts` and `crosstool/panrunner.ts`, which take
+one arm per port through `JBROWSE_PORTS` and are what `make crosstool` drives.
 
-Only the first has run. `results/alignments.md` has its v2.4.0 column;
-`results/interaction.md` and `results/crosstool-pan.md` do not, and nothing is
-missing but a run with 8004 served. The igv.js arm is the one to run first if
-only one can be: igv.js against JBrowse v2.4.0 is the 2023 paper's own Fig 8, so
-running it here re-runs a published comparison on a corpus built to that paper's
-recipe, with an instrument that belongs to neither tool.
+Since 2026-08-24 it is not an optional extra arm anywhere it matters: every
+figure in `results/figures` draws v2.4.0 beside v4.3.0, the build under test and
+igv.js, so a run that omits 8004 cannot produce the figure set. That is the 2023
+paper's own Fig 8 comparison re-run on a corpus built to the paper's recipe, with
+an instrument belonging to neither tool.
 
 In the interaction runner the role is **optional**: if nothing is served on
 8004 it logs `published: port 8004 not served, skipping (optional)` and emits
@@ -856,7 +886,6 @@ npx puppeteer browsers install chrome
 # serve the builds — 8000 is whichever new build you are testing
 npx http-server builds/current          -p 8000 -s --cors &
 npx http-server builds/release-4.3.0    -p 8001 -s --cors &
-npx http-server builds/release-4.1.15   -p 8002 -s --cors &
 npx http-server builds/release-2.4.0    -p 8004 -s --cors &   # the 2023 paper's version
 
 # sanity-check the renderer is hardware, not SwiftShader
@@ -901,14 +930,13 @@ every build, as a pass over the generated `config.json` that
 reason the pass exists.** It read "it does not currently fire on
 `builds/current`, which sets the slot nowhere", verified 2026-08-16 against the
 build staged then. `builds/current` was restaged 2026-08-18 (main @ `7fbb075ee5`)
-and it fires on that build. Measured across all twelve tracks and all four
-builds, before the pass:
+and it fires on that build. Measured across all twelve tracks and every build then served, before the
+pass:
 
 | build | tracks refusing |
 | --- | --- |
 | `current` | **5 of 12** — `1000x.shortread.bam`, both `200x.longread`, both `1000x.longread` |
 | `release-4.3.0` | 0 of 12 |
-| `release-4.1.15` | 0 of 12 |
 | `release-2.4.0` | 0 of 12 |
 
 Two things in that table matter more than the count. **Only the build under test

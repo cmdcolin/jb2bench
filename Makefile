@@ -23,14 +23,15 @@ STAMP := $(shell date +%Y-%m-%d)
 LOGDIR := results/logs
 
 .PHONY: help gate counts timings all figures report serve serve-stop \
-        corpus corpus-paper render interaction crosstool crosstool-versions \
+        corpus corpus-paper render interaction crosstool crosstool-cold \
+        crosstool-zoom crosstool-pan \
         parsers parsers-count cram-samtools multibam backends clean-logs \
         formats toolcheck
 
 help:
 	@echo "preflight"
 	@echo "  make gate            load, agents, disk, corpus, ports, sweep builds"
-	@echo "  make serve           http-servers for the four builds + crosstool"
+	@echo "  make serve           http-servers for the three builds + crosstool"
 	@echo "  make serve-stop      stop them"
 	@echo ""
 	@echo "corpus (generate once, then leave alone)"
@@ -46,8 +47,10 @@ help:
 	@echo "  make timings         render, interaction, cross-tool, parsers"
 	@echo "  make render          cold load, both formats x both read types"
 	@echo "  make interaction     zoom and pan time-to-content"
-	@echo "  make crosstool       against igv.js"
-	@echo "  make crosstool-versions  against igv.js, from v2.4.0 to HEAD (3x as long)"
+	@echo "  make crosstool       against igv.js: cold load, zoom and pan, all four arms"
+	@echo "  make crosstool-cold  just the cold-load matrix"
+	@echo "  make crosstool-zoom  just the zoom"
+	@echo "  make crosstool-pan   just the pan"
 	@echo "  make parsers         the parser libraries, 2023 vs current, + the sweep"
 	@echo "  make cram-samtools   @gmod/cram against samtools, the 2019 paper's benchmark"
 	@echo "  make multibam        multi-track pan"
@@ -72,7 +75,6 @@ $(LOGDIR):
 serve:
 	npx http-server builds/current       -p 8000 -s --cors &
 	npx http-server builds/release-4.3.0 -p 8001 -s --cors &
-	npx http-server builds/release-4.1.15 -p 8002 -s --cors &
 	npx http-server builds/release-2.4.0 -p 8004 -s --cors &
 	npx http-server crosstool            -p 8003 -s --cors &
 	@sleep 2 && $(NODE) scripts/gate.ts --warn
@@ -123,16 +125,27 @@ render: gate | $(LOGDIR)
 interaction: gate | $(LOGDIR)
 	$(NODE) scripts/render/runner-interaction.ts 2>&1 | tee $(LOGDIR)/interaction-$(STAMP).log
 
-crosstool: gate | $(LOGDIR)
-	$(NODE) scripts/crosstool/panrunner.ts 2>&1 | tee $(LOGDIR)/crosstool-pan-$(STAMP).log
+# Every figure in results/figures draws the same four arms: v2.4.0 (what the
+# 2023 paper benchmarked), v4.3.0 (the last release), the build under test, and
+# igv.js. So every cross-tool target serves all three JBrowse ports rather than
+# only 8000 — a matrix with one JBrowse column cannot draw those figures, and a
+# figure set where each panel has different arms is not a figure set.
+ARMS := JBROWSE_PORTS=8000,8001,8004
+TOOLARMS := TOOLS=jbrowse,jbrowse-release-4.3.0,jbrowse-release-2.4.0,igv,igv-deep
 
-# The 2023 paper's own comparison — igv.js against JBrowse v2.4.0 — plus the
-# last release in between, on this corpus and this instrument. Three JBrowse
-# arms instead of one, so budget roughly three times the wall clock; that is
-# why it is its own target and not what `crosstool` does by default.
-crosstool-versions: gate | $(LOGDIR)
-	JBROWSE_PORTS=8000,8001,8004 $(NODE) scripts/crosstool/panrunner.ts 2>&1 \
-	  | tee $(LOGDIR)/crosstool-pan-versions-$(STAMP).log
+crosstool: crosstool-cold crosstool-zoom crosstool-pan
+
+crosstool-cold: gate | $(LOGDIR)
+	$(ARMS) $(TOOLARMS) $(NODE) scripts/crosstool/runner.ts 2>&1 \
+	  | tee $(LOGDIR)/crosstool-cold-$(STAMP).log
+
+crosstool-zoom: gate | $(LOGDIR)
+	MOTION=zoom $(ARMS) $(TOOLARMS) $(NODE) scripts/crosstool/panrunner.ts 2>&1 \
+	  | tee $(LOGDIR)/crosstool-zoom-$(STAMP).log
+
+crosstool-pan: gate | $(LOGDIR)
+	MOTION=pan $(ARMS) $(TOOLARMS) $(NODE) scripts/crosstool/panrunner.ts 2>&1 \
+	  | tee $(LOGDIR)/crosstool-pan-$(STAMP).log
 
 multibam: gate | $(LOGDIR)
 	$(NODE) scripts/render/multibam.ts 2>&1 | tee $(LOGDIR)/multibam-$(STAMP).log

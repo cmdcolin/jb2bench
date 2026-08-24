@@ -65,7 +65,7 @@ not the same three at both layers:
 | --- | --- | --- | --- | --- |
 | `results/alignments.md` — cold load | column | column | column | every BAM row measured under load 14–35 and marked `unusable`; every CRAM row unmeasured |
 | `results/interaction.md` — zoom, pan | **absent** | column | column | the runner has had the arm since 2026-08-11 and no run has served port 8004 |
-| `results/crosstool-pan.md` — vs igv.js | **absent** | **absent** | column | `make crosstool-versions` runs all three; the paper's own Fig 8 is this comparison at v2.4.0 |
+| `results/crosstool-pan.md` — vs igv.js | **absent** | **absent** | column | `make crosstool` runs all three arms over all three motions; the paper's own Fig 8 is this comparison at v2.4.0 |
 | `results/crosstool.md` — cold load vs igv.js | **absent** | **absent** | column | superseded by the pan; the cold load folds in application boot |
 | `results/backends.md` | n/a | n/a | column | one build, one variable: the `?renderer=` rung |
 | `results/multibam-pan.md` | n/a | n/a | two branch builds | track count is the axis, not version |

@@ -45,10 +45,14 @@ const LOC = 'chr22_mask:124000-143000' // 19kb, matches historical jb2profile
 //
 // profile.ts already caps a run at WAIT_TIMEOUT (120 s), so a 2023 build that
 // cannot finish 1000x longread fails that cell instead of hanging the matrix.
+//
+// Three arms, matching every figure in results/figures: the build under test,
+// the last release, and the version the 2023 paper benchmarked. v4.1.15 was a
+// fourth until 2026-08-24; it sat between two releases, moved no conclusion, and
+// cost a quarter of the wall clock of the longest matrix here.
 const ports = [
   { port: 8000, extra: '&renderer=webgl' },
   { port: 8001, extra: '' },
-  { port: 8002, extra: '' },
   { port: 8004, extra: '' },
 ]
 const builds = await Promise.all(

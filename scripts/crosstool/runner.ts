@@ -31,8 +31,17 @@
 //   RUNS=3 WARMUP=1
 import { execFileSync } from 'child_process'
 import fs from 'fs'
-import { enumerateCases, selectCases } from '../render/cases.ts'
-import { loadavg, outliers, peak, type LoadWindow } from '../render/loadavg.ts'
+import { enumerateCases, migrateCaseKeys, selectCases } from '../render/cases.ts'
+import {
+  FOREIGN_CORE_CEILING,
+  foreign,
+  loadavg,
+  outliers,
+  peak,
+  waitForQuiet,
+  watchForeignCpu,
+  type LoadWindow,
+} from '../render/loadavg.ts'
 import { resolveBuild } from '../render/servedbuild.ts'
 
 const RUNS = Number(process.env.RUNS ?? 3)
@@ -45,13 +54,31 @@ const LOAD_CEILING = 4.0
 // is dropped.
 const DEEP = 10000
 
-const JBROWSE_PORT = 8000
+// One JBrowse arm per port, the way `panrunner.ts` does it. The comparison a
+// reader of the 2023 paper wants is igv.js against the JBrowse the paper
+// benchmarked, and the comparison a reader of this repo wants is igv.js against
+// the current one; a matrix that carries only the second answers half the
+// question. 8004 is v2.4.0 (what the paper shipped), 8001 the last release,
+// 8000 the build under test.
+//
+// The first port keeps the tool id `jbrowse`, because that is the key every
+// already-recorded row in results/crosstool.json is stored under and the ratio
+// column is against it. The rest are `jbrowse-<build>`.
+const JBROWSE_PORTS = (process.env.JBROWSE_PORTS ?? process.env.JBROWSE_PORT ?? '8000')
+  .split(',')
+  .map(Number)
 // One port serves every non-JBrowse harness page; the page is chosen by path.
 const CROSSTOOL_PORT = Number(process.env.CROSSTOOL_PORT ?? 8003)
 const IGV_PORT = CROSSTOOL_PORT
 
-const jbrowseBuild = await resolveBuild(JBROWSE_PORT)
-console.log(`port ${JBROWSE_PORT} is serving builds/${jbrowseBuild}`)
+const jbrowseArms = await Promise.all(
+  JBROWSE_PORTS.map(async (port, i) => {
+    const build = await resolveBuild(port)
+    console.log(`port ${port} is serving builds/${build}`)
+    return { port, build, id: i === 0 ? 'jbrowse' : `jbrowse-${build}` }
+  }),
+)
+const jbrowseBuild = jbrowseArms[0]!.build
 
 // Read from the installed package rather than typed in, so a bump cannot leave
 // the column labelled with the version it used to be. igv 3.8.5 is npm `latest`
@@ -74,12 +101,15 @@ interface Tool {
   url: (track: string) => string
 }
 const allTools: Tool[] = [
-  {
-    id: 'jbrowse',
-    label: `JBrowse (${jbrowseBuild})`,
-    url: t =>
-      `http://localhost:${JBROWSE_PORT}/?loc=${LOC}&assembly=hg19mod&tracks=${t}&renderer=webgl`,
-  },
+  // `renderer=webgl` goes only to the build under test: it is the branch's
+  // WebGL2 pin, and a release that predates the parameter ignores it anyway.
+  ...jbrowseArms.map(({ port, build, id }, i) => ({
+    id,
+    label: `JBrowse (${build})`,
+    url: (t: string) =>
+      `http://localhost:${port}/?loc=${LOC}&assembly=hg19mod&tracks=${t}` +
+      (i === 0 ? '&renderer=webgl' : ''),
+  })),
   {
     id: 'igv',
     label: `igv.js ${igvVersion}`,
@@ -159,7 +189,10 @@ const tools = requested.filter(t => {
 // FORMATS defaults to bam here rather than to both: the igv.js harness is
 // exercised on BAM in this benchmark, and widening it is a measurement decision
 // rather than a rename.
-const allCases = enumerateCases({ ...process.env, FORMATS: process.env.FORMATS ?? 'bam' })
+// Both containers by default, the way the interaction matrix does it. It used
+// to default to BAM alone, which left the cold-load figure with a CRAM row the
+// pan figure had and it did not.
+const allCases = enumerateCases()
 const cases = selectCases(allCases)
 
 const median = (a: number[]) => {
@@ -201,20 +234,33 @@ const RESULTS = 'results/crosstool.json'
 interface Recorded {
   igvVersion: string
   jbrowseBuild: string
+  /** every JBrowse arm this file holds, tool id → build directory */
+  jbrowseBuilds: Record<string, string>
   rows: Record<string, Row>
   dates: Record<string, string>
 }
 const prior: Recorded = fs.existsSync(RESULTS)
   ? JSON.parse(fs.readFileSync(RESULTS, 'utf8'))
-  : { igvVersion, jbrowseBuild, rows: {}, dates: {} }
+  : { igvVersion, jbrowseBuild, jbrowseBuilds: {}, rows: {}, dates: {} }
+prior.rows = migrateCaseKeys(prior.rows)
+prior.dates = migrateCaseKeys(prior.dates)
 
 const today = new Date().toISOString().slice(0, 10)
 
 for (const c of cases) {
   const runs: Record<string, number[]> = {}
   const before: Record<string, number> = {}
+  const foreignCores: Record<string, number> = {}
+  const foreignTop: Record<string, string | undefined> = {}
   for (const t of tools) {
     runs[t.id] = []
+    // The previous cell's Chrome is still tearing down when execFileSync
+    // returns, so a cell that starts immediately measures the last one's exit.
+    // Same settle the render matrix takes, for the same reason.
+    const quiet = waitForQuiet()
+    if (quiet.waitedMs > 1500) {
+      console.log(`  [settled ${(quiet.waitedMs / 1000).toFixed(1)}s]`)
+    }
     before[t.id] = loadavg()
     for (let i = 0; i < WARMUP; i++) {
       runOnce(t.url(c.track))
@@ -222,12 +268,22 @@ for (const c of cases) {
   }
   // interleaved: one round runs every tool, so a load spike lands on all of
   // them rather than on whichever tool owned the clock at the time
+  const cpu = Object.fromEntries(tools.map(t => [t.id, watchForeignCpu()]))
   for (let r = 0; r < RUNS; r++) {
     for (const t of tools) {
       const ms = runOnce(t.url(c.track))
       runs[t.id]!.push(ms)
       console.log(`${c.id} ${t.id} run ${r + 1}: ${ms}`)
     }
+  }
+  // Foreign CPU, not the load average, is what says whether a cell is
+  // trustworthy: the load average counts this benchmark's own threads, so a
+  // heavy cell inflates it by working. A watcher per arm, all started after the
+  // warmups, so what each reports is contention rather than its own cost.
+  for (const t of tools) {
+    const { cores, top } = await cpu[t.id]!.done()
+    foreignCores[t.id] = cores
+    foreignTop[t.id] = top
   }
   const row: Row = prior.rows[c.id] ?? {}
   for (const t of tools) {
@@ -237,13 +293,22 @@ for (const c of cases) {
       mean: vals.length ? mean(vals) : Number.NaN,
       stddev: vals.length ? stddev(vals) : Number.NaN,
       runs: runs[t.id]!,
-      load: { before: before[t.id]!, after: loadavg() },
+      load: {
+        before: before[t.id]!,
+        after: loadavg(),
+        foreignCores: foreignCores[t.id],
+        foreignTop: foreignTop[t.id],
+      },
     }
   }
   prior.rows[c.id] = row
   prior.dates[c.id] = today
   prior.igvVersion = igvVersion
   prior.jbrowseBuild = jbrowseBuild
+  prior.jbrowseBuilds = {
+    ...prior.jbrowseBuilds,
+    ...Object.fromEntries(jbrowseArms.map(a => [a.id, a.build])),
+  }
   fs.writeFileSync(RESULTS, JSON.stringify(prior, null, 2))
 }
 
@@ -267,11 +332,35 @@ const fmt = (c?: Cell) =>
 const rowPeak = (row: Row) =>
   Math.max(...Object.values(row).map(c => (c.load ? peak(c.load) : 0)))
 
+// Columns come from what the file holds, not only from what this run served. A
+// re-run of the 8000 arm alone must not silently drop a v2.4.0 column measured
+// last week: the data is still in the JSON, and a table that omits it makes a
+// narrower claim than the one on disk.
+const recordedArms: Tool[] = Object.entries(prior.jbrowseBuilds ?? {})
+  .filter(([id]) => !allTools.some(t => t.id === id))
+  .map(([id, build]) => ({
+    id,
+    label: `JBrowse (${build})`,
+    url: () => {
+      throw new Error(`${id} was not served this run; serve its port to measure it`)
+    },
+  }))
+
+const jbFirst = allTools.filter(t => t.id.startsWith('jbrowse'))
+const shownTools = [
+  ...jbFirst,
+  ...recordedArms,
+  ...allTools.filter(t => !t.id.startsWith('jbrowse')),
+].filter(t => Object.values(prior.rows).some(r => r[t.id]))
+
 const lines: string[] = []
 lines.push('# Cross-tool render benchmark: JBrowse vs igv.js')
 lines.push('')
 lines.push(
-  `JBrowse \`builds/${prior.jbrowseBuild}\` (WebGL2) against igv.js ${prior.igvVersion}, same BAM files, same window \`${LOC}\`, same instrument.`,
+  `JBrowse against igv.js ${prior.igvVersion} — same files, same window \`${LOC}\`, same instrument. ` +
+    `The JBrowse arms are ${Object.values(prior.jbrowseBuilds ?? { jbrowse: prior.jbrowseBuild })
+      .map(b => `\`builds/${b}\``)
+      .join(', ')}; only the build under test is asked for the WebGL2 renderer, since a release that predates the parameter ignores it.`,
 )
 lines.push('')
 lines.push(
@@ -279,7 +368,7 @@ lines.push(
 )
 lines.push('')
 lines.push(
-  '`igv.js` is measured three ways, two of them controls rather than workload knobs:',
+  'Three JBrowse arms and one igv.js arm carry the comparison; the remaining igv columns are controls rather than workload knobs:',
 )
 lines.push('')
 lines.push(
@@ -290,14 +379,20 @@ lines.push(
 )
 lines.push('')
 lines.push(
-  `Median of ${RUNS} runs after ${WARMUP} warmup, tools interleaved within each round. \`load\` is the highest 1-minute load average across the row's cells; this box is shared, and a row above ${LOAD_CEILING.toFixed(1)} is not comparable to one measured idle. A blank cell was not measured in the run that produced its row.`,
+  `Median of ${RUNS} runs after ${WARMUP} warmup, tools interleaved within each round. A blank cell was not measured in the run that produced its row.`,
+)
+lines.push('')
+lines.push(
+  `\`foreign\` is the most CPU any of the row's cells saw burned by processes **outside this benchmark**, in cores — outside the runner's process tree and outside the corpus http-servers, which serve the bytes under test and are apparatus rather than contention. That, and not the load average, is what says whether a row is trustworthy: a row above ${FOREIGN_CORE_CEILING} is contended and its absolute milliseconds are not a run of record. \`load\` is kept as context, because it counts this benchmark's own threads and a heavy cell inflates it by working — the 1000x long-read cells drive it into the tens on an idle box. Rows recorded before 2026-08-24 have no foreign figure and show \`?\`; they were judged against a ${LOAD_CEILING.toFixed(1)} load ceiling, which is the best that can be done with what they recorded.`,
 )
 lines.push('')
 const header = [
   'case',
-  ...allTools.map(t => t.label),
+  ...shownTools.map(t => t.label),
   'igv default ÷ JBrowse',
   'measured',
+  'foreign',
+  'by',
   'load',
 ]
 lines.push(`| ${header.join(' | ')} |`)
@@ -315,8 +410,17 @@ for (const c of allCases) {
       : '—'
   }
   const load = rowPeak(row)
+  const foreigns = Object.values(row)
+    .map(cell => foreign(cell.load ?? { before: 0, after: 0 }))
+    .filter(Number.isFinite)
+  const rowForeign = foreigns.length ? Math.max(...foreigns) : Number.NaN
+  // Name what burned it. A bare 0.55 cannot be acted on; "tsc" can.
+  const by = Object.values(row)
+    .filter(cell => foreign(cell.load ?? { before: 0, after: 0 }) === rowForeign)
+    .map(cell => cell.load?.foreignTop)
+    .find(Boolean)
   lines.push(
-    `| ${c.id} | ${allTools.map(t => (row[t.id] ? fmt(row[t.id]) : '')).join(' | ')} | ${ratio('igv')} | ${prior.dates[c.id] ?? '?'} | ${load ? load.toFixed(1) : '?'} |`,
+    `| ${c.id} | ${shownTools.map(t => (row[t.id] ? fmt(row[t.id]) : '')).join(' | ')} | ${ratio('igv')} | ${prior.dates[c.id] ?? '?'} | ${Number.isFinite(rowForeign) ? rowForeign.toFixed(2) : '?'} | ${by ?? '—'} | ${load ? load.toFixed(1) : '?'} |`,
   )
 }
 lines.push('')

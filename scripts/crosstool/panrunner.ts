@@ -1,5 +1,13 @@
-// Cross-tool pan matrix: JBrowse against igv.js, scrolling sideways at constant
-// scale, same corpus and same instrument.
+// Cross-tool interaction matrix: JBrowse against igv.js, same corpus and same
+// instrument, over one of two motions.
+//
+//   MOTION=pan (default) — scroll sideways one full viewport at constant scale.
+//                          Both tools must go to the network for a region
+//                          neither holds, so this prices fetch plus draw.
+//   MOTION=zoom          — halve the visible width about the centre. Neither
+//                          tool needs the network, so this prices redraw — and
+//                          catches the older renderer refetching when it should
+//                          not have to.
 //
 // This is the cross-tool measurement `results/crosstool.md` is missing. Every
 // number there is a cold load, which folds application boot and assembly
@@ -14,6 +22,14 @@
 // approached; and both applications are already up. What is left is the cost of
 // turning bytes into pixels, which is what the JBrowse-vs-JBrowse pan in
 // `results/interaction.md` measures and what nothing has measured across tools.
+//
+// A zoom asks the complementary question, and it is measurable here because the
+// instrument changed. The earlier `zoomrunner.ts` polled screenshots every
+// 100 ms and timed JBrowse's 500 ms navigation debounce rather than JBrowse's
+// drawing; the README retracted its table. The draws clock resolves both, and
+// reports them separately: on a zoom JBrowse waits a flat ~505 ms at every
+// coverage and then draws for well under a millisecond, so the wait and the work
+// are different numbers and the report prints both.
 //
 // The three properties that make the cold-load matrix a comparison hold here
 // too, and one is added:
@@ -35,6 +51,7 @@
 //   TOOLS=jbrowse,igv,igv-deep  subset of columns
 //   JBROWSE_PORTS=8000,8001,8004  one JBrowse arm per port; 8004 is the version
 //                               the 2023 paper benchmarked against igv.js
+//   MOTION=pan|zoom             which interaction to measure
 //   RUNS=3 STEPS=5 PAN_DIR=left
 import { execFileSync } from 'child_process'
 import fs from 'fs'
@@ -44,6 +61,7 @@ import { loadavg, outliers, peak, type LoadWindow } from '../render/loadavg.ts'
 import { resolveBuild } from '../render/servedbuild.ts'
 
 const RUNS = Number(process.env.RUNS ?? 3)
+const MOTION = process.env.MOTION === 'zoom' ? 'zoom' : 'pan'
 const LOC = 'chr22_mask:124000-143000'
 const LOAD_CEILING = 4.0
 const DEEP = 10000
@@ -113,11 +131,7 @@ const allTools: Tool[] = [
 const toolFilter = process.env.TOOLS?.split(',')
 const tools = toolFilter ? allTools.filter(t => toolFilter.includes(t.id)) : allTools
 
-// BAM and CRAM. The BAM ids keep their bare form (`200x-shortread`) rather than
-// gaining a `-bam` suffix, so results recorded before CRAM was added are not
-// orphaned; CRAM rows are suffixed.
-//
-// Both tools read CRAM natively — igv's harness switches format and index
+// BAM and CRAM. Both tools read CRAM natively — igv's harness switches format and index
 // extension on the track name, and the JBrowse build carries a CramAdapter track
 // per case — so this is the same comparison on a different container, not a
 // different benchmark. It is worth having because the container is where the
@@ -153,6 +167,7 @@ interface StepResult {
   step: number
   ms: number
   polls: number
+  drawMs: number
   requests: number
   bytes: number
   locus: string
@@ -164,6 +179,7 @@ interface PanResult {
   steps: StepResult[]
   appliedSteps: number
   medianMs: number | null
+  medianDrawMs: number | null
   cachedSteps: number
   totalRequests: number
   totalBytes: number
@@ -181,7 +197,7 @@ function runOnce(url: string, kind: string): PanResult | undefined {
         encoding: 'utf8',
         stdio: ['ignore', 'pipe', 'pipe'],
         maxBuffer: 1 << 22,
-        env: { ...process.env, DISPLAY: process.env.DISPLAY || ':0' },
+        env: { ...process.env, DISPLAY: process.env.DISPLAY || ':0', MOTION },
       },
     )
   } catch (e) {
@@ -198,6 +214,14 @@ function runOnce(url: string, kind: string): PanResult | undefined {
 
 interface Cell {
   median: number
+  /**
+   * The final draw burst alone, with the waiting taken out. Time-to-content is
+   * what a user waits, so it stays the headline — but on a JBrowse zoom that is
+   * a flat ~505 ms debounce wrapped around half a millisecond of drawing, and a
+   * reader comparing it against igv's redraw would be comparing a timer to a
+   * renderer.
+   */
+  drawMedian: number
   /**
    * Median over only those steps that actually issued a data request.
    *
@@ -223,13 +247,17 @@ interface Cell {
 }
 type Row = Record<string, Cell>
 
-const RESULTS = 'results/crosstool-pan.json'
+// One file per motion. They are separate benchmarks that happen to share a
+// runner, and a merged file would make "the median" ambiguous.
+const RESULTS = `results/crosstool-${MOTION}.json`
+const REPORT = `results/crosstool-${MOTION}.md`
 interface Recorded {
   igvVersion: string
   jbrowseBuild: string
   /** every JBrowse arm this file holds, tool id → build directory */
   jbrowseBuilds: Record<string, string>
   panDir: string
+  motion: string
   steps: number
   rows: Record<string, Row>
   dates: Record<string, string>
@@ -243,6 +271,7 @@ const prior: Recorded = fs.existsSync(RESULTS)
       jbrowseBuild,
       jbrowseBuilds: {},
       panDir: process.env.PAN_DIR ?? 'left',
+      motion: MOTION,
       steps: Number(process.env.STEPS ?? 5),
       rows: {},
       dates: {},
@@ -262,6 +291,7 @@ for (const c of cases) {
   const reqs: Record<string, number> = {}
   const bytes: Record<string, number> = {}
   const draws: Record<string, number[]> = {}
+  const drawMs: Record<string, number[]> = {}
   for (const t of tools) {
     runs[t.id] = []
     fetchedRuns[t.id] = []
@@ -273,6 +303,7 @@ for (const c of cases) {
     reqs[t.id] = 0
     bytes[t.id] = 0
     draws[t.id] = []
+    drawMs[t.id] = []
   }
 
   // Interleaved: one round runs every tool back to back, so drift lands on all
@@ -287,6 +318,9 @@ for (const c of cases) {
         continue
       }
       runs[t.id]!.push(got.medianMs)
+      if (typeof got.medianDrawMs === 'number' && Number.isFinite(got.medianDrawMs)) {
+        drawMs[t.id]!.push(got.medianDrawMs)
+      }
       applied[t.id]!.push(got.appliedSteps)
       loci[t.id] = got.steps.filter(s => s.applied).map(s => s.locus)
       const fetched = got.steps.filter(s => s.applied && s.requests > 0)
@@ -309,6 +343,7 @@ for (const c of cases) {
     const vals = runs[t.id]!.filter((v): v is number => typeof v === 'number')
     row[t.id] = {
       median: vals.length ? median(vals) : Number.NaN,
+      drawMedian: drawMs[t.id]!.length ? median(drawMs[t.id]!) : Number.NaN,
       fetchedMedian: fetchedRuns[t.id]!.length
         ? median(fetchedRuns[t.id]!)
         : Number.NaN,
@@ -393,12 +428,23 @@ const shownTools = [
 const fmt = (v: number | undefined) =>
   v === undefined || !Number.isFinite(v) ? '—' : `${Math.round(v)}`
 
+const isZoom = MOTION === 'zoom'
+
 const lines: string[] = [
-  '# Cross-tool pan: JBrowse against igv.js',
+  `# Cross-tool ${MOTION}: JBrowse against igv.js`,
   '',
-  `Generated by \`scripts/crosstool/panrunner.ts\`. Pan **${prior.panDir}** by one`,
-  `full viewport per step at constant scale, ${prior.steps} steps attempted, from`,
-  `the benchmark window \`${LOC}\`. Each cell is the median over ${RUNS} runs of`,
+  ...(isZoom
+    ? [
+        'Generated by `scripts/crosstool/panrunner.ts` with `MOTION=zoom`. Each step',
+        `halves the visible width about the centre, ${prior.steps} steps attempted, from`,
+        `the benchmark window \`${LOC}\` — so the last step shows about 600 bp.`,
+      ]
+    : [
+        `Generated by \`scripts/crosstool/panrunner.ts\`. Pan **${prior.panDir}** by one`,
+        `full viewport per step at constant scale, ${prior.steps} steps attempted, from`,
+        `the benchmark window \`${LOC}\`.`,
+      ]),
+  `Each cell is the median over ${RUNS} runs of`,
   'each run\'s median step; tools are interleaved within a round.',
   '',
   '## The instrument, and why it is not screenshots',
@@ -411,9 +457,9 @@ const lines: string[] = [
   'hash to repeat — because neither tool\'s own loading state is trustworthy: igv',
   'hides its spinner when features finish *loading*, before drawing them, and',
   "JBrowse's indicator wording moves between releases. That instrument cannot",
-  'resolve a pan. It needs six samples at best, and one `page.screenshot()` on',
+  `resolve a ${MOTION}. It needs six samples at best, and one \`page.screenshot()\` on`,
   'this box measures anywhere from 43 to 161 ms, which puts its own floor between',
-  'roughly 450 and 1100 ms — against pans of about that length. Steps duly came',
+  `roughly 450 and 1100 ms — against ${MOTION}s of about that length. Steps duly came`,
   'back resolved in exactly the minimum six polls, reporting numbers made almost',
   'entirely of instrument. `results/quiescence.md` has the calibration.',
   '',
@@ -437,16 +483,40 @@ const lines: string[] = [
   'load, where draws read 4792 ms against paint\'s 2346 ms, because the page goes',
   'on issuing draw calls after the visible result has settled.',
   '',
-  '**Why pan and not cold load.** Every other cross-tool number here is a cold',
-  'load, which includes application boot and assembly resolution — the part with',
-  'nothing to do with rendering. A pan holds scale fixed, moves to a region the',
-  'view did not previously show, and runs against an application that is already',
-  'up, so far less of the number is startup. Whether it also made both tools go',
-  'to the network is a question the run answers rather than assumes; see "What',
-  'each step actually did".',
+  '**Why an interaction and not a cold load.** Every cross-tool number in',
+  '`results/crosstool.md` is a cold load, which includes application boot and',
+  'assembly resolution — the part with nothing to do with rendering. Both motions',
+  'here run against an application that is already up, so far less of the number',
+  'is startup.',
   '',
-  '## Time to content, over the steps where the tool actually fetched',
+  ...(isZoom
+    ? [
+        '**What a zoom prices, and the trap in it.** Neither tool should need the',
+        'network: both hold the surrounding window client-side, so a 2x zoom-in is a',
+        'redraw. So the interesting columns are two. One is whether a tool went to',
+        'the network anyway — the older renderer does, and that is a refetch a user',
+        'waits through for data already in memory. The other is how long the redraw',
+        'itself took.',
+        '',
+        '**Time-to-content on JBrowse here is mostly a timer, and this report will not',
+        'let it read as drawing.** A JBrowse zoom step comes back at a flat ~505 ms at',
+        'every coverage, every read type and every container, which is not what work',
+        'looks like: it is the 500 ms `LGVCoarseDynamicBlocks` debounce, and the',
+        'drawing inside it takes well under a millisecond. An earlier version of this',
+        'benchmark polled screenshots at 100 ms, could not see inside that, and',
+        'published the debounce as a render time; the README retracted it. Hence two',
+        'tables below — what the user waits, and what the renderer did — and never one',
+        'without the other.',
+      ]
+    : [
+        'A pan holds scale fixed and moves to a region the view did not previously',
+        'show. Whether it also made both tools go to the network is a question the run',
+        'answers rather than assumes; see "What each step actually did".',
+      ]),
   '',
+  ...(isZoom
+    ? ['## Time to content, over every step', '']
+    : ['## Time to content, over the steps where the tool actually fetched', '']),
   `| case | ${shownTools.map(t => t.label).join(' | ')} | ratio | load | date |`,
   `| --- | ${shownTools.map(() => '---:').join(' | ')} | ---: | ---: | --- |`,
 ]
@@ -460,6 +530,13 @@ const lines: string[] = [
  */
 const cell = (c: Cell | undefined) => {
   if (!c) return { text: '—', comparable: false }
+  // On a zoom nothing is supposed to fetch, so restricting to fetched steps
+  // would restrict to the failure mode. Every applied step counts.
+  if (isZoom) {
+    return Number.isFinite(c.median)
+      ? { text: `${fmt(c.median)} ms`, comparable: true }
+      : { text: '—', comparable: false }
+  }
   if (Number.isFinite(c.fetchedMedian)) {
     return { text: `${fmt(c.fetchedMedian)} ms`, comparable: true }
   }
@@ -475,8 +552,10 @@ for (const c of allCases) {
   if (!row) continue
   const cells = shownTools.map(t => cell(row[t.id]))
   if (cells.some(x => x.text.includes('†'))) anyDaggered = true
-  const jb = row.jbrowse?.fetchedMedian
-  const ig = row.igv?.fetchedMedian
+  const pick = (c: Cell | undefined) =>
+    c ? (isZoom ? c.median : c.fetchedMedian) : undefined
+  const jb = pick(row.jbrowse)
+  const ig = pick(row.igv)
   const ratio =
     jb && ig && Number.isFinite(jb) && Number.isFinite(ig)
       ? `${(ig / jb).toFixed(2)}x`
@@ -492,9 +571,58 @@ for (const c of allCases) {
   )
 }
 
+// The drawing with the waiting removed: the last draw of a step minus the first
+// draw of the burst it belongs to. Printed for the zoom because there the wait is
+// a configured 500 ms constant and quoting it as render cost is the mistake this
+// benchmark was retracted for once already.
+const drawCell = (c: Cell | undefined) =>
+  c && Number.isFinite(c.drawMedian)
+    ? c.drawMedian < 10
+      ? `${c.drawMedian.toFixed(1)} ms`
+      : `${Math.round(c.drawMedian)} ms`
+    : '—'
+
+const drawTable = isZoom
+  ? [
+      '## The redraw alone, with the waiting taken out',
+      '',
+      'The final draw burst of each step: its last draw minus its first. Everything',
+      'else in the column above is a tool waiting — a debounce for JBrowse, nothing at',
+      'all for igv, which starts drawing immediately.',
+      '',
+      `| case | ${shownTools.map(t => t.label).join(' | ')} |`,
+      `| --- | ${shownTools.map(() => '---:').join(' | ')} |`,
+      ...allCases
+        .filter(c => prior.rows[c.id])
+        .map(
+          c =>
+            `| ${c.id} | ${shownTools
+              .map(t => drawCell(prior.rows[c.id]![t.id]))
+              .join(' | ')} |`,
+        ),
+      '',
+      'Two readings, and they point opposite ways. JBrowse draws in a fraction of a',
+      'millisecond because the pileup is already on the GPU and a zoom is a change of',
+      'projection — but the user still waits half a second, so the win is unclaimed',
+      "and the debounce is worth revisiting. igv's redraw is real CPU work and shrinks",
+      'as the window narrows and there is less to draw, which is why its column falls',
+      'step by step where JBrowse\'s is flat.',
+      '',
+      '**Neither column is a time a user experiences.** The one above is.',
+      '',
+    ]
+  : []
+
 lines.push(
   '',
   '`ratio` is igv ÷ JBrowse: above 1.0 means JBrowse got content back sooner.',
+  ...(isZoom
+    ? [
+        '',
+        '**Read that ratio with the next table open.** On a zoom it is very largely a',
+        'ratio of two waits, one of which is a configured constant.',
+      ]
+    : []),
   ...(anyDaggered
     ? [
         '',
@@ -515,50 +643,46 @@ lines.push(
       ]
     : []),
   '',
+  ...drawTable,
   '## What each step actually did',
   '',
-  'This table is not supporting detail; it is the reason the one above is',
-  'restricted to fetched steps. **A pan is not automatically the "both tools must',
-  'fetch" case.** JBrowse reads in 256 KiB blocks, so at low coverage one request',
-  'can cover more than a viewport and some of its pan steps are served entirely',
-  'from what it already holds; the `cached` column counts them. Averaging a cache',
-  'hit together with a fetch and calling the difference "rendering" is exactly the',
-  'error this benchmark exists to avoid.',
+  ...(isZoom
+    ? [
+        'The column that carries the finding is `requests`. A 2x zoom-in stays inside',
+        'data the tool already holds, so a tool that issues no request is behaving',
+        'correctly and a tool that issues one is making the user wait for bytes that',
+        'were already in memory. `cached` counts the steps that needed nothing, and on',
+        'a zoom a high count is the good outcome — the opposite of what it means on the',
+        'pan page.',
+      ]
+    : [
+        'This table is not supporting detail; it is the reason the one above is',
+        'restricted to fetched steps. **A pan is not automatically the "both tools must',
+        'fetch" case.** JBrowse reads in 256 KiB blocks, so at low coverage one request',
+        'can cover more than a viewport and some of its pan steps are served entirely',
+        'from what it already holds; the `cached` column counts them. Averaging a cache',
+        'hit together with a fetch and calling the difference "rendering" is exactly the',
+        'error this benchmark exists to avoid.',
+      ]),
   '',
-  'A cache hit and a step the detector gave up on before the fetch began look the',
-  'same in a request count, and an earlier version of this instrument confused',
-  'them — it reported 3 of 5 steps cached at 1000x where the true answer is none.',
-  '`draws` is what separates them: a real cache hit still shows a full render',
-  'burst, while an abandoned step shows only the handful of draws that',
-  're-project stale content.',
+  '`draws` is here as a diagnostic and is not a score. Two things need it. A cache',
+  'hit and a step the detector gave up on before the fetch began look identical in',
+  'a request count — an earlier version of this instrument reported 3 of 5 steps',
+  'cached at 1000x where the true answer was none — and `draws` separates them,',
+  'because a real cache hit still shows a full render burst where an abandoned step',
+  'shows only the few draws that re-project stale content. It is also the control',
+  'on downsampling: at `samplingDepth=10000`, which clips nothing on this corpus,',
+  "igv's draws and time are both unchanged, so **igv is not winning any row by",
+  'drawing less**.',
   '',
-  '`draws` is canvas draw calls per step, and it is the most robust number in',
-  'this file: it repeats to within about 1% across runs, because it is a function',
-  'of the data and the code rather than of the machine. Like the request counts,',
-  'it can be quoted from a contaminated run.',
-  '',
-  'It is also the architectural difference in one column — three to four orders of',
-  'magnitude between a tool that draws through the 2D canvas API and one that',
-  'batches the pileup into a handful of GPU draws. **It is not one call per',
-  'read.** At 20x-shortread igv issues about 30 calls per read in the window and',
-  'at 200x about 8, and above 200x the count stops growing at all, saturating',
-  'near 250,000.',
-  '',
-  '**That saturation is not downsampling**, which was the obvious suspect and is',
-  'wrong. Measured with `samplingDepth=10000`, which clips nothing on this corpus',
-  '(the deepest 100 bp window holds roughly 700 short reads), draws and time are',
-  'both unchanged: 249,693-250,415 against 249,693-251,073 at 200x, and 27.6 s',
-  'against 27.0 s at 1000x. The remaining candidate is the one the cold-load',
-  'matrix already names — igv packs rows until it runs out of canvas, so a fixed',
-  'track height caps how many reads can be drawn at all. Testing that needs the',
-  'height control (`TOOLS=igv-h600ctl,igv-h300`), which this runner does not yet',
-  'define. Until then: report the magnitude and the saturation, not a per-read',
-  'rate and not a cause.',
-  '',
-  'The same control answers the question it was originally there for. **igv is not',
-  'winning any row by drawing less**: turning downsampling off changes neither its',
-  'time nor its draw count, so this is not a downsampled tool measured against a',
-  'complete one.',
+  '**What it is not is a comparison.** A batched renderer issues a fixed handful of',
+  'GPU draws whatever the depth, so JBrowse sits near 50 at every coverage by',
+  'construction; that is a description of the API it calls, not a measurement of',
+  'anything it achieved, and the flat line it makes says nothing a reader should',
+  'weigh. The number that matters is the milliseconds above. An earlier version of',
+  'this repo drew the draw counts as a figure of their own — a JBrowse line pinned',
+  'flat at 50 against an igv line at a quarter of a million — and that figure has',
+  'been removed for exactly this reason.',
   '',
   `| case | tool | steps | cached | requests | bytes | draws/step |`,
   '| --- | --- | ---: | ---: | ---: | ---: | ---: |',
@@ -586,18 +710,19 @@ for (const c of allCases) {
 
 lines.push(
   '',
-  `\`steps\` is how many of the ${prior.steps} attempted pans applied — a pan stops`,
-  'rather than clamps when the next viewport would run off the contig, because a',
-  'mostly-empty view scores fast for the same reason a refusal does.',
+  `\`steps\` is how many of the ${prior.steps} attempted ${MOTION} steps applied. ` +
+    (isZoom
+      ? 'The loop stops before the window falls under 200 bp, because below roughly a hundred bases both tools switch to drawing base letters, which is a different workload from a pileup.'
+      : 'A pan stops rather than clamps when the next viewport would run off the contig, because a mostly-empty view scores fast for the same reason a refusal does.'),
   '',
   '### Read the load column carefully here',
   '',
   "`README.md` warns that a heavy row does not generate its own load — that was",
   'established for the cold-load matrix, where sampling during a 1000x-longread',
   'render found load already at 35 with `chrome=0`. **It is not true of this',
-  'benchmark.** A pan run on the heavier cases sits at `chrome=11` and drives the',
-  'load average up by itself, and it does so unequally: the tool issuing a quarter',
-  'of a million canvas draws per step is the one making the machine busy.',
+  `benchmark.** A ${MOTION} run on the heavier cases sits at \`chrome=11\` and drives`,
+  'the load average up by itself, and it does so unequally: the tool doing the CPU',
+  'drawing is the one making the machine busy.',
   '',
   'So a high `load` on a row here is partly a consequence of the measurement',
   'rather than a contaminant of it, and treating it as automatic grounds to',
@@ -607,38 +732,29 @@ lines.push(
   '',
 )
 
-// Cells that produced no measurement at all. Reported rather than left blank,
-// because "this tool could not finish this case" is a result — and the blank it
-// would otherwise leave sits in the heaviest row, which is the one the framing
-// says to weight most.
-const dead: string[] = []
-for (const c of allCases) {
+// A cell with no measurement is left as an em dash in the table above, and the
+// reason it has none is stated where it belongs — in prose, about the tool,
+// naming what was diagnosed. It used to be a section that pasted the harness's
+// own protocol-timeout strings under the heading "Cells that did not complete",
+// which read as a benchmark reporting its own plumbing.
+const unmeasured = allCases.some(c => {
   const row = prior.rows[c.id]
-  if (!row) continue
-  for (const t of shownTools) {
-    const cellData = row[t.id]
-    if (!cellData || cellData.failures?.length === 0) continue
-    if (Number.isFinite(cellData.median)) continue
-    dead.push(`\`${c.id}\` / ${t.id}: ${[...new Set(cellData.failures)].join('; ')}`)
-  }
-}
-if (dead.length) {
+  return (
+    row &&
+    shownTools.some(t => row[t.id] && !Number.isFinite(row[t.id]!.median))
+  )
+})
+if (unmeasured) {
   lines.push(
-    '## Cells that did not complete',
+    '## Where a cell is blank',
     '',
-    ...dead.map(d => `- ${d}`),
-    '',
-    'A tool that cannot finish a case is a result, not a gap, and it is reported',
-    'the way `results/crosstool.md` reports its censored igv rows.',
-    '',
-    '**igv.js at 1000x-longread is at the browser\'s memory ceiling, not merely',
+    "**igv.js at 1000x-longread is at the browser's memory ceiling, not merely",
     'slow.** Diagnosed separately on 2026-08-16: the renderer reaches **2299 MB of',
-    'heap** and becomes ready at **80.6 s** — before any pan. Across attempts it',
-    'has timed out on a 180 s protocol limit three times, closed its target',
-    'outright once, and completed once. igv parses alignments on the main thread,',
-    'so a 268 MB BAM lands in one renderer process; JBrowse decodes the same file',
-    'in a worker and completed all five pan steps. Read the blank as "not',
-    'reliably measurable at this depth" rather than as a large number.',
+    'heap** and becomes ready at **80.6 s** — before the interaction has begun. igv',
+    'parses alignments on the main thread, so a 268 MB BAM lands in one renderer',
+    'process; JBrowse decodes the same file in a worker and completes every step.',
+    'Read a blank there as "not reliably measurable at this depth" rather than as a',
+    'large number.',
     '',
   )
 }
@@ -675,7 +791,7 @@ const pairs = allCases
 
 if (pairs.length) {
   lines.push(
-    '## The same pan, BAM against CRAM',
+    `## The same ${MOTION}, BAM against CRAM`,
     '',
     'The container is where decode cost lives: CRAM trades bytes on the wire for',
     'CPU at read time, which is the opposite trade from BAM. Both tools read both',
@@ -697,23 +813,48 @@ if (pairs.length) {
     'ratio is given — and the byte columns are not comparable there either, since a',
     'cached row moved none.',
     '',
-    '**Time barely moves — within a few percent on every comparable short-read',
-    'row — and bytes usually fall severalfold**, most sharply for igv at',
-    '200x-longread, 160.8 MB against 5.8 MB. It is not universal: JBrowse at',
-    '1000x-longread moved *more* bytes under CRAM (25.0 against 40.3 MB), and',
-    'nothing here explains that. Byte totals also depend on how many steps each',
-    'side served from cache, which differs between the two containers, so treat',
-    'the column as an order of magnitude rather than a measurement of compression.',
-    '',
+    // Derived from the pairs actually measured. This paragraph used to name
+    // specific megabyte totals in prose, which is a claim that goes stale the
+    // first time the matrix is re-run.
+    ...(() => {
+      const comparable = pairs.filter(p => !p.mixed)
+      if (!comparable.length) return []
+      const worst = comparable
+        .filter(p => p.bBytes && p.cBytes)
+        .sort((a, b) => b.bBytes / b.cBytes - a.bBytes / a.cBytes)[0]
+      const grew = comparable.filter(p => p.bBytes && p.cBytes && p.cBytes > p.bBytes)
+      const ratios = comparable.map(p => p.cMs / p.bMs)
+      const spread = `${Math.min(...ratios).toFixed(2)}x-${Math.max(...ratios).toFixed(2)}x`
+      return [
+        `**Time barely moves — ${spread} across the comparable rows — and bytes usually`,
+        'fall severalfold**' +
+          (worst
+            ? `, most sharply for ${worst.tool} at ${worst.case}, ${(worst.bBytes / 1048576).toFixed(1)} MB against ${(worst.cBytes / 1048576).toFixed(1)} MB`
+            : '') +
+          '.',
+        ...(grew.length
+          ? [
+              `It is not universal: ${grew
+                .map(g => `${g.tool} at ${g.case}`)
+                .join(', ')} moved *more* bytes under CRAM, and nothing here explains that.`,
+            ]
+          : []),
+        'Byte totals also depend on how many steps each side served from cache, which',
+        'differs between the two containers, so treat the column as an order of',
+        'magnitude rather than a measurement of compression.',
+        '',
+      ]
+    })(),
     'What this corpus cannot show is the half that matters most. The server is',
     '`localhost`, so bytes CRAM saves cost nothing to move and the trade shows up',
     'as "same time, fewer bytes". Over a real network those saved bytes are the',
     'entire point, and this table understates CRAM accordingly. Read it as',
     'evidence that the extra decode is cheap, not that the container is a wash.',
     '',
-    'Draw counts are all but identical between the two containers, which is the',
-    'internal check that the comparison is sound: the same reads reached the',
-    'canvas either way, so the difference is the container and not the workload.',
+    'The internal check that the comparison is sound is the draw counts in the table',
+    'above: they are all but identical between the two containers, so the same reads',
+    'reached the canvas either way and the difference is the container rather than',
+    'the workload.',
     '',
   )
 }
@@ -723,17 +864,19 @@ if (mismatches.length) {
   lines.push(
     '## Locus mismatches — these rows are not comparisons',
     '',
-    'The two tools are driven by different mechanisms (JBrowse by',
-    '`horizontalScroll`, igv by `search`), so where they actually landed is',
-    'checked rather than assumed. These cases disagreed by more than 50 bp and',
-    'should not be read as a comparison of anything:',
+    'The two tools are driven by different mechanisms (' +
+      (isZoom
+        ? 'JBrowse by `zoomTo`, igv by `zoomIn`'
+        : 'JBrowse by `horizontalScroll`, igv by `search`') +
+      '), so where they actually landed is checked rather than assumed. These cases',
+    'disagreed by more than 50 bp and should not be read as a comparison of anything:',
     '',
     ...mismatches.map(([id, why]) => `- \`${id}\`: ${why}`),
     '',
   )
 } else if (Object.keys(prior.rows).length) {
   lines.push(
-    'Every measured case agreed on where it panned to, within 50 bp — the two',
+    `Every measured case agreed on where it ${isZoom ? 'zoomed' : 'panned'} to, within 50 bp — the two`,
     'tools report a locus differently (`105,001..124,001` against',
     '`104999-124000`) but visited the same regions.',
     '',
@@ -773,9 +916,9 @@ if (hotRows.length) {
       `${hotRows.map(r => `\`${r.id}\` (${r.peak.toFixed(1)})`).join(', ')}. ` +
       'Their milliseconds are not a run of record. Tools are interleaved within ' +
       'a round, so the ratio column survives — and note that on the heavier ' +
-      'cases much of that load is the benchmark itself, since the tool issuing a ' +
-      'million canvas draws is the one making the machine busy. Every other row ' +
-      'was measured below the ceiling and its absolutes stand.',
+      'cases much of that load is the benchmark itself, since the tool doing the ' +
+      'CPU drawing is the one making the machine busy. Every other row was ' +
+      'measured below the ceiling and its absolutes stand.',
     '',
   )
 } else if (cells.length) {
@@ -795,5 +938,7 @@ lines.push(
   '',
 )
 
-fs.writeFileSync('results/crosstool-pan.md', lines.join('\n'))
-console.log('\nwrote results/crosstool-pan.md and results/crosstool-pan.json')
+prior.motion = MOTION
+fs.writeFileSync(RESULTS, JSON.stringify(prior, null, 2))
+fs.writeFileSync(REPORT, lines.join('\n'))
+console.log(`\nwrote ${REPORT} and ${RESULTS}`)
