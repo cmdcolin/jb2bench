@@ -141,11 +141,16 @@ function run(
     return JSON.parse(out.trim().split('\n').pop()!) as Result
   } catch (e) {
     const { stdout, stderr } = e as { stdout?: string; stderr?: string }
-    const why = (stderr ?? '').trim().split('\n').filter(Boolean).slice(-4)
+    const lines = (stderr ?? '').trim().split('\n').filter(Boolean)
+    // The message, then the innermost frames. Keeping only the tail kept only
+    // stack frames and threw the message itself away, which is the one part
+    // that says what happened.
+    const message = lines.filter(l => /^\s*\w*(Error|Exception)\b/.test(l)).slice(0, 2)
+    const why = [...new Set([...message, ...lines.slice(-3)])]
     throw new Error(
       `interaction.ts failed for ${track} / ${build.name} / ${mode}\n` +
         `  url: ${url}\n` +
-        (why.length ? why.map(l => `  child: ${l}`).join('\n') : '  child said nothing') +
+        (why.length ? why.map(l => `  child: ${l.trim()}`).join('\n') : '  child said nothing') +
         (stdout?.trim() ? `\n  stdout: ${stdout.trim().slice(-200)}` : ''),
     )
   }
@@ -206,6 +211,8 @@ for (const m of MODES) {
 
 const results: Record<string, Record<Mode, Partial<Record<Role, Result>>>> = {}
 const measured: { key: string; load: LoadWindow; value: Result }[] = []
+// Cells that threw. Named at the end and in the report, never silently absent.
+const failed: string[] = []
 // Seeded for every case, not only the measured ones, so a CASES-filtered run
 // still renders full tables from what was recorded before.
 for (const c of allCases) {
@@ -233,8 +240,22 @@ for (const c of cases) {
       // runner switched: the load average counts this benchmark's own threads,
       // so a heavy cell disqualifies itself by working. See loadavg.ts.
       const cpu = watchForeignCpu()
-      const r = run(b, c.track, mode)
+      // A cell that throws must not take the other 107 with it. Two hours of
+      // measurement previously died on one crashed renderer, and the modes that
+      // had already been measured were never written out.
+      let r: Result | undefined
+      let failure: string | undefined
+      try {
+        r = run(b, c.track, mode)
+      } catch (e) {
+        failure = String(e)
+      }
       const { cores, top } = await cpu.done()
+      if (!r) {
+        failed.push(`${c.id} / ${b.name} / ${what}`)
+        console.log(`FAILED\n${failure}`)
+        continue
+      }
       const load = { before, after: loadavg(), foreignCores: cores, foreignTop: top }
       r.load = load
       results[c.id]![mode][b.role] = r
@@ -262,6 +283,13 @@ if (suspect.length) {
   )
   for (const s of suspect) {
     console.log(`  ${s.key} — load peaked at ${peak(s.load).toFixed(1)}`)
+  }
+}
+
+if (failed.length) {
+  console.log(`\n${failed.length} cell(s) failed and hold no value this run:`)
+  for (const f of failed) {
+    console.log(`  ${f}`)
   }
 }
 
