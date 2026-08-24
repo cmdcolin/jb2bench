@@ -20,12 +20,12 @@
 // --cpu-budget are extrapolated from a measured per-cell rate rather than run,
 // and are marked so in the output; nothing is silently capped.
 //
-// The output-buffer ceiling that decides which rows run at all is a property of
-// the BROWSER BUILD as much as the GPU: on one machine (amd rdna-1, macOS) the
-// Chrome puppeteer pins reports maxStorageBufferBindingSize = 128 MiB, the WebGPU
-// spec floor, while the system Chrome reports 2 GiB. Same hardware, 16x apart and
-// a different set of windows admitted. Record which browser a row came from —
-// PUPPETEER_EXECUTABLE_PATH picks one, --label names the output.
+// The output-buffer ceiling that decides which rows run at all is a DEVICE
+// limit, and a device does not inherit its adapter's. A bare requestDevice()
+// gets the spec default of 128 MiB even on an adapter advertising 2 GiB, so a
+// benchmark written that way reports DECLINED for matrices the app dispatches
+// happily. This one raises the limits the way getGpuDevice() does; see
+// requestAppLikeDevice in ldkernel.ts.
 //
 // Usage: node --experimental-strip-types scripts/ld/ldband.ts [numSamples] [numSnps]
 //          [--cpu-budget=SECONDS] [--label=NAME] [--headless] [--allow-software]
@@ -99,7 +99,15 @@ const out = await page.evaluate(
           (adapter as unknown as { isFallbackAdapter?: boolean }).isFallbackAdapter,
       ),
     }
-    const device = await adapter.requestDevice()
+    // NOT a bare requestDevice(): that yields the spec's default 128 MiB
+    // maxStorageBufferBindingSize regardless of hardware, which is not the
+    // device getGpuDevice() builds. See requestAppLikeDevice in ldkernel.ts.
+    const device = await adapter.requestDevice({
+      requiredLimits: {
+        maxStorageBufferBindingSize: adapter.limits.maxStorageBufferBindingSize,
+        maxBufferSize: adapter.limits.maxBufferSize,
+      },
+    })
     const MAXD = device.limits.maxComputeWorkgroupsPerDimension
     const MAXBIND = device.limits.maxStorageBufferBindingSize
     const MAXBUF = device.limits.maxBufferSize

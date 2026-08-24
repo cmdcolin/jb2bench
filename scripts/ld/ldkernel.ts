@@ -142,6 +142,34 @@ export function loadUniformsSize(generatedRelPath: string): number {
   return Number(m[1]!)
 }
 
+/**
+ * Device-creation options matching what the app does, and the reason a
+ * benchmark must not call `requestDevice()` bare.
+ *
+ * A WebGPU DEVICE gets the spec's DEFAULT limits — maxStorageBufferBindingSize
+ * 128 MiB — no matter what the adapter supports. Raising them is opt-in, and
+ * `getGpuDevice()` in packages/render-core opts in:
+ *
+ *   requiredLimits: {
+ *     maxStorageBufferBindingSize: adapter.limits.maxStorageBufferBindingSize,
+ *     maxBufferSize: adapter.limits.maxBufferSize,
+ *   }
+ *
+ * Measured on amd rdna-1: the adapter reports 2 GiB, a bare device reports
+ * 128 MiB, and a device asking for the adapter's maximum gets 2 GiB. So a
+ * benchmark that skips this is measuring a device the app never creates, with a
+ * ceiling 16x too low — and its symptom is rows that report DECLINED where the
+ * app would have dispatched. Nothing errors; the table is just wrong.
+ */
+export async function requestAppLikeDevice(adapter: GPUAdapter) {
+  return adapter.requestDevice({
+    requiredLimits: {
+      maxStorageBufferBindingSize: adapter.limits.maxStorageBufferBindingSize,
+      maxBufferSize: adapter.limits.maxBufferSize,
+    },
+  })
+}
+
 export interface AdapterInfo {
   vendor: string
   architecture: string

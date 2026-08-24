@@ -289,16 +289,16 @@ variant count**. Measured at 50,000 variants x 2,000 samples on amd rdna-1:
 
 | window | cells | output | GPU | CPU | CPU/GPU |
 | --- | --- | --- | --- | --- | --- |
-| full triangle | 1.25e9 | 4768 MiB | DECLINED | ~59 min (est) | — |
-| 2000 | 9.80e7 | 374 MiB | DECLINED | ~278 s (est) | — |
-| 1000 | 4.95e7 | 189 MiB | DECLINED | ~141 s (est) | — |
-| 500 | 2.49e7 | 95 MiB | **1407 ms** | ~70.6 s (est) | 50x |
-| 200 | 9.98e6 | 38 MiB | **503 ms** | 27.9 s | 55x |
+| full triangle | 1.25e9 | 4768 MiB | DECLINED | ~26 min (est) | — |
+| 2000 | 9.80e7 | 374 MiB | 6181 ms | ~123 s (est) | 20x |
+| 1000 | 4.95e7 | 189 MiB | 3158 ms | ~62 s (est) | 20x |
+| 500 | 2.49e7 | 95 MiB | **1337 ms** | 68.7 s | 51x |
+| 200 | 9.98e6 | 38 MiB | **456 ms** | 24.4 s | 53x |
 
 Rows marked `(est)` exceeded `--cpu-budget` and are extrapolated from a measured
-per-cell rate rather than run; nothing is capped silently. The three DECLINED
-rows are the point — the band is what brings 50,000 variants inside a 128 MiB
-output buffer at all.
+per-cell rate rather than run; nothing is capped silently. The DECLINED row is
+the point — 50,000 variants is not a matrix any adapter will allocate, and the
+window is what brings it into range at all.
 
 Three gotchas if you write more WebGPU here:
 
@@ -321,12 +321,18 @@ Three gotchas if you write more WebGPU here:
   CPU. `ldband.ts` is headed by default and calls `assertHardwareAdapter`, which
   refuses to report a timing from a fallback adapter unless `--allow-software`
   says to.
-- **The output-buffer ceiling is a browser-build property too.** On one macOS
-  machine (amd rdna-1) the Chrome puppeteer pins reports
-  `maxStorageBufferBindingSize` = 128 MiB, the WebGPU spec floor, while the
-  system Chrome reports 2 GiB — same hardware, 16x apart, and a different set of
-  matrix sizes admitted. Always record which browser produced a row
-  (`PUPPETEER_EXECUTABLE_PATH` selects one, `--label` names the output).
+- **Never call `requestDevice()` bare in a benchmark.** A WebGPU *device* gets
+  the spec's DEFAULT limits — `maxStorageBufferBindingSize` 128 MiB — no matter
+  what the *adapter* supports; raising them is opt-in, and
+  `getGpuDevice()` (packages/render-core) opts in to the adapter's maxima.
+  Measured on amd rdna-1, one browser, one adapter: adapter 2048 MiB, bare
+  device 128 MiB, device-with-`requiredLimits` 2048 MiB. A benchmark that skips
+  it measures a device the app never creates with a ceiling 16x too low, and the
+  symptom is rows reporting DECLINED where the app dispatches happily — nothing
+  errors, the table is just wrong. `requestAppLikeDevice` in `ldkernel.ts` is
+  the one to use. (`ldbench.ts` and `ldlimits.ts` still request bare devices;
+  their matrices stay under 128 MiB so no row changes, but new work should not
+  copy them.)
 
 ### Cross-tool: JBrowse vs igv.js
 

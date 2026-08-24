@@ -10,15 +10,15 @@
     "isFallbackAdapter": false
   },
   "limits": {
-    "maxStorageBufferBindingSize": 134217728,
-    "maxBufferSize": 268435456,
+    "maxStorageBufferBindingSize": 2147483644,
+    "maxBufferSize": 2147483648,
     "maxComputeWorkgroupsPerDimension": 65535
   },
   "calibration": {
     "n": 1200,
     "cells": 719400,
-    "ms": 2042.9,
-    "nsPerCell": 2839.7
+    "ms": 903.5,
+    "nsPerCell": 1255.9
   },
   "rows": [
     {
@@ -29,7 +29,7 @@
       "gpuMs": null,
       "declined": true,
       "gpuError": null,
-      "cpuMs": 3549588,
+      "cpuMs": 1569853,
       "cpuMeasured": false,
       "speedup": null,
       "maxAbsDiff": null
@@ -39,12 +39,12 @@
       "band": 2000,
       "cells": 97999000,
       "outputMiB": 373.8,
-      "gpuMs": null,
-      "declined": true,
+      "gpuMs": 6181,
+      "declined": false,
       "gpuError": null,
-      "cpuMs": 278290,
+      "cpuMs": 123078,
       "cpuMeasured": false,
-      "speedup": null,
+      "speedup": 19.9,
       "maxAbsDiff": null
     },
     {
@@ -52,12 +52,12 @@
       "band": 1000,
       "cells": 49499500,
       "outputMiB": 188.8,
-      "gpuMs": null,
-      "declined": true,
+      "gpuMs": 3158,
+      "declined": false,
       "gpuError": null,
-      "cpuMs": 140565,
+      "cpuMs": 62167,
       "cpuMeasured": false,
-      "speedup": null,
+      "speedup": 19.7,
       "maxAbsDiff": null
     },
     {
@@ -65,25 +65,25 @@
       "band": 500,
       "cells": 24874750,
       "outputMiB": 94.9,
-      "gpuMs": 1407,
+      "gpuMs": 1337,
       "declined": false,
       "gpuError": null,
-      "cpuMs": 70638,
-      "cpuMeasured": false,
-      "speedup": 50.2,
-      "maxAbsDiff": null
+      "cpuMs": 68664,
+      "cpuMeasured": true,
+      "speedup": 51.3,
+      "maxAbsDiff": 1.3387762010097504e-8
     },
     {
       "window": "200",
       "band": 200,
       "cells": 9979900,
       "outputMiB": 38.1,
-      "gpuMs": 503,
+      "gpuMs": 456,
       "declined": false,
       "gpuError": null,
-      "cpuMs": 27890,
+      "cpuMs": 24383,
       "cpuMeasured": true,
-      "speedup": 55.4,
+      "speedup": 53.4,
       "maxAbsDiff": 1.210719347000122e-8
     }
   ]
