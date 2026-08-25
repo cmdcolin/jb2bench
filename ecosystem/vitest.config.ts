@@ -1,23 +1,24 @@
 import { defineConfig } from 'vitest/config'
 
 export default defineConfig({
-  // BROWSER=1 makes vite resolve each package's `browser` field, which is the
-  // difference between measuring these libraries as JBrowse runs them and
-  // measuring them in the one runtime where the old arm gets a decompressor it
-  // would never have.
+  // NO BROWSER=1 RESOLUTION HERE, DELIBERATELY.
   //
-  // @gmod/bbi 3.0.0, @gmod/bgzf-filehandle 1.4.5 and @gmod/cram 1.7.3 all map
-  // `./esm/unzip.js` to `./esm/unzip-pako.js` for browsers. Under plain node they
-  // inflate with native zlib instead; their current versions inflate with wasm
-  // unconditionally. So the default run pits native C against wasm -- which is
-  // why the single-file BigWig comparison is a wash, and slightly negative -- and
-  // a browser would pit pako against wasm, which is what the wasm was written
-  // for. `scripts/render/charts.R` and ecosystem/README.md both have to say which
-  // resolution produced a number, because the two answer different questions.
-  resolve:
-    process.env.BROWSER === '1'
-      ? { conditions: ['browser'], mainFields: ['browser', 'module', 'main'] }
-      : undefined,
+  // A `resolve.conditions: ['browser']` block sat here on 2026-08-24 and did
+  // nothing. Vite's conditions apply to package `exports` conditions; what these
+  // 2023 tags carry is the legacy `browser` FIELD, an object map from
+  // ./esm/unzip.js to ./esm/unzip-pako.js, and vitest resolves these benches
+  // through its SSR pipeline besides. The run it produced was the node run under
+  // a filename claiming otherwise -- a dead mechanism that looks like a live one,
+  // which is the failure this directory exists to avoid.
+  //
+  // The redirect DOES work on the sweep path, where lib/legacy-resolve.mjs is
+  // registered as a real loader hook: under BROWSER=1 it traces
+  // `./esm/unzip.js -> ./esm/unzip-pako.js`, and the imported function changes
+  // from zlibBufferSync (native C) to pako's inflateRaw. Verified 2026-08-25.
+  //
+  // For a bench, the technique that works is the one bgzf.bench.ts already uses:
+  // import both decompressors explicitly by path and measure them as two arms,
+  // rather than asking a resolver to substitute one behind your back.
   test: {
     // Each case opens files up to 268 MB and the 1000x parses are seconds long.
     testTimeout: 600_000,
@@ -48,10 +49,7 @@ export default defineConfig({
       // here. Writing both to one path would mean whichever ran last silently
       // became "the" parser result, and the figures could not say which
       // resolution produced them.
-      outputJson:
-        process.env.BROWSER === '1'
-          ? 'results/bench-browser.json'
-          : 'results/bench.json',
+      outputJson: 'results/bench.json',
       reporters: ['default'],
     },
   },
