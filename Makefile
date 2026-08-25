@@ -26,7 +26,7 @@ LOGDIR := results/logs
         corpus corpus-paper render interaction crosstool crosstool-cold \
         crosstool-zoom crosstool-pan \
         parsers parsers-count cram-samtools multibam backends clean-logs \
-        formats toolcheck
+        formats toolcheck paper-tables
 
 help:
 	@echo "preflight"
@@ -58,6 +58,7 @@ help:
 	@echo ""
 	@echo "present"
 	@echo "  make figures         ggplot2 figures from the recorded JSON"
+	@echo "  make paper-tables    the render tables as \\input files for the paper"
 	@echo "  make report          results/report.html"
 	@echo "  make all             gate, counts, timings, figures, report"
 
@@ -169,6 +170,12 @@ cram-samtools: gate | $(LOGDIR)
 timings: render interaction crosstool parsers cram-samtools
 
 # ------------------------------------------------------------------ present
+
+# The four render tables the paper prints, as \input files. Same rule as the
+# parser tables ecosystem/report.ts writes: nothing measured is typed by hand.
+# The paper's `make sync-benchmarks` copies results/paper/*.tex.
+paper-tables:
+	$(NODE) scripts/render/papertables.ts
 
 figures:
 	Rscript scripts/render/charts.R
