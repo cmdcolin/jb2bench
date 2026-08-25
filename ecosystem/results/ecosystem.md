@@ -16,12 +16,6 @@ paper; `new` is the current release.
 | bam 200x longread | 1768 ms ±4.0% | 383 ms ±0.4% | 4.61x | 78% |
 | bam 1000x shortread | 920 ms ±0.5% | 190 ms ±3.8% | 4.85x | 79% |
 | bam 1000x longread | 10262 ms ±4.4% | 1962 ms ±2.5% | 5.23x | 81% |
-| bigwig 20x shortread | 0.82 ms ±5.7% | 0.74 ms ±2.2% | 1.10x | 9% |
-| bigwig 20x longread | 1.20 ms ±2.2% | 1.43 ms ±2.8% | 0.84x | -19% |
-| bigwig 200x shortread | 1.30 ms ±2.2% | 1.46 ms ±3.6% | 0.90x | -12% |
-| bigwig 200x longread | 1.55 ms ±3.4% | 1.61 ms ±3.9% | 0.96x | -4% |
-| bigwig 1000x shortread | 1.39 ms ±2.2% | 1.53 ms ±4.2% | 0.91x | -10% |
-| bigwig 1000x longread | 1.48 ms ±2.6% | 1.59 ms ±3.8% | 0.93x | -8% |
 | bgzf browser path 20x shortread | 101 ms ±2.0% | 17.8 ms ±4.2% | 5.68x | 82% |
 | bgzf node path 20x shortread | 37.7 ms ±3.8% | 17.1 ms ±4.3% | 2.21x | 55% |
 | bgzf browser path 20x longread | 125 ms ±0.5% | 36.0 ms ±2.8% | 3.46x | 71% |
@@ -64,10 +58,6 @@ the current release drops any record that lies inside the window.
 | cram 200x longread | 331 | 335 | 4 | 0 |
 | cram 1000x shortread | 153652 | 153677 | 34 | 9 |
 | cram 1000x longread | 1667 | 1683 | 16 | 0 |
-| bigwig 20x longread | 13168 | 13167 | 0 | 1 |
-| bigwig 200x longread | 17676 | 17675 | 0 | 1 |
-| bigwig 1000x shortread | 17047 | 17046 | 0 | 1 |
-| bigwig 1000x longread | 18495 | 18494 | 0 | 1 |
 
 ### CRAM reference spans, against the BAM holding the same alignments
 

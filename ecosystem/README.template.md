@@ -90,11 +90,8 @@ The gains are largest where the data is largest: 1000x long read BAM falls from
 {{parserBamPeakOld}} s to {{parserBamPeakNew}} s, and the same case in CRAM from
 {{parserCramPeakOld}} s to {{parserCramPeakNew}} s.
 
-BigWig is the exception: {{parserBbiFastMin}}x to {{parserBbiFastMax}}x faster at
-20x, and {{parserBbiSlowMin}} to {{parserBbiSlowMax}}% slower above it. These are
-{{parserBbiMsMin}} to {{parserBbiMsMax}} ms operations on summary data, so the
-case may be too small to be informative rather than a regression, but it is
-reported as measured.
+`@gmod/bbi` has no row here, and had one until 2026-08-25. It is measured with
+the file count as the axis instead, by `make cohort` below.
 
 ### The VCF cases, and why there are two shapes
 
@@ -249,13 +246,22 @@ and `quick-lru`.
 
 ### What does it cost at panel scale? — `make cohort`
 
-BigWig is the row of the main table that reports nothing: 1–3 ms, flat to
-slightly negative, and the paragraph above says the case may be too small to be
-informative. That is the right reading, and the reason is structural rather than
+BigWig had a row in the main table until 2026-08-25 and that row reported
+nothing: 1–3 ms, flat to slightly negative. The reason is structural rather than
 a matter of choosing a bigger file. Most of what a BigWig query costs is
 per-file and paid before any data is touched — the header, the chromosome B+
 tree, then an R-tree descent to find the overlapping blocks. Measured once, it
 is a rounding error. A cohort signal panel pays it once per sample.
+
+The row was also comparing the wrong two things. `@gmod/bbi` 3.0.0 maps
+`./esm/unzip.js` to `./esm/unzip-pako.js` through its `browser` field, so a node
+import of the 2023 side gets `zlib.inflateSync` — C — where a bundler gives it
+pako, pure JavaScript. Over this corpus's blocks the current release's wasm
+libdeflate runs 0.57 ms, native zlib 0.52 ms and pako 1.58 ms, so the row was
+setting wasm against C and reporting the tie. `bgzf.bench.ts` splits its arms for
+exactly this reason and `bbi.bench.ts` never did. What replaced it is this
+benchmark for the per-file cost, and `browser/` plus `latency.ts` for the
+decompressor, both of which resolve the `browser` field the way a bundler does.
 
 `make cohort` therefore holds the library and the window fixed and makes **N the
 axis**: 1, 10 and 100 per-sample BigWigs, written by
@@ -400,9 +406,6 @@ What the gate finds, all of it reported in `results/ecosystem.md`:
 - **CRAM, window edge** — the current release omits a few reads that start
   before the window and end within a base or two of its start, which
   {{parserCramOldVer}} returned.
-- **BigWig** — the current release drops exactly one feature in the long-read
-  and 1000x cases: a bin spanning {{bigwigDropped}}, which ends exactly where the
-  query starts and so does not overlap it. An off-by-one at the left edge, fixed.
 - **BGZF** — all three decompressors return byte-identical output.
 
 Two subtleties the gate had to be taught, both of which produced convincing but
@@ -587,7 +590,7 @@ different question.
 - `setup-sweep.sh` — the same for `sweep.json`, tolerant of a version that will
   no longer build; writes `.libs/sweep-manifest.txt`
 - `equivalence.test.ts` — the gate
-- `bam.bench.ts`, `cram.bench.ts`, `bgzf.bench.ts`, `bbi.bench.ts`
+- `bam.bench.ts`, `cram.bench.ts`, `bgzf.bench.ts`
 - `sweep.ts` — the per-major curve, one process per version
 - `sweepchart.R` — its figures; reads and time are drawn as separate files
   because one needs an idle box and the other does not

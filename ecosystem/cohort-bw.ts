@@ -1,14 +1,14 @@
 // The 100-BigWig cohort: what a per-sample signal panel costs to open.
 //
-// versions.json measures @gmod/bbi on one file and reports 1-3 ms, flat to
-// slightly negative, and its own README says the case may be too small to be
-// informative. That is the right reading of it, and the reason is structural
-// rather than a matter of picking a bigger file: most of what it costs to
-// answer a BigWig query is per-file and paid before any data is touched — the
-// header, the chromosome B+ tree, then a descent of the R-tree to find which
-// blocks overlap. Measured once, that cost is a rounding error. A cohort panel
-// pays it once per sample, and 2,504 of them is the workload behind the Zarr
-// comparison this directory already reports.
+// The two-point table measured @gmod/bbi on one file until 2026-08-25 and
+// reported 1-3 ms, flat to slightly negative. The reason is structural rather
+// than a matter of picking a bigger file: most of what it costs to answer a
+// BigWig query is per-file and paid before any data is touched — the header, the
+// chromosome B+ tree, then a descent of the R-tree to find which blocks overlap.
+// Measured once, that cost is a rounding error. A cohort panel pays it once per
+// sample, and 2,504 of them is the workload behind the Zarr comparison this
+// directory already reports. So that row is gone and this benchmark is what
+// replaced it; versions.json records the second reason it went.
 //
 // So this benchmark is the same library on the same window, with N as the axis.
 // It reports two things that answer different questions:

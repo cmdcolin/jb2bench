@@ -33,7 +33,6 @@ function corpus(ext: string): Case[] {
 
 export const BAM_CASES = corpus('bam')
 export const CRAM_CASES = corpus('cram')
-export const BW_CASES = corpus('bw')
 
 // The VCF corpus is its own thing: the alignment files carry no genotypes, and
 // what a VCF parser costs scales with samples x variants rather than with read

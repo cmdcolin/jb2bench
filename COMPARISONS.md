@@ -46,8 +46,9 @@ Two of those rows are the reason the set is worth having rather than a single
 headline. The **two-point** and **every-major** parser comparisons answer
 different questions from the same corpus, and a reader on an intermediate
 version can only use the second. The **file count** row exists because the
-two-point BigWig comparison reports nothing — 1–3 ms, flat — and that is a
-property of measuring a per-file cost once, not of the library.
+two-point BigWig comparison reported nothing — 1–3 ms, flat — and was withdrawn
+on 2026-08-25: that is a property of measuring a per-file cost once, not of the
+library.
 
 ## The three versions, and which benchmarks have them
 

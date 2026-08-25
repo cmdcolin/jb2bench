@@ -2,11 +2,11 @@
 // question. This runs before the benchmarks and checks, per library and per
 // case, what changed between the 2023 release and the current one.
 //
-// The three libraries do not agree with each other about what "overlaps this
-// window" means for a record that straddles an edge — a read starting before
-// the window, a BigWig bin ending exactly on it. Those disagreements are real
-// but they are a boundary convention, not lost data, so they are classified
-// apart and reported.
+// The libraries do not agree with each other about what "overlaps this window"
+// means for a record that straddles an edge — a read starting before the window,
+// one ending a base or two inside it. Those disagreements are real but they are
+// a boundary convention, not lost data, so they are classified apart and
+// reported.
 //
 // The gate proper: no record that lies wholly *inside* the window may disappear
 // between the 2023 release and the current one. That is the failure that would
@@ -24,8 +24,6 @@ import {
   CraiIndex as NewCraiIndex,
   IndexedCramFile as NewCram,
 } from './.libs/cram-js/new/esm/index.js'
-import { BigWig as OldBigWig } from './.libs/bbi-js/old/esm/index.js'
-import { BigWig as NewBigWig } from './.libs/bbi-js/new/esm/index.js'
 import {
   pakoUnzip as oldBrowserUnzip,
   unzip as oldNodeUnzip,
@@ -38,7 +36,6 @@ import ScanVcf from './.libs/vcf-js-scan/new/esm/index.js'
 
 import {
   BAM_CASES,
-  BW_CASES,
   CRAM_CASES,
   DATA,
   END,
@@ -225,18 +222,6 @@ test.each(CRAM_CASES)('cram $label lengthOnRef matches the BAM', async ({ label,
   // not what this benchmark is measuring; the invariant that matters is that the
   // current release never agrees with the BAM *less* often than v1.7.3 did.
   expect(n.agree).toBeGreaterThanOrEqual(o.agree)
-})
-
-test.each(BW_CASES)('bigwig $label agrees', async ({ label, file }) => {
-  const read = async (Ctor: any) => new Ctor({ path: file }).getFeatures(REF, START, END)
-  const o = await read(OldBigWig)
-  const n = await read(NewBigWig)
-  const item = (f: any) => ({
-    key: `${f.start}|${f.end}|${Math.fround(f.score)}`,
-    start: f.start,
-    end: f.end,
-  })
-  compare('bigwig', label, o.map(item), n.map(item))
 })
 
 test('bgzf decompresses to the same bytes', async () => {

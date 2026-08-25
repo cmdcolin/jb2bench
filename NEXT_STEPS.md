@@ -170,10 +170,12 @@ Two things to know before starting:
 **The timings themselves are done** — re-measured 2026-08-23 against the pins
 `versions.json` holds, so `make report` no longer refuses and
 `ecosystem/results/ecosystem.md` is current. `@gmod/vcf` has timing rows for the
-first time (up to 28.2x on the genotype scan). CRAM runs 6.9–12.2x, BAM
-3.8–5.8x, and BigWig is 0.79–1.03x — a regression on four of six cells, which is
-what measuring a per-file cost once looks like and why the cohort benchmark
-exists.
+first time (up to 28.2x on the genotype scan). CRAM runs 6.9–12.2x and BAM
+3.8–5.8x. BigWig had rows too, reading 0.79–1.03x, and they were withdrawn on
+2026-08-25 — that is what measuring a per-file cost once looks like, and in node
+it was also comparing wasm against native zlib rather than against the pako a
+browser gets. `versions.json` records both halves; the cohort benchmark is what
+replaced it.
 
 What is owed is the instrument, not the numbers. **`ecosystem/` has no
 equivalent of `scripts/render/loadavg.ts`**, so nothing records what else the
