@@ -20,14 +20,14 @@ Median of 3 runs after 1 warmup, tools interleaved within each round. A blank ce
 | 200x-shortread-bam | 2410 ±69 | 3209 ±39 | 4288 ±23 | 5192 ±115 | 5258 ±115 | 14928 ±6790 | 12344 ±4393 | 2.15× | 2026-08-24 | 0.09 | firefox 0.02 | 40.0 |
 | 200x-shortread-cram | 2420 ±79 | 3026 ±29 | 5193 ±15 | 5327 ±73 | 5509 ±202 |  |  | 2.20× | 2026-08-24 | 0.09 | firefox 0.01 | 2.0 |
 | 1000x-shortread-bam | 3342 ±43 | 4965 ±23 | 11228 ±351 | 27252 ±96 | 26604 ±626 | 39804 ±5160 | 38089 ±2482 | 8.15× | 2026-08-24 | 0.06 | firefox 0.01 | 42.8 |
-| 1000x-shortread-cram | 3171 ±15 | 6154 ±37 | 14877 ±658 | 29576 ±3695 | 29652 ±11081 |  |  | 9.33× | 2026-08-24 | 2.32 | MainThread 1.16, tsgolint 0.18, tsc 0.13 | 2.0 |
-| 20x-longread-bam | 2229 ±118 | 3081 ±77 | 3243 ±86 | 3917 ±874 | 3839 ±148 |  |  | 1.76× | 2026-08-24 | 0.57 | MainThread 0.12, npm exec tsx sc 0.07, npm exec tsx we 0.05 | 2.4 |
+| 1000x-shortread-cram | 2947 ±4 | 5884 ±70 | 13126 ±435 | 27202 ±138 | 27572 ±566 |  |  | 9.23× | 2026-08-25 | 0.09 | firefox 0.02 | 1.1 |
+| 20x-longread-bam | 2205 ±65 | 3060 ±37 | 3245 ±36 | 3556 ±205 | 3573 ±38 |  |  | 1.61× | 2026-08-25 | 0.11 | firefox 0.02, claude 0.01 | 1.6 |
 | 20x-longread-cram | 2336 ±30 | 2989 ±125 | 4163 ±84 | 3818 ±139 | 3796 ±16 |  |  | 1.63× | 2026-08-24 | 0.09 | firefox 0.01, claude 0.01 | 2.5 |
 | 200x-longread-bam | 2834 ±15 | 6496 ±27 | 9429 ±118 | 19559 ±443 | 19193 ±166 |  |  | 6.90× | 2026-08-24 | 0.08 | firefox 0.01 | 1.8 |
 | 200x-longread-cram | 2946 ±88 | 3984 ±74 | 7785 ±73 | 19666 ±113 | 18584 ±563 |  |  | 6.68× | 2026-08-24 | 0.07 | firefox 0.01 | 2.1 |
-| 1000x-longread-bam | 5359 ±111 | 20277 ±807 | 37984 ±323 | 60036 ±1047 | 58917 ±10512 |  |  | 11.20× | 2026-08-24 | 0.62 | tsgolint 0.10, MainThread 0.05, firefox 0.03 | 5.5 |
+| 1000x-longread-bam | 5164 ±36 | 18319 ±1476 | 36214 ±669 | 56855 ±1409 | 56779 ±261 |  |  | 11.01× | 2026-08-25 | 0.07 | firefox 0.02 | 1.6 |
 | 1000x-longread-cram | 5922 ±60 | 9571 ±176 | 23107 ±645 | 58107 ±365 | 59177 ±1492 |  |  | 9.81× | 2026-08-24 | 0.17 | Isolated Web Co 0.05, firefox 0.03 | 5.7 |
 
-Median cell load across the matrix: 1.99. Cells measured at more than twice that: 200x-shortread-bam/igv-h300, 200x-shortread-bam/igv-h600ctl, 1000x-shortread-bam/igv-h300, 1000x-shortread-bam/igv-h600ctl, 1000x-longread-bam/jbrowse, 1000x-longread-bam/igv, 1000x-longread-bam/igv-deep, 1000x-longread-bam/jbrowse-release-4.3.0, 1000x-longread-bam/jbrowse-release-2.4.0, 1000x-longread-cram/jbrowse, 1000x-longread-cram/jbrowse-release-4.3.0, 1000x-longread-cram/jbrowse-release-2.4.0.
+Median cell load across the matrix: 1.64. Cells measured at more than twice that: 200x-shortread-bam/igv-h300, 200x-shortread-bam/igv-h600ctl, 1000x-shortread-bam/igv-h300, 1000x-shortread-bam/igv-h600ctl, 1000x-longread-cram/jbrowse, 1000x-longread-cram/jbrowse-release-4.3.0, 1000x-longread-cram/jbrowse-release-2.4.0, 1000x-longread-cram/igv.
 
 A ratio above 1 means igv.js took longer. Read the ratios, not the absolutes: both columns of a row are measured within seconds of each other, so a ratio survives load the absolutes do not.

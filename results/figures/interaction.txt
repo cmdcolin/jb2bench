@@ -1,0 +1,24 @@
+# interaction.png
+
+Text that used to be drawn inside the figure. Written here so a paper
+caption can be built from it and so the caveats survive the image.
+
+## title
+
+What an interaction costs you
+
+## subtitle
+
+Time to content: from the interaction to the last canvas draw before the page stops drawing and stops fetching. 
+Zoom in — the region is already in memory, so this is redraw. Pan — one full viewport at constant scale, so this is fetch and redraw.
+
+## caveats
+
+Zoom measured 2026-08-24; pan measured 2026-08-16, 2026-08-24.
+Pan: Every row below the 4.0 load ceiling.
+Instrument: the last canvas draw before draws and network both go still. Neither tool's own loading state is consulted --
+igv hides its spinner before it draws, and JBrowse's indicator wording moves between releases.
+A series that stops has a cell with no measurement; results/crosstool-pan.md says which and why.
+IMPORTANT: JBrowse's zoom row is flat at ~505 ms at every depth because 500 ms of it is a navigation debounce, not drawing.
+results/figures/zoom-redraw.png separates the two.
+

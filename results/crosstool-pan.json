@@ -945,26 +945,27 @@
     },
     "1000x-longread-bam": {
       "jbrowse": {
-        "median": 4169,
-        "fetchedMedian": 4375.3499999940395,
+        "median": 1987.5,
+        "drawMedian": 1.6000000014901161,
+        "fetchedMedian": null,
         "runs": [
-          4290.599999964237,
-          3858.5,
-          4169
+          2013.0999999977648,
+          1987.5,
+          1903.8999999985099
         ],
         "appliedSteps": [
           5,
           5,
           5
         ],
-        "cachedSteps": 3,
-        "requests": 9,
-        "bytes": 26214400,
+        "cachedSteps": 5,
+        "requests": 0,
+        "bytes": 0,
         "drawsPerStep": [
           45,
           45,
-          18,
-          69,
+          45,
+          45,
           45
         ],
         "loci": [
@@ -975,18 +976,23 @@
           "chr22_mask:28,997..47,997"
         ],
         "load": {
-          "before": 1.38,
-          "after": 0.61
+          "before": 1.02,
+          "after": 0.31
         },
         "failures": []
       },
       "igv": {
         "median": null,
+        "drawMedian": null,
         "fetchedMedian": null,
         "runs": [
+          null,
+          null,
           null
         ],
         "appliedSteps": [
+          0,
+          0,
           0
         ],
         "cachedSteps": 0,
@@ -995,10 +1001,115 @@
         "drawsPerStep": [],
         "loci": [],
         "load": {
-          "before": 0.56,
-          "after": 0.55
+          "before": 1.02,
+          "after": 0.31
         },
         "failures": [
+          "Runtime.evaluate timed out. Increase the 'protocolTimeout' setting in launch/connect calls for a higher timeout if needed.",
+          "Runtime.evaluate timed out. Increase the 'protocolTimeout' setting in launch/connect calls for a higher timeout if needed.",
+          "Runtime.evaluate timed out. Increase the 'protocolTimeout' setting in launch/connect calls for a higher timeout if needed."
+        ]
+      },
+      "jbrowse-release-4.3.0": {
+        "median": 7595.800000000745,
+        "drawMedian": 0.10000000149011612,
+        "fetchedMedian": null,
+        "runs": [
+          8475.39999999851,
+          7595.800000000745,
+          6413.70000000298
+        ],
+        "appliedSteps": [
+          5,
+          5,
+          5
+        ],
+        "cachedSteps": 5,
+        "requests": 0,
+        "bytes": 0,
+        "drawsPerStep": [
+          4,
+          2,
+          4,
+          2,
+          4
+        ],
+        "loci": [
+          "chr22_mask:105,001..124,001",
+          "chr22_mask:86,000..105,000",
+          "chr22_mask:66,999..85,999",
+          "chr22_mask:47,998..66,998",
+          "chr22_mask:28,997..47,997"
+        ],
+        "load": {
+          "before": 1.02,
+          "after": 0.31
+        },
+        "failures": []
+      },
+      "jbrowse-release-2.4.0": {
+        "median": 7654.199999999255,
+        "drawMedian": 0.09999999776482582,
+        "fetchedMedian": null,
+        "runs": [
+          8554,
+          7654.199999999255,
+          7379.60000000149
+        ],
+        "appliedSteps": [
+          5,
+          5,
+          5
+        ],
+        "cachedSteps": 5,
+        "requests": 0,
+        "bytes": 0,
+        "drawsPerStep": [
+          4,
+          1,
+          2,
+          2,
+          2
+        ],
+        "loci": [
+          "chr22_mask:105,001..124,001",
+          "chr22_mask:86,000..105,000",
+          "chr22_mask:66,999..85,999",
+          "chr22_mask:47,998..66,998",
+          "chr22_mask:28,997..47,997"
+        ],
+        "load": {
+          "before": 1.02,
+          "after": 0.31
+        },
+        "failures": []
+      },
+      "igv-deep": {
+        "median": null,
+        "drawMedian": null,
+        "fetchedMedian": null,
+        "runs": [
+          null,
+          null,
+          null
+        ],
+        "appliedSteps": [
+          0,
+          0,
+          0
+        ],
+        "cachedSteps": 0,
+        "requests": 0,
+        "bytes": 0,
+        "drawsPerStep": [],
+        "loci": [],
+        "load": {
+          "before": 1.02,
+          "after": 0.31
+        },
+        "failures": [
+          "Runtime.evaluate timed out. Increase the 'protocolTimeout' setting in launch/connect calls for a higher timeout if needed.",
+          "Runtime.evaluate timed out. Increase the 'protocolTimeout' setting in launch/connect calls for a higher timeout if needed.",
           "Runtime.evaluate timed out. Increase the 'protocolTimeout' setting in launch/connect calls for a higher timeout if needed."
         ]
       }
@@ -1940,13 +2051,16 @@
     },
     "1000x-longread-cram": {
       "jbrowse": {
-        "median": 4316.6500000059605,
-        "fetchedMedian": 4655.949999988079,
+        "median": 3015,
+        "drawMedian": 1.7000000029802322,
+        "fetchedMedian": 3115.89999999851,
         "runs": [
-          4545.199999988079,
-          4088.100000023842
+          3166.1999999955297,
+          3015,
+          3010.4000000059605
         ],
         "appliedSteps": [
+          5,
           5,
           5
         ],
@@ -1968,19 +2082,22 @@
           "chr22_mask:28,997..47,997"
         ],
         "load": {
-          "before": 5.39,
-          "after": 10.22
+          "before": 0.31,
+          "after": 0.44
         },
         "failures": []
       },
       "igv": {
         "median": null,
+        "drawMedian": null,
         "fetchedMedian": null,
         "runs": [
+          null,
           null,
           null
         ],
         "appliedSteps": [
+          0,
           0,
           0
         ],
@@ -1990,11 +2107,115 @@
         "drawsPerStep": [],
         "loci": [],
         "load": {
-          "before": 5.39,
-          "after": 10.22
+          "before": 0.31,
+          "after": 0.44
         },
         "failures": [
-          "Protocol error (Runtime.evaluate): Target closed",
+          "Runtime.evaluate timed out. Increase the 'protocolTimeout' setting in launch/connect calls for a higher timeout if needed.",
+          "Runtime.evaluate timed out. Increase the 'protocolTimeout' setting in launch/connect calls for a higher timeout if needed.",
+          "Runtime.evaluate timed out. Increase the 'protocolTimeout' setting in launch/connect calls for a higher timeout if needed."
+        ]
+      },
+      "jbrowse-release-4.3.0": {
+        "median": 3905.5,
+        "drawMedian": 0,
+        "fetchedMedian": 4782.10000000149,
+        "runs": [
+          3905.5,
+          3893.5,
+          3957.1999999955297
+        ],
+        "appliedSteps": [
+          5,
+          5,
+          5
+        ],
+        "cachedSteps": 2,
+        "requests": 26,
+        "bytes": 49283072,
+        "drawsPerStep": [
+          10,
+          6,
+          10,
+          6,
+          10
+        ],
+        "loci": [
+          "chr22_mask:105,001..124,001",
+          "chr22_mask:86,000..105,000",
+          "chr22_mask:66,999..85,999",
+          "chr22_mask:47,998..66,998",
+          "chr22_mask:28,997..47,997"
+        ],
+        "load": {
+          "before": 0.31,
+          "after": 0.44
+        },
+        "failures": []
+      },
+      "jbrowse-release-2.4.0": {
+        "median": 1624.9000000059605,
+        "drawMedian": 0.10000000149011612,
+        "fetchedMedian": 7294.14999999851,
+        "runs": [
+          1272,
+          3756.3000000044703,
+          1624.9000000059605
+        ],
+        "appliedSteps": [
+          5,
+          5,
+          5
+        ],
+        "cachedSteps": 3,
+        "requests": 105,
+        "bytes": 49647616,
+        "drawsPerStep": [
+          4,
+          1,
+          2,
+          2,
+          2
+        ],
+        "loci": [
+          "chr22_mask:105,001..124,001",
+          "chr22_mask:86,000..105,000",
+          "chr22_mask:66,999..85,999",
+          "chr22_mask:47,998..66,998",
+          "chr22_mask:28,997..47,997"
+        ],
+        "load": {
+          "before": 0.31,
+          "after": 0.44
+        },
+        "failures": []
+      },
+      "igv-deep": {
+        "median": null,
+        "drawMedian": null,
+        "fetchedMedian": null,
+        "runs": [
+          null,
+          null,
+          null
+        ],
+        "appliedSteps": [
+          0,
+          0,
+          0
+        ],
+        "cachedSteps": 0,
+        "requests": 0,
+        "bytes": 0,
+        "drawsPerStep": [],
+        "loci": [],
+        "load": {
+          "before": 0.31,
+          "after": 0.44
+        },
+        "failures": [
+          "Runtime.evaluate timed out. Increase the 'protocolTimeout' setting in launch/connect calls for a higher timeout if needed.",
+          "Runtime.evaluate timed out. Increase the 'protocolTimeout' setting in launch/connect calls for a higher timeout if needed.",
           "Runtime.evaluate timed out. Increase the 'protocolTimeout' setting in launch/connect calls for a higher timeout if needed."
         ]
       }
@@ -2012,12 +2233,13 @@
     "1000x-shortread-cram": "2026-08-24",
     "20x-longread-cram": "2026-08-24",
     "200x-longread-cram": "2026-08-24",
-    "1000x-longread-cram": "2026-08-16",
+    "1000x-longread-cram": "2026-08-24",
     "20x-shortread-bam": "2026-08-24",
     "200x-shortread-bam": "2026-08-24",
     "1000x-shortread-bam": "2026-08-24",
     "20x-longread-bam": "2026-08-24",
-    "200x-longread-bam": "2026-08-24"
+    "200x-longread-bam": "2026-08-24",
+    "1000x-longread-bam": "2026-08-24"
   },
   "locusMismatch": {
     "1000x-shortread": "step counts differ: jbrowse 5, igv 4",
@@ -2027,5 +2249,6 @@
     "jbrowse": "current",
     "jbrowse-release-4.3.0": "release-4.3.0",
     "jbrowse-release-2.4.0": "release-2.4.0"
-  }
+  },
+  "motion": "pan"
 }

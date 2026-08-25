@@ -71,7 +71,13 @@ read_motion <- function(path, motion) {
         # how a benchmark ends up calling the difference "rendering". On a zoom
         # nothing is supposed to fetch, so every step counts.
         ms = if (motion == "Zoom in" || is.null(fetched)) num1(cell$median) else num1(fetched),
-        cached_only = motion == "Pan" && is.null(fetched),
+        requests = num1(cell$requests),
+        # From what the cell actually did, not from which motion it was. Keying
+        # this on the motion marked every zoom point as having gone to the
+        # network, when no arm issued a single request on any zoom step -- the
+        # legend then said the opposite of the finding, on the panel the finding
+        # is about.
+        cached_only = num1(cell$requests) == 0,
         draw_ms = num1(cell$drawMedian),
         # Median main-thread draws per step. A handful of calls means the arm
         # rasterized somewhere this instrument cannot see -- see main_thread below.
@@ -210,7 +216,8 @@ paper_fig(p_time, "results/figures/interaction.png", width = 13, height = 7.4)
 # drawImage blits, indistinguishable by number. An earlier version of this script
 # thresholded on the count and dropped cells at random.
 redraw <- d2 |>
-  filter(motion == "Zoom in", is.finite(draw_ms), !arm %in% ARM_BUILD[c("release-2.4.0", "release-4.3.0")])
+  filter(motion == "Zoom in", is.finite(draw_ms), !arm %in% ARM_BUILD[c("release-2.4.0", "release-4.3.0")]) |>
+  mutate(arm = droplevels(arm))
 offthread <- d2 |>
   filter(motion == "Zoom in", arm %in% ARM_BUILD[c("release-2.4.0", "release-4.3.0")]) |>
   distinct(arm) |>
@@ -222,7 +229,11 @@ if (nrow(redraw)) {
     geom_line(linewidth = 0.75) +
     geom_point(size = 2.5) +
     facet_grid(format ~ read, scales = "free_y") +
-    scale_colour_manual(values = ARMS, drop = FALSE) +
+    # drop = TRUE here, unlike every other figure in this repo. The two release
+    # arms are deliberately absent, and keeping their levels puts them in the
+    # legend with no line beside them -- which reads as a failed measurement
+    # rather than as an exclusion the caption explains.
+    scale_colour_manual(values = ARMS, drop = TRUE, limits = force) +
     cov_scale +
     scale_y_log10(labels = label_number(scale_cut = cut_short_scale()),
                   expand = expansion(mult = c(0.08, 0.2))) +

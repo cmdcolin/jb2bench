@@ -306,83 +306,83 @@
     },
     "20x-longread-bam": {
       "jbrowse": {
-        "median": 2229,
-        "mean": 2222,
-        "stddev": 118.08753815143521,
+        "median": 2205,
+        "mean": 2246.6666666666665,
+        "stddev": 64.66494843078092,
         "runs": [
-          2074,
-          2363,
-          2229
+          2197,
+          2205,
+          2338
         ],
         "load": {
-          "before": 2.03,
-          "after": 2.43,
-          "foreignCores": 0.5552148949216784,
-          "foreignTop": "MainThread 0.12, npm exec tsx sc 0.06, npm exec tsx we 0.05"
+          "before": 1.15,
+          "after": 1.44,
+          "foreignCores": 0.10804904698312191,
+          "foreignTop": "firefox 0.02, claude 0.01"
         }
       },
       "igv": {
-        "median": 3917,
-        "mean": 4383.666666666667,
-        "stddev": 873.8475585338415,
+        "median": 3556,
+        "mean": 3535,
+        "stddev": 205.07071950914883,
         "runs": [
-          5608,
-          3626,
-          3917
+          3274,
+          3775,
+          3556
         ],
         "load": {
-          "before": 1.85,
-          "after": 2.43,
-          "foreignCores": 0.5544488249306934,
-          "foreignTop": "MainThread 0.12, npm exec tsx sc 0.07, npm exec tsx we 0.05"
+          "before": 1.18,
+          "after": 1.44,
+          "foreignCores": 0.10800479347116791,
+          "foreignTop": "firefox 0.02, claude 0.01"
         }
       },
       "igv-deep": {
-        "median": 3839,
-        "mean": 3902,
-        "stddev": 147.72271321635003,
+        "median": 3573,
+        "mean": 3572.3333333333335,
+        "stddev": 37.56180092712394,
         "runs": [
-          3839,
-          3761,
-          4106
+          3573,
+          3618,
+          3526
         ],
         "load": {
-          "before": 1.78,
-          "after": 2.43,
-          "foreignCores": 0.567325505272101,
-          "foreignTop": "MainThread 0.12, npm exec tsx sc 0.07, npm exec tsx we 0.05"
+          "before": 1.65,
+          "after": 1.44,
+          "foreignCores": 0.1079916882801687,
+          "foreignTop": "firefox 0.02, claude 0.01"
         }
       },
       "jbrowse-release-4.3.0": {
-        "median": 3081,
-        "mean": 3038.6666666666665,
-        "stddev": 76.7086841382527,
+        "median": 3060,
+        "mean": 3058.6666666666665,
+        "stddev": 36.75444039689475,
         "runs": [
-          3081,
-          3104,
-          2931
+          3013,
+          3060,
+          3103
         ],
         "load": {
-          "before": 2.18,
-          "after": 2.43,
-          "foreignCores": 0.5674075106249558,
-          "foreignTop": "MainThread 0.12, npm exec tsx sc 0.07, npm exec tsx we 0.05"
+          "before": 1.14,
+          "after": 1.44,
+          "foreignCores": 0.10803429178362495,
+          "foreignTop": "firefox 0.02, claude 0.01"
         }
       },
       "jbrowse-release-2.4.0": {
-        "median": 3243,
-        "mean": 3259,
-        "stddev": 85.66601815578139,
+        "median": 3245,
+        "mean": 3220,
+        "stddev": 36.0647565729573,
         "runs": [
-          3243,
-          3371,
-          3163
+          3245,
+          3169,
+          3246
         ],
         "load": {
-          "before": 2.09,
-          "after": 2.43,
-          "foreignCores": 0.5669183827012562,
-          "foreignTop": "MainThread 0.12, npm exec tsx sc 0.07, npm exec tsx we 0.05"
+          "before": 1.29,
+          "after": 1.44,
+          "foreignCores": 0.10801954061352372,
+          "foreignTop": "firefox 0.02, claude 0.01"
         }
       }
     },
@@ -470,83 +470,83 @@
     },
     "1000x-longread-bam": {
       "jbrowse": {
-        "median": 5359,
-        "mean": 5324,
-        "stddev": 110.98047876390994,
+        "median": 5164,
+        "mean": 5148.666666666667,
+        "stddev": 35.96603335865043,
         "runs": [
-          5174,
-          5439,
-          5359
+          5099,
+          5183,
+          5164
         ],
         "load": {
-          "before": 1.54,
-          "after": 5.47,
-          "foreignCores": 0.6152620699428724,
-          "foreignTop": "tsgolint 0.10, MainThread 0.05, firefox 0.03"
+          "before": 1.33,
+          "after": 1.64,
+          "foreignCores": 0.07439837969081797,
+          "foreignTop": "firefox 0.02"
         }
       },
       "igv": {
-        "median": 60036,
-        "mean": 60334.666666666664,
-        "stddev": 1047.039424069388,
+        "median": 56855,
+        "mean": 57368.333333333336,
+        "stddev": 1408.6689540918485,
         "runs": [
-          59228,
-          60036,
-          61740
+          59292,
+          55958,
+          56855
         ],
         "load": {
-          "before": 1.25,
-          "after": 5.47,
-          "foreignCores": 0.6143045624093937,
-          "foreignTop": "tsgolint 0.10, MainThread 0.05, firefox 0.03"
+          "before": 1.3,
+          "after": 1.64,
+          "foreignCores": 0.07439486342853556,
+          "foreignTop": "firefox 0.02"
         }
       },
       "igv-deep": {
-        "median": 58917,
-        "mean": 65927.33333333333,
-        "stddev": 10511.512302656021,
+        "median": 56779,
+        "mean": 56936.666666666664,
+        "stddev": 261.3482138620597,
         "runs": [
-          58080,
-          58917,
-          80785
+          57305,
+          56726,
+          56779
         ],
         "load": {
-          "before": 1.41,
-          "after": 5.47,
-          "foreignCores": 0.6098814377324117,
-          "foreignTop": "tsgolint 0.10, MainThread 0.05, firefox 0.03"
+          "before": 1.19,
+          "after": 1.64,
+          "foreignCores": 0.07439369141496815,
+          "foreignTop": "firefox 0.02"
         }
       },
       "jbrowse-release-4.3.0": {
-        "median": 20277,
-        "mean": 19771,
-        "stddev": 807.0617489800062,
+        "median": 18319,
+        "mean": 19012.333333333332,
+        "stddev": 1475.9309679731712,
         "runs": [
-          18632,
-          20277,
-          20404
+          17654,
+          18319,
+          21064
         ],
         "load": {
-          "before": 1.52,
-          "after": 5.47,
-          "foreignCores": 0.6160990762504646,
-          "foreignTop": "tsgolint 0.10, MainThread 0.05, firefox 0.03"
+          "before": 1.3,
+          "after": 1.64,
+          "foreignCores": 0.07439707733269861,
+          "foreignTop": "firefox 0.02"
         }
       },
       "jbrowse-release-2.4.0": {
-        "median": 37984,
-        "mean": 37759.333333333336,
-        "stddev": 323.3999931285645,
+        "median": 36214,
+        "mean": 35908.333333333336,
+        "stddev": 669.0661817455397,
         "runs": [
-          37302,
-          37992,
-          37984
+          34980,
+          36214,
+          36531
         ],
         "load": {
-          "before": 1.45,
-          "after": 5.47,
-          "foreignCores": 0.6128150038848632,
-          "foreignTop": "tsgolint 0.10, MainThread 0.05, firefox 0.03"
+          "before": 1.5,
+          "after": 1.64,
+          "foreignCores": 0.07439603547903183,
+          "foreignTop": "firefox 0.02"
         }
       }
     },
@@ -716,83 +716,83 @@
     },
     "1000x-shortread-cram": {
       "jbrowse": {
-        "median": 3171,
-        "mean": 3176.3333333333335,
-        "stddev": 15.173075568988056,
+        "median": 2947,
+        "mean": 2948,
+        "stddev": 3.7416573867739413,
         "runs": [
-          3197,
-          3161,
-          3171
+          2944,
+          2953,
+          2947
         ],
         "load": {
-          "before": 1.29,
-          "after": 2.03,
-          "foreignCores": 2.2949707926819842,
-          "foreignTop": "MainThread 1.16, tsgolint 0.18, tsc 0.12"
+          "before": 0.41,
+          "after": 1.15,
+          "foreignCores": 0.08550428806391044,
+          "foreignTop": "firefox 0.02"
         }
       },
       "jbrowse-release-4.3.0": {
-        "median": 6154,
-        "mean": 6159.666666666667,
-        "stddev": 36.55437350334734,
+        "median": 5884,
+        "mean": 5876.333333333333,
+        "stddev": 70.02063188010295,
         "runs": [
-          6118,
-          6207,
-          6154
+          5787,
+          5958,
+          5884
         ],
         "load": {
-          "before": 1.19,
-          "after": 2.03,
-          "foreignCores": 2.304078713750243,
-          "foreignTop": "MainThread 1.16, tsgolint 0.18, tsc 0.13"
+          "before": 0.42,
+          "after": 1.15,
+          "foreignCores": 0.08557300136931557,
+          "foreignTop": "firefox 0.02"
         }
       },
       "jbrowse-release-2.4.0": {
-        "median": 14877,
-        "mean": 14987,
-        "stddev": 657.8120298889849,
+        "median": 13126,
+        "mean": 13328,
+        "stddev": 434.8271687310565,
         "runs": [
-          15842,
-          14242,
-          14877
+          12926,
+          13126,
+          13932
         ],
         "load": {
-          "before": 1.16,
-          "after": 2.03,
-          "foreignCores": 2.317292695406653,
-          "foreignTop": "MainThread 1.16, tsgolint 0.18, tsc 0.13"
+          "before": 0.43,
+          "after": 1.15,
+          "foreignCores": 0.08556986002665182,
+          "foreignTop": "firefox 0.02"
         }
       },
       "igv": {
-        "median": 29576,
-        "mean": 32030,
-        "stddev": 3694.7360753735397,
+        "median": 27202,
+        "mean": 27281.333333333332,
+        "stddev": 137.68643925803136,
         "runs": [
-          37252,
-          29576,
-          29262
+          27475,
+          27202,
+          27167
         ],
         "load": {
-          "before": 1.19,
-          "after": 2.03,
-          "foreignCores": 2.29749472931487,
-          "foreignTop": "MainThread 1.16, tsgolint 0.18, tsc 0.12"
+          "before": 0.62,
+          "after": 1.15,
+          "foreignCores": 0.08556703301544022,
+          "foreignTop": "firefox 0.02"
         }
       },
       "igv-deep": {
-        "median": 29652,
-        "mean": 37478.333333333336,
-        "stddev": 11080.837102353275,
+        "median": 27572,
+        "mean": 27322.333333333332,
+        "stddev": 565.9047819397025,
         "runs": [
-          53149,
-          29652,
-          29634
+          26539,
+          27572,
+          27856
         ],
         "load": {
-          "before": 1.59,
-          "after": 2.03,
-          "foreignCores": 2.32115667938578,
-          "foreignTop": "MainThread 1.16, tsgolint 0.18, tsc 0.13"
+          "before": 0.75,
+          "after": 1.15,
+          "foreignCores": 0.08556420619101701,
+          "foreignTop": "firefox 0.02"
         }
       }
     },
@@ -1047,12 +1047,12 @@
     "20x-shortread-bam": "2026-08-24",
     "200x-shortread-bam": "2026-08-24",
     "1000x-shortread-bam": "2026-08-24",
-    "20x-longread-bam": "2026-08-24",
+    "20x-longread-bam": "2026-08-25",
     "200x-longread-bam": "2026-08-24",
-    "1000x-longread-bam": "2026-08-24",
+    "1000x-longread-bam": "2026-08-25",
     "20x-shortread-cram": "2026-08-24",
     "200x-shortread-cram": "2026-08-24",
-    "1000x-shortread-cram": "2026-08-24",
+    "1000x-shortread-cram": "2026-08-25",
     "20x-longread-cram": "2026-08-24",
     "200x-longread-cram": "2026-08-24",
     "1000x-longread-cram": "2026-08-24"
