@@ -1,0 +1,20 @@
+{
+  "matrix": "100-kb-window-maf-0-samples.bin",
+  "rows": 2504,
+  "cols": 3105,
+  "budgetMs": 1800000,
+  "results": [
+    {
+      "n": 2504,
+      "v": 3105,
+      "distanceMs": 34984.6,
+      "clusterMs": 130077.1,
+      "totalMs": 165061.9,
+      "clusterShare": 0.7881
+    }
+  ],
+  "exponents": {
+    "distance": null,
+    "cluster": null
+  }
+}
