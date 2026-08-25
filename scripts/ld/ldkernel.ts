@@ -222,7 +222,7 @@ export interface GpuSession {
  * being fooled by it.
  */
 export async function launchGpuPage(
-  opts: { headed?: boolean } = {},
+  opts: { headed?: boolean; protocolTimeoutMs?: number } = {},
 ): Promise<GpuSession> {
   const srv = http.createServer((_q, s) => {
     s.writeHead(200, { 'Content-Type': 'text/html' })
@@ -236,6 +236,11 @@ export async function launchGpuPage(
     headless: !opts.headed,
     executablePath: chromePath(),
     args: GPU_ARGS,
+    // Default is 180s, and it applies to a single Runtime.callFunctionOn — so a
+    // page.evaluate that runs minutes of CPU work inside the page dies with a
+    // ProtocolError even though nothing is wrong. These benchmarks deliberately
+    // hold long work in one evaluate to keep it on one clock.
+    protocolTimeout: opts.protocolTimeoutMs ?? 3_600_000,
   })
   const page = await browser.newPage()
   // puppeteer types this payload as `unknown`, and rightly so: a page can throw
