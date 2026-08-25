@@ -199,6 +199,8 @@ interface Saved {
   results?: Record<string, Record<Mode, Partial<Record<Role, Result>>>>
   measuredAt?: Partial<Record<Mode, string>>
   builds?: Partial<Record<Role, string>>
+  /** which instrument decided "content is back", per mode */
+  detector?: Partial<Record<Mode, string>>
 }
 const priorRaw: Saved = fs.existsSync('results/interaction.json')
   ? (JSON.parse(fs.readFileSync('results/interaction.json', 'utf8')) as Saved)
@@ -210,8 +212,17 @@ const prior: Saved = { ...priorRaw, results: migrateCaseKeys(priorRaw.results) }
 
 const stamp = new Date().toISOString().slice(0, 10)
 const measuredAt = { ...prior.measuredAt }
+// Which instrument produced each mode's numbers, recorded per mode for the same
+// reason `measuredAt` is: a filtered re-run mixes vintages, and after 2026-08-25
+// it can mix INSTRUMENTS too. The text detector scored release-2.4.0 at 0 ms for
+// zooms that take seconds, so "which detector" is not a footnote about a cell —
+// it decides whether the published column is usable at all. Anything recorded
+// before the field existed was measured with the text detector.
+const DETECTOR = process.env.DETECTOR ?? 'structural'
+const detector = { ...prior.detector }
 for (const m of MODES) {
   measuredAt[m] = stamp
+  detector[m] = DETECTOR
 }
 
 const results: Record<string, Record<Mode, Partial<Record<Role, Result>>>> = {}
@@ -322,6 +333,7 @@ fs.writeFileSync(
           : {}),
       },
       measuredAt,
+      detector,
       results,
     },
     null,
@@ -370,7 +382,11 @@ md += `redraw = longest frame (ms) of the GPU redraw. A \`≥\` prefix marks a c
 // Modes can be re-measured independently (MODES=pan), so the table can hold
 // numbers from different runs. Say when each one was taken rather than letting
 // the page imply they are one sitting.
-const when = ALL_MODES.map(m => `${m}: ${measuredAt[m] ?? 'unknown'}`).join(', ')
+const when = ALL_MODES.map(
+  m =>
+    `${m}: ${measuredAt[m] ?? 'unknown'}` +
+    ` (${detector[m] ?? 'text, pre-2026-08-25'})`,
+).join(', ')
 md += `Measured — ${when}. Comparisons *within* a section are same-run; comparisons across sections may not be.\n\n`
 
 md += `## Zoom IN — only the old renderer refetches\n\n`
