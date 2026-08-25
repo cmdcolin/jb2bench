@@ -251,6 +251,78 @@ fs.writeFileSync(
   }),
 )
 
-console.log(`wrote ${OUT}/tab-{initial-render,zoom-interaction,pan-time-to-content,crosstool}.tex`)
+// -------------------------------------------------------- tab:crosstool-pan
+
+const pan = read('crosstool-pan.json')
+
+// A row is a comparison only where both tools went to the network on at least
+// one step. panrunner leaves fetchedMedian null for an arm that served every
+// step from what it already held, and a cached median over a fetched one is not
+// a ratio -- which is what keeps the long-read cases out, since this work
+// answers every step there from resident data. The row set follows the run
+// rather than a list written here.
+const fetched = (c: string, tool: string) => {
+  const v = pan.rows?.[c]?.[tool]?.fetchedMedian
+  return typeof v === 'number' && Number.isFinite(v) ? v : undefined
+}
+const panCases = CASES.filter(c => fetched(c, 'jbrowse') && fetched(c, 'igv'))
+
+const group = (n: number) => n.toLocaleString('en-US')
+const draws = (steps: number[] | undefined) => {
+  if (!steps?.length) return '---'
+  const lo = Math.min(...steps)
+  const hi = Math.max(...steps)
+  return lo === hi ? group(lo) : `${group(lo)}--${group(hi)}`
+}
+
+const xtPanRows = panCases.map(c => {
+  const row = pan.rows[c]
+  return [
+    LABELS[CASES.indexOf(c)]!,
+    ms(fetched(c, 'jbrowse')),
+    ms(fetched(c, 'igv')),
+    ratio(fetched(c, 'igv'), fetched(c, 'jbrowse')),
+    draws(row.jbrowse?.drawsPerStep),
+    draws(row.igv?.drawsPerStep),
+  ]
+})
+
+// panrunner records where each tool actually landed rather than assuming it,
+// and a row whose step counts disagree is a comparison over the steps the two
+// shared. Saying so in the caption is the alternative to dropping the row.
+const mismatched = panCases
+  .filter(c => pan.locusMismatch?.[c])
+  .map(c => `${LABELS[CASES.indexOf(c)]} (${pan.locusMismatch[c]})`)
+const rounds = pan.rows?.[panCases[0]!]?.jbrowse?.runs?.length ?? 3
+const numeral = ['zero', 'one', 'two', 'three', 'four', 'five', 'six'][rounds] ?? `${rounds}`
+const panDates = [...new Set(panCases.map(c => pan.dates?.[c]).filter(Boolean))]
+
+fs.writeFileSync(
+  path.join(OUT, 'tab-crosstool-pan.tex'),
+  longtable({
+    align: 'lrrrrr',
+    caption:
+      `\\label{tab:crosstool-pan}Pan against igv.js ${pan.igvVersion}, one viewport per ` +
+      `step at constant scale, median of ${numeral} interleaved rounds over the steps on ` +
+      `which the tool fetched. Draw calls are per step, counted by patching the canvas ` +
+      `drawing APIs; they are a function of the data and the code rather than of the ` +
+      `machine, and repeat to within about 1\\% across runs. Measured ` +
+      `${panDates.join(', ')}. Only the cases in which both tools went to the network ` +
+      `appear: where this work answered every step from data it already held there is ` +
+      `nothing to divide.` +
+      (mismatched.length
+        ? ` The two tools did not apply the same number of steps at ` +
+          `${mismatched.join('; ')}, so that row compares per-step medians over the ` +
+          `steps they shared.`
+        : ''),
+    header: ['Case', 'This work', 'igv.js', 'Ratio', 'Draws', 'Draws, igv'],
+    rows: xtPanRows,
+  }),
+)
+
+console.log(
+  `wrote ${OUT}/tab-{initial-render,zoom-interaction,pan-time-to-content,crosstool,crosstool-pan}.tex`,
+)
+console.log(`cross-tool pan rows carried: ${panCases.join(', ') || 'none'}`)
 console.log(`cold-load builds carried: ${coldBuilds.join(', ')}`)
 console.log(`worst foreign CPU across the cold matrix: ${worstForeign.toFixed(2)} cores`)
