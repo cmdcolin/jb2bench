@@ -105,3 +105,4 @@ flame/*.svg
 # the day that commit reached the primary checkout it replaced the real directory
 # with a link pointing at itself -- destroying every built library arm in it.
 ecosystem/.libs
+.claude
