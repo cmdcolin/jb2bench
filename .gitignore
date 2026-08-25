@@ -78,6 +78,16 @@ flame/*.svg
 /results/backends.json
 /results/backends.md
 
+# ecosystem/ has its own pnpm install. In a git worktree this is a symlink to the
+# primary checkout's copy, and an ABSOLUTE one -- so committing it made git write
+# a link pointing at its own path the first time that commit reached the primary,
+# destroying the real directory. Exactly what happened to ecosystem/.libs.
+#
+# Relative symlinks into the repo are fine and several are tracked on purpose
+# (crosstool/data -> ../data). It is absolute ones naming this checkout that
+# cannot survive being checked out somewhere else. Nothing should add one.
+/ecosystem/node_modules
+
 # The indexed VCF the browser benchmarks read. shell/generate_indexed_vcf.sh
 # writes it from data/variants.1000.wide.vcf, so it is regenerable like the rest
 # of the corpus -- it was tracked by accident, and a 1.3 MB binary that a script
