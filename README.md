@@ -159,9 +159,10 @@ content, with the widest margins on the heaviest tracks. The zoom column is not
 a speedup ratio: 0 ms means the branch showed no loading state at all, so there
 is nothing to divide.
 
-The metric is **time-to-content**: milliseconds a loading indicator is shown
-after an interaction before correct content returns, driven through
-`window.JBrowseSession` (both builds expose it). `MODE` selects what the
+The metric is **time-to-content**: milliseconds the view goes without correct
+content after an interaction, driven through `window.JBrowseSession` (every build
+exposes it) and measured structurally by `scripts/render/contentready.ts` rather
+than by reading a spinner's text — see the instrument notes below for why. `MODE` selects what the
 interaction is, and the three modes ask different questions:
 
 - **in** (default) — zoom in. The new view is a strict subset of loaded data, so
@@ -809,24 +810,47 @@ lessons from measurements that turned out to be measuring the wrong thing.
   time near zero. On a baseline column that quietly shrinks every speedup in the
   table.
 
-- **The loading-indicator wording is version-dependent too, and missing it reads
-  as a perfect score.** `scripts/render/interaction.ts` decides that content is
-  back when no loading indicator is on screen, so an indicator it does not
-  recognize is indistinguishable from an interaction that never blocked. The
-  detector matched `/Downloading|Loading alignments|Rendering/`; release-2.4.0
-  labels a refetching block plain **`Loading`** and its worker step
-  **`Serializing results`**, neither of which that pattern catches. Measured on
-  2026-08-13, the 2023 build therefore scored **0 ms on every zoom-in case** —
-  the same as the GPU branch, and the strongest-looking result in the table was
-  the instrument failing. With the pattern widened, the same cell reads 3366 ms
-  on 200x-longread.
+- **The loading indicator is no longer read as text, because that cannot be made
+  to work.** `scripts/render/interaction.ts` decides that content is back when
+  nothing is outstanding, and until 2026-08-25 it asked that by matching
+  `document.body.innerText`. Both patterns it could use are wrong:
+  `/Downloading|Loading alignments|Rendering/` misses release-2.4.0, which labels
+  a refetching block plain **`Loading`** and its worker step **`Serializing
+  results`**; adding `/\bLoading\b/` matches release-4.3.0 *permanently*, since
+  4.3.0 fully rendered and idle still carries four `Loading` strings, so every
+  step runs to `MAX_WAIT`. The per-build fallback between them needs the page to
+  be genuinely at rest when it samples, and on 2.4.0 the render-complete detector
+  says "at rest" with one block of six painted — so the fallback chose the narrow
+  pattern for 2.4.0 in **seven of twelve cells**, and those cells recorded 0 ms
+  with `loadingEverSeen: false` for zooms that take seconds.
 
   The direction of the error is what makes it dangerous: an unrecognized
-  indicator can only ever make a build look *faster*, and it lands hardest on
-  the oldest build in the matrix, which is the one whose wording is least likely
-  to match. Widening was checked against the other columns rather than assumed
-  safe — at rest `builds/current` carries no `Loading` text at all and a zoom-in
-  adds no blocks to it, so its 0 ms rests on its own evidence and did not move.
+  indicator can only ever make a build look *faster*, and it lands hardest on the
+  oldest build in the matrix, whose wording is least likely to match.
+
+  `scripts/render/contentready.ts` replaces it with a structural question, per
+  build generation. Builds from the DisplayChrome work publish
+  `data-display-phase` and `data-display-drawn`; older builds (4.3.0 and 2.4.0
+  alike) mark each finished block with a **region-keyed** marker,
+  `prerendered_canvas_{hg19mod}chr22_mask:119891..131879-0_done`. Content is back
+  once the finished regions **cover the region on screen** — which is exact,
+  needs no word list, and is checkable the instant an interaction is applied.
+  `DETECTOR=text` still runs the old way for comparison.
+
+  Two wrong versions of this are recorded in that file's header so nobody rebuilds
+  them. Waiting for the DOM to *stop changing* declares content back in the gap
+  between two blocks, which under load ended a warmup step early and left 2.4.0's
+  track blank for the rest of the run. Counting *finished blocks* instead of
+  measuring coverage called a view ready with half the screen unrendered, and
+  then called a pan ready because the one stale block still overlapped the new
+  view.
+
+  Measured 2026-08-25 on 200x-longread-bam, zoom in: `builds/current` reads 0 ms
+  on every step with **nothing** outstanding at any sample — its zero now rests on
+  a positive structural fact rather than on a regex missing — while 2.4.0 reads
+  1.8–5.1 s where the text detector recorded 0. **`results/interaction.json`
+  predates this and was measured with the text detector; the matrix needs
+  re-running on an idle box before those numbers are quoted.**
 
 - **A positive gate runs before any of it.** Every signal above is negative — no
   overlay, no unpainted display, no unstable count — so all of them pass on a

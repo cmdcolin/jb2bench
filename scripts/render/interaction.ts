@@ -7,11 +7,18 @@
 // alignments..." until it finishes. The GPU branch re-projects already-loaded
 // reads at the new zoom instantly, with no refetch and no loading state.
 //
-// So the metric that matters is TIME-TO-CONTENT after a zoom: how long a loading
-// indicator is shown before correct content is back. We drive the view model
-// directly via window.JBrowseSession (exposed by both builds) and sample the
-// loading state at high frequency. We also record the redraw frame cost (max rAF
+// So the metric that matters is TIME-TO-CONTENT after a zoom: how long the view
+// goes without correct content before it is back. We drive the view model
+// directly via window.JBrowseSession (exposed by every build) and sample
+// readiness at high frequency. We also record the redraw frame cost (max rAF
 // gap). Hardware-GPU headless.
+//
+// "Not ready" is asked STRUCTURALLY, in contentready.ts: how many units of the
+// current view have yet to finish rendering, counted from each generation's own
+// contract. It used to be asked by matching the text of a spinner, which is not
+// portable across build generations and silently scored release-2.4.0 at 0 ms —
+// that file has the full account, and DETECTOR=text still runs the old way for
+// comparison.
 //
 // THREE MODES, set by MODE=in|out|pan (default in; ZOOM= is the legacy name):
 //
@@ -40,6 +47,11 @@
 // Prints JSON with per-step time-to-content and redraw cost.
 import puppeteer from 'puppeteer'
 import { waitForRenderComplete } from './rendercomplete.ts'
+import {
+  contentReadyProbe,
+  waitForContentReady,
+  QUIET_MS,
+} from './contentready.ts'
 import fs from 'fs'
 import path from 'path'
 
@@ -78,6 +90,9 @@ const STEPS = 5 // attempted; out and pan stop early when they run out of contig
 const PAN_SIGN = process.env.PAN_DIR === 'right' ? 1 : -1
 
 const browser = await puppeteer.launch({
+  // The cache holds whatever `puppeteer browsers install` last fetched, which is
+  // not always the version this puppeteer pins. CHROME= names one explicitly.
+  executablePath: process.env.CHROME,
   headless: process.env.HEADLESS !== '0',
   args: [
     '--no-sandbox',
@@ -98,6 +113,19 @@ await page.goto(url, { waitUntil: 'load' })
 // data-display-phase contract it never fired. See rendercomplete.ts.
 const contract = await waitForRenderComplete(page)
 console.error(`render-complete contract: ${contract}`)
+
+// ...and then wait for every block of the view to be finished, which the
+// contract above does not establish on a legacy build: its legacy branch reports
+// ready as soon as ONE `-done` node exists anywhere, and on release-2.4.0 that
+// is one block of six with the rest still loading. Timing a step against a page
+// that had not finished its initial render is half of how 2.4.0 came to record
+// zeros.
+const settleIn = await waitForContentReady(page, { timeoutMs: 120000 })
+console.error(
+  `initial render: ${settleIn.contract} contract, a further ` +
+    `${settleIn.notReadyUntilMs}ms to finish every block` +
+    `${settleIn.censored ? ' (CENSORED: still unfinished)' : ''}`,
+)
 
 // install a frame recorder for redraw-cost (max rAF gap)
 await page.evaluate(() => {
@@ -148,14 +176,29 @@ const LOADING_FN = (wide: boolean) => {
 // is the harness giving up rather than content arriving. Zoom-out fetches more
 // data than zoom-in, so the ceiling has to be well clear of any real value.
 const MAX_WAIT = Number(process.env.MAX_WAIT ?? 120000)
-const QUIET = 300 // content considered back once loading stays false this long
+// Content is considered back once the page has stayed settled this long. Shared
+// with contentsignature.ts so the two detectors use one definition of "settled
+// long enough to count", and overridable with QUIET_MS.
+const QUIET = QUIET_MS
 
 // Decide the pattern here, with the page rendered and idle. Printed on stderr
 // for the same reason the render-complete contract is: a cell measured under a
 // different detector from its neighbours should be visible, not silent.
 const WIDE_OK = !(await page.evaluate(LOADING_FN, true))
+
+// DETECTOR=structural is the default as of 2026-08-25. The text detector above
+// is kept, behind DETECTOR=text, because every number recorded before that date
+// was measured with it and a claim about a change of instrument has to be
+// checkable by running both. See contentready.ts for why it cannot be the
+// default: on release-2.4.0 it reports 0 ms for a zoom that takes six seconds.
+const DETECTOR = process.env.DETECTOR ?? 'structural'
+if (DETECTOR !== 'structural' && DETECTOR !== 'text') {
+  throw new Error(`DETECTOR must be structural|text, got "${DETECTOR}"`)
+}
 console.error(
-  `loading detector: ${WIDE_OK ? 'wide' : 'narrow (wide matches this build at rest)'}`,
+  DETECTOR === 'structural'
+    ? 'detector: outstanding blocks (structural)'
+    : `detector: loading text, ${WIDE_OK ? 'wide' : 'narrow (wide matches this build at rest)'}`,
 )
 
 // Past a byte threshold JBrowse refuses the fetch and renders "Requested too
@@ -191,6 +234,10 @@ interface StepMetric {
 }
 
 async function interactStep(): Promise<StepMetric> {
+  // Which blocks were finished before the view moved. A build that swaps in
+  // blocks for the new region has reacted even if it never showed a gap; see
+  // ACK_MS in contentready.ts for the race this closes.
+  const keysBefore = (await page.evaluate(contentReadyProbe)).doneKeys
   const { t0, applied, locus } = await page.evaluate(
     ({ mode, factor, sign }) => {
       const w = window as unknown as {
@@ -262,28 +309,52 @@ async function interactStep(): Promise<StepMetric> {
     }
   }
 
-  // sample loading state until it has been false for QUIET ms (or timeout)
+  // How long until content is back. Both detectors answer it the same shape --
+  // the last moment the page was NOT settled, relative to the interaction -- so
+  // a step is timed identically either way and only the definition of "settled"
+  // differs.
   let lastLoadingTrue = 0
   let loadingSeen = false
   let censored = false
-  const start = Date.now()
-  for (;;) {
-    const loading = await page.evaluate(LOADING_FN, WIDE_OK)
-    const elapsed = Date.now() - start
-    if (loading) {
-      loadingSeen = true
-      lastLoadingTrue = elapsed
+  if (DETECTOR === 'structural') {
+    const settle = await waitForContentReady(page, {
+      quietMs: QUIET,
+      timeoutMs: MAX_WAIT,
+      baselineKeys: keysBefore,
+    })
+    lastLoadingTrue = settle.notReadyUntilMs
+    loadingSeen = settle.wasBusy
+    censored = settle.censored
+    // Per step, on stderr, for the same reason the detector choice is printed:
+    // a step that read 0 ms because the build had nothing to refetch and one
+    // that read 0 ms because its track was blank look identical in the JSON.
+    // `peak` separates them — a blank track has no blocks outstanding.
+    console.error(
+      `  step: ${settle.notReadyUntilMs}ms busy=${settle.wasBusy} ` +
+        `peakOutstanding=${settle.peakOutstanding} ack=${settle.acknowledged}` +
+        `${settle.censored ? ' CENSORED' : ''}`,
+    )
+  } else {
+    // sample loading state until it has been false for QUIET ms (or timeout)
+    const start = Date.now()
+    for (;;) {
+      const loading = await page.evaluate(LOADING_FN, WIDE_OK)
+      const elapsed = Date.now() - start
+      if (loading) {
+        loadingSeen = true
+        lastLoadingTrue = elapsed
+      }
+      if (elapsed - lastLoadingTrue >= QUIET && elapsed >= QUIET) {
+        break
+      }
+      if (elapsed >= MAX_WAIT) {
+        // never observed QUIET ms of settled content, so the true
+        // time-to-content is greater than this, not equal to it
+        censored = loadingSeen
+        break
+      }
+      await new Promise(r => setTimeout(r, 20))
     }
-    if (elapsed - lastLoadingTrue >= QUIET && elapsed >= QUIET) {
-      break
-    }
-    if (elapsed >= MAX_WAIT) {
-      // never observed QUIET ms of settled content, so the true time-to-content
-      // is greater than this, not equal to it
-      censored = loadingSeen
-      break
-    }
-    await new Promise(r => setTimeout(r, 20))
   }
 
   const redrawGapMs = await page.evaluate(t0arg => {
