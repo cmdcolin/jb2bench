@@ -8,5 +8,22 @@
 # postinstall run therefore spends a large download on a browser nothing here
 # reads, and lets an unrelated browser-download failure fail `pnpm install`.
 # Install the measurement browser explicitly instead, as the README describes.
+#
+# Nothing here runs its install scripts, and each `false` is a checked claim
+# rather than a default. pnpm asks about these because they declare one; what
+# they declare is:
+#
+#   core-js     a postinstall that prints a funding banner. Noise.
+#   esbuild     `node install.js`, which fetches the native binary -- but
+#               @esbuild/linux-x64 is installed as an optional platform
+#               dependency and supplies it, so `npx esbuild --version` answers
+#               with this off. Verified 2026-08-28 on 0.28.2.
+#   gosling.js  a `preinstall` of `npx only-allow pnpm`, a guard against being
+#               installed by npm. This repo uses pnpm, and running it would
+#               spawn a network npx to learn that.
+#   puppeteer   see the paragraph above.
 allowBuilds:
+  core-js: false
+  esbuild: false
+  gosling.js: false
   puppeteer: false

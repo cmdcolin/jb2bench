@@ -7,14 +7,19 @@
   },
   "dependencies": {
     "@genome-spy/core": "0.85.0",
+    "gosling.js": "1.0.7",
     "http-server": "^14.1.0",
     "igv": "3.8.5",
+    "pixi.js": "^6.5.10",
     "puppeteer": "24.43.1",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
     "tablemark": "^4.1.0"
   },
   "devDependencies": {
     "@types/node": "^25.9.3",
     "@webgpu/types": "^0.1.71",
+    "esbuild": "^0.28.2",
     "source-map": "^0.7.6",
     "typescript": "^5.9.3"
   }
