@@ -39,14 +39,30 @@ export interface Drew {
   canvases: number
   /** bytes pulled from files in the corpus */
   bytes: number
+  /**
+   * Features the page says arrived, where the page counts them; null where it
+   * does not.
+   *
+   * Pixels and bytes together are not always enough. Gosling at a window wider
+   * than its BAM fetcher will serve paints a full axis and fetches the header
+   * and the index — 0.4 MB and a painted canvas — and draws not one read. Both
+   * generic signals read clean, so the page has to be asked, and
+   * `crosstool/gosling.html` answers by counting `rawData` events into
+   * `__goslingState.records`.
+   */
+  records: number | null
   /** whatever the page said went wrong, deduplicated */
   errors: string[]
   /** the tool's own error field, where the tool has one */
   declared: string | null
 }
 
-/** A page drew the corpus if there are marks on a canvas AND it read the data. */
-export const drew = (d: Drew) => d.painted > 0 && d.bytes > 0
+/**
+ * A page drew the corpus if there are marks on a canvas, it read the data, and
+ * it did not itself report zero features.
+ */
+export const drew = (d: Drew) =>
+  d.painted > 0 && d.bytes > 0 && d.records !== 0
 
 export async function drewCheck(
   browser: Browser,
@@ -108,16 +124,22 @@ export async function drewCheck(
       }
       return { canvases: canvases.length, painted }
     })
-    const declared = await page.evaluate(() => {
+    const { declared, records } = await page.evaluate(() => {
       const w = window as Record<string, any>
-      return w.__igvState?.error ?? w.__gsState?.error ?? null
+      const n = w.__goslingState?.records
+      return {
+        declared:
+          w.__igvState?.error ?? w.__gsState?.error ?? w.__goslingState?.error ?? null,
+        records: typeof n === 'number' ? n : null,
+      }
     })
-    return { ...counted, bytes, errors: [...new Set(errors)], declared }
+    return { ...counted, bytes, records, errors: [...new Set(errors)], declared }
   } catch (e) {
     return {
       painted: 0,
       canvases: 0,
       bytes,
+      records: null,
       errors: [...new Set([...errors, String(e).split('\n')[0]!.slice(0, 120)])],
       declared: null,
     }

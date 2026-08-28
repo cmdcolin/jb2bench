@@ -10,8 +10,45 @@
 // So this asks the only question both tools answer the same way: when does the
 // screen stop changing? Poll a screenshot, hash it, and call it done when the
 // hash has repeated STABLE_POLLS times and differs from the frame captured right
-// after navigation. A loading spinner animates, so a tool that is still working
-// cannot satisfy the stability test — the animation is doing the waiting for us.
+// after navigation.
+//
+// ## Stable pixels alone are not enough, and Gosling is why
+//
+// This file used to argue that "a loading spinner animates, so a tool that is
+// still working cannot satisfy the stability test — the animation is doing the
+// waiting for us". **That is false for a tool whose loading state is static
+// text.** Measured 2026-08-28: Gosling with its tile cap raised, at the 100 kb
+// window, settled at 2402 ms on a frame showing an empty plot and the word
+// "Fetching" — its worker was still pulling the BAM. Nothing animated, five
+// identical frames, done. The number was a third of the truth and would have
+// made the patched arm the fastest column in the table.
+//
+// Two things now hold the countdown off, and neither is a tool reporting its own
+// completion time.
+//
+// **A corpus read in flight.** The clock is still the pixels, but the run cannot
+// settle while a data file is being read. Same `isData` URL-path match
+// `drewcheck.ts` uses, and it sees web-worker requests, which is where Gosling
+// fetches. An arm this changes was settling mid-fetch and was never right; an arm
+// it does not change reports exactly what it reported before.
+//
+// **`window.__harnessBusy()`, where the page defines it.** Network idleness alone
+// does not cover the Gosling case: traced on 2026-08-28, that page spends its
+// first 3.9 s booting a worker and reading the index with *zero* requests
+// outstanding and a static frame, which is the dead zone the wrong number came
+// out of. The first data then lands in a single event at 7.6 s. So a harness may
+// export a predicate that is true while it is knowably not done, and this will
+// not settle while it returns true. Gosling's is `records === 0` — "no feature
+// has arrived yet" — which is a *content* gate, not a completion timestamp:
+// once it clears, the pixels do all the timing, so it adds no constant to the
+// measurement. A page that defines no such predicate is measured exactly as
+// before, which is why every already-recorded number stays comparable.
+//
+// This still cannot catch the whole class. A tool that has its data, then thinks
+// with nothing moving on screen for longer than the settle window, satisfies both
+// tests. Guarding that needs a per-tool notion of finished, which is the thing
+// this instrument exists not to trust. So: check the screenshot when an arm's
+// number surprises you. The Gosling clip was found that way and by nothing else.
 //
 // Validated against the testid instrument on the same JBrowse builds: see
 // results/crosstool.md. If the two disagree by more than the poll interval on a
@@ -23,6 +60,7 @@ import crypto from 'crypto'
 import fs from 'fs'
 import path from 'path'
 import puppeteer from 'puppeteer'
+import { isData } from './drewcheck.ts'
 
 const WAIT_TIMEOUT = Number(process.env.MAX_WAIT ?? 120000)
 const POLL_MS = Number(process.env.POLL_MS ?? 150)
@@ -51,6 +89,26 @@ const browser = await puppeteer.launch({
 const page = await browser.newPage()
 await page.setViewport({ width: 1280, height: 800 })
 
+// Corpus reads in flight. Counted by URL *path* like everywhere else in this
+// directory, so the harness page's own `&track=…bam` query string is not
+// mistaken for a data request. Failed and cancelled requests resolve too, or a
+// single aborted range read would hang the run until MAX_WAIT.
+let inFlight = 0
+let fetches = 0
+page.on('request', r => {
+  if (isData(r.url())) {
+    inFlight++
+    fetches++
+  }
+})
+const settled = (r: { url: () => string }) => {
+  if (isData(r.url())) {
+    inFlight--
+  }
+}
+page.on('response', settled)
+page.on('requestfailed', settled)
+
 const hash = (b: Uint8Array) =>
   crypto.createHash('sha1').update(b).digest('hex')
 
@@ -74,7 +132,19 @@ try {
       throw new Error(`no stable paint within ${WAIT_TIMEOUT} ms`)
     }
     const h = await shot()
-    if (h === last && h !== blank) {
+    const busy =
+      inFlight > 0 ||
+      (await page.evaluate(() => {
+        const f = (window as unknown as { __harnessBusy?: () => boolean })
+          .__harnessBusy
+        return typeof f === 'function' ? f() === true : false
+      }))
+    if (busy) {
+      // Reading the corpus, or the page says it has no data yet. A static
+      // "loading" frame is not a settled one.
+      stable = 0
+      last = h
+    } else if (h === last && h !== blank) {
       stable++
     } else {
       stable = 0
@@ -91,6 +161,10 @@ try {
   if (screenshotPath) {
     await page.screenshot({ path: screenshotPath })
   }
+  // Diagnostic, on stderr so the contract of "one number on stdout" holds. A
+  // run that settles having read nothing is the signature of a harness that
+  // drew nothing — the case `toolcheck.ts` exists for.
+  console.error(`data requests: ${fetches}`)
   console.log(elapsed.toFixed(1))
 } catch (e) {
   console.error('profiling error:', e instanceof Error ? e.message : e)
