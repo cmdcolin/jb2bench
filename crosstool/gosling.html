@@ -105,6 +105,30 @@
 
       window.__goslingState = { ready: false, error: null, records: 0 }
 
+      // Defined HERE, before the format guard and before the bundle import, not
+      // in the `.then` after them. `paintprofile.ts` polls for it rather than
+      // latching it once, but the smaller the window in which it is undefined the
+      // less there is to go wrong — and this page's import is six megabytes, so
+      // that window used to be seconds long.
+      //
+      // `paintprofile.ts` will not call the pixels settled while this is true.
+      // Gosling needs it and igv does not: this page spends its first few seconds
+      // booting a worker and reading the index with no requests outstanding and
+      // nothing moving on screen, so pixel stability alone settles on an empty
+      // plot showing "Fetching" — traced at 2.4 s against a true 7.6 s.
+      //
+      // `records === 0` and nothing more, deliberately. It is a content gate and
+      // not a quiescence window, so it adds no constant to the number: the moment
+      // the first feature lands the pixels take over the timing. On this corpus
+      // the whole tile arrives in one event, so that moment is the start of the
+      // draw.
+      //
+      // At a window stock Gosling will not serve, `records` stays 0 and this
+      // stays true, so the instrument times out rather than reporting the
+      // fastest number in the table for a page with no reads on it. The runner
+      // marks those cells `n/a` before they are ever driven.
+      window.__harnessBusy = () => window.__goslingState.records === 0
+
       const fail = msg => {
         window.__goslingState.error = msg
         throw new Error(msg)
@@ -194,25 +218,6 @@
           api.subscribe('rawData', (_name, data) => {
             window.__goslingState.records += data?.data?.length ?? 0
           })
-          // `paintprofile.ts` will not call the pixels settled while this is
-          // true. Gosling needs it and the other harnesses do not: this page
-          // spends its first few seconds booting a worker and reading the index
-          // with no requests outstanding and nothing moving on screen, so pixel
-          // stability alone settles on an empty plot showing "Fetching" — traced
-          // at 2.4 s against a true 7.6 s on 2026-08-28.
-          //
-          // `records === 0` and nothing more, deliberately. It is a content gate
-          // and not a quiescence window, so it adds no constant to the number:
-          // the moment the first feature lands the pixels take over the timing.
-          // On this corpus the whole tile arrives in one event, so that moment is
-          // the start of the draw.
-          //
-          // At a window stock Gosling will not serve, `records` stays 0 and this
-          // stays true, so the instrument times out and reports FAIL. That is the
-          // right answer — the alternative was the fastest number in the table
-          // for a page with no reads on it — and the runner marks those cells
-          // `n/a` before they are ever driven.
-          window.__harnessBusy = () => window.__goslingState.records === 0
           window.__goslingState.ready = true
         })
         .catch(e => {

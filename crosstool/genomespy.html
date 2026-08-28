@@ -132,6 +132,21 @@
         windowSize,
       }
 
+      // This page builds a pileup spec and nothing else. Without this guard a
+      // BigWig or VCF track still gets a BAM spec, GenomeSpy dutifully asks for
+      // `<track>.bw.bai`, and the only trace in results/format-support.md is a
+      // bare 404 — which reads as a missing corpus file rather than as a gap in
+      // this harness. GenomeSpy's lazy sources are bam, bigbed, bigwig, gff3,
+      // tabix and vcf, so only the CRAM `no` belongs to the tool.
+      if (!track.endsWith('.bam')) {
+        const why = track.endsWith('.cram')
+          ? 'genomespy 0.85.0 has no CRAM lazy source'
+          : 'this harness builds a BAM pileup spec only; genomespy itself also reads bigwig, bigbed, vcf, gff3 and tabix'
+        const msg = `cannot open "${track}" — ${why}`
+        window.__gsState.error = msg
+        throw new Error(msg)
+      }
+
       // `paintprofile.ts` will not call the pixels settled while this is true.
       // Belt and braces here rather than a fix: this page's frames were checked
       // and it settles on a drawn pileup without the gate. It carries one anyway

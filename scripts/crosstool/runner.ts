@@ -306,13 +306,44 @@ const stddev = (a: number[]) => {
   return Math.sqrt(mean(a.map(x => (x - m) ** 2)))
 }
 
-function runOnce(url: string): number {
+/**
+ * The paint ceiling for a window, in ms.
+ *
+ * `paintprofile.ts` defaults to 120 s, a number chosen when the only window was
+ * 19 kb. A window five times as wide holds five times the reads, so leaving the
+ * ceiling flat would quietly redefine what a FAIL means between the two rows —
+ * scaling it keeps "did not settle" measuring the tool rather than the window.
+ * MAX_WAIT in the environment still overrides, for a run that wants one ceiling
+ * everywhere.
+ *
+ * It is a ceiling and not a cost: a cell that settles in two seconds still takes
+ * two seconds. Only a cell that cannot settle pays it, which is why `FAIL_LIMIT`
+ * exists.
+ */
+const ceilingFor = (w: Window) =>
+  Number(process.env.MAX_WAIT ?? Math.round(120000 * (span(w) / span(WINDOWS[0]!))))
+
+/**
+ * How many times an arm may fail a cell before the runner stops asking.
+ *
+ * Without this, an arm that cannot render a cell burns the ceiling WARMUP + RUNS
+ * times over — at the 100 kb ceiling that is most of an hour per arm per cell,
+ * spent proving the same thing four times. Two failures rather than one, because
+ * a single timeout can be a load spike and this box has them.
+ */
+const FAIL_LIMIT = 2
+
+function runOnce(url: string, ceiling: number): number {
   let out = ''
   try {
     out = execFileSync('node', ['scripts/crosstool/paintprofile.ts', url], {
       encoding: 'utf8',
       stdio: ['ignore', 'pipe', 'pipe'],
-      env: { ...process.env, DISPLAY: process.env.DISPLAY || ':0' },
+      env: {
+        ...process.env,
+        DISPLAY: process.env.DISPLAY || ':0',
+        MAX_WAIT: String(ceiling),
+      },
     })
   } catch (e) {
     out = (e as { stdout?: string }).stdout ?? ''
@@ -329,6 +360,16 @@ interface Cell {
   load: LoadWindow
   /** Set instead of a timing where the arm cannot open this cell at all. */
   unsupported?: string
+  /**
+   * The paint ceiling, in ms, that this arm failed to settle within — set
+   * instead of a timing when it gave up on the cell.
+   *
+   * Distinct from `unsupported`, which is a capability the tool does not have,
+   * and from a blank cell, which was never measured. "igv did not draw 100 kb of
+   * 1000x long read inside ten minutes" is a result; "igv has no CRAM reader" is
+   * a different one; and neither is "nobody ran this row".
+   */
+  unsettled?: number
 }
 type Row = Record<string, Cell>
 
@@ -380,6 +421,28 @@ for (const w of windows) {
       }
       return !why
     })
+    const ceiling = ceilingFor(w)
+    // Arms that gave up on this cell, and the ceiling they gave up against.
+    const abandoned = new Map<string, number>()
+    const fails: Record<string, number> = {}
+    const attempt = (t: Tool) => {
+      if (abandoned.has(t.id)) {
+        return Number.NaN
+      }
+      const ms = runOnce(t.url(c.track, w.loc), ceiling)
+      if (Number.isFinite(ms)) {
+        return ms
+      }
+      fails[t.id] = (fails[t.id] ?? 0) + 1
+      if (fails[t.id]! >= FAIL_LIMIT) {
+        abandoned.set(t.id, ceiling)
+        console.log(
+          `${key} ${t.id}: no stable paint in ${(ceiling / 1000).toFixed(0)}s, ` +
+            `${FAIL_LIMIT} times — abandoning this cell`,
+        )
+      }
+      return Number.NaN
+    }
     for (const t of measurable) {
       runs[t.id] = []
       // The previous cell's Chrome is still tearing down when execFileSync
@@ -391,7 +454,7 @@ for (const w of windows) {
       }
       before[t.id] = loadavg()
       for (let i = 0; i < WARMUP; i++) {
-        runOnce(t.url(c.track, w.loc))
+        attempt(t)
       }
     }
     // interleaved: one round runs every tool, so a load spike lands on all of
@@ -399,7 +462,10 @@ for (const w of windows) {
     const cpu = Object.fromEntries(measurable.map(t => [t.id, watchForeignCpu()]))
     for (let r = 0; r < RUNS; r++) {
       for (const t of measurable) {
-        const ms = runOnce(t.url(c.track, w.loc))
+        if (abandoned.has(t.id)) {
+          continue
+        }
+        const ms = attempt(t)
         runs[t.id]!.push(ms)
         console.log(`${key} ${t.id} run ${r + 1}: ${ms}`)
       }
@@ -428,7 +494,9 @@ for (const w of windows) {
         continue
       }
       const vals = runs[t.id]!.filter(Number.isFinite)
+      const gaveUp = abandoned.get(t.id)
       row[t.id] = {
+        ...(gaveUp && !vals.length ? { unsettled: gaveUp } : {}),
         median: vals.length ? median(vals) : Number.NaN,
         mean: vals.length ? mean(vals) : Number.NaN,
         stddev: vals.length ? stddev(vals) : Number.NaN,
@@ -460,7 +528,7 @@ for (const [id, row] of Object.entries(prior.rows)) {
   for (const [tool, cell] of Object.entries(row)) {
     // An unsupported cell carries a zeroed load window and no timing, so it
     // would drag the median load down and read as the quietest cell in the run.
-    if (cell.load && !cell.unsupported) {
+    if (cell.load && !cell.unsupported && !cell.unsettled) {
       cells.push({ key: `${id}/${tool}`, load: cell.load, value: cell.median })
     }
   }
@@ -471,6 +539,9 @@ const fmt = (c?: Cell) => {
   if (c?.unsupported) {
     return 'n/a'
   }
+  if (c?.unsettled) {
+    return `>${(c.unsettled / 1000).toFixed(0)}s`
+  }
   return c && Number.isFinite(c.median)
     ? `${c.median.toFixed(0)} ±${c.stddev.toFixed(0)}`
     : 'FAIL'
@@ -478,7 +549,9 @@ const fmt = (c?: Cell) => {
 
 const rowPeak = (row: Row) =>
   Math.max(
-    ...Object.values(row).map(c => (c.load && !c.unsupported ? peak(c.load) : 0)),
+    ...Object.values(row).map(c =>
+      c.load && !c.unsupported && !c.unsettled ? peak(c.load) : 0,
+    ),
   )
 
 // Columns come from what the file holds, not only from what this run served. A
@@ -552,7 +625,7 @@ lines.push(
 )
 lines.push('')
 lines.push(
-  `Median of ${RUNS} runs after ${WARMUP} warmup, tools interleaved within each round. A blank cell was not measured in the run that produced its row; \`n/a\` is a capability limit named in the list above, and an arm holding one is dropped from the interleaving rather than timed on a page it cannot draw.`,
+  `Median of ${RUNS} runs after ${WARMUP} warmup, tools interleaved within each round. A blank cell was not measured in the run that produced its row; \`n/a\` is a capability limit named in the list above, and an arm holding one is dropped from the interleaving rather than timed on a page it cannot draw. \`>Ns\` is an arm that failed to settle within the paint ceiling ${FAIL_LIMIT} times and was abandoned for that cell — a result about the tool at that width, not a gap in the run. The ceiling scales with the window (${WINDOWS.map(w => `${w.id} ${(ceilingFor(w) / 1000).toFixed(0)}s`).join(', ')}), so \`>Ns\` means the same thing on both rows.`,
 )
 lines.push('')
 lines.push(
@@ -589,7 +662,7 @@ for (const c of allCases) {
   }
   const load = rowPeak(row)
   const foreigns = Object.values(row)
-    .filter(cell => !cell.unsupported)
+    .filter(cell => !cell.unsupported && !cell.unsettled)
     .map(cell => foreign(cell.load ?? { before: 0, after: 0 }))
     .filter(Number.isFinite)
   const rowForeign = foreigns.length ? Math.max(...foreigns) : Number.NaN
@@ -598,6 +671,7 @@ for (const c of allCases) {
     .filter(
       cell =>
         !cell.unsupported &&
+        !cell.unsettled &&
         foreign(cell.load ?? { before: 0, after: 0 }) === rowForeign,
     )
     .map(cell => cell.load?.foreignTop)

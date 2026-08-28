@@ -44,6 +44,13 @@
 // measurement. A page that defines no such predicate is measured exactly as
 // before, which is why every already-recorded number stays comparable.
 //
+// The predicate is polled, never latched: a harness sets it from a module script,
+// and a module script awaiting a multi-megabyte import has not run by
+// `domcontentloaded`, so a one-time lookup finds nothing and disables the gate
+// for the whole run. A harness should also define it as early in its script as it
+// can, before any await, so the window where it is absent is as small as
+// possible.
+//
 // This still cannot catch the whole class. A tool that has its data, then thinks
 // with nothing moving on screen for longer than the settle window, satisfies both
 // tests. Guarding that needs a per-tool notion of finished, which is the thing
@@ -77,6 +84,10 @@ if (screenshotPath) {
 
 const browser = await puppeteer.launch({
   headless: process.env.HEADLESS !== '0',
+  // Above MAX_WAIT, or a cell that blocks the main thread longer than
+  // puppeteer's 180 s default dies with a protocol error instead of either
+  // measuring or timing out cleanly. The heavy igv cells block it for minutes.
+  protocolTimeout: WAIT_TIMEOUT + 60000,
   args: [
     '--no-sandbox',
     '--ignore-gpu-blocklist',
@@ -132,6 +143,20 @@ try {
       throw new Error(`no stable paint within ${WAIT_TIMEOUT} ms`)
     }
     const h = await shot()
+    // Asked EVERY poll, and not latched once at the start. A harness defines
+    // this predicate from a module script, and a module script that awaits a
+    // multi-megabyte dynamic import has not run by `domcontentloaded` — so a
+    // one-time lookup finds nothing and silently disables the gate for the whole
+    // run. That regression made the patched Gosling arm report 1.4 s on a cell
+    // it cannot render at all.
+    //
+    // Polling it costs the page's main thread, which the heavy igv cells hold
+    // for minutes. That is survivable and not the failure it first looked like:
+    // a blocked poll only *delays* settling, never hastens it, and
+    // `protocolTimeout` above is what keeps a long block from becoming an error.
+    // On the cells where this blocks for minutes, `page.screenshot` blocks too,
+    // so the cell is beyond this instrument either way and the runner abandons
+    // it rather than paying the ceiling four times.
     const busy =
       inFlight > 0 ||
       (await page.evaluate(() => {
