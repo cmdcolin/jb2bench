@@ -1,0 +1,224 @@
+<!doctype html>
+<!--
+  Gosling harness for the cross-tool comparison.
+
+  Same shape as index.html (igv.js) and genomespy.html: everything that varies
+  between runs is a URL parameter, so the runner drives this page exactly as it
+  drives a JBrowse build.
+
+    ?track=1000x.shortread.bam    file in ./data
+    ?loc=chr22_mask:124000-143000 the benchmark window
+    ?height=N                     track height in px (default 600)
+    ?mates=1                      Gosling's loadMates; omit for reads only
+    ?bundle=gosling-patched.bundle.js   the tile-cap-raised build; see below
+
+  The workload is BAM alignments through Gosling's own `bam` fetcher and its
+  `displace`/`pile` transform, so all four tools read the same bytes off the same
+  disk with no server and no preprocessing.
+
+  Read this column as a renderer comparison over a shared decoder, not a
+  whole-stack one: Gosling 1.0.7 depends on `@gmod/bam` ^1.1.18, which is the
+  pin `ecosystem/versions.json` calls the 2023 side, so it parses BAM with the
+  same package JBrowse does — an older release of it. igv.js is the opposite
+  case, since it maintains its own readers.
+
+  ## The bundle is generated and this page will not run without it
+
+  gosling.js ships ESM with bare specifiers (`react`, `pixi.js`, `higlass`), so
+  unlike igv.js and GenomeSpy it cannot be loaded out of node_modules by a
+  browser. `make crosstool-bundles` builds it from gosling-entry.js.
+  A missing bundle is reported in `__goslingState.error` and thrown, because the
+  instrument for this arm is paint quiescence and a page that draws nothing
+  settles immediately — a dead harness does not look dead, it looks fast.
+
+  ## Stock Gosling stops at a 20 kb tile, and `?bundle=` is the patched arm
+
+  `MAX_TILE_WIDTH = 2e4` on Gosling's `BamDataFetcher`, compared against every
+  visible tile by `gosling-track.ts:calculateVisibleTiles`, which returns before
+  fetching anything. Tile width is the declared genome length over 2^zoom, so the
+  limit scales with the assembly and not with the file: on this 250 kb corpus the
+  19 kb window draws 7559 reads and the 100 kb window paints a full axis, fetches
+  the header and the index, and draws not one read. Both of the generic "did it
+  draw" signals — a painted canvas and bytes off the disk — read clean on that
+  page, which is why `__goslingState.records` exists and why `drewcheck.ts` reads
+  it.
+
+  `?bundle=gosling-patched.bundle.js` loads the same build with that cap and the
+  BAM worker's own 200 kb cap raised past any genome size, which renders the
+  wider window. Two things to say wherever its numbers appear:
+
+    * **It is not the library anyone installs.** It is a separate arm; the stock
+      column keeps its `n/a`, because where a tool stops is a result.
+    * **It reads a whole tile, not the window.** At the 100 kb window it lays out
+      40002 reads — every read in the 20x file — against the roughly 16000 in
+      view, because the tile HiGlass asks for at that zoom covers the contig. The
+      same kind of over-read as GenomeSpy's `windowSize` snapping, and larger.
+      Compare it to the other arms with that in hand.
+
+  ## Why the assembly is a custom contig list and not a name
+
+  The corpus is a 250 kb slice of chr22 under a made-up contig name, and
+  Gosling's `assembly` accepts `[[name, size], ...]` for exactly this case (its
+  `ChromSizes` form). No genome file is fetched and no built-in is involved.
+  GenomeSpy's equivalent is a fight — see genomespy.html — and Gosling's is one
+  line.
+
+  ## loadMates is off by default, and that is a fairness decision
+
+  Gosling's own pileup example sets `loadMates: true`, which makes the fetcher
+  issue a second pass for each read's mate so it can colour by inferred SV type.
+  Neither igv.js nor JBrowse does that by default, so the default here matches
+  them and `?mates=1` is the control that says what it costs.
+-->
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>Gosling harness</title>
+    <style>
+      html,
+      body {
+        margin: 0;
+        padding: 0;
+        font-family: sans-serif;
+      }
+      #gos {
+        width: 1280px;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="gos"></div>
+    <script type="module">
+      const params = new URLSearchParams(location.search)
+      const track = params.get('track') ?? '20x.shortread.bam'
+      const locus = params.get('loc') ?? 'chr22_mask:124000-143000'
+      const height = Number(params.get('height') ?? 600)
+      const mates = params.get('mates') === '1'
+      // Named, not free-form: the two bundles `make crosstool-bundles` builds
+      // are the only arms, and a typo should say so rather than 404 into a
+      // generic load failure.
+      const BUNDLES = ['gosling.bundle.js', 'gosling-patched.bundle.js']
+      const bundle = params.get('bundle') ?? BUNDLES[0]
+
+      const [chrom, range] = locus.split(':')
+      const [start, end] = range.split('-').map(Number)
+
+      window.__goslingState = { ready: false, error: null, records: 0 }
+
+      const fail = msg => {
+        window.__goslingState.error = msg
+        throw new Error(msg)
+      }
+
+      if (!BUNDLES.includes(bundle)) {
+        fail(`unknown bundle "${bundle}" — one of ${BUNDLES.join(', ')}`)
+      }
+
+      if (!track.endsWith('.bam')) {
+        // Gosling 1.0.7 ships fetchers for bam, bigwig, vcf, gff, bed and csv,
+        // and none for CRAM. This page builds a pileup spec and nothing else, so
+        // a BigWig or VCF `no` in results/format-support.md is this harness's
+        // limit and not the tool's; CRAM is the tool's. Say which, instead of
+        // failing somewhere inside the compiler.
+        const why = track.endsWith('.cram')
+          ? 'gosling 1.0.7 has no CRAM fetcher'
+          : 'this harness builds a BAM pileup spec only; gosling itself also reads bigwig, vcf, gff, bed and csv'
+        fail(`cannot open "${track}" — ${why}`)
+      }
+
+      // The size a made-up contig is declared to be, read from the same .fai the
+      // other harnesses use. One contig, so a constant is honest; a second one
+      // would make this a chrom.sizes fetch.
+      const CONTIG_SIZE = 250001
+
+      const spec = {
+        assembly: [[chrom, CONTIG_SIZE]],
+        xDomain: { chromosome: chrom, interval: [start, end] },
+        tracks: [
+          {
+            data: {
+              type: 'bam',
+              // ABSOLUTE, and this is not a style choice: Gosling's BAM fetcher
+              // runs in a web worker, where a relative URL has no base to
+              // resolve against and `fetch` rejects with "Failed to parse URL".
+              url: new URL(`./data/${track}`, location.href).href,
+              indexUrl: new URL(`./data/${track}.bai`, location.href).href,
+              ...(mates ? { loadMates: true } : {}),
+            },
+            mark: 'rect',
+            // `pile` assigns each read a row, which is the layout step igv.js
+            // and JBrowse also perform; without it every read lands on one
+            // overplotted line and the comparison is against a different
+            // picture. Gosling's own pileup example uses these bounding-box
+            // settings.
+            dataTransform: [
+              {
+                type: 'displace',
+                method: 'pile',
+                boundingBox: {
+                  startField: 'start',
+                  endField: 'end',
+                  padding: 5,
+                  isPaddingBP: true,
+                },
+                newField: 'pileup-row',
+              },
+            ],
+            x: { field: 'start', type: 'genomic' },
+            xe: { field: 'end', type: 'genomic' },
+            row: { field: 'pileup-row', type: 'nominal', padding: 0.2 },
+            color: { value: '#C8C8C8' },
+            stroke: { value: 'white' },
+            strokeWidth: { value: 0 },
+            width: 1280,
+            height,
+          },
+        ],
+      }
+
+      let embed
+      try {
+        ;({ embed } = await import(`./${bundle}`))
+      } catch (e) {
+        fail(`${bundle} did not load (${e}) — run \`make crosstool-bundles\``)
+      }
+      if (!embed) {
+        fail(`${bundle} loaded but exported no embed — rebuild it`)
+      }
+
+      embed(document.getElementById('gos'), spec)
+        .then(api => {
+          window.goslingApi = api
+          // A count of what actually arrived, so a page that drew nothing says 0
+          // rather than reporting ready and leaving the instrument to guess.
+          api.subscribe('rawData', (_name, data) => {
+            window.__goslingState.records += data?.data?.length ?? 0
+          })
+          // `paintprofile.ts` will not call the pixels settled while this is
+          // true. Gosling needs it and the other harnesses do not: this page
+          // spends its first few seconds booting a worker and reading the index
+          // with no requests outstanding and nothing moving on screen, so pixel
+          // stability alone settles on an empty plot showing "Fetching" — traced
+          // at 2.4 s against a true 7.6 s on 2026-08-28.
+          //
+          // `records === 0` and nothing more, deliberately. It is a content gate
+          // and not a quiescence window, so it adds no constant to the number:
+          // the moment the first feature lands the pixels take over the timing.
+          // On this corpus the whole tile arrives in one event, so that moment is
+          // the start of the draw.
+          //
+          // At a window stock Gosling will not serve, `records` stays 0 and this
+          // stays true, so the instrument times out and reports FAIL. That is the
+          // right answer — the alternative was the fastest number in the table
+          // for a page with no reads on it — and the runner marks those cells
+          // `n/a` before they are ever driven.
+          window.__harnessBusy = () => window.__goslingState.records === 0
+          window.__goslingState.ready = true
+        })
+        .catch(e => {
+          window.__goslingState.error = String(e)
+          console.error(e)
+        })
+    </script>
+  </body>
+</html>

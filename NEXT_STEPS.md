@@ -45,29 +45,56 @@ exist until something is drawn — measured on all three build generations,
 sampled mid-load at 0.7 s and 2.2 s with megabytes already fetched — so counting
 canvases separates "drew" from "declined to draw" with no threshold to tune.
 
-**The GenomeSpy harness has never worked, and the 2026-08-23 fix did not fix
-it.** Verified against a running page this time: it paints an empty plot frame
-and issues **zero** requests for the BAM or its index. Root `genomes` + root
-`assembly` — what the deprecation notice for root `genome` points at — fails
-identically to the deprecated form; an inline `scale.assembly` object fails
-differently; a plain numeric domain only changes which call arrives first. The
-cause, read out of the bundle: startup only *configures* genomes, the sole
-loader is the view-insertion preflight, and that preflight collects assemblies
-from x/y scale resolutions that have already resolved to type `locus` — ours is
-not visible to it then, so nothing loads and the first draw resolves against an
-empty store. `crosstool/genomespy.html`'s header has the full account.
+**The GenomeSpy harness draws, and the cause was the domain and not the
+assembly.** Every earlier account here blamed the genome-declaration form.
+Swept against a running page on 2026-08-28: with **no `domain` anywhere on the x
+scale**, root `genomes` + `assembly` loads, fetches and draws; add a domain and
+every form fails identically — root `scales` or the channel, chromosomal
+`{chrom, pos}` or plain linear numbers, root `genomes` or an inline
+`scale.assembly` object. A declared domain is read before `assemblyPreflight`
+runs, and that preflight is the only thing on the `embed()` path that calls
+`ensureAssembly`. The page therefore declares no domain, names the x scale, and
+calls `zoomTo` after embed; it lands on exactly the requested interval and pulls
+0.93 MB where the domain forms fetch nothing. `COMPARISONS.md` §6 has the
+account, and the arm is no longer gated.
 
-The arm is **opt-in behind `GENOMESPY=1`** in `scripts/crosstool/runner.ts`
-rather than on with a comment asking for a manual preflight. Paint quiescence
-cannot tell a dead harness from a fast one — a page that throws settles
-immediately and reports a very small number — so leaving it on risks a wrong
-column, not a missing one.
+**Gosling has a harness too, and it stops at 20 kb.** `crosstool/gosling.html`,
+7559 reads at the 19 kb window. `MAX_TILE_WIDTH = 2e4` in its `BamDataFetcher`
+means it draws no reads at 100 kb, so those cells are `n/a` in the matrix rather
+than timings. A second arm, `gosling-patched`, is the same build with that cap
+raised; it reaches both windows and reads a whole tile rather than the window
+(40002 reads at 100 kb against roughly 16000 in view), so it is an upper bound
+and not a substitute for the stock column. Both need `make crosstool-bundles`
+first: gosling.js ships ESM with bare specifiers, so unlike the other two it
+cannot be loaded out of `node_modules`.
 
-Two stale claims went with the first attempt: the header said the workload was
-BigWig signal "because GenomeSpy has no alignment track" (the spec has read BAM
-since it was written, through that tool's own lazy BAM source and `pileup`), and
-an inline comment said four genome-declaration forms had been tested and all
-four worked.
+**Pixel quiescence settled on a page that was still fetching, and the fix is
+new.** `paintprofile.ts` assumed in its own header that "a loading spinner
+animates, so a tool that is still working cannot satisfy the stability test".
+False for Gosling, whose loading state is static text: traced 2026-08-28, it
+spends its first 3.9 s booting a worker and reading the index with zero requests
+outstanding and nothing moving, then lands the whole tile in one event at 7.6 s.
+The instrument reported 2.4 s on an empty plot. It now also declines to settle
+while a corpus read is in flight and while a page's `__harnessBusy()` is true.
+Two things are owed: the stock 19 kb Gosling cell moved up by roughly half once
+gated, so **no Gosling number measured before 2026-08-28 is usable**; and the
+residual case — a tool that holds its data and thinks with a still screen — is
+uncovered by construction, so an arm whose number surprises you gets its
+screenshot checked. That is how this was found and nothing else would have found
+it.
+
+**The four-arm, two-window matrix has no run of record.** The harnesses and the
+runner are done and smoke-tested; what is missing is an idle box. The smoke run
+on 2026-08-28 measured at 13–15 foreign cores, which is not a number anyone
+should quote — see the standing constraint at the end of this file. The 100 kb
+window roughly quintuples the bytes per cell, so the full run is longer than the
+19 kb matrix was; `WINDOWS=19kb` restores the old scope.
+
+**The figures still draw four arms.** `scripts/arms.R` names v2.4.0, v4.3.0, the
+build under test and igv.js, and returns `NA` for anything else, so GenomeSpy and
+Gosling land in `results/crosstool.md` and in no figure. Whether they belong in
+the paper's figures is a design decision about those figures, not a gap in the
+measurement.
 
 **A probe that queries the DOM for canvases misses igv.js entirely.** igv 3.x
 calls `parentDiv.attachShadow()` and puts its whole UI inside, so

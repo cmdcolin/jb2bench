@@ -104,11 +104,40 @@ did not:
 | --- | --- | --- | --- |
 | igv.js 3.8.5 | yes, same indexed BAM over range requests | `crosstool/index.html` | **runs**, cold load and pan. npm `latest` as of 2026-08-23, so this is the current release and not a trailing pin |
 | igv.js 2.12.1 | yes | same, `?igv=2.12.1` | loads; the version the 2023 paper timed |
-| GenomeSpy 0.85.0 | yes — native `bam` lazy source | `crosstool/genomespy.html` | **does not draw**; verified against a running page 2026-08-23, zero data requests. Arm is opt-in behind `GENOMESPY=1` — see §6 |
+| GenomeSpy 0.85.0 | yes — native `bam` lazy source | `crosstool/genomespy.html` | **runs**, cold load, both windows. Draws since 2026-08-28: no domain in the spec, `zoomTo` after embed — see §6 for why the declarative form cannot work on 0.85.0 |
 | HiGlass + `higlass-pileup` | yes, client-side indexed BAM | none written | not started |
-| Gosling 1.0.7 | yes — its own `bam` fetcher | none written | not started. See the note below on which parsers it ships |
+| Gosling 1.0.7 | yes — its own `bam` fetcher | `crosstool/gosling.html` | **runs**, cold load, at the 19 kb window only: its BAM fetcher declines any tile wider than 20 kb. A second arm patches that cap out and reaches both windows. Needs a bundle step — see below, and the note on which parsers it ships |
 | JBrowse 1 v1.16.11 | yes | `~/src/dont_care/jb2profile/jb1web` | prior art, not wired up here |
 | `@jbrowse/react-linear-genome-view` | yes | `~/src/dont_care/jb2profile/jb2lgv` | prior art, not wired up here |
+
+**Gosling is the one arm that needs a build step.** gosling.js ships ESM with
+bare specifiers (`react`, `pixi.js`, `higlass`), so unlike igv.js and GenomeSpy
+— both of which ship a self-contained bundle `crosstool/` symlinks into place —
+a browser cannot load it out of `node_modules`. `make crosstool-bundles` runs
+`scripts/crosstool/goslingbundle.ts`, which builds two bundles from the tracked
+`crosstool/gosling-entry.js`: stock, and the same build with its tile-width caps
+raised. Both are generated and gitignored, `make serve` depends on them, and the
+runner refuses to start without the one its arms need.
+
+**Gosling draws BAM reads only while the visible tile is at most 20 kb wide.**
+`MAX_TILE_WIDTH = 2e4` in its `BamDataFetcher`, compared against every visible
+tile by `gosling-track.ts:calculateVisibleTiles`, which returns before fetching.
+Tile width is the declared genome length over 2^zoom, so the limit is a function
+of the assembly and not of the file: on this 250 kb corpus the 19 kb window
+draws 7559 reads and the 100 kb window paints a full axis and no reads, having
+fetched only the header and the index. The runner records those cells as `n/a`
+rather than timing an empty page, and `toolcheck.ts` expects them empty rather
+than counting them as breakage.
+
+**The `gosling-patched` arm is that cap patched out**, and it is a second column
+rather than a replacement: the stock `n/a` is a result, and a patched library is
+not the library anyone installs. It draws 40002 reads at the 100 kb window —
+every read in the 20x file, against roughly 16000 in view, because the tile
+HiGlass asks for at that zoom covers the contig — so read it as an upper bound on
+what an unpatched Gosling would cost at that width. The patch fails the build if
+either pattern stops matching, because a silent no-op would hand the runner a
+stock bundle labelled patched, at the one window where stock draws nothing, under
+the instrument that reports an empty page as fast.
 
 **A harness page that draws nothing looks exactly like a fast one**, and the
 instrument for the non-JBrowse arms is paint quiescence, which settles
@@ -304,31 +333,59 @@ genotype call, because that call appears partway along the axis. `bgzf` prefers
 decompressor at import time and sweeping `unzip` would report the end of that
 split as a regression.
 
-### 6. Make the GenomeSpy harness draw at all
+### 6. GenomeSpy draws — and a declared domain still cannot work
 
-**Still broken, and now verified broken rather than assumed fixed.** Checked
-against a running page on 2026-08-23: an empty plot frame and zero requests for
-the BAM. The declaration form is not the fix — root `genomes` + `assembly` fails
-exactly as the deprecated root `genome` did, an inline `scale.assembly` object
-fails differently, and a plain numeric domain only reorders the failure. The
-earlier account here, that `BamSource` touches the genome before
-`assemblyPreflight` is awaited, was closer than the declaration-form theory that
-replaced it: startup only *configures* genomes, and the sole loader is the
-view-insertion preflight, which collects assemblies from x/y scale resolutions
-already resolved to type `locus`. Ours is not among them, so nothing loads.
+**Resolved 2026-08-28**, after being broken since the arm was written. The
+harness draws the corpus at both windows: 0.93 MB of BAM at the 19 kb window and
+2.33 MB at 100 kb, over exactly the requested interval, read back from the scale
+resolution.
 
-Two things made this survive as long as it did: nothing drove the page, so no
-run ever failed on it, and *four* independent signals read clean on a dead page
-— `embed()` resolves, its promise does not reject, `__gsState.error` stays null,
-and GenomeSpy logs the exception itself so `pageerror` never fires. A tool's
-self-reported readiness is not a completion signal, the same lesson
+**What was wrong was never the assembly declaration — it was the domain.**
+Sweeping the forms against a running page settles it: with no `domain` anywhere
+on the x scale, root `genomes` + `assembly` loads and draws. Add a domain and
+every form dies identically — root `scales` or the channel, chromosomal
+`{chrom, pos}` or plain linear numbers, root `genomes` or an inline
+`scale.assembly` object — with `Genome hg19mod has not been loaded yet. Call
+ensureAssembly("hg19mod")` and zero requests for the BAM. Declaring a domain
+makes something read the genome before `assemblyPreflight` has loaded it, and
+that preflight is the only thing on the `embed()` path that ever calls
+`ensureAssembly`.
+
+So the page declares no domain and moves to the window afterwards, through
+`api.getScaleResolutionByName('pos').zoomTo([{chrom, pos: start}, {chrom, pos:
+end}])`. It costs one empty axis frame before the zoom — the lazy source declines
+a view wider than its `windowSize`, so that frame reads the header and the index
+and stops — and the arm is otherwise navigation-to-pileup like the rest.
+
+**Why the built-in assemblies work and ours cannot.** A built-in (`hg38`,
+`hg19`, `mm10`, ...) is a hardcoded chrom.sizes string in the bundle, and
+`getGenome` builds one on demand, synchronously, at any point in the lifecycle.
+That is why GenomeSpy's published BAM example declares `assembly: "hg38"` and
+works with a domain, and it is why that example could never have shown us
+anything: it never loads a configured genome. A configured genome is checked
+*before* the built-in fallback, so naming ours after a built-in does not help
+either — `genomes: { hg19: { contigs } }` throws where a bare `assembly:
+"hg19"` would not.
+
+**What is still owed.** Two things, neither blocking:
+
+- The corpus sits on a made-up `chr22_mask`. Regenerated onto real `chr22`
+  coordinates it could use `assembly: "hg19"` and take the synchronous branch,
+  which would make a declarative domain work here. That is a corpus change
+  touching every other benchmark in this repo, so it stays a decision.
+- The ordering looks like an upstream bug rather than a documented constraint,
+  and it has not been reported.
+
+Two things made the original failure survive as long as it did: nothing drove the
+page, so no run ever failed on it, and *four* independent signals read clean on a
+dead page — `embed()` resolves, its promise does not reject, `__gsState.error`
+stays null, and GenomeSpy logs the exception itself so `pageerror` never fires. A
+tool's self-reported readiness is not a completion signal, the same lesson
 `scripts/crosstool/quiescence.ts` opens with, arrived at from a third direction.
-
-The arm is opt-in behind `GENOMESPY=1`. What is owed is a spec form that gets
-the locus scale in front of the preflight; `toolcheck.ts` is the gate, and it
-now counts data bytes by URL *path*, because matching the whole URL matched the
-harness page's own `&track=…bam` query and credited its 5 kB to the corpus —
-which is how this page reported `ok` while fetching nothing.
+The arm is no longer gated: a gated arm goes unexercised, which is how the page
+rotted, so `toolcheck.ts` preflights it on every run instead — counting data
+bytes by URL *path*, because matching the whole URL matched the harness page's
+own `&track=…bam` query and credited its 5 kB to the corpus.
 
 ### 7. Error bars on the interaction table
 

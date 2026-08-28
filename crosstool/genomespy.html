@@ -2,88 +2,90 @@
 <!--
   GenomeSpy harness for the cross-tool comparison.
 
-  Same shape as index.html (the igv.js harness): everything that varies between
-  runs is a URL parameter, so the runner can drive this page exactly as it drives
-  a JBrowse build.
+  Same shape as index.html (igv.js) and gosling.html: everything that varies
+  between runs is a URL parameter, so the runner can drive this page exactly as
+  it drives a JBrowse build.
 
     ?track=1000x.shortread.bam    file in ./data
-    ?loc=chr22_mask:124000-143000 the shared benchmark window
-    ?window=N                     GenomeSpy's lazy-source windowSize (default 30000)
+    ?loc=chr22_mask:124000-143000 the benchmark window
+    ?window=N                     lazy-source windowSize; see below for the default
 
-  The workload is BAM alignments, read through GenomeSpy's own `lazy` BAM source
-  and laid out by its `pileup` transform — so all three tools read the same bytes
-  off the same disk with no server and no preprocessing. The header here used to
-  claim the workload was BigWig signal "because GenomeSpy has no alignment
-  track"; the spec below has read BAM since it was written, and GenomeSpy does
-  have a pileup. The claim was stale, not a description of this file.
+  The workload is BAM alignments through GenomeSpy's own `lazy` BAM source and
+  its `pileup` transform, so all four tools read the same bytes off the same disk
+  with no server and no preprocessing.
 
   GenomeSpy reads its indexed formats through the same @gmod packages JBrowse
   does, which makes this a renderer comparison over a shared decoder rather than
   a whole-stack one. Say so wherever the numbers appear.
 
-  ## THIS PAGE DOES NOT WORK on @genome-spy/core 0.85.0, and the arm is off
+  ## The window is set by zoomTo after embed, not by a domain in the spec
 
-  It paints an empty plot frame, issues **zero** requests for the BAM or its
-  index, and reports `__gsState.ready === true` while doing so. Do not read a
-  timing off it; `scripts/crosstool/runner.ts` keeps the arm behind GENOMESPY=1.
+  **A `domain` anywhere on the x scale kills this page on 0.85.0.** Root `scales`
+  or the channel, chromosomal `{chrom, pos}` or plain linear numbers, inline
+  `scale.assembly` or root `genomes` — every combination fails identically:
+  `Genome hg19mod has not been loaded yet. Call ensureAssembly("hg19mod")`,
+  zero requests for the BAM, an empty plot frame. Declaring a domain makes
+  something read the genome before `assemblyPreflight` has loaded it, and the
+  preflight is the only thing on the embed path that ever calls
+  `ensureAssembly`.
 
-  The spec below is deliberately shaped like GenomeSpy's own published BAM
-  example (https://genomespy.app/docs/examples/genomic-data/bam-read-alignments/)
-  — root `scales` for the domain, `resolve` + a container root, and an identical
-  `x`/`x2` encoding — so that whoever picks this up starts from upstream's form
-  rather than from a guess. It still fails.
+  So this page declares no domain. It names the x scale, and moves to the window
+  afterwards through the API:
 
-  ### What the published example settles, and what it cannot
+      api.getScaleResolutionByName('pos').zoomTo([{chrom, pos: start},
+                                                  {chrom, pos: end}])
 
-  It disproved a comment that used to sit in this file, claiming the domain
-  belongs on the channel because "a root `scales` block creates a scale
-  resolution the assembly preflight does not walk". That is backwards. Upstream
-  puts the domain in a root `scales` block, and reading the bundle, such a block
-  is precisely what attaches view-level scale props and creates the resolution.
+  which lands on exactly the requested interval — verified by reading the domain
+  back, and by 0.93 MB of BAM arriving where the domain forms fetch nothing.
 
-  **But that example cannot show how a custom assembly loads, because it never
-  loads one.** It declares `assembly: "hg38"`, a *built-in*. Tracing
-  `getGenome` in the bundle, a built-in name takes a branch that constructs the
-  genome on demand and caches it, so the loader is never involved. A
-  *configured* genome — ours, `genomes: { hg19mod: { contigs } }` — takes a
-  different branch that refuses with "has not been loaded yet" unless something
-  has called `ensureAssembly`. Nothing on the embed path does, for any spec
-  shape tried.
+  **What that costs the measurement**: the page renders once at the whole-contig
+  view before the zoom. That first frame reads the BAM header and the index and
+  then stops, because the lazy source declines to load a view wider than
+  `windowSize` — so the extra work is an empty axis frame, not a second pileup.
+  The number this arm reports is still navigation-to-pileup, with one cheap frame
+  in the middle that the other three arms do not have.
 
-  ### Forms tried against 0.85.0, all failing
+  ## Why a configured genome and not a built-in name
 
-  | form | result |
-  | --- | --- |
-  | root `genome` (deprecated) | "Genome hg19mod has not been loaded yet" |
-  | root `genomes` + `assembly` | identical |
-  | inline `scale.assembly` on the channel | "No genomes have been configured!" |
-  | inline `assembly` in root `scales.x` | "No genomes have been configured!" |
-  | domain on the channel vs in root `scales` | no change |
-  | unit view at root vs `vconcat` + `resolve` | no change |
+  A built-in assembly (`hg38`, `hg19`, `mm10`, ...) is a hardcoded chrom.sizes
+  string in the bundle, and `getGenome` builds one on demand, synchronously, at
+  any point in the lifecycle — which is why GenomeSpy's published BAM example
+  declares `assembly: "hg38"` and works with a domain. A *configured* genome —
+  ours, `genomes: { hg19mod: { contigs } }` — is checked before that fallback
+  and throws until the preflight has loaded it.
 
-  The assembly loader itself is not the problem: a `contigs`-only configured
-  genome is built synchronously once `ensureAssembly` runs. The problem is that
-  it never runs, because the preflight collects assemblies from x/y scale
-  resolutions that have resolved to type `locus`, and ours is not among them.
+  Naming a configured genome after a built-in does not help: the configured map
+  is consulted first, so `genomes: { hg19: { contigs } }` throws where a bare
+  `assembly: "hg19"` would not. The only way to reach the synchronous branch is
+  to have no configured genome at all, which means real contig names in the
+  corpus — a 250 kb slice regenerated onto `chr22` instead of `chr22_mask`. That
+  would make a spec domain work here, and it is a corpus change touching every
+  other benchmark in this repo, so it stays a decision rather than a fix. The
+  zoomTo route needs no corpus change and lands on the same window.
 
-  ### The next thing to try
+  ## windowSize has to exceed the view span, and it rounds outward
 
-  Give the corpus a real contig name. The 250 kb slice sits under a made-up
-  `chr22_mask`, which forces a custom assembly and therefore the branch that
-  does not work. Regenerated onto real `chr22` coordinates it could use
-  `assembly: "hg38"` exactly as the example does, and bypass the loader the same
-  way. That is a corpus change touching every other benchmark, so it is a
-  decision rather than a fix.
+  The lazy source drops any request wider than `windowSize`
+  (`domain[1] - domain[0] > windowSize` and it returns without loading), and the
+  interval it does load is snapped outward to multiples of `windowSize`. So:
 
-  ### Every failure here is silent
+    * the default here is `max(30000, span + 1000)`, which keeps the 19 kb
+      benchmark window on the 30000 this page has always used and lets a 100 kb
+      window load at all;
+    * **this arm reads more bytes than the window it draws** — up to two
+      windowSize-aligned blocks. That is a property of GenomeSpy's lazy source,
+      not a harness setting to tune away, and `drewcheck.ts` counts the bytes so
+      a report can say how much.
+
+  ## Every failure here is silent
 
   `embed()` resolves, its promise does not reject, `__gsState.error` stays null,
   and GenomeSpy logs the exception itself so `pageerror` never fires. Four
-  independent signals read clean on a dead page. Only the absence of data
-  requests gives it away, which is why `drewcheck.ts` counts bytes by URL
-  *path*. The one 404 in a run is `favicon.ico`, confirmed 2026-08-24 — not a
-  missing genome file.
-
+  independent signals read clean on a dead page, and the instrument is paint
+  quiescence — a page that throws settles immediately and reports the best
+  number in the table. That is why this page records `zoomed` and `lazyLoaded`
+  alongside `ready`, why `drewcheck.ts` counts bytes by URL *path*, and why the
+  arm is preflighted with `toolcheck.ts` on every run rather than trusted.
 -->
 <html lang="en">
   <head>
@@ -110,45 +112,43 @@
       const params = new URLSearchParams(location.search)
       const track = params.get('track') ?? '20x.shortread.bam'
       const locus = params.get('loc') ?? 'chr22_mask:124000-143000'
+
       // "chr22_mask:124000-143000" -> ["chr22_mask", 124000, 143000]. The
       // corpus is one contig, so the size is a constant read from the .fai
       // rather than fetched; if the fixture ever grows a second contig this
       // has to become a chrom.sizes URL instead.
       const [chrom, range] = locus.split(':')
       const [start, end] = range.split('-').map(Number)
+      const CONTIG_SIZE = 250001
 
-      // The corpus assembly is a 250 kb slice of chr22 under a made-up contig
-      // name, so there is no published chrom.sizes to point at and no built-in
-      // assembly that matches. It is declared inline on the scale below rather
-      // than at the root, and that is a correctness requirement, not a style.
-      //
-      // Both root forms are dead ends in 0.85.0. Root `genome` is deprecated.
-      // Root `genomes` + `assembly` — what the deprecation notice points at —
-      // only *configures*: `getGenome` finds the name registered but not
-      // loaded and throws "Genome hg19mod has not been loaded yet. Call
-      // ensureAssembly(...)", and nothing on the `embed()` path ever calls it.
-      // The bundle's inline-object branch builds the genome synchronously
-      // instead, which is why the assembly lives on `x.scale` here.
-      //
-      // Every one of these failures is silent: `embed()` resolves, the promise
-      // does not reject, `__gsState.error` stays null, and the page paints an
-      // empty plot frame. Only the absence of data requests gives it away.
+      const windowSize = Number(params.get('window') ?? Math.max(30000, end - start + 1000))
+
+      window.__gsState = {
+        ready: false,
+        error: null,
+        zoomed: null,
+        lazyLoaded: null,
+        domain: null,
+        windowSize,
+      }
+
+      // `paintprofile.ts` will not call the pixels settled while this is true.
+      // Belt and braces here rather than a fix: this page's frames were checked
+      // and it settles on a drawn pileup without the gate. It carries one anyway
+      // because the failure it guards against is invisible — a page that is
+      // working with nothing moving on screen reads as finished — and this arm
+      // has a whole-contig frame before its zoom that is exactly that shape.
+      // `ready` goes true after the zoom lands and the lazy load resolves or
+      // times out, so the pixels still do all the timing.
+      window.__harnessBusy = () => !window.__gsState.ready
+
       const spec = {
-        genomes: { hg19mod: { contigs: [{ name: 'chr22_mask', size: 250001 }] } },
+        genomes: { hg19mod: { contigs: [{ name: chrom, size: CONTIG_SIZE }] } },
         assembly: 'hg19mod',
-        // The domain goes in a ROOT `scales` block, which is what GenomeSpy's
-        // published BAM example does. An earlier version of this file moved it
-        // onto the channel under a comment asserting the opposite — that a root
-        // block "creates a scale resolution the assembly preflight does not
-        // walk". Backwards: a root `scales` block is precisely what attaches
-        // view-level scale props and creates that resolution.
-        scales: {
-          x: { domain: [{ chrom, pos: start }, { chrom, pos: end }] },
-        },
-        // A CONTAINER root, not a bare unit view, mirroring that example's
-        // `resolve` + `vconcat`. The preflight collects assemblies by asking
-        // each x/y scale *resolution* for its requirement, and a shared
-        // resolution is what a container creates.
+        // A CONTAINER root, not a bare unit view, mirroring GenomeSpy's
+        // published BAM example: the assembly preflight collects requirements
+        // from x/y scale *resolutions*, and a shared resolution is what a
+        // container creates.
         resolve: { scale: { x: 'shared' } },
         data: {
           lazy: {
@@ -156,7 +156,7 @@
             url: `./data/${track}`,
             // indexUrl defaults to url + ".bai", which is how the corpus is
             // named, so it is left alone.
-            windowSize: Number(params.get('window') ?? 30000),
+            windowSize,
           },
         },
         // pileup assigns each read a lane, which is the layout step igv.js and
@@ -167,7 +167,13 @@
           {
             mark: { type: 'rect', minWidth: 1 },
             encoding: {
-              x: { chrom: 'chrom', pos: 'start', type: 'locus' },
+              // `name` is what makes the resolution reachable from the API as
+              // `getScaleResolutionByName('pos')`. No `domain` here, and none in
+              // a root `scales` block either — see the header. Naming it in a
+              // root block instead is rejected outright: "Cannot mix
+              // view-level scales.x with encoding.x.scale in the same scale
+              // resolution."
+              x: { chrom: 'chrom', pos: 'start', type: 'locus', scale: { name: 'pos' } },
               x2: { chrom: 'chrom', pos: 'end' },
               y: { field: 'lane', type: 'index', scale: { zoom: false } },
             },
@@ -175,10 +181,28 @@
         ],
       }
 
-      window.__gsState = { ready: false, error: null }
+      const LAZY_TIMEOUT_MS = 60000
+
       embed(document.getElementById('gs'), spec)
-        .then(api => {
+        .then(async api => {
           window.gsApi = api
+          const res = api.getScaleResolutionByName('pos')
+          if (!res) {
+            throw new Error('no scale resolution named "pos" — the spec lost its name')
+          }
+          await res.zoomTo([
+            { chrom, pos: start },
+            { chrom, pos: end },
+          ])
+          window.__gsState.zoomed = true
+          window.__gsState.domain = res.getDomain()
+          // A lazy load that never resolves is the failure this arm is prone to,
+          // so it is raced rather than awaited: a hung page should say so in its
+          // own state, not stall the instrument into a timeout.
+          window.__gsState.lazyLoaded = await Promise.race([
+            api.awaitVisibleLazyData().then(() => 'ok'),
+            new Promise(r => setTimeout(() => r('timeout'), LAZY_TIMEOUT_MS)),
+          ])
           window.__gsState.ready = true
         })
         .catch(e => {

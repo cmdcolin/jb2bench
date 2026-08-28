@@ -106,3 +106,18 @@ flame/*.svg
 # with a link pointing at itself -- destroying every built library arm in it.
 ecosystem/.libs
 .claude
+
+# The Gosling harness bundles. gosling.js ships ESM with bare specifiers
+# (`react`, `pixi.js`, `higlass`), so unlike igv.js and GenomeSpy -- both of
+# which ship a self-contained bundle crosstool/ symlinks straight into place --
+# a browser cannot load it out of node_modules. `make crosstool-bundles` builds
+# both from the tracked crosstool/gosling-entry.js, so they are generated like
+# the corpus and do not belong in a repo whose data policy is that generated
+# things are regenerable. crosstool/gosling.html refuses to run without one
+# rather than painting an empty frame.
+#
+# Two of them: stock, and the same build with Gosling's 20 kb tile-width cap
+# raised so the wide window renders at all. See
+# scripts/crosstool/goslingbundle.ts.
+/crosstool/gosling.bundle.js
+/crosstool/gosling-patched.bundle.js

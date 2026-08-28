@@ -108,8 +108,23 @@ cold <- fromJSON("results/crosstool.json", simplifyVector = FALSE)
 cold_under_test <- cold$jbrowseBuilds$jbrowse %||% cold$jbrowseBuild
 cold_igv <- cold$igvVersion
 
-cold_rows <- do.call(rbind, lapply(names(cold$rows), function(case) {
-  per <- cold$rows[[case]]
+# The cross-tool matrix gained a window axis on 2026-08-28 and keys its rows
+# `<case>@<window>`. Every figure here is the 19 kb window: it is what the
+# earlier rows were measured at, and mixing two windows into one panel would
+# draw a line that jumps between them. The 100 kb rows stay in
+# results/crosstool.md. A key with no `@` predates the migration and is 19 kb.
+COLD_WINDOW <- "19kb"
+cold_keys <- Filter(
+  function(k) {
+    w <- if (grepl("@", k)) sub("^.*@", "", k) else "19kb"
+    w == COLD_WINDOW
+  },
+  names(cold$rows)
+)
+
+cold_rows <- do.call(rbind, lapply(cold_keys, function(key) {
+  case <- sub("@.*$", "", key)
+  per <- cold$rows[[key]]
   do.call(rbind, lapply(names(per), function(tool) {
     cell <- per[[tool]]
     lab <- arm_label(tool, cold_under_test, cold_igv)
@@ -121,7 +136,7 @@ cold_rows <- do.call(rbind, lapply(names(cold$rows), function(case) {
       case = case, build = tool, arm = lab,
       median = cell$median / 1000, sd = cell$stddev / 1000,
       load = ld, foreign = fg,
-      measured = cold$dates[[case]] %||% NA_character_
+      measured = cold$dates[[key]] %||% NA_character_
     )
   }))
 }))

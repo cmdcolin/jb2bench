@@ -15,8 +15,11 @@
 //
 // Read `drew` as a property of the *pair*, never of the tool alone: a `no` can
 // be the harness page's fault as easily as the tool's, which is why every cell
-// carries the error the page reported and why GenomeSpy is `no` across the
-// board on 0.85.0 for a reason that has nothing to do with formats.
+// carries the error the page reported. Two rows are that case today. The
+// GenomeSpy and Gosling harness pages build a BAM pileup spec and nothing else,
+// so their BigWig and VCF cells report a gap in this repo and not in the tool —
+// both libraries read those formats. Their CRAM cells are the tool: neither has
+// a CRAM reader.
 //
 // Usage: node --experimental-strip-types scripts/crosstool/formatsupport.ts
 import fs from 'fs'
@@ -64,6 +67,9 @@ const igvVersion = JSON.parse(
 const gsVersion = JSON.parse(
   fs.readFileSync('node_modules/@genome-spy/core/package.json', 'utf8'),
 ).version as string
+const goslingVersion = JSON.parse(
+  fs.readFileSync('node_modules/gosling.js/package.json', 'utf8'),
+).version as string
 
 const TOOLS: Tool[] = [
   {
@@ -85,6 +91,12 @@ const TOOLS: Tool[] = [
     label: `GenomeSpy ${gsVersion}`,
     url: t =>
       `http://localhost:${CROSSTOOL_PORT}/genomespy.html?loc=${LOC}&track=${t}`,
+  },
+  {
+    id: 'gosling',
+    label: `Gosling ${goslingVersion}`,
+    url: t =>
+      `http://localhost:${CROSSTOOL_PORT}/gosling.html?loc=${LOC}&track=${t}`,
   },
 ]
 

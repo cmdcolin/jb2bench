@@ -24,7 +24,7 @@ LOGDIR := results/logs
 
 .PHONY: help gate counts timings all figures report serve serve-stop \
         corpus corpus-paper render interaction crosstool crosstool-cold \
-        crosstool-zoom crosstool-pan \
+        crosstool-zoom crosstool-pan crosstool-bundles \
         parsers parsers-count cram-samtools multibam backends clean-logs \
         formats toolcheck paper-tables
 
@@ -33,6 +33,7 @@ help:
 	@echo "  make gate            load, agents, disk, corpus, ports, sweep builds"
 	@echo "  make serve           http-servers for the three builds + crosstool"
 	@echo "  make serve-stop      stop them"
+	@echo "  make crosstool-bundles  build the Gosling harness bundle"
 	@echo ""
 	@echo "corpus (generate once, then leave alone)"
 	@echo "  make corpus          alignments, variants, GFF3, modBAM, cohort BigWigs"
@@ -73,7 +74,7 @@ $(LOGDIR):
 # Serving is backgrounded and deliberately not a dependency of anything: a
 # benchmark target that starts its own servers would also have to decide which
 # build goes where, and that decision belongs to whoever staged builds/.
-serve:
+serve: crosstool-bundles
 	npx http-server builds/current       -p 8000 -s --cors &
 	npx http-server builds/release-4.3.0 -p 8001 -s --cors &
 	npx http-server builds/release-2.4.0 -p 8004 -s --cors &
@@ -115,7 +116,7 @@ counts: | $(LOGDIR)
 formats:
 	$(NODE) scripts/crosstool/formatsupport.ts
 
-toolcheck:
+toolcheck: crosstool-bundles
 	$(NODE) scripts/crosstool/toolcheck.ts
 
 # ------------------------------------------------------- timings (idle box)
@@ -132,20 +133,44 @@ interaction: gate | $(LOGDIR)
 # only 8000 — a matrix with one JBrowse column cannot draw those figures, and a
 # figure set where each panel has different arms is not a figure set.
 ARMS := JBROWSE_PORTS=8000,8001,8004
-TOOLARMS := TOOLS=jbrowse,jbrowse-release-4.3.0,jbrowse-release-2.4.0,igv,igv-deep
+
+# Two arm lists, because the two runners can drive different numbers of tools.
+#
+# Cold load is a page load, so any harness page that draws can be an arm.
+# Pan and zoom are *motions*, and panrunner.ts moves each tool through its own
+# API -- `kind: 'jbrowse' | 'igv'` -- so an arm there costs a driver per tool.
+# GenomeSpy and Gosling have no driver yet, so naming them in a motion run would
+# have them silently filtered out and quietly narrow the table.
+TOOLARMS := TOOLS=jbrowse,jbrowse-release-4.3.0,jbrowse-release-2.4.0,igv,igv-deep,genomespy,gosling
+MOTIONARMS := TOOLS=jbrowse,jbrowse-release-4.3.0,jbrowse-release-2.4.0,igv,igv-deep
+
+# The Gosling harness is the one arm that needs a build step. gosling.js ships
+# ESM with bare specifiers, so a browser cannot load it out of node_modules the
+# way it loads the igv.js and GenomeSpy bundles that crosstool/ symlinks into
+# place. The runner refuses to start without this file rather than letting the
+# arm paint an empty frame -- which, under a paint-quiescence instrument, would
+# report the best number in the table.
+# Two bundles: stock Gosling, and the same build with its 20 kb tile-width cap
+# raised so the wide window renders at all. The patched one is a separate arm and
+# never a substitute for the stock column -- see the script's header.
+crosstool-bundles: crosstool/gosling.bundle.js
+
+crosstool/gosling.bundle.js crosstool/gosling-patched.bundle.js &: \
+    crosstool/gosling-entry.js scripts/crosstool/goslingbundle.ts package.json
+	$(NODE) scripts/crosstool/goslingbundle.ts
 
 crosstool: crosstool-cold crosstool-zoom crosstool-pan
 
-crosstool-cold: gate | $(LOGDIR)
+crosstool-cold: gate crosstool-bundles | $(LOGDIR)
 	$(ARMS) $(TOOLARMS) $(NODE) scripts/crosstool/runner.ts 2>&1 \
 	  | tee $(LOGDIR)/crosstool-cold-$(STAMP).log
 
 crosstool-zoom: gate | $(LOGDIR)
-	MOTION=zoom $(ARMS) $(TOOLARMS) $(NODE) scripts/crosstool/panrunner.ts 2>&1 \
+	MOTION=zoom $(ARMS) $(MOTIONARMS) $(NODE) scripts/crosstool/panrunner.ts 2>&1 \
 	  | tee $(LOGDIR)/crosstool-zoom-$(STAMP).log
 
 crosstool-pan: gate | $(LOGDIR)
-	MOTION=pan $(ARMS) $(TOOLARMS) $(NODE) scripts/crosstool/panrunner.ts 2>&1 \
+	MOTION=pan $(ARMS) $(MOTIONARMS) $(NODE) scripts/crosstool/panrunner.ts 2>&1 \
 	  | tee $(LOGDIR)/crosstool-pan-$(STAMP).log
 
 multibam: gate | $(LOGDIR)

@@ -40,19 +40,29 @@ export function enumerateCases(env = process.env): Case[] {
 }
 
 /**
- * Relabel recorded rows keyed `<cov>-<read>` as `<cov>-<read>-bam`.
+ * Relabel one case id keyed `<cov>-<read>` as `<cov>-<read>-bam`.
  *
  * Every row recorded before a runner learned about formats was BAM, since BAM
  * was all it enumerated. Renaming keeps those measurements on the same axis as
  * the CRAM rows rather than stranding them under names nothing reads. It
  * relabels, never re-values.
+ *
+ * **It takes a case id and not a row key**, because a row key can carry more
+ * than the case: the cross-tool matrix keys its rows `<case>@<window>`, and
+ * appending `-bam` to one of those produces `20x-shortread-bam@19kb-bam` on the
+ * second pass. Anything holding composite keys migrates the case part with this
+ * — see `migrateRowKeys` in scripts/crosstool/windows.ts.
  */
+export const migrateCaseKey = (id: string) =>
+  /-(bam|cram)$/.test(id) ? id : `${id}-bam`
+
+/** `migrateCaseKey` over a record keyed by bare case id. */
 export function migrateCaseKeys<T>(
   byCase: Record<string, T> | undefined,
 ): Record<string, T> {
   const out: Record<string, T> = {}
   for (const [k, v] of Object.entries(byCase ?? {})) {
-    out[/-(bam|cram)$/.test(k) ? k : `${k}-bam`] = v
+    out[migrateCaseKey(k)] = v
   }
   return out
 }

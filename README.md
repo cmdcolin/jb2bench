@@ -414,57 +414,163 @@ mark where 2.12.1 had drawn eight — a timing difference, not a failure, and
 irrelevant to a runner that measures paint quiescence rather than counting
 canvases).
 
-#### GenomeSpy: BAM harness written, still does not render
+#### GenomeSpy: drawing since 2026-08-28, by not declaring a domain
 
-`crosstool/genomespy.html`, with `@genome-spy/core` at **0.85.0**. The arm is
-wired into `scripts/crosstool/runner.ts` but **opt-in behind `GENOMESPY=1`**,
-and it should stay that way until `make toolcheck` passes it. The instrument on
-those runs is paint quiescence, and a page that throws settles immediately — so
-a dead harness does not look broken, it reports the best number in the table.
+`crosstool/genomespy.html`, with `@genome-spy/core` at **0.85.0**. The arm runs
+in `scripts/crosstool/runner.ts` at both windows, no longer gated: it was
+opt-in behind `GENOMESPY=1` while the page drew nothing, and a gated arm goes
+unexercised, which is how the page rotted in the first place. `make toolcheck`
+preflights it on every run instead — necessary, because the instrument on those
+runs is paint quiescence and a page that throws settles immediately, so a dead
+harness does not look broken, it reports the best number in the table.
 
 **GenomeSpy does read alignments.** It has a native `bam` lazy data source, so
-the comparison can run on the *same* BAM workload as igv.js and JBrowse rather
+the comparison runs on the *same* BAM workload as igv.js and JBrowse rather
 than being pushed onto signal. Its transform registry carries `pileup`,
 `alignmentMismatches`, `flattenCigar` and `coverage`. The harness uses `pileup`
 to assign lanes, because comparing a laid-out stack against a single
 overplotted row would not be a comparison.
 
-**It draws nothing**, verified against a running page on 2026-08-23: an empty
-plot frame and **zero** requests for the BAM or its index. Three declaration
-forms were tried on 0.85.0 and each fails differently — root `genome`
-(deprecated) and root `genomes` + `assembly` both give "Genome hg19mod has not
-been loaded yet", an inline `scale.assembly` object gives "No genomes have been
-configured!". A plain numeric domain only changes which call arrives first.
+**What was wrong was the domain, not the assembly declaration.** Every earlier
+account here blamed the genome-declaration form, and every one of them was
+looking at the wrong half of the spec. Swept against a running page: with **no
+`domain` anywhere on the x scale**, root `genomes` + `assembly` loads, fetches
+and draws. Add a domain and every form fails identically — root `scales` or the
+channel, chromosomal `{chrom, pos}` or plain linear numbers, root `genomes` or
+an inline `scale.assembly` object — with `Genome hg19mod has not been loaded
+yet. Call ensureAssembly("hg19mod")` and zero requests for the BAM.
 
-The mechanism, read out of the bundle rather than inferred:
+The mechanism, read out of the bundle:
 
 - Startup only *configures* genomes — `configureGenomes()` off the root spec,
   and nothing more.
-- The sole loader is the view-insertion preflight, which collects assemblies by
-  asking each x/y scale resolution for its assembly requirement, and only a
-  resolution already resolved to type `locus` reports one.
-- Our locus scale is not among them, so the preflight collects nothing, loads
-  nothing, and the first draw resolves the genome against an empty store.
+- The sole loader on the `embed()` path is the view-insertion preflight
+  (`assemblyPreflight`), which collects assemblies by asking each x/y scale
+  resolution for its requirement and then calls `ensureAssembly` for each.
+- A declared domain is read *before* that preflight runs, through
+  `getConfiguredDomain` → `fromComplexInterval` → `getLocusGenome` →
+  `getGenome()`, and a configured genome that has not been loaded yet throws
+  there rather than loading on demand.
 
-This supersedes the earlier account that `BamSource` touches `this.genome` from
-its constructor before `assemblyPreflight` is awaited — which was closer than
-the declaration-form theory that briefly replaced it, but named the wrong
-trigger. The stack says the first access comes through `getConfiguredDomain` →
-`fromComplexInterval` → `getLocusGenome` → `getGenome()` with no argument.
+So the harness declares no domain, names the x scale, and moves to the window
+afterwards:
 
-**Four independent signals read clean on the dead page**, which is why this
-survived so long: `embed()` resolves, its promise does not reject,
-`__gsState.error` stays null, and GenomeSpy logs the exception itself so
-`pageerror` never fires. Only the absence of data requests gives it away —
-hence `drewcheck.ts` counting bytes by URL *path*, since matching the whole URL
-matched the harness page's own `&track=….bam` query and credited its 5 kB to
-the corpus.
+```js
+await api.getScaleResolutionByName('pos').zoomTo([
+  { chrom, pos: start },
+  { chrom, pos: end },
+])
+```
 
-What is owed is a spec form that puts the locus scale in front of the preflight.
-Do not report this upstream on the strength of what is written here: GenomeSpy's
-own published BAM examples presumably work, and the corpus is a 250 kb slice
-under a made-up contig name, so this harness exercises an inline-genome path
-those examples do not.
+which lands on exactly the requested interval — read back off the resolution as
+`[124000, 143001]` — and pulls 0.93 MB of BAM where every domain form fetches
+nothing. The cost to the measurement is one empty axis frame before the zoom:
+the lazy source declines a view wider than its `windowSize`, so that first frame
+reads the header and the index and stops.
+
+**A built-in assembly would not have had this problem**, and that is the whole
+asymmetry. `hg38`, `hg19`, `mm10` and the rest are hardcoded chrom.sizes strings
+in the bundle, and `getGenome` builds one on demand, synchronously, at any point
+in the lifecycle. GenomeSpy's published BAM example declares `assembly: "hg38"`
+and therefore never exercises the loader at all — which is why that example
+could not have told us anything. A *configured* genome is checked before the
+built-in fallback, so naming ours after a built-in does not help either:
+`genomes: { hg19: { contigs } }` throws where a bare `assembly: "hg19"` would
+not. The only route to the synchronous branch is real contig names in the
+corpus, and the corpus is a 250 kb slice under a made-up `chr22_mask`.
+Regenerating it onto real `chr22` coordinates would make a declared domain work
+here, and would touch every other benchmark in this repo, so it stays a decision
+rather than a fix.
+
+**`windowSize` has to exceed the view span, and it rounds outward.** The lazy
+source drops any request wider than `windowSize` and snaps the interval it does
+load to multiples of it, so this arm reads more bytes than the window it draws —
+up to two aligned blocks. The harness defaults to `max(30000, span + 1000)`,
+which keeps the 19 kb window on the 30000 it has always used and lets the 100 kb
+window load at all. That over-fetch is a property of the lazy source, not a
+harness setting to tune away; `drewcheck.ts` counts the bytes.
+
+**Four independent signals read clean on the dead page**, which is why the
+original failure survived so long: `embed()` resolves, its promise does not
+reject, `__gsState.error` stays null, and GenomeSpy logs the exception itself so
+`pageerror` never fires. Only the absence of data requests gives it away — hence
+`drewcheck.ts` counting bytes by URL *path*, since matching the whole URL matched
+the harness page's own `&track=….bam` query and credited its 5 kB to the corpus.
+The page now also records `zoomed`, `lazyLoaded` and the domain it landed on, so
+a future failure says which step stopped.
+
+The ordering looks like an upstream bug rather than a documented constraint, and
+it has not been reported.
+
+#### Gosling: runs at 19 kb, and cannot reach 100 kb
+
+`crosstool/gosling.html`, with **gosling.js 1.0.7**, on the same BAM through
+Gosling's own `bam` fetcher and its `displace`/`pile` transform. 7559 reads and
+1.56 MB at the 19 kb window, drawn as a real pileup.
+
+**It is the one arm that needs a build step.** gosling.js ships ESM with bare
+specifiers (`react`, `pixi.js`, `higlass`), so unlike igv.js and GenomeSpy — both
+of which ship a self-contained bundle `crosstool/` symlinks into place — a
+browser cannot load it out of `node_modules`. `make crosstool-bundles` builds
+`crosstool/gosling.bundle.js` from the tracked `crosstool/gosling-entry.js`; the
+bundle is generated and gitignored, `make serve` depends on it, and the runner
+refuses to start without it rather than letting the page paint an empty frame.
+
+Two things the harness settles cheaply that GenomeSpy makes hard:
+
+- **The custom assembly is one line.** Gosling's `assembly` accepts
+  `[[name, size], ...]` — its `ChromSizes` form — so `[['chr22_mask', 250001]]`
+  is the whole declaration. No genome file is fetched and no built-in is
+  involved.
+- **The window is declarative.** `xDomain: { chromosome, interval }` works, so
+  no post-embed zoom is needed.
+
+**But Gosling draws BAM reads only while the visible tile is at most 20 kb
+wide.** `MAX_TILE_WIDTH = 2e4` in its `BamDataFetcher`, compared against every
+visible tile by `gosling-track.ts:calculateVisibleTiles`, which returns before
+fetching anything. Tile width is the declared genome length over 2^zoom, so the
+limit scales with the assembly and not with the file: swept on this 250 kb
+corpus, 19 kb draws and 30 kb already does not, and the 100 kb window paints a
+full axis and no reads having fetched only the header and the index. The runner
+records those cells as `n/a` rather than timing an empty page — under paint
+quiescence an empty page settles immediately, so timing it would make Gosling
+the fastest tool in the table at the window it cannot render — and
+`toolcheck.ts` expects them empty rather than counting them as breakage. Both
+generic "did it draw" signals read clean on that page, a painted canvas and
+bytes off the disk, which is why the harness counts `rawData` events into
+`__goslingState.records` and `drewcheck.ts` reads it.
+
+**So there are two Gosling arms, and the pair is the finding.**
+`scripts/crosstool/goslingbundle.ts` builds a second bundle from the same entry
+point with that cap and the BAM worker's own 200 kb cap raised past any genome
+size, and the runner drives it as `gosling-patched` — the stock column keeps its
+`n/a`, because where a tool stops is a result and a patched library is not the
+library anyone installs. Two properties of that arm travel with its numbers:
+
+- **The patch asserts before it replaces.** A text patch against someone else's
+  build output is the thing that rots silently on a version bump, and a silent
+  no-op would hand the runner a "patched" bundle that is stock — at the one
+  window where stock draws nothing, under the instrument that reports an empty
+  page as fast. Each replacement fails the build unless it matches exactly once.
+- **It reads a whole tile, not the window.** At 100 kb it lays out 40002 reads,
+  every read in the 20x file, against roughly 16000 in view: the tile HiGlass
+  asks for at that zoom covers the contig. Same kind of over-read as GenomeSpy's
+  `windowSize` snapping and larger, so the column is an upper bound on what an
+  unpatched Gosling would cost at this width even if it could draw it.
+
+**Its BAM parser is the 2023 one.** Gosling 1.0.7 depends on `@gmod/bam`
+^1.1.18, `@gmod/bbi` ^3.0.1 and `@gmod/vcf` ^5.0.10 — to the version, the pins
+`ecosystem/versions.json` calls the *2023* side. So whatever `ecosystem/`
+measures as the parser speedup since 2023 is speedup a Gosling user has not had
+yet, which is a stronger statement than any render timing against Gosling and
+needs no harness. Re-check it rather than quoting it: a dependency range is not
+a lockfile.
+
+**`loadMates` is off, and that is a fairness decision.** Gosling's own pileup
+example sets it, which makes the fetcher issue a second pass per read so it can
+colour by inferred SV type. Neither igv.js nor JBrowse does that by default, so
+the harness default matches them and `?mates=1` is the control that says what it
+costs.
 
 #### HiGlass: `higlass-pileup` is the way in
 
@@ -476,18 +582,22 @@ all. No harness for it has been written yet.
 #### Both of them read our decoder
 
 `@genome-spy/core` 0.85.0 depends on `@gmod/bam ^7.1.19`, `@gmod/bbi ^9.2.0`,
-`@gmod/bed`, `@gmod/indexedfasta`, `@gmod/tabix` and `@gmod/vcf`, and
-`higlass-pileup` 1.12.2 depends on `@gmod/bam 1.1.8`. Two consequences for how
-any resulting number should be read:
+`@gmod/bed`, `@gmod/indexedfasta`, `@gmod/tabix` and `@gmod/vcf`; gosling.js
+1.0.7 depends on `@gmod/bam ^1.1.18`; and `higlass-pileup` 1.12.2 depends on
+`@gmod/bam 1.1.8`. Three consequences for how any resulting number should be
+read:
 
 - A JBrowse-vs-GenomeSpy BAM comparison largely **isolates the render path**,
   because both sides decode with the same library. The igv.js comparison does
   not: igv maintains its own readers, so it confounds parser and renderer. This
   makes GenomeSpy the more informative of the two comparisons, not the less.
-- `higlass-pileup` pins `@gmod/bam` 1.1.8 against GenomeSpy's 7.x, so a HiGlass
-  number is *not* decoder-controlled in the same way — it would carry six major
-  versions of parser difference. Say so rather than presenting the three as one
-  matrix.
+- **Gosling is decoder-controlled the other way.** It reads the same library at
+  the version this repo calls the 2023 side, so a JBrowse-vs-Gosling number
+  carries six majors of parser difference on top of the renderer difference. The
+  parser half of that gap is what `ecosystem/` measures directly, so read the
+  render column as an upper bound on Gosling's renderer and not as one.
+- `higlass-pileup` pins `@gmod/bam` 1.1.8, same era as Gosling, against
+  GenomeSpy's 7.x. Say so rather than presenting the four as one matrix.
 
 #### Cross-tool pan, and the instrument it needed
 

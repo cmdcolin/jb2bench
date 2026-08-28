@@ -221,9 +221,17 @@ fs.writeFileSync(
 // ------------------------------------------------------------ tab:crosstool
 
 const ct = read('crosstool.json')
-const ctDates = [...new Set(CASES.map(c => ct.dates?.[c]).filter(Boolean))]
+// The cross-tool matrix gained a window axis on 2026-08-28 and keys its rows
+// `<case>@<window>`. The paper's table is the 19 kb window, which is the one
+// every figure and every earlier row was measured at; the 100 kb rows are in
+// results/crosstool.md and are not in the paper. The `?? ct.rows?.[c]` reads a
+// file written before the migration ran.
+const ctKey = (c: string) => `${c}@19kb`
+const ctDates = [
+  ...new Set(CASES.map(c => ct.dates?.[ctKey(c)] ?? ct.dates?.[c]).filter(Boolean)),
+]
 const ctRows = CASES.map((c, i) => {
-  const row = ct.rows?.[c] ?? {}
+  const row = ct.rows?.[ctKey(c)] ?? ct.rows?.[c] ?? {}
   return [
     LABELS[i]!,
     ms(row.jbrowse?.median),
