@@ -18,14 +18,20 @@ import { writeFileSync } from 'node:fs'
 
 import { tablemark } from 'tablemark'
 
-import { LD_COMPUTE_WGSL, launchGpuPage, loadWgsl } from './ldkernel.ts'
+import { LD_COMPUTE_WGSL, assertHardwareAdapter, launchGpuPage, loadWgsl } from './ldkernel.ts'
+
+// Headed by default: a GPU timing off a headless software adapter is a CPU
+// timing wearing a GPU's name. --headless is available for a machine with no
+// display, and is checked by assertHardwareAdapter all the same.
+const HEADED = !process.argv.includes('--headless')
+const ALLOW_SOFTWARE = process.argv.includes('--allow-software')
 
 const NUM_SAMPLES = Number(process.argv[2] ?? 1000)
 const MAX_N = Number(process.argv[3] ?? 2000)
 const SIZES = [100, 250, 500, 1000, 2000, 2897, 4000].filter(n => n <= MAX_N)
 
 const code = loadWgsl(LD_COMPUTE_WGSL)
-const { page, close } = await launchGpuPage()
+const { page, close } = await launchGpuPage({ headed: HEADED })
 
 const out = await page.evaluate(
   async ({ code, NUM_SAMPLES, sizes }) => {
@@ -160,8 +166,18 @@ const out = await page.evaluate(
       const cpuMs = performance.now() - t
       rows.push({ n, numCells: (n * (n - 1)) / 2, workUnits: ((n * (n - 1)) / 2) * NUM_SAMPLES, gpuMs, cpuMs })
     }
+    const ai = adapter.info
     return {
-      adapter: { vendor: adapter.info.vendor, architecture: adapter.info.architecture, description: adapter.info.description },
+      adapter: {
+        vendor: ai?.vendor ?? '',
+        architecture: ai?.architecture ?? '',
+        device: ai?.device ?? '',
+        description: ai?.description ?? '',
+        isFallbackAdapter: Boolean(
+          (ai as { isFallbackAdapter?: boolean } | undefined)?.isFallbackAdapter ??
+            (adapter as unknown as { isFallbackAdapter?: boolean }).isFallbackAdapter,
+        ),
+      },
       maxComputeWorkgroupsPerDimension: MAXD,
       rows,
     }
@@ -170,6 +186,8 @@ const out = await page.evaluate(
 )
 
 await close()
+
+assertHardwareAdapter(out.adapter, ALLOW_SOFTWARE)
 
 interface Row { n: number; numCells: number; workUnits: number; gpuMs: number; cpuMs: number }
 const rows = out.rows as Row[]
