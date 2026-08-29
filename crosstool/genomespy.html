@@ -18,6 +18,35 @@
   does, which makes this a renderer comparison over a shared decoder rather than
   a whole-stack one. Say so wherever the numbers appear.
 
+  ## The spec draws what the other arms draw, and it did not always
+
+  **Until 2026-08-29 this page asked GenomeSpy for `mark: rect` and a `pileup`
+  transform and nothing else** — flat rectangles, one per read. JBrowse and
+  igv.js were meanwhile drawing a coverage track and per-base mismatches on top
+  of their pileups. Screenshots settle it: counting distinct saturated hues in
+  the read band, igv scored 207 and JBrowse 12, against **2 for GenomeSpy**. The
+  arm was winning the light cells partly by drawing less, and "a renderer
+  comparison over a shared decoder" is not true of two arms drawing different
+  pictures.
+
+  So the spec now carries the layers GenomeSpy's own published BAM example
+  carries, and that JBrowse draws here: a coverage track with mismatch support,
+  a directional `arrow` backbone per read, CIGAR overlays for deletions, skips
+  and insertions, and per-base mismatch rects coloured by base. Same palette as
+  their example, so the colours are theirs. It scores 53 hues now.
+
+  **What is deliberately left out, and why.** Their example also draws the base
+  letter inside each mismatch and an "I"/"S" glyph for insertions and soft
+  clips. At this window a base is 1/15th of a pixel, so no arm displays readable
+  text and JBrowse draws none — including them would price a feature nobody
+  sees. Their two interactive sliders (`minMapq`, `minBaseQuality`) are gone for
+  the same reason: they are UI, not drawn content, and one of them filters reads
+  *out*, which would cut the workload rather than measure it.
+
+  **`scripts/crosstool/shots.ts` is what caught this, and re-checks it.**
+  `drewcheck.ts` cannot: it asks whether a page drew anything from corpus bytes,
+  and a page of flat rectangles passes that as cleanly as a full pileup.
+
   ## The window is set by zoomTo after embed, not by a domain in the spec
 
   **A `domain` anywhere on the x scale kills this page on 0.85.0.** Root `scales`
@@ -157,6 +186,13 @@
       // times out, so the pixels still do all the timing.
       window.__harnessBusy = () => !window.__gsState.ready
 
+      // Base palette, from GenomeSpy's own BAM example so the mismatch colours
+      // are theirs and not ours.
+      const BASE_COLORS = {
+        domain: ['A', 'C', 'T', 'G', 'N'],
+        range: ['#4FBF45', '#4D96E8', '#E85F78', '#E8B322', '#BDBDBD'],
+      }
+
       const spec = {
         genomes: { hg19mod: { contigs: [{ name: chrom, size: CONTIG_SIZE }] } },
         assembly: 'hg19mod',
@@ -165,6 +201,7 @@
         // from x/y scale *resolutions*, and a shared resolution is what a
         // container creates.
         resolve: { scale: { x: 'shared' } },
+        spacing: 5,
         data: {
           lazy: {
             type: 'bam',
@@ -179,19 +216,152 @@
         // against a single overplotted row.
         transform: [{ type: 'pileup', start: 'start', end: 'end', as: 'lane' }],
         vconcat: [
+          // Coverage with mismatch support, which is what JBrowse's SNP-coverage
+          // track draws above its pileup and what igv draws above its own.
           {
-            mark: { type: 'rect', minWidth: 1 },
+            name: 'coverage',
+            height: 40,
+            resolve: { scale: { color: 'independent' } },
+            layer: [
+              {
+                name: 'depth',
+                transform: [
+                  { type: 'flattenCigar', copyFields: ['chrom'] },
+                  { type: 'filter', expr: "datum.cigarType == 'aligned'" },
+                  { type: 'collect', sort: { field: ['chrom', 'cigarStart'] } },
+                  {
+                    type: 'coverage',
+                    chrom: 'chrom',
+                    start: 'cigarStart',
+                    end: 'cigarEnd',
+                    as: 'coverage',
+                    asStart: 'start',
+                    asEnd: 'end',
+                  },
+                ],
+                mark: 'rect',
+                encoding: {
+                  // `name` is what makes the resolution reachable from the API as
+                  // `getScaleResolutionByName('pos')`. No `domain` here, and none
+                  // in a root `scales` block either — see the header. It rides on
+                  // the first view because the root resolves x as shared, so one
+                  // name names the resolution every view draws through.
+                  x: {
+                    chrom: 'chrom', pos: 'start', type: 'locus', band: 0,
+                    scale: { name: 'pos' },
+                  },
+                  x2: { chrom: 'chrom', pos: 'end', band: 0 },
+                  y: { field: 'coverage', type: 'quantitative' },
+                  color: { value: '#d0d0d0' },
+                },
+              },
+              {
+                name: 'mismatch-summary',
+                transform: [
+                  { type: 'filter', expr: 'datum.md != null' },
+                  { type: 'alignmentMismatches', copyFields: ['chrom'] },
+                  { type: 'aggregate', groupby: ['chrom', 'mismatchStart', 'base'] },
+                  {
+                    type: 'stack',
+                    field: 'count',
+                    groupby: ['chrom', 'mismatchStart'],
+                    sort: { field: 'base', order: 'ascending' },
+                    as: ['mismatchCount0', 'mismatchCount1'],
+                  },
+                  { type: 'formula', expr: 'datum.mismatchStart + 1', as: 'mismatchEnd' },
+                ],
+                mark: 'rect',
+                encoding: {
+                  x: { chrom: 'chrom', pos: 'mismatchStart', type: 'locus', band: 0 },
+                  x2: { chrom: 'chrom', pos: 'mismatchEnd', band: 0 },
+                  y: { field: 'mismatchCount0', type: 'quantitative' },
+                  y2: { field: 'mismatchCount1' },
+                  color: { field: 'base', type: 'nominal', scale: BASE_COLORS, legend: null },
+                },
+              },
+            ],
+          },
+          {
+            name: 'read-alignments',
+            resolve: { scale: { color: 'independent' } },
             encoding: {
-              // `name` is what makes the resolution reachable from the API as
-              // `getScaleResolutionByName('pos')`. No `domain` here, and none in
-              // a root `scales` block either — see the header. Naming it in a
-              // root block instead is rejected outright: "Cannot mix
-              // view-level scales.x with encoding.x.scale in the same scale
-              // resolution."
-              x: { chrom: 'chrom', pos: 'start', type: 'locus', scale: { name: 'pos' } },
-              x2: { chrom: 'chrom', pos: 'end' },
-              y: { field: 'lane', type: 'index', scale: { zoom: false } },
+              y: {
+                field: 'lane',
+                type: 'index',
+                scale: { padding: 0.25, reverse: true, zoom: false },
+              },
             },
+            layer: [
+              {
+                // An arrow rather than a rect, because JBrowse and igv both draw
+                // a pointed read that states its strand.
+                name: 'read-backbone',
+                mark: {
+                  type: 'arrow',
+                  style: 'arrow-block',
+                  minStemLength: 10,
+                  fill: '#e0e0e0',
+                  stroke: '#c4c4c4',
+                  strokeWidth: 0.5,
+                },
+                encoding: {
+                  x: { chrom: 'chrom', pos: 'start', type: 'locus', band: 0 },
+                  x2: { chrom: 'chrom', pos: 'end', band: 0 },
+                  direction: {
+                    field: 'strand',
+                    type: 'nominal',
+                    scale: { domain: ['+', '-'], range: ['forward', 'reverse'] },
+                  },
+                },
+              },
+              {
+                name: 'cigar-overlays',
+                transform: [{ type: 'flattenCigar', copyFields: ['chrom', 'lane'] }],
+                encoding: {
+                  x: { chrom: 'chrom', pos: 'cigarStart', type: 'locus', band: 0 },
+                  x2: { chrom: 'chrom', pos: 'cigarEnd', band: 0 },
+                },
+                layer: [
+                  {
+                    name: 'deletions',
+                    transform: [{ type: 'filter', expr: "datum.cigarType == 'deletion'" }],
+                    layer: [
+                      { mark: { type: 'rect', color: 'white', minWidth: 1 } },
+                      { mark: { type: 'rule', color: '#222', minLength: 1 } },
+                    ],
+                  },
+                  {
+                    name: 'skips',
+                    transform: [{ type: 'filter', expr: "datum.cigarType == 'skip'" }],
+                    mark: { type: 'rule', color: '#6b6b6b', strokeDash: [2, 2], minLength: 1 },
+                  },
+                  {
+                    // A 1 px rect rather than the example's "I" glyph. An
+                    // insertion is zero bases wide, so `minWidth` is what makes
+                    // it visible, and at 15 bp/px a letter would be 1/15th of a
+                    // pixel — JBrowse and igv both draw a tick here and no arm
+                    // draws readable text, so a glyph would price something
+                    // nobody displays.
+                    name: 'insertions',
+                    transform: [{ type: 'filter', expr: "datum.cigarType == 'insertion'" }],
+                    mark: { type: 'rect', color: '#800080', minWidth: 1 },
+                  },
+                ],
+              },
+              {
+                name: 'mismatches',
+                transform: [
+                  { type: 'filter', expr: 'datum.md != null' },
+                  { type: 'alignmentMismatches', copyFields: ['chrom', 'lane'] },
+                ],
+                mark: { type: 'rect', minWidth: 1 },
+                encoding: {
+                  x: { chrom: 'chrom', pos: 'mismatchStart', type: 'locus', band: 0 },
+                  x2: { chrom: 'chrom', pos: 'mismatchEnd', band: 0 },
+                  color: { field: 'base', type: 'nominal', scale: BASE_COLORS, legend: null },
+                },
+              },
+            ],
           },
         ],
       }

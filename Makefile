@@ -26,7 +26,7 @@ LOGDIR := results/logs
         corpus corpus-paper render interaction crosstool crosstool-cold \
         crosstool-zoom crosstool-pan crosstool-bundles \
         parsers parsers-count cram-samtools multibam backends clean-logs \
-        formats toolcheck paper-tables
+        formats toolcheck shots paper-tables
 
 help:
 	@echo "preflight"
@@ -118,6 +118,14 @@ formats:
 
 toolcheck: crosstool-bundles
 	$(NODE) scripts/crosstool/toolcheck.ts
+
+# What each arm actually DRAWS at one window, into screenshots/crosstool/.
+# `toolcheck` asks whether a page drew anything from corpus bytes; a page of
+# flat rectangles passes that as cleanly as a full pileup, which is how the
+# GenomeSpy arm spent its first weeks being timed on a picture nobody else was
+# drawing. Not a timing, so it does not need an idle box.
+shots: crosstool-bundles
+	$(NODE) scripts/crosstool/shots.ts
 
 # ------------------------------------------------------- timings (idle box)
 
