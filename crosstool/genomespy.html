@@ -47,6 +47,25 @@
   `drewcheck.ts` cannot: it asks whether a page drew anything from corpus bytes,
   and a page of flat rectangles passes that as cleanly as a full pileup.
 
+  ## The mismatch layers need MD tags, and say nothing when they are missing
+
+  `alignmentMismatches` reads the MD tag, and the layer filters on
+  `datum.md != null`, so on a BAM without MD this page draws a pileup with no
+  mismatches in it and reports success — the same silent-success shape as every
+  other failure here. JBrowse and igv.js reconstruct mismatches from the
+  reference and are unaffected, so a no-MD corpus would quietly restore exactly
+  the unfair comparison this spec was written to end.
+
+  Every BAM in this corpus carries MD because `shell/generate_alignments.sh`
+  runs `samtools calmd`, and `data/20x.shortread.nomd.bam` is that same file
+  with the tag stripped, so the dependency is testable on our own synthetic
+  reads. Measured: GenomeSpy 87 saturated hues with MD against 0 without,
+  Gosling 12 against 0, JBrowse and igv.js unchanged at 19 and 253.
+
+  **CRAM never needs MD** — it is reference-compressed, so the mismatches are
+  intrinsic to the format and htslib hands back an MD on decode. Moot here in
+  any case, since neither GenomeSpy nor Gosling reads CRAM.
+
   ## The window is set by zoomTo after embed, not by a domain in the spec
 
   **A `domain` anywhere on the x scale kills this page on 0.85.0.** Root `scales`

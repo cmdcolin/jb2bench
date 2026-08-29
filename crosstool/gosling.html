@@ -43,6 +43,36 @@
   page, which is why `__goslingState.records` exists and why `drewcheck.ts` reads
   it.
 
+  ## The spec draws coverage and mismatches, and both need MD tags
+
+  **Until 2026-08-29 this page asked Gosling for reads and nothing else** — flat
+  grey rectangles, no coverage track, not one coloured base, while JBrowse and
+  igv.js drew both. It now carries what Gosling's own pileup example carries: a
+  coverage track, per-base mismatches coloured by the read's base, and the
+  insertion/deletion and clip layers. `records` goes from 7559 to 41962 at 20x
+  short read, because `subjson` turns one read into one row per substitution.
+
+  Two shapes come back in that `substitutions` array and only `type` tells them
+  apart: CIGAR-derived entries carry a `type` — S, H, I, D, N — while MD-derived
+  mismatches carry `variant`, the read base, and no type at all. So the mismatch
+  layer is the NOT of the CIGAR set rather than a list of its own; there is no
+  positive value to match on.
+
+  **Gosling has no minimum mark width**, so at 15 bp/px a one-base mismatch is a
+  fifteenth of a pixel and blends into the read under it. The marks are drawn
+  and the work is done — 186 distinct colours in the read band against 17 before
+  — but the picture stays paler than igv's. That is Gosling's own rendering
+  behaviour and not something to tune away: the schema has no knob for it.
+
+  **Without MD tags it draws no mismatches at all and says so nowhere.**
+  `bam-worker.ts` computes substitutions only `if (segment.md)`. JBrowse and
+  igv.js reconstruct them from the reference instead, so a no-MD corpus quietly
+  restores the unfair comparison. `data/20x.shortread.nomd.bam` is one of our
+  own synthetic BAMs with the tag stripped, for testing exactly that: Gosling
+  scores 12 saturated hues with MD and 0 without, while JBrowse and igv.js hold
+  at 19 and 253. CRAM never needs MD — it is reference-compressed already — and
+  Gosling reads no CRAM regardless.
+
   `?bundle=gosling-patched.bundle.js` loads the same build with that cap and the
   BAM worker's own 200 kb cap raised past any genome size, which renders the
   wider window. Two things to say wherever its numbers appear:
@@ -155,47 +185,136 @@
       // would make this a chrom.sizes fetch.
       const CONTIG_SIZE = 250001
 
+      // Split out of the track height rather than added to it, so the arm
+      // still draws into the same 600 px the other arms get.
+      const COVERAGE_HEIGHT = 80
+
+      const bamData = {
+        type: 'bam',
+        // ABSOLUTE, and this is not a style choice: Gosling's BAM fetcher
+        // runs in a web worker, where a relative URL has no base to
+        // resolve against and `fetch` rejects with "Failed to parse URL".
+        url: new URL(`./data/${track}`, location.href).href,
+        indexUrl: new URL(`./data/${track}.bai`, location.href).href,
+        ...(mates ? { loadMates: true } : {}),
+      }
+
+      // `pile` assigns each read a row, which is the layout step igv.js
+      // and JBrowse also perform; without it every read lands on one
+      // overplotted line and the comparison is against a different
+      // picture. Gosling's own pileup example uses these bounding-box
+      // settings.
+      const PILE = {
+        type: 'displace',
+        method: 'pile',
+        boundingBox: {
+          startField: 'start',
+          endField: 'end',
+          padding: 5,
+          isPaddingBP: true,
+        },
+        newField: 'pileup-row',
+      }
+
+      // Gosling hands each read a JSON *string* of its substitutions rather
+      // than a row apiece, so `subjson` is what turns one read into one row per
+      // substitution. `pos` is relative to the read, hence `baseGenomicField`.
+      const SUBJSON = {
+        type: 'subjson',
+        field: 'substitutions',
+        genomicField: 'pos',
+        baseGenomicField: 'start',
+        genomicLengthField: 'length',
+      }
+
+      // Two shapes come back in that array and only `type` tells them apart.
+      // CIGAR-derived entries carry a `type` — S, H, I, D, N — and MD-derived
+      // mismatches carry `variant`, the read base, and no type at all. So the
+      // mismatch layer is the NOT of the CIGAR set rather than a list of its
+      // own; there is no positive value to match on.
+      const CIGAR_TYPES = ['S', 'H', 'I', 'D', 'N']
+      const BASE_COLORS = {
+        domain: ['A', 'C', 'T', 'G', 'N'],
+        range: ['#4FBF45', '#4D96E8', '#E85F78', '#E8B322', '#BDBDBD'],
+      }
+      const subPos = {
+        x: { field: 'pos_start', type: 'genomic' },
+        xe: { field: 'pos_end', type: 'genomic' },
+      }
+
       const spec = {
         assembly: [[chrom, CONTIG_SIZE]],
         xDomain: { chromosome: chrom, interval: [start, end] },
+        spacing: 1,
         tracks: [
+          // Coverage, which is what JBrowse and igv both draw above a pileup.
           {
-            data: {
-              type: 'bam',
-              // ABSOLUTE, and this is not a style choice: Gosling's BAM fetcher
-              // runs in a web worker, where a relative URL has no base to
-              // resolve against and `fetch` rejects with "Failed to parse URL".
-              url: new URL(`./data/${track}`, location.href).href,
-              indexUrl: new URL(`./data/${track}.bai`, location.href).href,
-              ...(mates ? { loadMates: true } : {}),
-            },
-            mark: 'rect',
-            // `pile` assigns each read a row, which is the layout step igv.js
-            // and JBrowse also perform; without it every read lands on one
-            // overplotted line and the comparison is against a different
-            // picture. Gosling's own pileup example uses these bounding-box
-            // settings.
-            dataTransform: [
+            alignment: 'overlay',
+            data: bamData,
+            mark: 'bar',
+            tracks: [
               {
-                type: 'displace',
-                method: 'pile',
-                boundingBox: {
-                  startField: 'start',
-                  endField: 'end',
-                  padding: 5,
-                  isPaddingBP: true,
-                },
-                newField: 'pileup-row',
+                dataTransform: [{ type: 'coverage', startField: 'start', endField: 'end' }],
+                x: { field: 'start', type: 'genomic' },
+                xe: { field: 'end', type: 'genomic' },
+                y: { field: 'coverage', type: 'quantitative', axis: 'right' },
+                color: { value: '#C6C6C6' },
               },
             ],
-            x: { field: 'start', type: 'genomic' },
-            xe: { field: 'end', type: 'genomic' },
+            width: 1280,
+            height: COVERAGE_HEIGHT,
+          },
+          {
+            alignment: 'overlay',
+            data: bamData,
+            mark: 'rect',
+            tracks: [
+              // The reads themselves.
+              {
+                dataTransform: [PILE],
+                x: { field: 'start', type: 'genomic' },
+                xe: { field: 'end', type: 'genomic' },
+                color: { value: '#C8C8C8' },
+              },
+              // Per-base mismatches, coloured by the read's base. Gosling
+              // computes these only `if (segment.md)` — see the MD note in the
+              // header — so a corpus without MD tags silently draws none.
+              {
+                dataTransform: [
+                  PILE,
+                  SUBJSON,
+                  { type: 'filter', field: 'type', oneOf: CIGAR_TYPES, not: true },
+                ],
+                ...subPos,
+                color: { field: 'variant', type: 'nominal', ...BASE_COLORS, legend: false },
+              },
+              // Insertions, deletions and skips.
+              {
+                dataTransform: [
+                  PILE,
+                  SUBJSON,
+                  { type: 'filter', field: 'type', oneOf: ['I', 'D', 'N'] },
+                ],
+                ...subPos,
+                color: { value: '#222222' },
+              },
+              // Soft and hard clips, the pair Gosling's own pileup example
+              // draws.
+              {
+                dataTransform: [
+                  PILE,
+                  SUBJSON,
+                  { type: 'filter', field: 'type', oneOf: ['S', 'H'] },
+                ],
+                ...subPos,
+                color: { value: '#414141' },
+              },
+            ],
             row: { field: 'pileup-row', type: 'nominal', padding: 0.2 },
-            color: { value: '#C8C8C8' },
             stroke: { value: 'white' },
             strokeWidth: { value: 0 },
             width: 1280,
-            height,
+            height: height - COVERAGE_HEIGHT,
           },
         ],
       }

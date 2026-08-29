@@ -44,6 +44,21 @@ for i in *.cram; do
   samtools index -@3 "$base.bam"
   rm -f "$base.tmp.bam"
 done
+
+# A no-MD twin of one synthetic BAM, so the MD dependency is testable on our own
+# reads rather than on some real file dragged in for the purpose.
+#
+# It matters because the cross-tool arms do not agree about what to do without
+# MD. GenomeSpy's `alignmentMismatches` filters on `datum.md != null` and
+# Gosling's worker computes substitutions only `if (segment.md)`, so both draw a
+# pileup with no mismatches at all and say nothing about it. JBrowse and igv.js
+# reconstruct mismatches from the reference and draw them either way. Every
+# other BAM here carries MD because the loop above runs `samtools calmd`; this
+# one is that same file with the tag stripped, which is the only difference.
+echo "[$(date +%T)] no-MD twin"
+samtools view -@3 -x MD -O BAM -o 20x.shortread.nomd.bam 20x.shortread.bam
+samtools index -@3 20x.shortread.nomd.bam
+
 rm -f 1000x.1.fq 1000x.2.fq 1000x_0001.fastq
 echo "[$(date +%T)] DONE alignment generation"
 ls -la *.bam *.cram

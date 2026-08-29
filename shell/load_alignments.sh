@@ -53,6 +53,17 @@ for l in builds/*; do
       jbrowse add-track "data/$extra" --load symlink --out "$l" --trackId "$extra" --force -a hg19mod >/dev/null
     fi
   done
+  # The no-MD twin, for `scripts/crosstool/drawdetail.py` rather than for any
+  # timing run. GenomeSpy and Gosling draw mismatches only where a BAM carries
+  # MD tags, and say nothing when it does not; JBrowse and igv.js read the
+  # reference instead. This track is what lets that be measured rather than
+  # asserted, so JBrowse needs it for the same reason the other tools do — and
+  # without it the comparison is JBrowse failing to resolve a trackId, which
+  # scores as "drew nothing" and looks like a result.
+  if [ -f "data/20x.shortread.nomd.bam" ]; then
+    jbrowse add-track data/20x.shortread.nomd.bam --load symlink --out "$l" \
+      --trackId 20x.shortread.nomd.bam --force -a hg19mod >/dev/null
+  fi
   # Two adapter settings `add-track` cannot express: fetchSizeLimit, which
   # otherwise refuses the heavy windows outright, and the sequenceAdapter a 2.x
   # CRAM track needs. See shell/patch_adapters.js for what each looks like when

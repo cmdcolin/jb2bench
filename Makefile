@@ -126,6 +126,8 @@ toolcheck: crosstool-bundles
 # drawing. Not a timing, so it does not need an idle box.
 shots: crosstool-bundles
 	$(NODE) scripts/crosstool/shots.ts
+	TRACK=20x.shortread.nomd.bam $(NODE) scripts/crosstool/shots.ts
+	@python3 scripts/crosstool/drawdetail.py screenshots/crosstool/*.png
 
 # ------------------------------------------------------- timings (idle box)
 
