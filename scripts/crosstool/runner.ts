@@ -404,121 +404,218 @@ if (fs.existsSync(RESULTS)) {
 
 const today = new Date().toISOString().slice(0, 10)
 
+async function measureRow(c: Case, w: Window): Promise<Row> {
+  const key = rowKey(c.id, w.id)
+  const runs: Record<string, number[]> = {}
+  const before: Record<string, number> = {}
+  const foreignCores: Record<string, number> = {}
+  const foreignTop: Record<string, string | undefined> = {}
+  // An arm that cannot open this cell is recorded as such and dropped from the
+  // round, so the interleaving stays honest: a cell nobody measured must not
+  // sit in the rotation contributing a fast empty page.
+  const measurable = tools.filter(t => {
+    const why = unsupported(t, c, w)
+    if (why) {
+      console.log(`${key} ${t.id}: unsupported — ${why}`)
+    }
+    return !why
+  })
+  const ceiling = ceilingFor(w)
+  // Arms that gave up on this cell, and the ceiling they gave up against.
+  const abandoned = new Map<string, number>()
+  const fails: Record<string, number> = {}
+  const attempt = (t: Tool) => {
+    if (abandoned.has(t.id)) {
+      return Number.NaN
+    }
+    const ms = runOnce(t.url(c.track, w.loc), ceiling)
+    if (Number.isFinite(ms)) {
+      return ms
+    }
+    fails[t.id] = (fails[t.id] ?? 0) + 1
+    if (fails[t.id]! >= FAIL_LIMIT) {
+      abandoned.set(t.id, ceiling)
+      console.log(
+        `${key} ${t.id}: no stable paint in ${(ceiling / 1000).toFixed(0)}s, ` +
+          `${FAIL_LIMIT} times — abandoning this cell`,
+      )
+    }
+    return Number.NaN
+  }
+  for (const t of measurable) {
+    runs[t.id] = []
+    // The previous cell's Chrome is still tearing down when execFileSync
+    // returns, so a cell that starts immediately measures the last one's exit.
+    // Same settle the render matrix takes, for the same reason.
+    const quiet = waitForQuiet()
+    if (quiet.waitedMs > 1500) {
+      console.log(`  [settled ${(quiet.waitedMs / 1000).toFixed(1)}s]`)
+    }
+    before[t.id] = loadavg()
+    for (let i = 0; i < WARMUP; i++) {
+      attempt(t)
+    }
+  }
+  // interleaved: one round runs every tool, so a load spike lands on all of
+  // them rather than on whichever tool owned the clock at the time
+  const cpu = Object.fromEntries(measurable.map(t => [t.id, watchForeignCpu()]))
+  for (let r = 0; r < RUNS; r++) {
+    for (const t of measurable) {
+      if (abandoned.has(t.id)) {
+        continue
+      }
+      const ms = attempt(t)
+      runs[t.id]!.push(ms)
+      console.log(`${key} ${t.id} run ${r + 1}: ${ms}`)
+    }
+  }
+  // Foreign CPU, not the load average, is what says whether a cell is
+  // trustworthy: the load average counts this benchmark's own threads, so a
+  // heavy cell inflates it by working. A watcher per arm, all started after the
+  // warmups, so what each reports is contention rather than its own cost.
+  for (const t of measurable) {
+    const { cores, top } = await cpu[t.id]!.done()
+    foreignCores[t.id] = cores
+    foreignTop[t.id] = top
+  }
+  const row: Row = {}
+  for (const t of tools) {
+    const why = unsupported(t, c, w)
+    if (why) {
+      row[t.id] = {
+        median: Number.NaN,
+        mean: Number.NaN,
+        stddev: Number.NaN,
+        runs: [],
+        load: { before: 0, after: 0 },
+        unsupported: why,
+      }
+      continue
+    }
+    const vals = runs[t.id]!.filter(Number.isFinite)
+    const gaveUp = abandoned.get(t.id)
+    row[t.id] = {
+      ...(gaveUp && !vals.length ? { unsettled: gaveUp } : {}),
+      median: vals.length ? median(vals) : Number.NaN,
+      mean: vals.length ? mean(vals) : Number.NaN,
+      stddev: vals.length ? stddev(vals) : Number.NaN,
+      runs: runs[t.id]!,
+      load: {
+        before: before[t.id]!,
+        after: loadavg(),
+        foreignCores: foreignCores[t.id],
+        foreignTop: foreignTop[t.id],
+      },
+    }
+  }
+  return row
+}
+
+/**
+ * The worst foreign CPU any measured arm of a row saw, which is the figure the
+ * paper's gate reads and the one that decides whether a row is quotable.
+ *
+ * Unsupported arms carry a zeroed load window and no timing, so they are left
+ * out: counting them would let a row of capability limits report a clean cell
+ * it never measured.
+ */
+const rowForeign = (row: Row) =>
+  Math.max(
+    ...Object.values(row)
+      .filter(cell => !cell.unsupported)
+      .map(cell => foreign(cell.load))
+      .filter(Number.isFinite),
+    0,
+  )
+
+function record(key: string, row: Row) {
+  // Merged, not replaced: a row can hold arms this run is not measuring — the
+  // igv height controls are carried from the run that added them — and a
+  // TOOLS= subset must not delete what it did not look at.
+  prior.rows[key] = { ...prior.rows[key], ...row }
+  prior.dates[key] = today
+  prior.igvVersion = igvVersion
+  prior.jbrowseBuild = jbrowseBuild
+  prior.jbrowseBuilds = {
+    ...prior.jbrowseBuilds,
+    ...Object.fromEntries(jbrowseArms.map(a => [a.id, a.build])),
+  }
+  fs.writeFileSync(RESULTS, JSON.stringify(prior, null, 2))
+}
+
+// Rows measured above the foreign-CPU ceiling, queued for another pass once the
+// matrix is done.
+//
+// `waitForQuiet` is bounded at 30 s and then proceeds, which is the right call
+// for one cell — a box that is genuinely busy should still produce a
+// measurement, marked as such, rather than hanging the run. What it cannot do
+// is recover: the run of 2026-08-29 logged `[settled 30.5s]` repeatedly and
+// wrote 42 of 138 cells above the ceiling, and every one of them was in the
+// 19 kb window the paper's cold-load figure draws. The rows were unusable by
+// morning and the whole six-hour matrix had to go again for them.
+//
+// So a contended row is now re-measured at the END of the run rather than
+// restarting it: whatever was compiling or recording has usually stopped by
+// then, and the cost of being wrong is one row rather than the matrix. The
+// cleaner of the two measurements is kept, so a retry that is *also* contended
+// cannot replace a better first attempt.
+const RETRY_PASSES = Number(process.env.RETRY_PASSES ?? 2)
+const contended: { c: Case; w: Window; foreign: number }[] = []
+
 for (const w of windows) {
   for (const c of cases) {
     const key = rowKey(c.id, w.id)
-    const runs: Record<string, number[]> = {}
-    const before: Record<string, number> = {}
-    const foreignCores: Record<string, number> = {}
-    const foreignTop: Record<string, string | undefined> = {}
-    // An arm that cannot open this cell is recorded as such and dropped from the
-    // round, so the interleaving stays honest: a cell nobody measured must not
-    // sit in the rotation contributing a fast empty page.
-    const measurable = tools.filter(t => {
-      const why = unsupported(t, c, w)
-      if (why) {
-        console.log(`${key} ${t.id}: unsupported — ${why}`)
-      }
-      return !why
-    })
-    const ceiling = ceilingFor(w)
-    // Arms that gave up on this cell, and the ceiling they gave up against.
-    const abandoned = new Map<string, number>()
-    const fails: Record<string, number> = {}
-    const attempt = (t: Tool) => {
-      if (abandoned.has(t.id)) {
-        return Number.NaN
-      }
-      const ms = runOnce(t.url(c.track, w.loc), ceiling)
-      if (Number.isFinite(ms)) {
-        return ms
-      }
-      fails[t.id] = (fails[t.id] ?? 0) + 1
-      if (fails[t.id]! >= FAIL_LIMIT) {
-        abandoned.set(t.id, ceiling)
-        console.log(
-          `${key} ${t.id}: no stable paint in ${(ceiling / 1000).toFixed(0)}s, ` +
-            `${FAIL_LIMIT} times — abandoning this cell`,
-        )
-      }
-      return Number.NaN
+    const row = await measureRow(c, w)
+    record(key, row)
+    const fg = rowForeign(row)
+    if (fg > FOREIGN_CORE_CEILING) {
+      console.log(
+        `${key}: ${fg.toFixed(2)} foreign cores against a ${FOREIGN_CORE_CEILING} ` +
+          `ceiling — queued for re-measurement`,
+      )
+      contended.push({ c, w, foreign: fg })
     }
-    for (const t of measurable) {
-      runs[t.id] = []
-      // The previous cell's Chrome is still tearing down when execFileSync
-      // returns, so a cell that starts immediately measures the last one's exit.
-      // Same settle the render matrix takes, for the same reason.
-      const quiet = waitForQuiet()
-      if (quiet.waitedMs > 1500) {
-        console.log(`  [settled ${(quiet.waitedMs / 1000).toFixed(1)}s]`)
-      }
-      before[t.id] = loadavg()
-      for (let i = 0; i < WARMUP; i++) {
-        attempt(t)
-      }
-    }
-    // interleaved: one round runs every tool, so a load spike lands on all of
-    // them rather than on whichever tool owned the clock at the time
-    const cpu = Object.fromEntries(measurable.map(t => [t.id, watchForeignCpu()]))
-    for (let r = 0; r < RUNS; r++) {
-      for (const t of measurable) {
-        if (abandoned.has(t.id)) {
-          continue
-        }
-        const ms = attempt(t)
-        runs[t.id]!.push(ms)
-        console.log(`${key} ${t.id} run ${r + 1}: ${ms}`)
-      }
-    }
-    // Foreign CPU, not the load average, is what says whether a cell is
-    // trustworthy: the load average counts this benchmark's own threads, so a
-    // heavy cell inflates it by working. A watcher per arm, all started after the
-    // warmups, so what each reports is contention rather than its own cost.
-    for (const t of measurable) {
-      const { cores, top } = await cpu[t.id]!.done()
-      foreignCores[t.id] = cores
-      foreignTop[t.id] = top
-    }
-    const row: Row = prior.rows[key] ?? {}
-    for (const t of tools) {
-      const why = unsupported(t, c, w)
-      if (why) {
-        row[t.id] = {
-          median: Number.NaN,
-          mean: Number.NaN,
-          stddev: Number.NaN,
-          runs: [],
-          load: { before: 0, after: 0 },
-          unsupported: why,
-        }
-        continue
-      }
-      const vals = runs[t.id]!.filter(Number.isFinite)
-      const gaveUp = abandoned.get(t.id)
-      row[t.id] = {
-        ...(gaveUp && !vals.length ? { unsettled: gaveUp } : {}),
-        median: vals.length ? median(vals) : Number.NaN,
-        mean: vals.length ? mean(vals) : Number.NaN,
-        stddev: vals.length ? stddev(vals) : Number.NaN,
-        runs: runs[t.id]!,
-        load: {
-          before: before[t.id]!,
-          after: loadavg(),
-          foreignCores: foreignCores[t.id],
-          foreignTop: foreignTop[t.id],
-        },
-      }
-    }
-    prior.rows[key] = row
-    prior.dates[key] = today
-    prior.igvVersion = igvVersion
-    prior.jbrowseBuild = jbrowseBuild
-    prior.jbrowseBuilds = {
-      ...prior.jbrowseBuilds,
-      ...Object.fromEntries(jbrowseArms.map(a => [a.id, a.build])),
-    }
-    fs.writeFileSync(RESULTS, JSON.stringify(prior, null, 2))
   }
+}
+
+for (let pass = 1; pass <= RETRY_PASSES && contended.length; pass++) {
+  const queue = contended.splice(0, contended.length)
+  console.log(
+    `\nretry pass ${pass} of ${RETRY_PASSES}: ${queue.length} contended ` +
+      `row${queue.length === 1 ? '' : 's'}`,
+  )
+  for (const q of queue) {
+    const key = rowKey(q.c.id, q.w.id)
+    // A longer wait than the per-cell one: this pass exists because the box was
+    // busy, so it is worth giving it minutes rather than seconds to go quiet.
+    const quiet = waitForQuiet({ maxMs: 300000 })
+    console.log(
+      `${key}: retrying after ${(quiet.waitedMs / 1000).toFixed(0)}s, ` +
+        `${quiet.cores.toFixed(2)} foreign cores now (was ${q.foreign.toFixed(2)})`,
+    )
+    const row = await measureRow(q.c, q.w)
+    const fg = rowForeign(row)
+    if (fg < q.foreign) {
+      record(key, row)
+      console.log(`${key}: kept the retry, ${fg.toFixed(2)} foreign cores`)
+    } else {
+      console.log(
+        `${key}: kept the first measurement, retry was dirtier ` +
+          `(${fg.toFixed(2)} against ${q.foreign.toFixed(2)})`,
+      )
+    }
+    const best = Math.min(fg, q.foreign)
+    if (best > FOREIGN_CORE_CEILING) {
+      contended.push({ ...q, foreign: best })
+    }
+  }
+}
+
+if (contended.length) {
+  console.log(
+    `\nSTILL CONTENDED after ${RETRY_PASSES} retry passes, not a run of record: ` +
+      contended.map(q => rowKey(q.c.id, q.w.id)).join(', '),
+  )
 }
 
 // ---- report ----------------------------------------------------------------
