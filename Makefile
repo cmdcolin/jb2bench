@@ -26,11 +26,12 @@ LOGDIR := results/logs
         corpus corpus-paper render interaction crosstool crosstool-cold \
         crosstool-zoom crosstool-pan crosstool-bundles \
         parsers parsers-count cram-samtools multibam backends clean-logs \
-        formats toolcheck shots paper-tables paper-figs paper-data
+        formats toolcheck shots paper-tables paper-figs paper-data wait-quiet
 
 help:
 	@echo "preflight"
 	@echo "  make gate            load, agents, disk, corpus, ports, sweep builds"
+	@echo "  make wait-quiet      block until it passes, to chain a run behind"
 	@echo "  make serve           http-servers for the three builds + crosstool"
 	@echo "  make serve-stop      stop them"
 	@echo "  make crosstool-bundles  build the Gosling harness bundle"
@@ -69,6 +70,11 @@ help:
 
 gate:
 	@$(NODE) scripts/gate.ts
+
+# `gate` asked on a loop, for a run that starts itself when the box frees up:
+#   make wait-quiet && make crosstool-cold
+wait-quiet:
+	@$(NODE) scripts/waitquiet.ts
 
 $(LOGDIR):
 	@mkdir -p $(LOGDIR)
@@ -234,6 +240,7 @@ figures:
 paper-figs:
 	Rscript scripts/paperfigs/perf-coldload.R
 	Rscript scripts/paperfigs/perf-interaction.R
+	Rscript scripts/paperfigs/perf-motion.R
 	Rscript scripts/paperfigs/parser.R
 	Rscript scripts/paperfigs/ldband.R
 	Rscript scripts/paperfigs/cluster-endtoend.R

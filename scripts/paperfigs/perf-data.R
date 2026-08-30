@@ -66,7 +66,7 @@ rows <- list()
 # are not a fair pair, and a figure drawing both has to say which is which. The
 # cold-load figure draws the cross-tool session alone instead.
 add <- function(panel, case, series, ms, usable = TRUE, session = NA, format = "BAM",
-                window = NA, censored = FALSE) {
+                window = NA, censored = FALSE, metric = NA) {
   # Format-agnostic: `case` carries whichever suffix its own JSON key does
   # (alignments/interaction are always "-bam"; cold load's cross-tool loop
   # passes both), and only READ_CASES -- stripped of the format suffix and of
@@ -75,7 +75,7 @@ add <- function(panel, case, series, ms, usable = TRUE, session = NA, format = "
   rows[[length(rows) + 1]] <<- data.frame(
     panel = panel, case = labels[match(base, READ_CASES)],
     series = series, ms = ms, usable = usable, session = session, format = format,
-    window = window, censored = censored,
+    window = window, censored = censored, metric = metric,
     stringsAsFactors = FALSE
   )
 }
@@ -245,6 +245,61 @@ for (base in READ_CASES) {
         add("Cold load", key, xt_builds[[b]], ms,
             usable = contention_ok(arm), session = "cross-tool",
             format = FORMATS[[fmt]], window = win, censored = censored)
+      }
+    }
+  }
+}
+
+# The cross-tool motion runs, zoom and pan: the same harness and the same arms
+# as the cold load above, against an application that is already up.
+#
+# Kept apart from interaction.json rather than merged into its panels. That file
+# reads 0 ms for this work on a zoom where this one reads 507, for the same
+# build and the same motion: its marker fires before the 500 ms
+# `LGVCoarseDynamicBlocks` debounce and the draw-and-network detector here waits
+# the debounce out. Two instruments measuring two quantities, so a panel holding
+# both would be comparing neither -- the same reason the cold-load figure draws
+# one session and not two.
+#
+# TWO METRICS PER CELL, because one of them is not a render time.
+# results/crosstool-zoom.md is explicit about it: a JBrowse zoom step comes back
+# at a flat ~505 ms at every coverage and every read type, which is the debounce
+# and not work, while the drawing inside it takes well under a millisecond.
+# Publishing that number alone as a render time is a mistake this repo made once
+# and retracted, so what the user waits and what the renderer did both travel
+# and the figures draw them side by side.
+#
+# Pan's waiting figure is `fetchedMedian` -- the steps on which the tool went to
+# the network -- rather than the median over all five steps. This work serves
+# three of five from data it already holds and igv.js serves none, so a median
+# over every step prices residency twice: once by being fast on a step, and
+# again by not fetching on it. Zoom needs no such choice, since no arm issued a
+# single request on any zoom step.
+MOTIONS <- c("crosstool-zoom.json" = "Zoom in, both hold the data",
+             "crosstool-pan.json" = "Pan, both refetch")
+MOTION_WAIT <- c("crosstool-zoom.json" = "median",
+                 "crosstool-pan.json" = "fetchedMedian")
+for (f in names(MOTIONS)) {
+  motion <- read_results(f)$rows
+  for (base in READ_CASES) {
+    key <- paste0(base, "-", FORMAT)
+    cell <- cell_for(motion, key, f)
+    present <- names(xt_builds)[names(xt_builds) %in% names(cell)]
+    # Per row, as everywhere else here: a contended arm invalidates the pair it
+    # is compared against and not only itself. These runs predate foreignCores,
+    # so contention_ok falls back to the load rule, which errs toward calling a
+    # clean row dirty.
+    ok <- all(vapply(present, function(b) contention_ok(cell[[b]]), logical(1)))
+    for (b in present) {
+      arm <- cell[[b]]
+      wait <- arm[[MOTION_WAIT[[f]]]]
+      if (!is.null(wait)) {
+        add(MOTIONS[[f]], key, xt_builds[[b]], wait, usable = ok,
+            session = "cross-tool motion", metric = "what the user waits")
+      }
+      if (!is.null(arm$drawMedian)) {
+        add(MOTIONS[[f]], key, xt_builds[[b]], arm$drawMedian, usable = ok,
+            session = "cross-tool motion", metric = "what the renderer did")
       }
     }
   }
