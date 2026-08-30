@@ -230,14 +230,39 @@ const ctKey = (c: string) => `${c}@19kb`
 const ctDates = [
   ...new Set(CASES.map(c => ct.dates?.[ctKey(c)] ?? ct.dates?.[c]).filter(Boolean)),
 ]
+// The same contention rule the cold table above applies, and for the same
+// reason. It was missing here: this table asserted "on an idle box, every cell
+// within the foreign-CPU ceiling" as a fixed sentence and marked no row,
+// whatever the run had been through. The run of 2026-08-30 is what found it --
+// four of its 19 kb rows sat above the ceiling, two of them rows this table
+// prints, and it would have printed them under that sentence.
+//
+// Per row, not per cell: every column of a row is a comparison against the
+// others, so contention on one arm invalidates the ratio and not just the point.
+const CT_ARMS = ['jbrowse', 'igv', 'igv-deep']
+const ctForeign = (c: string) => {
+  const row = ct.rows?.[ctKey(c)] ?? ct.rows?.[c] ?? {}
+  const seen = CT_ARMS.map(a => foreign(row[a]?.load ?? ({ before: 0, after: 0 } as LoadWindow)))
+    .filter(f => Number.isFinite(f))
+  return seen.length ? Math.max(...seen) : Number.NaN
+}
+const ctDirty = CASES.filter(c => ctForeign(c) > FOREIGN_CORE_CEILING)
+const ctWorst = Math.max(0, ...CASES.map(ctForeign).filter(f => Number.isFinite(f)))
+// An arm abandoned at the paint ceiling records what it was abandoned at and no
+// median, so "igv completed every case" is read off the run rather than
+// asserted: the sentence was a fixed one naming a duration two runs out of date.
+const ctIncomplete = CASES.filter(
+  c => (ct.rows?.[ctKey(c)] ?? ct.rows?.[c] ?? {}).igv?.median == null,
+)
 const ctRows = CASES.map((c, i) => {
   const row = ct.rows?.[ctKey(c)] ?? ct.rows?.[c] ?? {}
+  const dirty = ctForeign(c) > FOREIGN_CORE_CEILING
   return [
     LABELS[i]!,
     ms(row.jbrowse?.median),
     ms(row.igv?.median),
     ms(row['igv-deep']?.median),
-    ratio(row.igv?.median, row.jbrowse?.median),
+    dirty ? 'unusable' : ratio(row.igv?.median, row.jbrowse?.median),
   ]
 })
 
@@ -250,10 +275,19 @@ fs.writeFileSync(
       `interleaved rounds. The fourth column is igv with downsampling effectively ` +
       `disabled, which changes neither its time nor its draw count on this corpus and ` +
       `is therefore a control rather than a workload knob; the fifth is igv at its ` +
-      `default divided by this work. Measured ${ctDates.join(', ')} on an idle box, ` +
-      `every cell within the foreign-CPU ceiling. igv completed every case in this run, ` +
-      `including 1000$\\times$ long read at 60 s, so no cell is reported from a partial ` +
-      `set of rounds.`,
+      `default divided by this work. Measured ${ctDates.join(', ')}. ` +
+      (ctDirty.length
+        ? `${ctDirty.length} row${ctDirty.length === 1 ? '' : 's'} ` +
+          `(${ctDirty.map((c, i) => LABELS[CASES.indexOf(c)]!.toLowerCase()).join(', ')}) ` +
+          `sat above the ${FOREIGN_CORE_CEILING}-core foreign-CPU ceiling, worst ` +
+          `${ctWorst.toFixed(2)}, and their ratios are withheld rather than quoted. `
+        : `Every cell sat within the ${FOREIGN_CORE_CEILING}-core foreign-CPU ceiling, ` +
+          `worst ${ctWorst.toFixed(2)}. `) +
+      (ctIncomplete.length
+        ? `igv.js reached no stable paint in ` +
+          `${ctIncomplete.map(c => LABELS[CASES.indexOf(c)]!.toLowerCase()).join(', ')}.`
+        : `igv completed every case in this run, so no cell is reported from a ` +
+          `partial set of rounds.`),
     header: ['Case', 'This work', 'igv.js', 'igv.js, no downsampling', 'Ratio'],
     rows: ctRows,
   }),
