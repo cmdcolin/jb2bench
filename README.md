@@ -32,6 +32,7 @@ numbers describe the same bytes.
 | `screenshots/` | puppeteer verify/probe output (untracked) |
 | `Makefile`, `scripts/gate.ts` | every benchmark in one place, and the preflight that decides whether a timing is worth keeping |
 | `results/figures/` | the ggplot2 figures, laid out like the 2023 paper's Fig 8: format × read type, time against coverage. Every one draws the same four arms — v2.4.0, v4.3.0, the build under test, igv.js — from `scripts/arms.R` |
+| `scripts/paperfigs/`, `results/figures/paper/` | the manuscript's own figures, ported here when the manuscript moved to a Google Doc. They draw the same JSON as the set above, and carry what it does not: GenomeSpy, igv.js at both windows, and a foreign-CPU gate that drops a contended cell rather than plotting it |
 
 ## Where the conclusions are
 
@@ -1061,6 +1062,8 @@ make gate       # is this machine fit to measure on right now?
 make counts     # request shapes and the equivalence gate — any box
 make timings    # render, interaction, cross-tool, parsers — idle box only
 make figures    # ggplot2 figures from the recorded JSON
+make paper-figs # the manuscript figures, from results/paper/*.csv
+make paper-data # refresh results/paper/*.csv after a fresh run
 make all        # gate, counts, timings, figures, report
 ```
 

@@ -26,7 +26,7 @@ LOGDIR := results/logs
         corpus corpus-paper render interaction crosstool crosstool-cold \
         crosstool-zoom crosstool-pan crosstool-bundles \
         parsers parsers-count cram-samtools multibam backends clean-logs \
-        formats toolcheck shots paper-tables
+        formats toolcheck shots paper-tables paper-figs paper-data
 
 help:
 	@echo "preflight"
@@ -60,6 +60,8 @@ help:
 	@echo "present"
 	@echo "  make figures         ggplot2 figures from the recorded JSON"
 	@echo "  make paper-tables    the render tables as \\input files for the paper"
+	@echo "  make paper-figs      the manuscript figures, from results/paper/*.csv"
+	@echo "  make paper-data      refresh results/paper/*.csv from results/"
 	@echo "  make report          results/report.html"
 	@echo "  make all             gate, counts, timings, figures, report"
 
@@ -206,9 +208,9 @@ timings: render interaction crosstool parsers cram-samtools
 
 # ------------------------------------------------------------------ present
 
-# The four render tables the paper prints, as \input files. Same rule as the
-# parser tables ecosystem/report.ts writes: nothing measured is typed by hand.
-# The paper's `make sync-benchmarks` copies results/paper/*.tex.
+# The four render tables the manuscript prints, as \input files. Same rule as
+# the parser tables ecosystem/report.ts writes: nothing measured is typed by
+# hand. They land in results/paper/ beside the CSVs `make paper-data` writes.
 paper-tables:
 	$(NODE) scripts/render/papertables.ts
 
@@ -216,6 +218,40 @@ figures:
 	Rscript scripts/render/charts.R
 	Rscript scripts/crosstool/panchart.R
 	Rscript ecosystem/sweepchart.R
+
+# The manuscript figures, ported from the paper repo when the manuscript moved
+# to a Google Doc. Separate from `figures` above, which draws this repo's own
+# four-arm charts into results/figures/: these carry the comparators that set
+# does not (igv.js at both windows, GenomeSpy) and are gated on foreign CPU
+# per cell. Both draw the same JSON, so a conclusion should not depend on which
+# one you read; where they disagree, these are the ones the manuscript quotes.
+#
+# Two targets, because the scripts are written as two halves. `paper-data`
+# re-reads results/ and rewrites the CSVs, and is what a fresh benchmark
+# invalidates; `paper-figs` redraws from the committed CSVs and needs no run.
+# So a figure change is one command and cannot silently pick up a new
+# measurement with it.
+paper-figs:
+	Rscript scripts/paperfigs/perf-coldload.R
+	Rscript scripts/paperfigs/perf-interaction.R
+	Rscript scripts/paperfigs/parser.R
+	Rscript scripts/paperfigs/ldband.R
+	Rscript scripts/paperfigs/cluster-endtoend.R
+	Rscript scripts/paperfigs/cluster.R
+
+# The cluster pair reads jbrowse-components, not this repo, so it is skipped
+# rather than fatal when that checkout is not beside us: the other four are the
+# ones a benchmark run here invalidates.
+JB2 ?= $(HOME)/src/jbrowse-components
+paper-data:
+	Rscript scripts/paperfigs/perf-data.R .
+	Rscript scripts/paperfigs/parser-data.R .
+	Rscript scripts/paperfigs/ldband-data.R .
+	@if [ -d $(JB2) ]; then \
+	   Rscript scripts/paperfigs/cluster-data.R $(JB2); \
+	   Rscript scripts/paperfigs/clusterphases-data.R . $(JB2) \
+	     || echo "clusterphases.csv left as committed, for the reason above"; \
+	 else echo "no $(JB2); the clustering CSVs are left as committed"; fi
 
 report:
 	$(NODE) scripts/render/report.ts > results/report.html

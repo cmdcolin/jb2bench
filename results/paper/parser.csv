@@ -1,0 +1,41 @@
+"package","coverage","reads","version","arm","ms"
+"@gmod/bam",20,"long read","v1.1.18","2023",146.08691365
+"@gmod/bam",20,"long read","v8.11.0","current",38.32615625
+"@gmod/bam",200,"long read","v1.1.18","2023",1692.249255
+"@gmod/bam",200,"long read","v8.11.0","current",350.974835200001
+"@gmod/bam",1000,"long read","v1.1.18","2023",9748.1514638
+"@gmod/bam",1000,"long read","v8.11.0","current",1860.1896046
+"@gmod/bam",20,"short read","v1.1.18","2023",22.03598
+"@gmod/bam",20,"short read","v8.11.0","current",5.23283297916666
+"@gmod/bam",200,"short read","v1.1.18","2023",172.0647678
+"@gmod/bam",200,"short read","v8.11.0","current",39.8884953846155
+"@gmod/bam",1000,"short read","v1.1.18","2023",866.2810744
+"@gmod/bam",1000,"short read","v8.11.0","current",181.84898
+"@gmod/bgzf-filehandle",20,"long read","v1.4.5","2023",121.7407914
+"@gmod/bgzf-filehandle",20,"long read","v6.6.0","current",35.0687224666665
+"@gmod/bgzf-filehandle",200,"long read","v1.4.5","2023",1140.2336304
+"@gmod/bgzf-filehandle",200,"long read","v6.6.0","current",328.716749699999
+"@gmod/bgzf-filehandle",20,"short read","v1.4.5","2023",100.7167024
+"@gmod/bgzf-filehandle",20,"short read","v6.6.0","current",18.0613989285714
+"@gmod/bgzf-filehandle",200,"short read","v1.4.5","2023",1044.1315377
+"@gmod/bgzf-filehandle",200,"short read","v6.6.0","current",189.894325300001
+"@gmod/bgzf-filehandle (node zlib)",20,"long read","v1.4.5","2023",47.5596350909093
+"@gmod/bgzf-filehandle (node zlib)",20,"long read","v6.6.0","current",35.1110011999999
+"@gmod/bgzf-filehandle (node zlib)",200,"long read","v1.4.5","2023",850.693977599999
+"@gmod/bgzf-filehandle (node zlib)",200,"long read","v6.6.0","current",313.425853199999
+"@gmod/bgzf-filehandle (node zlib)",20,"short read","v1.4.5","2023",75.9176817
+"@gmod/bgzf-filehandle (node zlib)",20,"short read","v6.6.0","current",18.0753997857143
+"@gmod/bgzf-filehandle (node zlib)",200,"short read","v1.4.5","2023",357.854131899999
+"@gmod/bgzf-filehandle (node zlib)",200,"short read","v6.6.0","current",187.4163249
+"@gmod/cram",20,"long read","v1.7.3","2023",412.1762851
+"@gmod/cram",20,"long read","v13.4.1","current",42.2075874999997
+"@gmod/cram",200,"long read","v1.7.3","2023",2732.2811012
+"@gmod/cram",200,"long read","v13.4.1","current",263.334449599995
+"@gmod/cram",1000,"long read","v1.7.3","2023",11859.2650642
+"@gmod/cram",1000,"long read","v13.4.1","current",1078.8989714
+"@gmod/cram",20,"short read","v1.7.3","2023",384.71173995
+"@gmod/cram",20,"short read","v13.4.1","current",39.0045731000003
+"@gmod/cram",200,"short read","v1.7.3","2023",717.6808013
+"@gmod/cram",200,"short read","v13.4.1","current",79.8762203000006
+"@gmod/cram",1000,"short read","v1.7.3","2023",3243.274707
+"@gmod/cram",1000,"short read","v13.4.1","current",363.044286199997
