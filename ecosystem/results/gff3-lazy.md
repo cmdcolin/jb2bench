@@ -9,12 +9,12 @@ timing means nothing.
 
 | case | eager | lazy | speedup | agree |
 | --- | --- | --- | --- | --- |
-| 200 genes sparse | 6.04 ms | 5.10 ms | 1.18x | yes |
-| 1000 genes sparse | 43.03 ms | 28.68 ms | 1.50x | yes |
-| 5000 genes sparse | 166.08 ms | 130.02 ms | 1.28x | yes |
-| 200 genes rich | 20.22 ms | 9.70 ms | 2.09x | yes |
-| 1000 genes rich | 107.05 ms | 56.30 ms | 1.90x | yes |
-| 5000 genes rich | 572.33 ms | 260.69 ms | 2.20x | yes |
+| 200 genes sparse | 4.43 ms | 3.50 ms | 1.27x | yes |
+| 1000 genes sparse | 25.35 ms | 23.23 ms | 1.09x | yes |
+| 5000 genes sparse | 139.58 ms | 98.39 ms | 1.42x | yes |
+| 200 genes rich | 16.94 ms | 8.64 ms | 1.96x | yes |
+| 1000 genes rich | 84.74 ms | 45.58 ms | 1.86x | yes |
+| 5000 genes rich | 457.75 ms | 219.79 ms | 2.08x | yes |
 
 ## Parse plus a render pass's attribute reads
 
@@ -58,12 +58,12 @@ from a bad fixture, then too low from the wrong consumer.
 
 | case | eager | lazy | speedup | agree |
 | --- | --- | --- | --- | --- |
-| 200 genes sparse | 6.29 ms | 6.42 ms | 0.98x | yes |
-| 1000 genes sparse | 32.57 ms | 29.99 ms | 1.09x | yes |
-| 5000 genes sparse | 179.02 ms | 153.85 ms | 1.16x | yes |
-| 200 genes rich | 21.10 ms | 18.58 ms | 1.14x | yes |
-| 1000 genes rich | 98.71 ms | 94.74 ms | 1.04x | yes |
-| 5000 genes rich | 494.89 ms | 428.60 ms | 1.15x | yes |
+| 200 genes sparse | 4.81 ms | 4.92 ms | 0.98x | yes |
+| 1000 genes sparse | 27.76 ms | 25.46 ms | 1.09x | yes |
+| 5000 genes sparse | 144.76 ms | 126.63 ms | 1.14x | yes |
+| 200 genes rich | 16.76 ms | 15.45 ms | 1.09x | yes |
+| 1000 genes rich | 81.27 ms | 74.08 ms | 1.10x | yes |
+| 5000 genes rich | 458.26 ms | 407.49 ms | 1.12x | yes |
 
 ## Reading this
 

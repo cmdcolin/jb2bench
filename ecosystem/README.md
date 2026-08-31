@@ -95,43 +95,43 @@ same curve.
 
 | case | 2023 | current | speedup |
 | --- | --- | --- | --- |
-| bam 20x shortread | 22.4 ms | 5.21 ms | 4.30x |
-| bam 20x longread | 145 ms | 40.7 ms | 3.57x |
-| bam 200x shortread | 175 ms | 39.8 ms | 4.39x |
-| bam 200x longread | 1768 ms | 383 ms | 4.61x |
-| bam 1000x shortread | 920 ms | 190 ms | 4.85x |
-| bam 1000x longread | 10262 ms | 1962 ms | 5.23x |
-| bgzf browser path 20x shortread | 101 ms | 17.8 ms | 5.68x |
-| bgzf node path 20x shortread | 37.7 ms | 17.1 ms | 2.21x |
-| bgzf browser path 20x longread | 125 ms | 36.0 ms | 3.46x |
-| bgzf node path 20x longread | 78.0 ms | 32.0 ms | 2.44x |
-| bgzf browser path 200x shortread | 981 ms | 179 ms | 5.49x |
-| bgzf node path 200x shortread | 565 ms | 173 ms | 3.27x |
-| bgzf browser path 200x longread | 1079 ms | 315 ms | 3.42x |
-| bgzf node path 200x longread | 515 ms | 312 ms | 1.65x |
-| cram 20x shortread | 372 ms | 40.2 ms | 9.23x |
-| cram 20x longread | 467 ms | 41.2 ms | 11.34x |
-| cram 200x shortread | 770 ms | 81.5 ms | 9.45x |
-| cram 200x longread | 2799 ms | 251 ms | 11.14x |
-| cram 1000x shortread | 3214 ms | 353 ms | 9.12x |
-| cram 1000x longread | 12671 ms | 1157 ms | 10.95x |
-| vcf genotypes 100 samples gtonly | 16.9 ms | 2.59 ms | 6.53x |
-| vcf SAMPLES 100 samples gtonly | 14.1 ms | 4.46 ms | 3.16x |
-| vcf genotypes 1000 samples gtonly | 157 ms | 20.8 ms | 7.55x |
-| vcf SAMPLES 1000 samples gtonly | 127 ms | 37.8 ms | 3.35x |
-| vcf genotypes 3000 samples gtonly | 526 ms | 85.4 ms | 6.16x |
-| vcf SAMPLES 3000 samples gtonly | 435 ms | 156 ms | 2.79x |
-| vcf genotypes 100 samples wide | 65.9 ms | 2.88 ms | 22.89x |
-| vcf SAMPLES 100 samples wide | 65.4 ms | 32.4 ms | 2.02x |
-| vcf genotypes 1000 samples wide | 665 ms | 23.0 ms | 28.96x |
-| vcf SAMPLES 1000 samples wide | 624 ms | 306 ms | 2.04x |
-| vcf genotypes 3000 samples wide | 2012 ms | 96.3 ms | 20.88x |
-| vcf SAMPLES 3000 samples wide | 1878 ms | 948 ms | 1.98x |
+| bam 20x shortread | 22.0 ms | 5.23 ms | 4.21x |
+| bam 20x longread | 146 ms | 38.3 ms | 3.81x |
+| bam 200x shortread | 172 ms | 39.9 ms | 4.31x |
+| bam 200x longread | 1692 ms | 351 ms | 4.82x |
+| bam 1000x shortread | 866 ms | 182 ms | 4.76x |
+| bam 1000x longread | 9748 ms | 1860 ms | 5.24x |
+| bgzf browser path 20x shortread | 101 ms | 18.1 ms | 5.58x |
+| bgzf node path 20x shortread | 75.9 ms | 18.1 ms | 4.20x |
+| bgzf browser path 20x longread | 122 ms | 35.1 ms | 3.47x |
+| bgzf node path 20x longread | 47.6 ms | 35.1 ms | 1.35x |
+| bgzf browser path 200x shortread | 1044 ms | 190 ms | 5.50x |
+| bgzf node path 200x shortread | 358 ms | 187 ms | 1.91x |
+| bgzf browser path 200x longread | 1140 ms | 329 ms | 3.47x |
+| bgzf node path 200x longread | 851 ms | 313 ms | 2.71x |
+| cram 20x shortread | 385 ms | 39.0 ms | 9.86x |
+| cram 20x longread | 412 ms | 42.2 ms | 9.77x |
+| cram 200x shortread | 718 ms | 79.9 ms | 8.98x |
+| cram 200x longread | 2732 ms | 263 ms | 10.38x |
+| cram 1000x shortread | 3243 ms | 363 ms | 8.93x |
+| cram 1000x longread | 11859 ms | 1079 ms | 10.99x |
+| vcf genotypes 100 samples gtonly | 16.5 ms | 2.55 ms | 6.48x |
+| vcf SAMPLES 100 samples gtonly | 14.4 ms | 5.08 ms | 2.83x |
+| vcf genotypes 1000 samples gtonly | 160 ms | 20.2 ms | 7.91x |
+| vcf SAMPLES 1000 samples gtonly | 130 ms | 43.8 ms | 2.97x |
+| vcf genotypes 3000 samples gtonly | 538 ms | 89.4 ms | 6.02x |
+| vcf SAMPLES 3000 samples gtonly | 418 ms | 160 ms | 2.62x |
+| vcf genotypes 100 samples wide | 64.8 ms | 2.94 ms | 22.07x |
+| vcf SAMPLES 100 samples wide | 63.3 ms | 31.8 ms | 1.99x |
+| vcf genotypes 1000 samples wide | 640 ms | 23.2 ms | 27.54x |
+| vcf SAMPLES 1000 samples wide | 605 ms | 312 ms | 1.94x |
+| vcf genotypes 3000 samples wide | 1978 ms | 98.9 ms | 20.01x |
+| vcf SAMPLES 3000 samples wide | 1851 ms | 970 ms | 1.91x |
 
 
 The gains are largest where the data is largest: 1000x long read BAM falls from
-10.3 s to 2.0 s, and the same case in CRAM from
-12.7 s to 1.2 s.
+9.7 s to 1.9 s, and the same case in CRAM from
+11.9 s to 1.1 s.
 
 `@gmod/bbi` has no row here, and had one until 2026-08-25. It is measured with
 the file count as the axis instead, by `make cohort` below.
@@ -475,7 +475,7 @@ compares C++ against JavaScript and says nothing about the library.
 what a genome browser actually runs — is the headline. The Node path is included
 so the harder comparison is on the record rather than hidden, and it turns out
 the current pure-JS decompressor also beats 1.4.5's native-zlib
-path, by 1.65x to 3.27x, because that path
+path, by 1.35x to 4.20x, because that path
 spent its advantage on Buffer conversions and promisify wrapping.
 
 ## How does the parser compare to htslib? — `vcf-crosslang.json`

@@ -3,13 +3,22 @@
   "inner": 3,
   "rule": "newest patch of each major line, npm as of 2026-08-16",
   "ruleDate": "2026-08-16",
-  "measured": "2026-08-16",
-  "loadPeak": 10.3,
-  "loadMedian": 10.3,
+  "measured": "2026-08-29",
+  "loadPeak": 1.85,
+  "loadMedian": 1.3,
   "unbuildable": {
     "bam-js": [],
     "cram-js": [],
-    "bbi-js": []
+    "bbi-js": [],
+    "vcf-js": [],
+    "bgzf-filehandle": []
+  },
+  "notBuilt": {
+    "bam-js": [],
+    "cram-js": [],
+    "bbi-js": [],
+    "vcf-js": [],
+    "bgzf-filehandle": []
   },
   "results": [
     {
@@ -20,15 +29,17 @@
         {
           "tag": "v1.1.18",
           "major": 1,
-          "ms": null,
+          "ms": 25.0167,
           "records": 3079,
-          "checksum": "",
+          "checksum": "700117106",
           "counts": {
             "reads": 4,
             "bytes": 583060,
             "dataReads": 3,
             "indexReads": 1,
+            "countable": true,
             "records": 3079,
+            "checksum": "700117106",
             "pattern": [
               131493,
               65535,
@@ -39,15 +50,17 @@
         {
           "tag": "v2.0.4",
           "major": 2,
-          "ms": null,
+          "ms": 23.3546,
           "records": 3079,
-          "checksum": "",
+          "checksum": "700117106",
           "counts": {
             "reads": 4,
             "bytes": 583060,
             "dataReads": 3,
             "indexReads": 1,
+            "countable": true,
             "records": 3079,
+            "checksum": "700117106",
             "pattern": [
               131493,
               65535,
@@ -58,15 +71,17 @@
         {
           "tag": "v3.0.3",
           "major": 3,
-          "ms": null,
+          "ms": 22.4495,
           "records": 3081,
-          "checksum": "",
+          "checksum": "713525628",
           "counts": {
             "reads": 4,
             "bytes": 583060,
             "dataReads": 3,
             "indexReads": 1,
+            "countable": true,
             "records": 3081,
+            "checksum": "713525628",
             "pattern": [
               131493,
               65535,
@@ -77,15 +92,17 @@
         {
           "tag": "v4.0.1",
           "major": 4,
-          "ms": null,
+          "ms": 21.3232,
           "records": 3081,
-          "checksum": "",
+          "checksum": "713525628",
           "counts": {
             "reads": 4,
             "bytes": 583060,
             "dataReads": 3,
             "indexReads": 1,
+            "countable": true,
             "records": 3081,
+            "checksum": "713525628",
             "pattern": [
               131493,
               65535,
@@ -96,15 +113,17 @@
         {
           "tag": "v5.0.7",
           "major": 5,
-          "ms": null,
+          "ms": 26.7041,
           "records": 3081,
-          "checksum": "",
+          "checksum": "713525628",
           "counts": {
             "reads": 4,
             "bytes": 583060,
             "dataReads": 3,
             "indexReads": 1,
+            "countable": true,
             "records": 3081,
+            "checksum": "713525628",
             "pattern": [
               131493,
               65535,
@@ -115,15 +134,17 @@
         {
           "tag": "v6.1.1",
           "major": 6,
-          "ms": null,
+          "ms": 29.6727,
           "records": 3081,
-          "checksum": "",
+          "checksum": "713525628",
           "counts": {
             "reads": 4,
             "bytes": 583060,
             "dataReads": 3,
             "indexReads": 1,
+            "countable": true,
             "records": 3081,
+            "checksum": "713525628",
             "pattern": [
               131493,
               65535,
@@ -134,22 +155,24 @@
         {
           "tag": "v7.9.1",
           "major": 7,
-          "ms": null,
+          "ms": 6.3949,
           "records": 3081,
-          "checksum": "",
+          "checksum": "713525628",
           "counts": {
             "reads": 8,
             "bytes": 790135,
             "dataReads": 7,
             "indexReads": 1,
+            "countable": true,
             "records": 3081,
+            "checksum": "713525628",
             "pattern": [
               65958,
               65536,
               65536,
-              76001,
-              65536,
               385216,
+              65536,
+              76001,
               65536
             ]
           }
@@ -157,23 +180,25 @@
         {
           "tag": "v8.11.0",
           "major": 8,
-          "ms": null,
+          "ms": 5.7598,
           "records": 3081,
-          "checksum": "",
+          "checksum": "713525628",
           "counts": {
             "reads": 8,
             "bytes": 790135,
             "dataReads": 7,
             "indexReads": 1,
+            "countable": true,
             "records": 3081,
+            "checksum": "713525628",
             "pattern": [
               65958,
               65536,
               65536,
               76001,
-              385216,
               65536,
-              65536
+              65536,
+              385216
             ]
           }
         }
@@ -191,15 +216,17 @@
         {
           "tag": "v1.1.18",
           "major": 1,
-          "ms": null,
+          "ms": 180.5336,
           "records": 31126,
-          "checksum": "",
+          "checksum": "390037337",
           "counts": {
             "reads": 4,
             "bytes": 3259805,
             "dataReads": 3,
             "indexReads": 1,
+            "countable": true,
             "records": 31126,
+            "checksum": "390037337",
             "pattern": [
               131493,
               65535,
@@ -210,15 +237,17 @@
         {
           "tag": "v2.0.4",
           "major": 2,
-          "ms": null,
+          "ms": 177.3144,
           "records": 31126,
-          "checksum": "",
+          "checksum": "390037337",
           "counts": {
             "reads": 4,
             "bytes": 3259805,
             "dataReads": 3,
             "indexReads": 1,
+            "countable": true,
             "records": 31126,
+            "checksum": "390037337",
             "pattern": [
               131493,
               65535,
@@ -229,15 +258,17 @@
         {
           "tag": "v3.0.3",
           "major": 3,
-          "ms": null,
+          "ms": 161.8778,
           "records": 31134,
-          "checksum": "",
+          "checksum": "442213377",
           "counts": {
             "reads": 4,
             "bytes": 3259805,
             "dataReads": 3,
             "indexReads": 1,
+            "countable": true,
             "records": 31134,
+            "checksum": "442213377",
             "pattern": [
               131493,
               65535,
@@ -248,15 +279,17 @@
         {
           "tag": "v4.0.1",
           "major": 4,
-          "ms": null,
+          "ms": 171.694,
           "records": 31134,
-          "checksum": "",
+          "checksum": "442213377",
           "counts": {
             "reads": 4,
             "bytes": 3259805,
             "dataReads": 3,
             "indexReads": 1,
+            "countable": true,
             "records": 31134,
+            "checksum": "442213377",
             "pattern": [
               131493,
               65535,
@@ -267,15 +300,17 @@
         {
           "tag": "v5.0.7",
           "major": 5,
-          "ms": null,
+          "ms": 197.18,
           "records": 31134,
-          "checksum": "",
+          "checksum": "442213377",
           "counts": {
             "reads": 4,
             "bytes": 3259805,
             "dataReads": 3,
             "indexReads": 1,
+            "countable": true,
             "records": 31134,
+            "checksum": "442213377",
             "pattern": [
               131493,
               65535,
@@ -286,15 +321,17 @@
         {
           "tag": "v6.1.1",
           "major": 6,
-          "ms": null,
+          "ms": 217.5016,
           "records": 31134,
-          "checksum": "",
+          "checksum": "442213377",
           "counts": {
             "reads": 4,
             "bytes": 3259805,
             "dataReads": 3,
             "indexReads": 1,
+            "countable": true,
             "records": 31134,
+            "checksum": "442213377",
             "pattern": [
               131493,
               65535,
@@ -305,43 +342,47 @@
         {
           "tag": "v7.9.1",
           "major": 7,
-          "ms": null,
+          "ms": 37.5353,
           "records": 31133,
-          "checksum": "",
+          "checksum": "436265944",
           "counts": {
             "reads": 8,
             "bytes": 3513603,
             "dataReads": 7,
             "indexReads": 1,
+            "countable": true,
             "records": 31133,
+            "checksum": "436265944",
             "pattern": [
               65958,
               75159,
-              75092,
-              3061937,
               74982,
               84351,
-              75284
+              75092,
+              75284,
+              3061937
             ]
           }
         },
         {
           "tag": "v8.11.0",
           "major": 8,
-          "ms": null,
+          "ms": 39.113,
           "records": 31133,
-          "checksum": "",
+          "checksum": "436265944",
           "counts": {
             "reads": 8,
             "bytes": 3513603,
             "dataReads": 7,
             "indexReads": 1,
+            "countable": true,
             "records": 31133,
+            "checksum": "436265944",
             "pattern": [
               65958,
               75159,
-              74982,
               75092,
+              74982,
               84351,
               75284,
               3061937
@@ -366,15 +407,17 @@
         {
           "tag": "v1.1.18",
           "major": 1,
-          "ms": null,
+          "ms": 1728.7444,
           "records": 335,
-          "checksum": "",
+          "checksum": "31347829",
           "counts": {
             "reads": 9,
             "bytes": 55459318,
             "dataReads": 8,
             "indexReads": 1,
+            "countable": true,
             "records": 335,
+            "checksum": "31347829",
             "pattern": [
               131488,
               65535,
@@ -390,15 +433,17 @@
         {
           "tag": "v2.0.4",
           "major": 2,
-          "ms": null,
+          "ms": 1723.4724,
           "records": 335,
-          "checksum": "",
+          "checksum": "31347829",
           "counts": {
             "reads": 9,
             "bytes": 55459318,
             "dataReads": 8,
             "indexReads": 1,
+            "countable": true,
             "records": 335,
+            "checksum": "31347829",
             "pattern": [
               131488,
               65535,
@@ -414,15 +459,17 @@
         {
           "tag": "v3.0.3",
           "major": 3,
-          "ms": null,
+          "ms": 1633.9247,
           "records": 335,
-          "checksum": "",
+          "checksum": "31347829",
           "counts": {
             "reads": 9,
             "bytes": 55459318,
             "dataReads": 8,
             "indexReads": 1,
+            "countable": true,
             "records": 335,
+            "checksum": "31347829",
             "pattern": [
               131488,
               65535,
@@ -438,15 +485,17 @@
         {
           "tag": "v4.0.1",
           "major": 4,
-          "ms": null,
+          "ms": 1310.8347,
           "records": 335,
-          "checksum": "",
+          "checksum": "31347829",
           "counts": {
             "reads": 9,
             "bytes": 55459318,
             "dataReads": 8,
             "indexReads": 1,
+            "countable": true,
             "records": 335,
+            "checksum": "31347829",
             "pattern": [
               131488,
               65535,
@@ -462,15 +511,17 @@
         {
           "tag": "v5.0.7",
           "major": 5,
-          "ms": null,
+          "ms": 1323.7511,
           "records": 335,
-          "checksum": "",
+          "checksum": "31347829",
           "counts": {
             "reads": 9,
             "bytes": 55459318,
             "dataReads": 8,
             "indexReads": 1,
+            "countable": true,
             "records": 335,
+            "checksum": "31347829",
             "pattern": [
               131488,
               65535,
@@ -486,15 +537,17 @@
         {
           "tag": "v6.1.1",
           "major": 6,
-          "ms": null,
+          "ms": 1413.3708,
           "records": 335,
-          "checksum": "",
+          "checksum": "31347829",
           "counts": {
             "reads": 9,
             "bytes": 55459318,
             "dataReads": 8,
             "indexReads": 1,
+            "countable": true,
             "records": 335,
+            "checksum": "31347829",
             "pattern": [
               131488,
               65535,
@@ -510,15 +563,17 @@
         {
           "tag": "v7.9.1",
           "major": 7,
-          "ms": null,
+          "ms": 349.8005,
           "records": 335,
-          "checksum": "",
+          "checksum": "31347829",
           "counts": {
             "reads": 8,
             "bytes": 55311862,
             "dataReads": 7,
             "indexReads": 1,
+            "countable": true,
             "records": 335,
+            "checksum": "31347829",
             "pattern": [
               65953,
               1239920,
@@ -533,23 +588,25 @@
         {
           "tag": "v8.11.0",
           "major": 8,
-          "ms": null,
+          "ms": 364.0672,
           "records": 335,
-          "checksum": "",
+          "checksum": "31347829",
           "counts": {
             "reads": 8,
             "bytes": 55311862,
             "dataReads": 7,
             "indexReads": 1,
+            "countable": true,
             "records": 335,
+            "checksum": "31347829",
             "pattern": [
               65953,
               1239920,
-              5040624,
               4810746,
+              5040624,
               6536966,
-              19008551,
-              18608230
+              18608230,
+              19008551
             ]
           }
         }
@@ -564,15 +621,17 @@
         {
           "tag": "v1.7.4",
           "major": 1,
-          "ms": null,
+          "ms": 361.6695,
           "records": 3079,
-          "checksum": "",
+          "checksum": "700117106",
           "counts": {
             "reads": 280,
             "bytes": 540808,
             "dataReads": 279,
             "indexReads": 1,
+            "countable": true,
             "records": 3079,
+            "checksum": "700117106",
             "pattern": [
               26,
               52,
@@ -592,15 +651,17 @@
         {
           "tag": "v2.0.4",
           "major": 2,
-          "ms": null,
+          "ms": 384.5879,
           "records": 3079,
-          "checksum": "",
+          "checksum": "700117106",
           "counts": {
             "reads": 280,
             "bytes": 540808,
             "dataReads": 279,
             "indexReads": 1,
+            "countable": true,
             "records": 3079,
+            "checksum": "700117106",
             "pattern": [
               26,
               52,
@@ -620,15 +681,17 @@
         {
           "tag": "v3.0.7",
           "major": 3,
-          "ms": null,
+          "ms": 350.0878,
           "records": 3079,
-          "checksum": "",
+          "checksum": "700117106",
           "counts": {
             "reads": 280,
             "bytes": 540808,
             "dataReads": 279,
             "indexReads": 1,
+            "countable": true,
             "records": 3079,
+            "checksum": "700117106",
             "pattern": [
               26,
               52,
@@ -648,15 +711,17 @@
         {
           "tag": "v4.0.10",
           "major": 4,
-          "ms": null,
+          "ms": 367.567,
           "records": 3079,
-          "checksum": "",
+          "checksum": "700117106",
           "counts": {
             "reads": 280,
             "bytes": 540808,
             "dataReads": 279,
             "indexReads": 1,
+            "countable": true,
             "records": 3079,
+            "checksum": "700117106",
             "pattern": [
               26,
               52,
@@ -676,15 +741,17 @@
         {
           "tag": "v5.1.0",
           "major": 5,
-          "ms": null,
+          "ms": 370.5734,
           "records": 3079,
-          "checksum": "",
+          "checksum": "700117106",
           "counts": {
             "reads": 280,
             "bytes": 540808,
             "dataReads": 279,
             "indexReads": 1,
+            "countable": true,
             "records": 3079,
+            "checksum": "700117106",
             "pattern": [
               26,
               52,
@@ -704,15 +771,17 @@
         {
           "tag": "v6.0.1",
           "major": 6,
-          "ms": null,
+          "ms": 346.0749,
           "records": 3081,
-          "checksum": "",
+          "checksum": "713525628",
           "counts": {
             "reads": 280,
             "bytes": 540808,
             "dataReads": 279,
             "indexReads": 1,
+            "countable": true,
             "records": 3081,
+            "checksum": "713525628",
             "pattern": [
               26,
               52,
@@ -732,15 +801,17 @@
         {
           "tag": "v7.0.3",
           "major": 7,
-          "ms": null,
+          "ms": 288.3123,
           "records": 3081,
-          "checksum": "",
+          "checksum": "713525628",
           "counts": {
             "reads": 280,
             "bytes": 540808,
             "dataReads": 279,
             "indexReads": 1,
+            "countable": true,
             "records": 3081,
+            "checksum": "713525628",
             "pattern": [
               26,
               52,
@@ -760,15 +831,17 @@
         {
           "tag": "v8.7.0",
           "major": 8,
-          "ms": null,
+          "ms": 66.6348,
           "records": 3081,
-          "checksum": "",
+          "checksum": "713525628",
           "counts": {
             "reads": 16,
             "bytes": 270416,
             "dataReads": 15,
             "indexReads": 1,
+            "countable": true,
             "records": 3081,
+            "checksum": "713525628",
             "pattern": [
               26,
               52,
@@ -788,15 +861,17 @@
         {
           "tag": "v9.0.0",
           "major": 9,
-          "ms": null,
+          "ms": 65.8731,
           "records": 3081,
-          "checksum": "",
+          "checksum": "713525628",
           "counts": {
             "reads": 16,
             "bytes": 270416,
             "dataReads": 15,
             "indexReads": 1,
+            "countable": true,
             "records": 3081,
+            "checksum": "713525628",
             "pattern": [
               26,
               52,
@@ -809,22 +884,24 @@
               586,
               17,
               17,
-              114
+              113
             ]
           }
         },
         {
           "tag": "v10.6.1",
           "major": 10,
-          "ms": null,
+          "ms": 37.2393,
           "records": 3081,
-          "checksum": "",
+          "checksum": "713525628",
           "counts": {
             "reads": 16,
             "bytes": 270416,
             "dataReads": 15,
             "indexReads": 1,
+            "countable": true,
             "records": 3081,
+            "checksum": "713525628",
             "pattern": [
               26,
               52,
@@ -837,22 +914,24 @@
               586,
               17,
               17,
-              114
+              113
             ]
           }
         },
         {
           "tag": "v11.4.1",
           "major": 11,
-          "ms": null,
+          "ms": 37.9296,
           "records": 3081,
-          "checksum": "",
+          "checksum": "713525628",
           "counts": {
             "reads": 16,
             "bytes": 270416,
             "dataReads": 15,
             "indexReads": 1,
+            "countable": true,
             "records": 3081,
+            "checksum": "713525628",
             "pattern": [
               26,
               52,
@@ -872,15 +951,17 @@
         {
           "tag": "v12.0.1",
           "major": 12,
-          "ms": null,
+          "ms": 33.6958,
           "records": 3081,
-          "checksum": "",
+          "checksum": "713525628",
           "counts": {
             "reads": 16,
             "bytes": 270416,
             "dataReads": 15,
             "indexReads": 1,
+            "countable": true,
             "records": 3081,
+            "checksum": "713525628",
             "pattern": [
               26,
               52,
@@ -900,15 +981,17 @@
         {
           "tag": "v13.4.1",
           "major": 13,
-          "ms": null,
+          "ms": 34.0284,
           "records": 3081,
-          "checksum": "",
+          "checksum": "713525628",
           "counts": {
             "reads": 16,
             "bytes": 270416,
             "dataReads": 15,
             "indexReads": 1,
+            "countable": true,
             "records": 3081,
+            "checksum": "713525628",
             "pattern": [
               26,
               52,
@@ -942,15 +1025,17 @@
         {
           "tag": "v1.7.4",
           "major": 1,
-          "ms": null,
+          "ms": 735.4654,
           "records": 31126,
-          "checksum": "",
+          "checksum": "390037337",
           "counts": {
             "reads": 538,
             "bytes": 1099273,
             "dataReads": 537,
             "indexReads": 1,
+            "countable": true,
             "records": 31126,
+            "checksum": "390037337",
             "pattern": [
               26,
               52,
@@ -970,15 +1055,17 @@
         {
           "tag": "v2.0.4",
           "major": 2,
-          "ms": null,
+          "ms": 736.5238,
           "records": 31126,
-          "checksum": "",
+          "checksum": "390037337",
           "counts": {
             "reads": 538,
             "bytes": 1099273,
             "dataReads": 537,
             "indexReads": 1,
+            "countable": true,
             "records": 31126,
+            "checksum": "390037337",
             "pattern": [
               26,
               52,
@@ -998,15 +1085,17 @@
         {
           "tag": "v3.0.7",
           "major": 3,
-          "ms": null,
+          "ms": 706.8622,
           "records": 31126,
-          "checksum": "",
+          "checksum": "390037337",
           "counts": {
             "reads": 538,
             "bytes": 1099273,
             "dataReads": 537,
             "indexReads": 1,
+            "countable": true,
             "records": 31126,
+            "checksum": "390037337",
             "pattern": [
               26,
               52,
@@ -1026,15 +1115,17 @@
         {
           "tag": "v4.0.10",
           "major": 4,
-          "ms": null,
+          "ms": 736.9522,
           "records": 31126,
-          "checksum": "",
+          "checksum": "390037337",
           "counts": {
             "reads": 538,
             "bytes": 1099273,
             "dataReads": 537,
             "indexReads": 1,
+            "countable": true,
             "records": 31126,
+            "checksum": "390037337",
             "pattern": [
               26,
               52,
@@ -1054,15 +1145,17 @@
         {
           "tag": "v5.1.0",
           "major": 5,
-          "ms": null,
+          "ms": 764.9281,
           "records": 31126,
-          "checksum": "",
+          "checksum": "390037337",
           "counts": {
             "reads": 538,
             "bytes": 1099273,
             "dataReads": 537,
             "indexReads": 1,
+            "countable": true,
             "records": 31126,
+            "checksum": "390037337",
             "pattern": [
               26,
               52,
@@ -1082,15 +1175,17 @@
         {
           "tag": "v6.0.1",
           "major": 6,
-          "ms": null,
+          "ms": 675.6531,
           "records": 31133,
-          "checksum": "",
+          "checksum": "436265944",
           "counts": {
             "reads": 538,
             "bytes": 1099273,
             "dataReads": 537,
             "indexReads": 1,
+            "countable": true,
             "records": 31133,
+            "checksum": "436265944",
             "pattern": [
               26,
               52,
@@ -1110,15 +1205,17 @@
         {
           "tag": "v7.0.3",
           "major": 7,
-          "ms": null,
+          "ms": 562.146,
           "records": 31133,
-          "checksum": "",
+          "checksum": "436265944",
           "counts": {
             "reads": 538,
             "bytes": 1099273,
             "dataReads": 537,
             "indexReads": 1,
+            "countable": true,
             "records": 31133,
+            "checksum": "436265944",
             "pattern": [
               26,
               52,
@@ -1138,15 +1235,17 @@
         {
           "tag": "v8.7.0",
           "major": 8,
-          "ms": null,
+          "ms": 135.5305,
           "records": 31133,
-          "checksum": "",
+          "checksum": "436265944",
           "counts": {
             "reads": 30,
             "bytes": 549870,
             "dataReads": 29,
             "indexReads": 1,
+            "countable": true,
             "records": 31133,
+            "checksum": "436265944",
             "pattern": [
               26,
               52,
@@ -1166,15 +1265,17 @@
         {
           "tag": "v9.0.0",
           "major": 9,
-          "ms": null,
+          "ms": 122.0245,
           "records": 31133,
-          "checksum": "",
+          "checksum": "436265944",
           "counts": {
             "reads": 30,
             "bytes": 549870,
             "dataReads": 29,
             "indexReads": 1,
+            "countable": true,
             "records": 31133,
+            "checksum": "436265944",
             "pattern": [
               26,
               52,
@@ -1194,15 +1295,17 @@
         {
           "tag": "v10.6.1",
           "major": 10,
-          "ms": null,
+          "ms": 65.6254,
           "records": 31133,
-          "checksum": "",
+          "checksum": "436265944",
           "counts": {
             "reads": 30,
             "bytes": 549870,
             "dataReads": 29,
             "indexReads": 1,
+            "countable": true,
             "records": 31133,
+            "checksum": "436265944",
             "pattern": [
               26,
               52,
@@ -1222,15 +1325,17 @@
         {
           "tag": "v11.4.1",
           "major": 11,
-          "ms": null,
+          "ms": 76.7013,
           "records": 31133,
-          "checksum": "",
+          "checksum": "436265944",
           "counts": {
             "reads": 30,
             "bytes": 549870,
             "dataReads": 29,
             "indexReads": 1,
+            "countable": true,
             "records": 31133,
+            "checksum": "436265944",
             "pattern": [
               26,
               52,
@@ -1250,15 +1355,17 @@
         {
           "tag": "v12.0.1",
           "major": 12,
-          "ms": null,
+          "ms": 69.1412,
           "records": 31133,
-          "checksum": "",
+          "checksum": "436265944",
           "counts": {
             "reads": 30,
             "bytes": 549870,
             "dataReads": 29,
             "indexReads": 1,
+            "countable": true,
             "records": 31133,
+            "checksum": "436265944",
             "pattern": [
               26,
               52,
@@ -1278,15 +1385,17 @@
         {
           "tag": "v13.4.1",
           "major": 13,
-          "ms": null,
+          "ms": 66.7279,
           "records": 31133,
-          "checksum": "",
+          "checksum": "436265944",
           "counts": {
             "reads": 30,
             "bytes": 549870,
             "dataReads": 29,
             "indexReads": 1,
+            "countable": true,
             "records": 31133,
+            "checksum": "436265944",
             "pattern": [
               26,
               52,
@@ -1320,15 +1429,17 @@
         {
           "tag": "v1.7.4",
           "major": 1,
-          "ms": null,
+          "ms": 2569.6738,
           "records": 331,
-          "checksum": "",
+          "checksum": "7599390",
           "counts": {
             "reads": 728,
             "bytes": 35854580,
             "dataReads": 727,
             "indexReads": 1,
+            "countable": true,
             "records": 331,
+            "checksum": "7599390",
             "pattern": [
               26,
               52,
@@ -1348,15 +1459,17 @@
         {
           "tag": "v2.0.4",
           "major": 2,
-          "ms": null,
+          "ms": 2593.6782,
           "records": 331,
-          "checksum": "",
+          "checksum": "7599390",
           "counts": {
             "reads": 728,
             "bytes": 35854580,
             "dataReads": 727,
             "indexReads": 1,
+            "countable": true,
             "records": 331,
+            "checksum": "7599390",
             "pattern": [
               26,
               52,
@@ -1376,15 +1489,17 @@
         {
           "tag": "v3.0.7",
           "major": 3,
-          "ms": null,
+          "ms": 2730.933,
           "records": 335,
-          "checksum": "",
+          "checksum": "31347829",
           "counts": {
             "reads": 728,
             "bytes": 35854580,
             "dataReads": 727,
             "indexReads": 1,
+            "countable": true,
             "records": 335,
+            "checksum": "31347829",
             "pattern": [
               26,
               52,
@@ -1404,15 +1519,17 @@
         {
           "tag": "v4.0.10",
           "major": 4,
-          "ms": null,
+          "ms": 2568.251,
           "records": 335,
-          "checksum": "",
+          "checksum": "31347829",
           "counts": {
             "reads": 728,
             "bytes": 35854580,
             "dataReads": 727,
             "indexReads": 1,
+            "countable": true,
             "records": 335,
+            "checksum": "31347829",
             "pattern": [
               26,
               52,
@@ -1432,15 +1549,17 @@
         {
           "tag": "v5.1.0",
           "major": 5,
-          "ms": null,
+          "ms": 2596.9945,
           "records": 335,
-          "checksum": "",
+          "checksum": "31347829",
           "counts": {
             "reads": 728,
             "bytes": 35854580,
             "dataReads": 727,
             "indexReads": 1,
+            "countable": true,
             "records": 335,
+            "checksum": "31347829",
             "pattern": [
               26,
               52,
@@ -1460,15 +1579,17 @@
         {
           "tag": "v6.0.1",
           "major": 6,
-          "ms": null,
+          "ms": 2432.5576,
           "records": 335,
-          "checksum": "",
+          "checksum": "31347829",
           "counts": {
             "reads": 728,
             "bytes": 35854580,
             "dataReads": 727,
             "indexReads": 1,
+            "countable": true,
             "records": 335,
+            "checksum": "31347829",
             "pattern": [
               26,
               52,
@@ -1488,15 +1609,17 @@
         {
           "tag": "v7.0.3",
           "major": 7,
-          "ms": null,
+          "ms": 1908.3519,
           "records": 335,
-          "checksum": "",
+          "checksum": "31347829",
           "counts": {
             "reads": 728,
             "bytes": 35854580,
             "dataReads": 727,
             "indexReads": 1,
+            "countable": true,
             "records": 335,
+            "checksum": "31347829",
             "pattern": [
               26,
               52,
@@ -1516,15 +1639,17 @@
         {
           "tag": "v8.7.0",
           "major": 8,
-          "ms": null,
+          "ms": 299.094,
           "records": 335,
-          "checksum": "",
+          "checksum": "31347829",
           "counts": {
             "reads": 44,
             "bytes": 17927326,
             "dataReads": 43,
             "indexReads": 1,
+            "countable": true,
             "records": 335,
+            "checksum": "31347829",
             "pattern": [
               26,
               52,
@@ -1544,15 +1669,17 @@
         {
           "tag": "v9.0.0",
           "major": 9,
-          "ms": null,
+          "ms": 248.7568,
           "records": 335,
-          "checksum": "",
+          "checksum": "31347829",
           "counts": {
             "reads": 44,
             "bytes": 17927326,
             "dataReads": 43,
             "indexReads": 1,
+            "countable": true,
             "records": 335,
+            "checksum": "31347829",
             "pattern": [
               26,
               52,
@@ -1572,15 +1699,17 @@
         {
           "tag": "v10.6.1",
           "major": 10,
-          "ms": null,
+          "ms": 238.0053,
           "records": 335,
-          "checksum": "",
+          "checksum": "31347829",
           "counts": {
             "reads": 44,
             "bytes": 17927326,
             "dataReads": 43,
             "indexReads": 1,
+            "countable": true,
             "records": 335,
+            "checksum": "31347829",
             "pattern": [
               26,
               52,
@@ -1600,15 +1729,17 @@
         {
           "tag": "v11.4.1",
           "major": 11,
-          "ms": null,
+          "ms": 259.6399,
           "records": 335,
-          "checksum": "",
+          "checksum": "31347829",
           "counts": {
             "reads": 44,
             "bytes": 17927326,
             "dataReads": 43,
             "indexReads": 1,
+            "countable": true,
             "records": 335,
+            "checksum": "31347829",
             "pattern": [
               26,
               52,
@@ -1628,15 +1759,17 @@
         {
           "tag": "v12.0.1",
           "major": 12,
-          "ms": null,
+          "ms": 258.7412,
           "records": 335,
-          "checksum": "",
+          "checksum": "31347829",
           "counts": {
             "reads": 44,
             "bytes": 17927326,
             "dataReads": 43,
             "indexReads": 1,
+            "countable": true,
             "records": 335,
+            "checksum": "31347829",
             "pattern": [
               26,
               52,
@@ -1656,15 +1789,17 @@
         {
           "tag": "v13.4.1",
           "major": 13,
-          "ms": null,
+          "ms": 269.8189,
           "records": 335,
-          "checksum": "",
+          "checksum": "31347829",
           "counts": {
             "reads": 44,
             "bytes": 17927326,
             "dataReads": 43,
             "indexReads": 1,
+            "countable": true,
             "records": 335,
+            "checksum": "31347829",
             "pattern": [
               26,
               52,
@@ -1695,15 +1830,17 @@
         {
           "tag": "v1.0.35",
           "major": 1,
-          "ms": null,
+          "ms": 1.6667,
           "records": 4901,
-          "checksum": "",
+          "checksum": "529781147",
           "counts": {
             "reads": 5,
             "bytes": 31243,
             "dataReads": 5,
             "indexReads": 0,
+            "countable": true,
             "records": 4901,
+            "checksum": "529781147",
             "pattern": [
               2000,
               56,
@@ -1716,15 +1853,17 @@
         {
           "tag": "v2.0.5",
           "major": 2,
-          "ms": null,
+          "ms": 1.6776,
           "records": 4901,
-          "checksum": "",
+          "checksum": "529781147",
           "counts": {
             "reads": 5,
             "bytes": 31243,
             "dataReads": 5,
             "indexReads": 0,
+            "countable": true,
             "records": 4901,
+            "checksum": "529781147",
             "pattern": [
               2000,
               56,
@@ -1737,15 +1876,17 @@
         {
           "tag": "v3.0.1",
           "major": 3,
-          "ms": null,
+          "ms": 1.7904,
           "records": 4901,
-          "checksum": "",
+          "checksum": "529781147",
           "counts": {
             "reads": 5,
             "bytes": 31243,
             "dataReads": 5,
             "indexReads": 0,
+            "countable": true,
             "records": 4901,
+            "checksum": "529781147",
             "pattern": [
               2000,
               56,
@@ -1758,15 +1899,17 @@
         {
           "tag": "v4.0.6",
           "major": 4,
-          "ms": null,
+          "ms": 1.8995,
           "records": 4901,
-          "checksum": "",
+          "checksum": "529781147",
           "counts": {
             "reads": 5,
             "bytes": 31243,
             "dataReads": 5,
             "indexReads": 0,
+            "countable": true,
             "records": 4901,
+            "checksum": "529781147",
             "pattern": [
               2000,
               56,
@@ -1779,15 +1922,17 @@
         {
           "tag": "v5.0.2",
           "major": 5,
-          "ms": null,
+          "ms": 1.4238,
           "records": 4901,
-          "checksum": "",
+          "checksum": "529781147",
           "counts": {
             "reads": 5,
             "bytes": 31243,
             "dataReads": 5,
             "indexReads": 0,
+            "countable": true,
             "records": 4901,
+            "checksum": "529781147",
             "pattern": [
               2000,
               56,
@@ -1800,15 +1945,17 @@
         {
           "tag": "v6.0.3",
           "major": 6,
-          "ms": null,
+          "ms": 1.7582,
           "records": 4901,
-          "checksum": "",
+          "checksum": "529781147",
           "counts": {
             "reads": 5,
             "bytes": 31243,
             "dataReads": 5,
             "indexReads": 0,
+            "countable": true,
             "records": 4901,
+            "checksum": "529781147",
             "pattern": [
               2000,
               56,
@@ -1821,15 +1968,17 @@
         {
           "tag": "v7.1.0",
           "major": 7,
-          "ms": null,
+          "ms": 2.0441,
           "records": 4901,
-          "checksum": "",
+          "checksum": "529781147",
           "counts": {
             "reads": 7,
             "bytes": 31241,
             "dataReads": 7,
             "indexReads": 0,
+            "countable": true,
             "records": 4901,
+            "checksum": "529781147",
             "pattern": [
               2000,
               32,
@@ -1844,15 +1993,17 @@
         {
           "tag": "v8.1.2",
           "major": 8,
-          "ms": null,
+          "ms": 1.6045,
           "records": 4901,
-          "checksum": "",
+          "checksum": "529781147",
           "counts": {
             "reads": 7,
             "bytes": 31241,
             "dataReads": 7,
             "indexReads": 0,
+            "countable": true,
             "records": 4901,
+            "checksum": "529781147",
             "pattern": [
               2000,
               32,
@@ -1867,15 +2018,17 @@
         {
           "tag": "v9.3.3",
           "major": 9,
-          "ms": null,
+          "ms": 1.5992,
           "records": 4901,
-          "checksum": "",
+          "checksum": "529781147",
           "counts": {
             "reads": 7,
             "bytes": 31241,
             "dataReads": 7,
             "indexReads": 0,
+            "countable": true,
             "records": 4901,
+            "checksum": "529781147",
             "pattern": [
               2000,
               32,
@@ -1890,15 +2043,17 @@
         {
           "tag": "v10.0.2",
           "major": 10,
-          "ms": null,
+          "ms": 1.6424,
           "records": 4901,
-          "checksum": "",
+          "checksum": "529781147",
           "counts": {
             "reads": 6,
             "bytes": 31241,
             "dataReads": 6,
             "indexReads": 0,
+            "countable": true,
             "records": 4901,
+            "checksum": "529781147",
             "pattern": [
               2000,
               32,
@@ -1912,15 +2067,17 @@
         {
           "tag": "v11.2.1",
           "major": 11,
-          "ms": null,
+          "ms": 1.7387,
           "records": 4901,
-          "checksum": "",
+          "checksum": "529781147",
           "counts": {
             "reads": 6,
             "bytes": 31241,
             "dataReads": 6,
             "indexReads": 0,
+            "countable": true,
             "records": 4901,
+            "checksum": "529781147",
             "pattern": [
               2000,
               32,
@@ -1942,15 +2099,17 @@
         {
           "tag": "v1.0.35",
           "major": 1,
-          "ms": null,
+          "ms": 4.102,
           "records": 14555,
-          "checksum": "",
+          "checksum": "797753553",
           "counts": {
             "reads": 5,
             "bytes": 65825,
             "dataReads": 5,
             "indexReads": 0,
+            "countable": true,
             "records": 14555,
+            "checksum": "797753553",
             "pattern": [
               2000,
               56,
@@ -1963,15 +2122,17 @@
         {
           "tag": "v2.0.5",
           "major": 2,
-          "ms": null,
+          "ms": 3.0684,
           "records": 14555,
-          "checksum": "",
+          "checksum": "797753553",
           "counts": {
             "reads": 5,
             "bytes": 65825,
             "dataReads": 5,
             "indexReads": 0,
+            "countable": true,
             "records": 14555,
+            "checksum": "797753553",
             "pattern": [
               2000,
               56,
@@ -1984,15 +2145,17 @@
         {
           "tag": "v3.0.1",
           "major": 3,
-          "ms": null,
+          "ms": 3.036,
           "records": 14555,
-          "checksum": "",
+          "checksum": "797753553",
           "counts": {
             "reads": 5,
             "bytes": 65825,
             "dataReads": 5,
             "indexReads": 0,
+            "countable": true,
             "records": 14555,
+            "checksum": "797753553",
             "pattern": [
               2000,
               56,
@@ -2005,15 +2168,17 @@
         {
           "tag": "v4.0.6",
           "major": 4,
-          "ms": null,
+          "ms": 2.7123,
           "records": 14555,
-          "checksum": "",
+          "checksum": "797753553",
           "counts": {
             "reads": 5,
             "bytes": 65825,
             "dataReads": 5,
             "indexReads": 0,
+            "countable": true,
             "records": 14555,
+            "checksum": "797753553",
             "pattern": [
               2000,
               56,
@@ -2026,15 +2191,17 @@
         {
           "tag": "v5.0.2",
           "major": 5,
-          "ms": null,
+          "ms": 2.8048,
           "records": 14555,
-          "checksum": "",
+          "checksum": "797753553",
           "counts": {
             "reads": 5,
             "bytes": 65825,
             "dataReads": 5,
             "indexReads": 0,
+            "countable": true,
             "records": 14555,
+            "checksum": "797753553",
             "pattern": [
               2000,
               56,
@@ -2047,15 +2214,17 @@
         {
           "tag": "v6.0.3",
           "major": 6,
-          "ms": null,
+          "ms": 3.3894,
           "records": 14555,
-          "checksum": "",
+          "checksum": "797753553",
           "counts": {
             "reads": 5,
             "bytes": 65825,
             "dataReads": 5,
             "indexReads": 0,
+            "countable": true,
             "records": 14555,
+            "checksum": "797753553",
             "pattern": [
               2000,
               56,
@@ -2068,15 +2237,17 @@
         {
           "tag": "v7.1.0",
           "major": 7,
-          "ms": null,
+          "ms": 3.6575,
           "records": 14555,
-          "checksum": "",
+          "checksum": "797753553",
           "counts": {
             "reads": 7,
             "bytes": 65823,
             "dataReads": 7,
             "indexReads": 0,
+            "countable": true,
             "records": 14555,
+            "checksum": "797753553",
             "pattern": [
               2000,
               32,
@@ -2091,15 +2262,17 @@
         {
           "tag": "v8.1.2",
           "major": 8,
-          "ms": null,
+          "ms": 2.1358,
           "records": 14555,
-          "checksum": "",
+          "checksum": "797753553",
           "counts": {
             "reads": 7,
             "bytes": 65823,
             "dataReads": 7,
             "indexReads": 0,
+            "countable": true,
             "records": 14555,
+            "checksum": "797753553",
             "pattern": [
               2000,
               32,
@@ -2114,15 +2287,17 @@
         {
           "tag": "v9.3.3",
           "major": 9,
-          "ms": null,
+          "ms": 2.8262,
           "records": 14555,
-          "checksum": "",
+          "checksum": "797753553",
           "counts": {
             "reads": 7,
             "bytes": 65823,
             "dataReads": 7,
             "indexReads": 0,
+            "countable": true,
             "records": 14555,
+            "checksum": "797753553",
             "pattern": [
               2000,
               32,
@@ -2137,15 +2312,17 @@
         {
           "tag": "v10.0.2",
           "major": 10,
-          "ms": null,
+          "ms": 3.585,
           "records": 14555,
-          "checksum": "",
+          "checksum": "797753553",
           "counts": {
             "reads": 6,
             "bytes": 65823,
             "dataReads": 6,
             "indexReads": 0,
+            "countable": true,
             "records": 14555,
+            "checksum": "797753553",
             "pattern": [
               2000,
               32,
@@ -2159,15 +2336,17 @@
         {
           "tag": "v11.2.1",
           "major": 11,
-          "ms": null,
+          "ms": 3.5901,
           "records": 14555,
-          "checksum": "",
+          "checksum": "797753553",
           "counts": {
             "reads": 6,
             "bytes": 65823,
             "dataReads": 6,
             "indexReads": 0,
+            "countable": true,
             "records": 14555,
+            "checksum": "797753553",
             "pattern": [
               2000,
               32,
@@ -2189,15 +2368,17 @@
         {
           "tag": "v1.0.35",
           "major": 1,
-          "ms": null,
+          "ms": 3.7714,
           "records": 17676,
-          "checksum": "",
+          "checksum": "463718310",
           "counts": {
             "reads": 5,
             "bytes": 75387,
             "dataReads": 5,
             "indexReads": 0,
+            "countable": true,
             "records": 17676,
+            "checksum": "463718310",
             "pattern": [
               2000,
               56,
@@ -2210,15 +2391,17 @@
         {
           "tag": "v2.0.5",
           "major": 2,
-          "ms": null,
+          "ms": 3.5422,
           "records": 17676,
-          "checksum": "",
+          "checksum": "463718310",
           "counts": {
             "reads": 5,
             "bytes": 75387,
             "dataReads": 5,
             "indexReads": 0,
+            "countable": true,
             "records": 17676,
+            "checksum": "463718310",
             "pattern": [
               2000,
               56,
@@ -2231,15 +2414,17 @@
         {
           "tag": "v3.0.1",
           "major": 3,
-          "ms": null,
+          "ms": 3.6897,
           "records": 17676,
-          "checksum": "",
+          "checksum": "463718310",
           "counts": {
             "reads": 5,
             "bytes": 75387,
             "dataReads": 5,
             "indexReads": 0,
+            "countable": true,
             "records": 17676,
+            "checksum": "463718310",
             "pattern": [
               2000,
               56,
@@ -2252,15 +2437,17 @@
         {
           "tag": "v4.0.6",
           "major": 4,
-          "ms": null,
+          "ms": 3.6474,
           "records": 17676,
-          "checksum": "",
+          "checksum": "463718310",
           "counts": {
             "reads": 5,
             "bytes": 75387,
             "dataReads": 5,
             "indexReads": 0,
+            "countable": true,
             "records": 17676,
+            "checksum": "463718310",
             "pattern": [
               2000,
               56,
@@ -2273,15 +2460,17 @@
         {
           "tag": "v5.0.2",
           "major": 5,
-          "ms": null,
+          "ms": 3.4299,
           "records": 17676,
-          "checksum": "",
+          "checksum": "463718310",
           "counts": {
             "reads": 5,
             "bytes": 75387,
             "dataReads": 5,
             "indexReads": 0,
+            "countable": true,
             "records": 17676,
+            "checksum": "463718310",
             "pattern": [
               2000,
               56,
@@ -2294,15 +2483,17 @@
         {
           "tag": "v6.0.3",
           "major": 6,
-          "ms": null,
+          "ms": 3.7556,
           "records": 17676,
-          "checksum": "",
+          "checksum": "463718310",
           "counts": {
             "reads": 5,
             "bytes": 75387,
             "dataReads": 5,
             "indexReads": 0,
+            "countable": true,
             "records": 17676,
+            "checksum": "463718310",
             "pattern": [
               2000,
               56,
@@ -2315,15 +2506,17 @@
         {
           "tag": "v7.1.0",
           "major": 7,
-          "ms": null,
+          "ms": 4.2217,
           "records": 17676,
-          "checksum": "",
+          "checksum": "463718310",
           "counts": {
             "reads": 7,
             "bytes": 75385,
             "dataReads": 7,
             "indexReads": 0,
+            "countable": true,
             "records": 17676,
+            "checksum": "463718310",
             "pattern": [
               2000,
               32,
@@ -2338,15 +2531,17 @@
         {
           "tag": "v8.1.2",
           "major": 8,
-          "ms": null,
+          "ms": 2.7615,
           "records": 17676,
-          "checksum": "",
+          "checksum": "463718310",
           "counts": {
             "reads": 7,
             "bytes": 75385,
             "dataReads": 7,
             "indexReads": 0,
+            "countable": true,
             "records": 17676,
+            "checksum": "463718310",
             "pattern": [
               2000,
               32,
@@ -2361,15 +2556,17 @@
         {
           "tag": "v9.3.3",
           "major": 9,
-          "ms": null,
+          "ms": 4.0587,
           "records": 17675,
-          "checksum": "",
+          "checksum": "457524341",
           "counts": {
             "reads": 7,
             "bytes": 75385,
             "dataReads": 7,
             "indexReads": 0,
+            "countable": true,
             "records": 17675,
+            "checksum": "457524341",
             "pattern": [
               2000,
               32,
@@ -2384,15 +2581,17 @@
         {
           "tag": "v10.0.2",
           "major": 10,
-          "ms": null,
+          "ms": 3.6038,
           "records": 17675,
-          "checksum": "",
+          "checksum": "457524341",
           "counts": {
             "reads": 6,
             "bytes": 75385,
             "dataReads": 6,
             "indexReads": 0,
+            "countable": true,
             "records": 17675,
+            "checksum": "457524341",
             "pattern": [
               2000,
               32,
@@ -2406,15 +2605,17 @@
         {
           "tag": "v11.2.1",
           "major": 11,
-          "ms": null,
+          "ms": 4.4955,
           "records": 17675,
-          "checksum": "",
+          "checksum": "457524341",
           "counts": {
             "reads": 6,
             "bytes": 75385,
             "dataReads": 6,
             "indexReads": 0,
+            "countable": true,
             "records": 17675,
+            "checksum": "457524341",
             "pattern": [
               2000,
               32,
@@ -2436,6 +2637,513 @@
         "v7.1.0",
         "v8.1.2"
       ]
+    },
+    {
+      "library": "vcf-js",
+      "package": "@gmod/vcf",
+      "case": "1000 samples gtonly",
+      "points": [
+        {
+          "tag": "v5.0.10",
+          "major": 5,
+          "ms": 1.2162,
+          "records": 317,
+          "checksum": "624362",
+          "counts": {
+            "reads": null,
+            "bytes": null,
+            "dataReads": null,
+            "indexReads": null,
+            "countable": false,
+            "records": 317,
+            "checksum": "624362",
+            "pattern": []
+          }
+        },
+        {
+          "tag": "v6.1.2",
+          "major": 6,
+          "ms": 0.6843,
+          "records": 317,
+          "checksum": "624362",
+          "counts": {
+            "reads": null,
+            "bytes": null,
+            "dataReads": null,
+            "indexReads": null,
+            "countable": false,
+            "records": 317,
+            "checksum": "624362",
+            "pattern": []
+          }
+        },
+        {
+          "tag": "v7.2.0",
+          "major": 7,
+          "ms": 0.6534,
+          "records": 317,
+          "checksum": "624362",
+          "counts": {
+            "reads": null,
+            "bytes": null,
+            "dataReads": null,
+            "indexReads": null,
+            "countable": false,
+            "records": 317,
+            "checksum": "624362",
+            "pattern": []
+          }
+        }
+      ],
+      "disagree": []
+    },
+    {
+      "library": "vcf-js",
+      "package": "@gmod/vcf",
+      "case": "1000 samples wide",
+      "points": [
+        {
+          "tag": "v5.0.10",
+          "major": 5,
+          "ms": 1.4758,
+          "records": 317,
+          "checksum": "624564",
+          "counts": {
+            "reads": null,
+            "bytes": null,
+            "dataReads": null,
+            "indexReads": null,
+            "countable": false,
+            "records": 317,
+            "checksum": "624564",
+            "pattern": []
+          }
+        },
+        {
+          "tag": "v6.1.2",
+          "major": 6,
+          "ms": 0.8322,
+          "records": 317,
+          "checksum": "624564",
+          "counts": {
+            "reads": null,
+            "bytes": null,
+            "dataReads": null,
+            "indexReads": null,
+            "countable": false,
+            "records": 317,
+            "checksum": "624564",
+            "pattern": []
+          }
+        },
+        {
+          "tag": "v7.2.0",
+          "major": 7,
+          "ms": 0.6995,
+          "records": 317,
+          "checksum": "624564",
+          "counts": {
+            "reads": null,
+            "bytes": null,
+            "dataReads": null,
+            "indexReads": null,
+            "countable": false,
+            "records": 317,
+            "checksum": "624564",
+            "pattern": []
+          }
+        }
+      ],
+      "disagree": []
+    },
+    {
+      "library": "vcf-js",
+      "package": "@gmod/vcf",
+      "case": "3000 samples wide",
+      "points": [
+        {
+          "tag": "v5.0.10",
+          "major": 5,
+          "ms": 1.4497,
+          "records": 317,
+          "checksum": "1873884",
+          "counts": {
+            "reads": null,
+            "bytes": null,
+            "dataReads": null,
+            "indexReads": null,
+            "countable": false,
+            "records": 317,
+            "checksum": "1873884",
+            "pattern": []
+          }
+        },
+        {
+          "tag": "v6.1.2",
+          "major": 6,
+          "ms": 0.8207,
+          "records": 317,
+          "checksum": "1873884",
+          "counts": {
+            "reads": null,
+            "bytes": null,
+            "dataReads": null,
+            "indexReads": null,
+            "countable": false,
+            "records": 317,
+            "checksum": "1873884",
+            "pattern": []
+          }
+        },
+        {
+          "tag": "v7.2.0",
+          "major": 7,
+          "ms": 0.7913,
+          "records": 317,
+          "checksum": "1873884",
+          "counts": {
+            "reads": null,
+            "bytes": null,
+            "dataReads": null,
+            "indexReads": null,
+            "countable": false,
+            "records": 317,
+            "checksum": "1873884",
+            "pattern": []
+          }
+        }
+      ],
+      "disagree": []
+    },
+    {
+      "library": "bgzf-filehandle",
+      "package": "@gmod/bgzf-filehandle",
+      "case": "20x shortread",
+      "points": [
+        {
+          "tag": "v1.5.5",
+          "major": 1,
+          "ms": 97.9358,
+          "records": 15353393,
+          "checksum": "98667193",
+          "counts": {
+            "reads": null,
+            "bytes": null,
+            "dataReads": null,
+            "indexReads": null,
+            "countable": false,
+            "records": 15353393,
+            "checksum": "98667193",
+            "pattern": []
+          }
+        },
+        {
+          "tag": "v2.0.4",
+          "major": 2,
+          "ms": 94.6404,
+          "records": 15353393,
+          "checksum": "98667193",
+          "counts": {
+            "reads": null,
+            "bytes": null,
+            "dataReads": null,
+            "indexReads": null,
+            "countable": false,
+            "records": 15353393,
+            "checksum": "98667193",
+            "pattern": []
+          }
+        },
+        {
+          "tag": "v3.0.5",
+          "major": 3,
+          "ms": 98.7371,
+          "records": 15353393,
+          "checksum": "98667193",
+          "counts": {
+            "reads": null,
+            "bytes": null,
+            "dataReads": null,
+            "indexReads": null,
+            "countable": false,
+            "records": 15353393,
+            "checksum": "98667193",
+            "pattern": []
+          }
+        },
+        {
+          "tag": "v4.2.1",
+          "major": 4,
+          "ms": 97.9312,
+          "records": 15353393,
+          "checksum": "98667193",
+          "counts": {
+            "reads": null,
+            "bytes": null,
+            "dataReads": null,
+            "indexReads": null,
+            "countable": false,
+            "records": 15353393,
+            "checksum": "98667193",
+            "pattern": []
+          }
+        },
+        {
+          "tag": "v5.0.2",
+          "major": 5,
+          "ms": 98.7415,
+          "records": 15353393,
+          "checksum": "98667193",
+          "counts": {
+            "reads": null,
+            "bytes": null,
+            "dataReads": null,
+            "indexReads": null,
+            "countable": false,
+            "records": 15353393,
+            "checksum": "98667193",
+            "pattern": []
+          }
+        },
+        {
+          "tag": "v6.6.0",
+          "major": 6,
+          "ms": 19.4006,
+          "records": 15353393,
+          "checksum": "98667193",
+          "counts": {
+            "reads": null,
+            "bytes": null,
+            "dataReads": null,
+            "indexReads": null,
+            "countable": false,
+            "records": 15353393,
+            "checksum": "98667193",
+            "pattern": []
+          }
+        }
+      ],
+      "disagree": []
+    },
+    {
+      "library": "bgzf-filehandle",
+      "package": "@gmod/bgzf-filehandle",
+      "case": "20x longread",
+      "points": [
+        {
+          "tag": "v1.5.5",
+          "major": 1,
+          "ms": 116.6403,
+          "records": 12242345,
+          "checksum": "663722506",
+          "counts": {
+            "reads": null,
+            "bytes": null,
+            "dataReads": null,
+            "indexReads": null,
+            "countable": false,
+            "records": 12242345,
+            "checksum": "663722506",
+            "pattern": []
+          }
+        },
+        {
+          "tag": "v2.0.4",
+          "major": 2,
+          "ms": 113.4188,
+          "records": 12242345,
+          "checksum": "663722506",
+          "counts": {
+            "reads": null,
+            "bytes": null,
+            "dataReads": null,
+            "indexReads": null,
+            "countable": false,
+            "records": 12242345,
+            "checksum": "663722506",
+            "pattern": []
+          }
+        },
+        {
+          "tag": "v3.0.5",
+          "major": 3,
+          "ms": 117.328,
+          "records": 12242345,
+          "checksum": "663722506",
+          "counts": {
+            "reads": null,
+            "bytes": null,
+            "dataReads": null,
+            "indexReads": null,
+            "countable": false,
+            "records": 12242345,
+            "checksum": "663722506",
+            "pattern": []
+          }
+        },
+        {
+          "tag": "v4.2.1",
+          "major": 4,
+          "ms": 118.0897,
+          "records": 12242345,
+          "checksum": "663722506",
+          "counts": {
+            "reads": null,
+            "bytes": null,
+            "dataReads": null,
+            "indexReads": null,
+            "countable": false,
+            "records": 12242345,
+            "checksum": "663722506",
+            "pattern": []
+          }
+        },
+        {
+          "tag": "v5.0.2",
+          "major": 5,
+          "ms": 113.3527,
+          "records": 12242345,
+          "checksum": "663722506",
+          "counts": {
+            "reads": null,
+            "bytes": null,
+            "dataReads": null,
+            "indexReads": null,
+            "countable": false,
+            "records": 12242345,
+            "checksum": "663722506",
+            "pattern": []
+          }
+        },
+        {
+          "tag": "v6.6.0",
+          "major": 6,
+          "ms": 35.7855,
+          "records": 12242345,
+          "checksum": "663722506",
+          "counts": {
+            "reads": null,
+            "bytes": null,
+            "dataReads": null,
+            "indexReads": null,
+            "countable": false,
+            "records": 12242345,
+            "checksum": "663722506",
+            "pattern": []
+          }
+        }
+      ],
+      "disagree": []
+    },
+    {
+      "library": "bgzf-filehandle",
+      "package": "@gmod/bgzf-filehandle",
+      "case": "200x shortread",
+      "points": [
+        {
+          "tag": "v1.5.5",
+          "major": 1,
+          "ms": 1000.5765,
+          "records": 153909361,
+          "checksum": "624191214",
+          "counts": {
+            "reads": null,
+            "bytes": null,
+            "dataReads": null,
+            "indexReads": null,
+            "countable": false,
+            "records": 153909361,
+            "checksum": "624191214",
+            "pattern": []
+          }
+        },
+        {
+          "tag": "v2.0.4",
+          "major": 2,
+          "ms": 984.2742,
+          "records": 153909361,
+          "checksum": "624191214",
+          "counts": {
+            "reads": null,
+            "bytes": null,
+            "dataReads": null,
+            "indexReads": null,
+            "countable": false,
+            "records": 153909361,
+            "checksum": "624191214",
+            "pattern": []
+          }
+        },
+        {
+          "tag": "v3.0.5",
+          "major": 3,
+          "ms": 918.0807,
+          "records": 153909361,
+          "checksum": "624191214",
+          "counts": {
+            "reads": null,
+            "bytes": null,
+            "dataReads": null,
+            "indexReads": null,
+            "countable": false,
+            "records": 153909361,
+            "checksum": "624191214",
+            "pattern": []
+          }
+        },
+        {
+          "tag": "v4.2.1",
+          "major": 4,
+          "ms": 924.7209,
+          "records": 153909361,
+          "checksum": "624191214",
+          "counts": {
+            "reads": null,
+            "bytes": null,
+            "dataReads": null,
+            "indexReads": null,
+            "countable": false,
+            "records": 153909361,
+            "checksum": "624191214",
+            "pattern": []
+          }
+        },
+        {
+          "tag": "v5.0.2",
+          "major": 5,
+          "ms": 907.854,
+          "records": 153909361,
+          "checksum": "624191214",
+          "counts": {
+            "reads": null,
+            "bytes": null,
+            "dataReads": null,
+            "indexReads": null,
+            "countable": false,
+            "records": 153909361,
+            "checksum": "624191214",
+            "pattern": []
+          }
+        },
+        {
+          "tag": "v6.6.0",
+          "major": 6,
+          "ms": 180.6849,
+          "records": 153909361,
+          "checksum": "624191214",
+          "counts": {
+            "reads": null,
+            "bytes": null,
+            "dataReads": null,
+            "indexReads": null,
+            "countable": false,
+            "records": 153909361,
+            "checksum": "624191214",
+            "pattern": []
+          }
+        }
+      ],
+      "disagree": []
     }
   ]
 }

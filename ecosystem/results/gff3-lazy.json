@@ -8,9 +8,9 @@
       "genes": 200,
       "shape": "sparse",
       "mode": "parse",
-      "eager": 6.0393,
-      "lazy": 5.1026,
-      "ratio": 1.1835730803903892,
+      "eager": 4.4294,
+      "lazy": 3.4995,
+      "ratio": 1.2657236748106873,
       "identical": true
     },
     {
@@ -18,9 +18,9 @@
       "genes": 200,
       "shape": "sparse",
       "mode": "reads",
-      "eager": 6.288,
-      "lazy": 6.4241,
-      "ratio": 0.9788141529552778,
+      "eager": 4.8128,
+      "lazy": 4.9236,
+      "ratio": 0.977496141035015,
       "identical": true
     },
     {
@@ -28,9 +28,9 @@
       "genes": 1000,
       "shape": "sparse",
       "mode": "parse",
-      "eager": 43.0333,
-      "lazy": 28.6848,
-      "ratio": 1.5002126561802767,
+      "eager": 25.3451,
+      "lazy": 23.23,
+      "ratio": 1.0910503659061557,
       "identical": true
     },
     {
@@ -38,9 +38,9 @@
       "genes": 1000,
       "shape": "sparse",
       "mode": "reads",
-      "eager": 32.5695,
-      "lazy": 29.9895,
-      "ratio": 1.0860301105386885,
+      "eager": 27.7612,
+      "lazy": 25.4636,
+      "ratio": 1.0902307607722395,
       "identical": true
     },
     {
@@ -48,9 +48,9 @@
       "genes": 5000,
       "shape": "sparse",
       "mode": "parse",
-      "eager": 166.0845,
-      "lazy": 130.0232,
-      "ratio": 1.2773451199478245,
+      "eager": 139.5758,
+      "lazy": 98.3931,
+      "ratio": 1.418552723717415,
       "identical": true
     },
     {
@@ -58,9 +58,9 @@
       "genes": 5000,
       "shape": "sparse",
       "mode": "reads",
-      "eager": 179.0224,
-      "lazy": 153.8463,
-      "ratio": 1.1636444945377302,
+      "eager": 144.7596,
+      "lazy": 126.625,
+      "ratio": 1.1432150049358343,
       "identical": true
     },
     {
@@ -68,9 +68,9 @@
       "genes": 200,
       "shape": "rich",
       "mode": "parse",
-      "eager": 20.2195,
-      "lazy": 9.6956,
-      "ratio": 2.0854305045587687,
+      "eager": 16.9438,
+      "lazy": 8.6396,
+      "ratio": 1.9611787582758462,
       "identical": true
     },
     {
@@ -78,9 +78,9 @@
       "genes": 200,
       "shape": "rich",
       "mode": "reads",
-      "eager": 21.0951,
-      "lazy": 18.5809,
-      "ratio": 1.1353109913943888,
+      "eager": 16.7619,
+      "lazy": 15.4453,
+      "ratio": 1.0852427599334427,
       "identical": true
     },
     {
@@ -88,9 +88,9 @@
       "genes": 1000,
       "shape": "rich",
       "mode": "parse",
-      "eager": 107.0548,
-      "lazy": 56.299,
-      "ratio": 1.9015399918293399,
+      "eager": 84.7384,
+      "lazy": 45.5801,
+      "ratio": 1.8591095675525064,
       "identical": true
     },
     {
@@ -98,9 +98,9 @@
       "genes": 1000,
       "shape": "rich",
       "mode": "reads",
-      "eager": 98.7123,
-      "lazy": 94.7417,
-      "ratio": 1.0419097398505621,
+      "eager": 81.2739,
+      "lazy": 74.0793,
+      "ratio": 1.0971202481664917,
       "identical": true
     },
     {
@@ -108,9 +108,9 @@
       "genes": 5000,
       "shape": "rich",
       "mode": "parse",
-      "eager": 572.3278,
-      "lazy": 260.6898,
-      "ratio": 2.1954361083556013,
+      "eager": 457.7476,
+      "lazy": 219.7897,
+      "ratio": 2.0826617443856557,
       "identical": true
     },
     {
@@ -118,9 +118,9 @@
       "genes": 5000,
       "shape": "rich",
       "mode": "reads",
-      "eager": 494.8923,
-      "lazy": 428.6015,
-      "ratio": 1.1546676808177292,
+      "eager": 458.262,
+      "lazy": 407.4913,
+      "ratio": 1.1245933348761066,
       "identical": true
     }
   ]

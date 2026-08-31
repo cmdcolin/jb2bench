@@ -69,18 +69,18 @@ without the other.
 
 | case | JBrowse (current) | JBrowse (release-4.3.0) | JBrowse (release-2.4.0) | igv.js 3.8.5 | igv.js 3.8.5 (depth 10000) | ratio | load | date |
 | --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | --- |
-| 20x-shortread-bam | 506 ms | 1112 ms | 1150 ms | 50 ms | 46 ms | 0.10x | 2.2 | 2026-08-24 |
-| 20x-shortread-cram | 504 ms | 1110 ms | 1160 ms | 39 ms | 41 ms | 0.08x | 2.3 | 2026-08-24 |
-| 200x-shortread-bam | 507 ms | 1143 ms | 1163 ms | 119 ms | 118 ms | 0.23x | 2.3 | 2026-08-24 |
-| 200x-shortread-cram | 506 ms | 1126 ms | 1169 ms | 123 ms | 126 ms | 0.24x | 1.9 | 2026-08-24 |
-| 1000x-shortread-bam | 504 ms | 1800 ms | 2058 ms | 116 ms | 129 ms | 0.23x | 1.9 | 2026-08-24 |
-| 1000x-shortread-cram | 506 ms | 1224 ms | 1912 ms | 89 ms | 117 ms | 0.18x | 1.8 | 2026-08-24 |
-| 20x-longread-bam | 510 ms | 1212 ms | 1254 ms | 274 ms | 273 ms | 0.54x | 1.8 | 2026-08-24 |
-| 20x-longread-cram | 510 ms | 1148 ms | 1170 ms | 225 ms | 244 ms | 0.44x | 1.3 | 2026-08-24 |
-| 200x-longread-bam | 517 ms | 3374 ms | 3760 ms | 1300 ms | 1344 ms | 2.51x | 1.2 | 2026-08-24 |
-| 200x-longread-cram | 516 ms | 1272 ms | 1956 ms | 1393 ms | 1337 ms | 2.70x | 1.3 | 2026-08-24 |
-| 1000x-longread-bam | 532 ms | 9728 ms | 8007 ms | 1200 ms | 1316 ms | 2.25x | 1.3 | 2026-08-24 |
-| 1000x-longread-cram | 531 ms | 3319 ms | 4510 ms | 1288 ms | 1368 ms | 2.43x | 1.4 | 2026-08-24 |
+| 20x-shortread-bam | 507 ms | 1114 ms | 1125 ms | 36 ms | 42 ms | 0.07x | 1.6 | 2026-08-29 |
+| 20x-shortread-cram | 507 ms | 1108 ms | 1142 ms | 44 ms | 40 ms | 0.09x | 1.3 | 2026-08-29 |
+| 200x-shortread-bam | 507 ms | 1204 ms | 1154 ms | 85 ms | 82 ms | 0.17x | 0.7 | 2026-08-29 |
+| 200x-shortread-cram | 507 ms | 1134 ms | 1153 ms | 85 ms | 87 ms | 0.17x | 0.9 | 2026-08-29 |
+| 1000x-shortread-bam | 508 ms | 1730 ms | 1990 ms | 84 ms | 89 ms | 0.17x | 1.5 | 2026-08-29 |
+| 1000x-shortread-cram | 507 ms | 1254 ms | 1843 ms | 83 ms | 87 ms | 0.16x | 1.5 | 2026-08-29 |
+| 20x-longread-bam | 511 ms | 1209 ms | 1246 ms | 239 ms | 240 ms | 0.47x | 0.8 | 2026-08-29 |
+| 20x-longread-cram | 510 ms | 1151 ms | 1157 ms | 228 ms | 225 ms | 0.45x | 0.6 | 2026-08-29 |
+| 200x-longread-bam | 515 ms | 3281 ms | 3648 ms | 1348 ms | 1316 ms | 2.62x | 0.8 | 2026-08-29 |
+| 200x-longread-cram | 515 ms | 1273 ms | 1980 ms | 1286 ms | 1342 ms | 2.50x | 1.2 | 2026-08-29 |
+| 1000x-longread-bam | 530 ms | 7699 ms | 8298 ms | 1228 ms | 1257 ms | 2.32x | 1.2 | 2026-08-29 |
+| 1000x-longread-cram | 531 ms | 3095 ms | 4602 ms | 1267 ms | 1303 ms | 2.39x | 1.3 | 2026-08-29 |
 
 `ratio` is igv ÷ JBrowse: above 1.0 means JBrowse got content back sooner.
 
@@ -109,18 +109,18 @@ the count distinguishes them.
 
 | case | JBrowse (current) | JBrowse (release-4.3.0) | JBrowse (release-2.4.0) | igv.js 3.8.5 | igv.js 3.8.5 (depth 10000) |
 | --- | ---: | ---: | ---: | ---: | ---: |
-| 20x-shortread-bam | 0.5 ms | 23 ms ‡ | 50 ms ‡ | 47 ms | 42 ms |
-| 20x-shortread-cram | 0.4 ms | 17 ms ‡ | 65 ms ‡ | 37 ms | 38 ms |
-| 200x-shortread-bam | 0.5 ms | 52 ms ‡ | 17 ms ‡ | 115 ms | 114 ms |
-| 200x-shortread-cram | 0.5 ms | 61 ms ‡ | 24 ms ‡ | 119 ms | 122 ms |
-| 1000x-shortread-bam | 0.2 ms | 0.1 ms ‡ | 0.0 ms ‡ | 112 ms | 125 ms |
-| 1000x-shortread-cram | 0.6 ms | 49 ms ‡ | 0.1 ms ‡ | 85 ms | 115 ms |
-| 20x-longread-bam | 0.5 ms | 97 ms ‡ | 53 ms ‡ | 270 ms | 268 ms |
-| 20x-longread-cram | 0.5 ms | 43 ms ‡ | 116 ms ‡ | 221 ms | 239 ms |
-| 200x-longread-bam | 0.6 ms | 0.1 ms ‡ | 0.0 ms ‡ | 1296 ms | 1341 ms |
-| 200x-longread-cram | 0.6 ms | 148 ms ‡ | 0.0 ms ‡ | 1390 ms | 1333 ms |
-| 1000x-longread-bam | 0.6 ms | 0.1 ms ‡ | 0.1 ms ‡ | 1196 ms | 1312 ms |
-| 1000x-longread-cram | 0.5 ms | 0.1 ms ‡ | 0.0 ms ‡ | 1284 ms | 1364 ms |
+| 20x-shortread-bam | 0.6 ms | 22 ms ‡ | 50 ms ‡ | 32 ms | 38 ms |
+| 20x-shortread-cram | 0.5 ms | 19 ms ‡ | 50 ms ‡ | 40 ms | 36 ms |
+| 200x-shortread-bam | 0.6 ms | 96 ms ‡ | 12 ms ‡ | 81 ms | 78 ms |
+| 200x-shortread-cram | 0.5 ms | 57 ms ‡ | 101 ms ‡ | 81 ms | 83 ms |
+| 1000x-shortread-bam | 0.6 ms | 0.1 ms ‡ | 0.0 ms ‡ | 80 ms | 85 ms |
+| 1000x-shortread-cram | 0.5 ms | 55 ms ‡ | 0.0 ms ‡ | 79 ms | 83 ms |
+| 20x-longread-bam | 0.6 ms | 93 ms ‡ | 59 ms ‡ | 235 ms | 236 ms |
+| 20x-longread-cram | 0.6 ms | 42 ms ‡ | 115 ms ‡ | 223 ms | 221 ms |
+| 200x-longread-bam | 0.6 ms | 0.1 ms ‡ | 0.0 ms ‡ | 1344 ms | 1313 ms |
+| 200x-longread-cram | 0.6 ms | 137 ms ‡ | 0.0 ms ‡ | 1282 ms | 1340 ms |
+| 1000x-longread-bam | 0.6 ms | 0.2 ms ‡ | 0.0 ms ‡ | 1224 ms | 1255 ms |
+| 1000x-longread-cram | 0.6 ms | 0.0 ms ‡ | 0.0 ms ‡ | 1264 ms | 1299 ms |
 
 Between the two arms this column can compare, it points opposite ways. The
 current renderer draws in a fraction of a millisecond, because the pileup is
@@ -182,14 +182,14 @@ been removed for exactly this reason.
 | 200x-shortread-cram | igv | 5 | 5 | 0 | — | 9645–152891 |
 | 200x-shortread-cram | igv-deep | 5 | 5 | 0 | — | 9645–152891 |
 | 1000x-shortread-bam | jbrowse | 5 | 5 | 0 | — | 20–20 |
-| 1000x-shortread-bam | jbrowse-release-4.3.0 | 5 | 5 | 0 | — | 10–12 |
+| 1000x-shortread-bam | jbrowse-release-4.3.0 | 5 | 5 | 0 | — | 12–12 |
 | 1000x-shortread-bam | jbrowse-release-2.4.0 | 5 | 5 | 0 | — | 6–12 |
-| 1000x-shortread-bam | igv | 5 | 5 | 0 | — | 9631–151728 |
+| 1000x-shortread-bam | igv | 5 | 5 | 0 | — | 9607–151698 |
 | 1000x-shortread-bam | igv-deep | 5 | 5 | 0 | — | 9718–153157 |
 | 1000x-shortread-cram | jbrowse | 5 | 5 | 0 | — | 20–20 |
 | 1000x-shortread-cram | jbrowse-release-4.3.0 | 5 | 5 | 0 | — | 12–18 |
-| 1000x-shortread-cram | jbrowse-release-2.4.0 | 5 | 5 | 0 | — | 6–9 |
-| 1000x-shortread-cram | igv | 5 | 5 | 0 | — | 9580–151729 |
+| 1000x-shortread-cram | jbrowse-release-2.4.0 | 5 | 5 | 0 | — | 6–12 |
+| 1000x-shortread-cram | igv | 5 | 5 | 0 | — | 9601–151755 |
 | 1000x-shortread-cram | igv-deep | 5 | 5 | 0 | — | 9696–153166 |
 | 20x-longread-bam | jbrowse | 5 | 5 | 0 | — | 20–23 |
 | 20x-longread-bam | jbrowse-release-4.3.0 | 5 | 5 | 0 | — | 12–18 |
@@ -214,12 +214,12 @@ been removed for exactly this reason.
 | 1000x-longread-bam | jbrowse | 5 | 5 | 0 | — | 18–24 |
 | 1000x-longread-bam | jbrowse-release-4.3.0 | 5 | 5 | 0 | — | 2–4 |
 | 1000x-longread-bam | jbrowse-release-2.4.0 | 5 | 5 | 0 | — | 1–4 |
-| 1000x-longread-bam | igv | 5 | 5 | 0 | — | 230438–885140 |
+| 1000x-longread-bam | igv | 5 | 5 | 0 | — | 232702–889083 |
 | 1000x-longread-bam | igv-deep | 5 | 5 | 0 | — | 238070–903054 |
 | 1000x-longread-cram | jbrowse | 5 | 5 | 0 | — | 18–24 |
 | 1000x-longread-cram | jbrowse-release-4.3.0 | 5 | 5 | 0 | — | 8–12 |
-| 1000x-longread-cram | jbrowse-release-2.4.0 | 5 | 5 | 0 | — | 6–9 |
-| 1000x-longread-cram | igv | 5 | 5 | 0 | — | 233829–891901 |
+| 1000x-longread-cram | jbrowse-release-2.4.0 | 5 | 5 | 0 | — | 4–9 |
+| 1000x-longread-cram | igv | 5 | 5 | 0 | — | 235405–899783 |
 | 1000x-longread-cram | igv-deep | 5 | 5 | 0 | — | 239407–907018 |
 
 `steps` is how many of the 5 attempted zoom steps applied. The loop stops before the window falls under 200 bp, because below roughly a hundred bases both tools switch to drawing base letters, which is a different workload from a pileup.

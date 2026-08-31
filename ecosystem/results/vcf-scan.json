@@ -6,54 +6,54 @@
       "case": "100 samples gtonly",
       "samples": 100,
       "shape": "gtonly",
-      "old": 1.342,
-      "new": 1.3114,
-      "ratio": 1.0233338416958977,
+      "old": 1.2436,
+      "new": 1.1626,
+      "ratio": 1.0696714261138827,
       "identical": true
     },
     {
       "case": "1000 samples gtonly",
       "samples": 1000,
       "shape": "gtonly",
-      "old": 7.3791,
-      "new": 6.8498,
-      "ratio": 1.0772723291190984,
+      "old": 6.6448,
+      "new": 5.9433,
+      "ratio": 1.1180320697255735,
       "identical": true
     },
     {
       "case": "3000 samples gtonly",
       "samples": 3000,
       "shape": "gtonly",
-      "old": 19.7304,
-      "new": 18.1525,
-      "ratio": 1.0869246660239635,
+      "old": 19.0499,
+      "new": 16.721,
+      "ratio": 1.1392799473715687,
       "identical": true
     },
     {
       "case": "100 samples wide",
       "samples": 100,
       "shape": "wide",
-      "old": 3.4799,
-      "new": 1.6073,
-      "ratio": 2.1650594164126176,
+      "old": 3.4326,
+      "new": 1.569,
+      "ratio": 2.1877629063097515,
       "identical": true
     },
     {
       "case": "1000 samples wide",
       "samples": 1000,
       "shape": "wide",
-      "old": 29.292,
-      "new": 9.7559,
-      "ratio": 3.002490800438709,
+      "old": 28.5503,
+      "new": 9.5038,
+      "ratio": 3.0040930996022643,
       "identical": true
     },
     {
       "case": "3000 samples wide",
       "samples": 3000,
       "shape": "wide",
-      "old": 86.1978,
-      "new": 29.888,
-      "ratio": 2.884027034261242,
+      "old": 79.5363,
+      "new": 26.8002,
+      "ratio": 2.9677502406698455,
       "identical": true
     }
   ]

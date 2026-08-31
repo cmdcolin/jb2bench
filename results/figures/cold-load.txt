@@ -14,8 +14,8 @@ The instrument belongs to neither tool: igv.js hides its spinner before it draws
 
 ## caveats
 
-Measured 2026-08-24, 2026-08-25 on one workstation.  Worst cell saw 0.17 cores of foreign CPU — work by processes outside this benchmark — against a
-0.5 ceiling, so the absolute seconds stand. Peak 1-min load was 5.7, which counts this benchmark's own six renders and is context, not a verdict.
+Measured 2026-08-30, 2026-08-31 on one workstation.  Worst cell saw 0.22 cores of foreign CPU — work by processes outside this benchmark — against a
+0.5 ceiling, so the absolute seconds stand. Peak 1-min load was 2.9, which counts this benchmark's own six renders and is context, not a verdict.
 Arms are measured back to back within each case, so contention lands on all of them at once and the ratios between them survive it better than the
 values do.  igv.js parses alignments on the main thread where JBrowse decodes in a worker, and JBrowse boots an application shell where igv mounts a
 widget. Both are inside these numbers, and a cold load is where they weigh most — results/figures/interaction.png is the same four arms with startup

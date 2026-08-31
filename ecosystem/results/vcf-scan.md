@@ -7,12 +7,12 @@ to match or the timing means nothing.
 
 | case | v7.1.1 | v7.2.0 | speedup | ranges agree |
 | --- | --- | --- | --- | --- |
-| 100 samples gtonly | 1.34 ms | 1.31 ms | 1.02x | yes |
-| 1000 samples gtonly | 7.38 ms | 6.85 ms | 1.08x | yes |
-| 3000 samples gtonly | 19.73 ms | 18.15 ms | 1.09x | yes |
-| 100 samples wide | 3.48 ms | 1.61 ms | 2.17x | yes |
-| 1000 samples wide | 29.29 ms | 9.76 ms | 3.00x | yes |
-| 3000 samples wide | 86.20 ms | 29.89 ms | 2.88x | yes |
+| 100 samples gtonly | 1.24 ms | 1.16 ms | 1.07x | yes |
+| 1000 samples gtonly | 6.64 ms | 5.94 ms | 1.12x | yes |
+| 3000 samples gtonly | 19.05 ms | 16.72 ms | 1.14x | yes |
+| 100 samples wide | 3.43 ms | 1.57 ms | 2.19x | yes |
+| 1000 samples wide | 28.55 ms | 9.50 ms | 3.00x | yes |
+| 3000 samples wide | 79.54 ms | 26.80 ms | 2.97x | yes |
 
 The split between the two shapes is the change working as designed. `wide`
 (`FORMAT=GT:AD:DP:GQ:PL`) is where GT is followed by fields the scan has to

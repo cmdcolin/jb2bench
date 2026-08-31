@@ -4,133 +4,165 @@
   "rows": {
     "20x-shortread-bam@19kb": {
       "jbrowse": {
-        "median": 2101,
-        "mean": 2129,
-        "stddev": 42.45782220824175,
+        "median": 2158,
+        "mean": 2155,
+        "stddev": 12.832251036613439,
         "runs": [
-          2101,
-          2097,
-          2189
+          2158,
+          2138,
+          2169
         ],
         "load": {
-          "before": 1.14,
-          "after": 1.55,
-          "foreignCores": 0.13989637305699396,
-          "foreignTop": "claude 0.03, firefox 0.02, Isolated Web Co 0.02"
+          "before": 0.12,
+          "after": 1.08,
+          "foreignCores": 0.218492716909442,
+          "foreignTop": "firefox 0.05, Isolated Web Co 0.01, claude 0.01"
         }
       },
       "igv": {
-        "median": 1475,
-        "mean": 1533.6666666666667,
-        "stddev": 134.73513111121224,
+        "median": 1585,
+        "mean": 1582.3333333333333,
+        "stddev": 19.68643074697787,
         "runs": [
-          1475,
-          1406,
-          1720
+          1605,
+          1585,
+          1557
         ],
         "load": {
-          "before": 1.47,
-          "after": 1.55,
-          "foreignCores": 0.13982671048700243,
-          "foreignTop": "claude 0.03, firefox 0.02, Isolated Web Co 0.02"
+          "before": 0.31,
+          "after": 1.08,
+          "foreignCores": 0.2184109809789703,
+          "foreignTop": "firefox 0.05, Isolated Web Co 0.01, claude 0.01"
         }
       },
       "igv-deep": {
-        "median": 1437,
-        "mean": 1464.6666666666667,
-        "stddev": 40.549010126293126,
+        "median": 1401,
+        "mean": 1456,
+        "stddev": 84.9509662491644,
         "runs": [
-          1437,
-          1522,
-          1435
+          1576,
+          1391,
+          1401
         ],
         "load": {
-          "before": 1.51,
-          "after": 1.55,
-          "foreignCores": 0.13960250129445903,
-          "foreignTop": "claude 0.03, firefox 0.02, Isolated Web Co 0.02"
+          "before": 0.29,
+          "after": 1.08,
+          "foreignCores": 0.21838270201839124,
+          "foreignTop": "firefox 0.05, Isolated Web Co 0.01, claude 0.01"
         }
       },
       "jbrowse-release-4.3.0": {
-        "median": 2780,
-        "mean": 2782.3333333333335,
-        "stddev": 62.483775671947214,
+        "median": 2686,
+        "mean": 2680.6666666666665,
+        "stddev": 13.59738536958076,
         "runs": [
-          2780,
-          2860,
-          2707
+          2662,
+          2686,
+          2694
         ],
         "load": {
-          "before": 1.21,
-          "after": 1.55,
-          "foreignCores": 0.14007053338380815,
-          "foreignTop": "claude 0.03, firefox 0.02, Isolated Web Co 0.02"
+          "before": 0.27,
+          "after": 1.08,
+          "foreignCores": 0.21846441678060577,
+          "foreignTop": "firefox 0.05, Isolated Web Co 0.01, claude 0.01"
         }
       },
       "jbrowse-release-2.4.0": {
-        "median": 2567,
-        "mean": 2515.6666666666665,
-        "stddev": 82.6935440177903,
+        "median": 2477,
+        "mean": 2463,
+        "stddev": 27.94041278626117,
         "runs": [
-          2581,
-          2399,
-          2567
+          2488,
+          2424,
+          2477
         ],
         "load": {
-          "before": 1.51,
-          "after": 1.55,
-          "foreignCores": 0.1398462090123104,
-          "foreignTop": "claude 0.03, firefox 0.02, Isolated Web Co 0.02"
+          "before": 0.25,
+          "after": 1.08,
+          "foreignCores": 0.21843926726433444,
+          "foreignTop": "firefox 0.05, Isolated Web Co 0.01, claude 0.01"
+        }
+      },
+      "genomespy": {
+        "median": 1401,
+        "mean": 1399,
+        "stddev": 30.243456592570013,
+        "runs": [
+          1361,
+          1401,
+          1435
+        ],
+        "load": {
+          "before": 0.34,
+          "after": 1.08,
+          "foreignCores": 0.21835128953841848,
+          "foreignTop": "firefox 0.05, Isolated Web Co 0.01, claude 0.01"
+        }
+      },
+      "gosling": {
+        "median": 2500,
+        "mean": 2514.6666666666665,
+        "stddev": 34.266926069057064,
+        "runs": [
+          2562,
+          2482,
+          2500
+        ],
+        "load": {
+          "before": 0.31,
+          "after": 1.08,
+          "foreignCores": 0.2183230260319343,
+          "foreignTop": "firefox 0.05, Isolated Web Co 0.01, claude 0.01"
         }
       }
     },
     "200x-shortread-bam@19kb": {
       "jbrowse": {
-        "median": 2410,
-        "mean": 2415,
-        "stddev": 69.08448933491994,
+        "median": 2386,
+        "mean": 2388.6666666666665,
+        "stddev": 9.177266598624136,
         "runs": [
-          2410,
-          2502,
-          2333
+          2386,
+          2401,
+          2379
         ],
         "load": {
-          "before": 1.27,
-          "after": 1.48,
-          "foreignCores": 0.08945501595020718,
-          "foreignTop": "firefox 0.02"
+          "before": 1.82,
+          "after": 1.33,
+          "foreignCores": 0.039727748079339396,
+          "foreignTop": ""
         }
       },
       "igv": {
-        "median": 5192,
-        "mean": 5213,
-        "stddev": 114.86513831445988,
+        "median": 5252,
+        "mean": 5244.666666666667,
+        "stddev": 107.08667309966987,
         "runs": [
-          5192,
-          5084,
-          5363
+          5110,
+          5252,
+          5372
         ],
         "load": {
-          "before": 1.21,
-          "after": 1.48,
-          "foreignCores": 0.08964909737631292,
-          "foreignTop": "firefox 0.02"
+          "before": 1.57,
+          "after": 1.33,
+          "foreignCores": 0.0397607781282859,
+          "foreignTop": ""
         }
       },
       "igv-deep": {
-        "median": 5258,
-        "mean": 5212,
-        "stddev": 114.92606318846913,
+        "median": 5235,
+        "mean": 5225.666666666667,
+        "stddev": 71.34112107021838,
         "runs": [
-          5054,
-          5324,
-          5258
+          5134,
+          5308,
+          5235
         ],
         "load": {
-          "before": 1.17,
-          "after": 1.48,
-          "foreignCores": 0.08964010168130795,
-          "foreignTop": "firefox 0.02"
+          "before": 1.56,
+          "after": 1.33,
+          "foreignCores": 0.03975976195257295,
+          "foreignTop": ""
         }
       },
       "igv-h300": {
@@ -162,85 +194,117 @@
         }
       },
       "jbrowse-release-4.3.0": {
-        "median": 3209,
-        "mean": 3183.3333333333335,
-        "stddev": 39.160637833870325,
+        "median": 3284,
+        "mean": 3234.3333333333335,
+        "stddev": 119.9731451432176,
         "runs": [
-          3209,
-          3128,
-          3213
+          3350,
+          3069,
+          3284
         ],
         "load": {
-          "before": 1.27,
-          "after": 1.48,
-          "foreignCores": 0.08944503925767168,
-          "foreignTop": "firefox 0.02"
+          "before": 1.67,
+          "after": 1.33,
+          "foreignCores": 0.03976295582258918,
+          "foreignTop": ""
         }
       },
       "jbrowse-release-2.4.0": {
-        "median": 4288,
-        "mean": 4273.666666666667,
-        "stddev": 23.156472577277874,
+        "median": 4257,
+        "mean": 4257.333333333333,
+        "stddev": 2.8674417556808756,
         "runs": [
-          4288,
-          4292,
-          4241
+          4254,
+          4257,
+          4261
         ],
         "load": {
-          "before": 1.22,
-          "after": 1.48,
-          "foreignCores": 0.0896590947107811,
-          "foreignTop": "firefox 0.02"
+          "before": 1.62,
+          "after": 1.33,
+          "foreignCores": 0.0397619395355629,
+          "foreignTop": ""
+        }
+      },
+      "genomespy": {
+        "median": 2458,
+        "mean": 2456,
+        "stddev": 9.899494936611665,
+        "runs": [
+          2467,
+          2443,
+          2458
+        ],
+        "load": {
+          "before": 1.52,
+          "after": 1.33,
+          "foreignCores": 0.03975816520996242,
+          "foreignTop": ""
+        }
+      },
+      "gosling": {
+        "median": 52921,
+        "mean": 52873.333333333336,
+        "stddev": 174.3451238842722,
+        "runs": [
+          52640,
+          52921,
+          53059
+        ],
+        "load": {
+          "before": 1.55,
+          "after": 1.33,
+          "foreignCores": 0.03975729431350203,
+          "foreignTop": ""
         }
       }
     },
     "1000x-shortread-bam@19kb": {
       "jbrowse": {
-        "median": 3342,
-        "mean": 3356.6666666666665,
-        "stddev": 42.913349386357105,
+        "median": 3274,
+        "mean": 3331.3333333333335,
+        "stddev": 94.0968767931339,
         "runs": [
-          3342,
-          3313,
-          3415
+          3464,
+          3274,
+          3256
         ],
         "load": {
-          "before": 1.99,
-          "after": 1.4,
-          "foreignCores": 0.06357785857329024,
-          "foreignTop": "firefox 0.01"
+          "before": 1.39,
+          "after": 1.15,
+          "foreignCores": 0.03376131554757311,
+          "foreignTop": ""
         }
       },
       "igv": {
-        "median": 27252,
-        "mean": 27257.333333333332,
-        "stddev": 95.60450942409683,
+        "median": 26221,
+        "mean": 26393.333333333332,
+        "stddev": 416.2774181827413,
         "runs": [
-          27252,
-          27377,
-          27143
+          25992,
+          26221,
+          26967
         ],
         "load": {
-          "before": 1.79,
-          "after": 1.4,
-          "foreignCores": 0.06357068982946797,
-          "foreignTop": "firefox 0.01"
+          "before": 1.3,
+          "after": 1.15,
+          "foreignCores": 0.03378063554188815,
+          "foreignTop": ""
         }
       },
       "igv-deep": {
-        "median": 26604,
-        "mean": 27024.666666666668,
-        "stddev": 626.2828611915085,
+        "median": 26485,
+        "mean": 26263,
+        "stddev": 341.17835023146864,
         "runs": [
-          26604,
-          26560,
-          27910
+          26523,
+          25781,
+          26485
         ],
         "load": {
-          "before": 1.48,
-          "after": 1.4,
-          "foreignCores": 0.06356871252945229,
-          "foreignTop": "firefox 0.01"
+          "before": 1.6,
+          "after": 1.15,
+          "foreignCores": 0.033780134739321295,
+          "foreignTop": ""
         }
       },
       "igv-h300": {
@@ -272,790 +336,2330 @@
         }
       },
       "jbrowse-release-4.3.0": {
-        "median": 4965,
-        "mean": 4969,
-        "stddev": 23.03620339089466,
+        "median": 4998,
+        "mean": 4961.666666666667,
+        "stddev": 100.10771976004425,
         "runs": [
-          4999,
-          4965,
-          4943
+          4998,
+          4825,
+          5062
         ],
         "load": {
-          "before": 1.91,
-          "after": 1.4,
-          "foreignCores": 0.06353625532709191,
-          "foreignTop": "firefox 0.01"
+          "before": 1.36,
+          "after": 1.15,
+          "foreignCores": 0.03376060048967712,
+          "foreignTop": ""
         }
       },
       "jbrowse-release-2.4.0": {
-        "median": 11228,
-        "mean": 11019.666666666666,
-        "stddev": 351.2286371518637,
+        "median": 10593,
+        "mean": 10590,
+        "stddev": 190.66375289148868,
         "runs": [
-          11228,
-          10525,
-          11306
+          10593,
+          10355,
+          10822
         ],
         "load": {
-          "before": 1.91,
-          "after": 1.4,
-          "foreignCores": 0.06357291443902321,
-          "foreignTop": "firefox 0.01"
+          "before": 1.3,
+          "after": 1.15,
+          "foreignCores": 0.03375995696346782,
+          "foreignTop": ""
+        }
+      },
+      "genomespy": {
+        "median": 5623,
+        "mean": 5641.666666666667,
+        "stddev": 76.26853144573383,
+        "runs": [
+          5559,
+          5743,
+          5623
+        ],
+        "load": {
+          "before": 1.5,
+          "after": 1.15,
+          "foreignCores": 0.033779705491796666,
+          "foreignTop": ""
+        }
+      },
+      "gosling": {
+        "unsettled": 120000,
+        "median": null,
+        "mean": null,
+        "stddev": null,
+        "runs": [
+          null
+        ],
+        "load": {
+          "before": 1.5,
+          "after": 1.15,
+          "foreignCores": 0.033736848347254614,
+          "foreignTop": ""
         }
       }
     },
     "20x-longread-bam@19kb": {
       "jbrowse": {
-        "median": 2205,
-        "mean": 2246.6666666666665,
-        "stddev": 64.66494843078092,
+        "median": 2280,
+        "mean": 2247.3333333333335,
+        "stddev": 91.94684454739173,
         "runs": [
-          2197,
-          2205,
-          2338
+          2280,
+          2122,
+          2340
         ],
         "load": {
-          "before": 1.15,
-          "after": 1.44,
-          "foreignCores": 0.10804904698312191,
-          "foreignTop": "firefox 0.02, claude 0.01"
+          "before": 1.62,
+          "after": 0.84,
+          "foreignCores": 0.04055110780115553,
+          "foreignTop": ""
         }
       },
       "igv": {
-        "median": 3556,
-        "mean": 3535,
-        "stddev": 205.07071950914883,
+        "median": 3468,
+        "mean": 3462.6666666666665,
+        "stddev": 33.68811198166037,
         "runs": [
-          3274,
-          3775,
-          3556
+          3501,
+          3419,
+          3468
         ],
         "load": {
-          "before": 1.18,
-          "after": 1.44,
-          "foreignCores": 0.10800479347116791,
-          "foreignTop": "firefox 0.02, claude 0.01"
+          "before": 2.19,
+          "after": 0.84,
+          "foreignCores": 0.040584717805894524,
+          "foreignTop": ""
         }
       },
       "igv-deep": {
-        "median": 3573,
-        "mean": 3572.3333333333335,
-        "stddev": 37.56180092712394,
+        "median": 3483,
+        "mean": 3441.6666666666665,
+        "stddev": 70.81588020274047,
         "runs": [
-          3573,
-          3618,
-          3526
+          3500,
+          3483,
+          3342
         ],
         "load": {
-          "before": 1.65,
-          "after": 1.44,
-          "foreignCores": 0.1079916882801687,
-          "foreignTop": "firefox 0.02, claude 0.01"
+          "before": 2.17,
+          "after": 0.84,
+          "foreignCores": 0.040583508946989436,
+          "foreignTop": ""
         }
       },
       "jbrowse-release-4.3.0": {
-        "median": 3060,
-        "mean": 3058.6666666666665,
-        "stddev": 36.75444039689475,
+        "median": 2889,
+        "mean": 2925,
+        "stddev": 68.58571279792899,
         "runs": [
-          3013,
-          3060,
-          3103
+          3021,
+          2865,
+          2889
         ],
         "load": {
-          "before": 1.14,
-          "after": 1.44,
-          "foreignCores": 0.10803429178362495,
-          "foreignTop": "firefox 0.02, claude 0.01"
+          "before": 1.57,
+          "after": 0.84,
+          "foreignCores": 0.040549899835418485,
+          "foreignTop": ""
         }
       },
       "jbrowse-release-2.4.0": {
-        "median": 3245,
-        "mean": 3220,
-        "stddev": 36.0647565729573,
+        "median": 3266,
+        "mean": 3285.6666666666665,
+        "stddev": 79.20577981154882,
         "runs": [
-          3245,
-          3169,
-          3246
+          3266,
+          3200,
+          3391
         ],
         "load": {
-          "before": 1.29,
-          "after": 1.44,
-          "foreignCores": 0.10801954061352372,
-          "foreignTop": "firefox 0.02, claude 0.01"
+          "before": 2.41,
+          "after": 0.84,
+          "foreignCores": 0.04054854095998509,
+          "foreignTop": ""
+        }
+      },
+      "genomespy": {
+        "median": 4942,
+        "mean": 5074,
+        "stddev": 332.61489243067075,
+        "runs": [
+          4749,
+          4942,
+          5531
+        ],
+        "load": {
+          "before": 2,
+          "after": 0.84,
+          "foreignCores": 0.04058245125452017,
+          "foreignTop": ""
+        }
+      },
+      "gosling": {
+        "unsettled": 120000,
+        "median": null,
+        "mean": null,
+        "stddev": null,
+        "runs": [
+          null
+        ],
+        "load": {
+          "before": 1.92,
+          "after": 0.84,
+          "foreignCores": 0.04058154470485421,
+          "foreignTop": ""
         }
       }
     },
     "200x-longread-bam@19kb": {
       "jbrowse": {
-        "median": 2834,
-        "mean": 2830.3333333333335,
-        "stddev": 15.326085243430198,
+        "median": 2811,
+        "mean": 2833.3333333333335,
+        "stddev": 62.845489540264985,
         "runs": [
-          2834,
-          2810,
-          2847
+          2811,
+          2919,
+          2770
         ],
         "load": {
-          "before": 1.79,
-          "after": 1.32,
-          "foreignCores": 0.0763283895830903,
-          "foreignTop": "firefox 0.01"
+          "before": 0.97,
+          "after": 1.15,
+          "foreignCores": 0.1639272911440499,
+          "foreignTop": "firefox 0.03, Isolated Web Co 0.01"
         }
       },
       "igv": {
-        "median": 19559,
-        "mean": 19377,
-        "stddev": 442.87244213204326,
+        "median": 18327,
+        "mean": 18428.333333333332,
+        "stddev": 242.70329393909944,
         "runs": [
-          18767,
-          19805,
-          19559
+          18195,
+          18327,
+          18763
         ],
         "load": {
-          "before": 1.46,
-          "after": 1.32,
-          "foreignCores": 0.07636511398719331,
-          "foreignTop": "firefox 0.01"
+          "before": 1.11,
+          "after": 1.15,
+          "foreignCores": 0.1638981042419651,
+          "foreignTop": "firefox 0.03, Isolated Web Co 0.01"
         }
       },
       "igv-deep": {
-        "median": 19193,
-        "mean": 19147,
-        "stddev": 165.70656796478124,
+        "median": 18501,
+        "mean": 18358.666666666668,
+        "stddev": 355.4343196084975,
         "runs": [
-          18925,
-          19323,
-          19193
+          18705,
+          18501,
+          17870
         ],
         "load": {
-          "before": 1.45,
-          "after": 1.32,
-          "foreignCores": 0.07636190405021695,
-          "foreignTop": "firefox 0.01"
+          "before": 1.14,
+          "after": 1.15,
+          "foreignCores": 0.1639545326860623,
+          "foreignTop": "firefox 0.03, Isolated Web Co 0.01"
         }
       },
       "jbrowse-release-4.3.0": {
-        "median": 6496,
-        "mean": 6511.666666666667,
-        "stddev": 27.255988129012838,
+        "median": 6164,
+        "mean": 6120,
+        "stddev": 139.85945326171796,
         "runs": [
-          6550,
-          6496,
-          6489
+          5931,
+          6164,
+          6265
         ],
         "load": {
-          "before": 1.81,
-          "after": 1.32,
-          "foreignCores": 0.07632482425204966,
-          "foreignTop": "firefox 0.01"
+          "before": 0.97,
+          "after": 1.15,
+          "foreignCores": 0.1638848058368643,
+          "foreignTop": "firefox 0.03, Isolated Web Co 0.01"
         }
       },
       "jbrowse-release-2.4.0": {
-        "median": 9429,
-        "mean": 9410,
-        "stddev": 117.93501035174697,
+        "median": 9146,
+        "mean": 9156,
+        "stddev": 90.9065454189081,
         "runs": [
-          9429,
-          9257,
-          9544
+          9272,
+          9050,
+          9146
         ],
         "load": {
-          "before": 1.68,
-          "after": 1.32,
-          "foreignCores": 0.07636832419404585,
-          "foreignTop": "firefox 0.01"
+          "before": 1.12,
+          "after": 1.15,
+          "foreignCores": 0.16392080524166874,
+          "foreignTop": "firefox 0.03, Isolated Web Co 0.01"
+        }
+      },
+      "genomespy": {
+        "median": 43281,
+        "mean": 42896,
+        "stddev": 550.8484365049973,
+        "runs": [
+          43290,
+          42117,
+          43281
+        ],
+        "load": {
+          "before": 1.75,
+          "after": 1.15,
+          "foreignCores": 0.163952262355272,
+          "foreignTop": "firefox 0.03, Isolated Web Co 0.01"
+        }
+      },
+      "gosling": {
+        "unsettled": 120000,
+        "median": null,
+        "mean": null,
+        "stddev": null,
+        "runs": [
+          null
+        ],
+        "load": {
+          "before": 1.26,
+          "after": 1.15,
+          "foreignCores": 0.16390978038542467,
+          "foreignTop": "firefox 0.03, Isolated Web Co 0.01"
         }
       }
     },
     "1000x-longread-bam@19kb": {
       "jbrowse": {
-        "median": 5164,
-        "mean": 5148.666666666667,
-        "stddev": 35.96603335865043,
+        "median": 5140,
+        "mean": 5143.666666666667,
+        "stddev": 13.719410418171119,
         "runs": [
-          5099,
-          5183,
-          5164
+          5162,
+          5140,
+          5129
         ],
         "load": {
-          "before": 1.33,
-          "after": 1.64,
-          "foreignCores": 0.07439837969081797,
-          "foreignTop": "firefox 0.02"
+          "before": 2.49,
+          "after": 1.39,
+          "foreignCores": 0.03570798187857356,
+          "foreignTop": ""
         }
       },
       "igv": {
-        "median": 56855,
-        "mean": 57368.333333333336,
-        "stddev": 1408.6689540918485,
+        "median": 54744,
+        "mean": 54608.333333333336,
+        "stddev": 816.8420219901085,
         "runs": [
-          59292,
-          55958,
-          56855
+          54744,
+          53547,
+          55534
         ],
         "load": {
-          "before": 1.3,
-          "after": 1.64,
-          "foreignCores": 0.07439486342853556,
-          "foreignTop": "firefox 0.02"
+          "before": 2.3,
+          "after": 1.39,
+          "foreignCores": 0.03569636799885322,
+          "foreignTop": ""
         }
       },
       "igv-deep": {
-        "median": 56779,
-        "mean": 56936.666666666664,
-        "stddev": 261.3482138620597,
+        "median": 54066,
+        "mean": 54128.666666666664,
+        "stddev": 330.40009416194516,
         "runs": [
-          57305,
-          56726,
-          56779
+          54066,
+          54561,
+          53759
         ],
         "load": {
-          "before": 1.19,
-          "after": 1.64,
-          "foreignCores": 0.07439369141496815,
-          "foreignTop": "firefox 0.02"
+          "before": 2.24,
+          "after": 1.39,
+          "foreignCores": 0.035706759574128666,
+          "foreignTop": ""
         }
       },
       "jbrowse-release-4.3.0": {
-        "median": 18319,
-        "mean": 19012.333333333332,
-        "stddev": 1475.9309679731712,
+        "median": 17381,
+        "mean": 18002.333333333332,
+        "stddev": 1100.6777709918356,
         "runs": [
-          17654,
-          18319,
-          21064
+          17077,
+          17381,
+          19549
         ],
         "load": {
-          "before": 1.3,
-          "after": 1.64,
-          "foreignCores": 0.07439707733269861,
-          "foreignTop": "firefox 0.02"
+          "before": 2.88,
+          "after": 1.39,
+          "foreignCores": 0.035718335412178205,
+          "foreignTop": ""
         }
       },
       "jbrowse-release-2.4.0": {
-        "median": 36214,
-        "mean": 35908.333333333336,
-        "stddev": 669.0661817455397,
+        "median": 34356,
+        "mean": 34189.666666666664,
+        "stddev": 390.0686549257138,
         "runs": [
-          34980,
-          36214,
-          36531
+          34356,
+          34562,
+          33651
         ],
         "load": {
-          "before": 1.5,
-          "after": 1.64,
-          "foreignCores": 0.07439603547903183,
-          "foreignTop": "firefox 0.02"
+          "before": 2.3,
+          "after": 1.39,
+          "foreignCores": 0.035696673480805366,
+          "foreignTop": ""
+        }
+      },
+      "genomespy": {
+        "unsettled": 120000,
+        "median": null,
+        "mean": null,
+        "stddev": null,
+        "runs": [
+          null
+        ],
+        "load": {
+          "before": 2.41,
+          "after": 1.39,
+          "foreignCores": 0.03570649220618597,
+          "foreignTop": ""
+        }
+      },
+      "gosling": {
+        "unsettled": 120000,
+        "median": null,
+        "mean": null,
+        "stddev": null,
+        "runs": [
+          null
+        ],
+        "load": {
+          "before": 1.48,
+          "after": 1.39,
+          "foreignCores": 0.03567409600664033,
+          "foreignTop": ""
         }
       }
     },
     "20x-shortread-cram@19kb": {
       "jbrowse": {
-        "median": 2263,
-        "mean": 2277,
-        "stddev": 71.72168430816443,
+        "median": 2255,
+        "mean": 2215.6666666666665,
+        "stddev": 65.7740239169098,
         "runs": [
-          2371,
-          2197,
-          2263
+          2255,
+          2123,
+          2269
         ],
         "load": {
-          "before": 1.55,
-          "after": 1.38,
-          "foreignCores": 0.09507441401250583,
-          "foreignTop": "claude 0.01, firefox 0.01"
+          "before": 1.08,
+          "after": 0.97,
+          "foreignCores": 0.1979710250702545,
+          "foreignTop": "firefox 0.04, Isolated Web Co 0.01, claude 0.01"
         }
       },
       "jbrowse-release-4.3.0": {
-        "median": 2604,
-        "mean": 2605.6666666666665,
-        "stddev": 46.96334267868457,
+        "median": 2644,
+        "mean": 2647,
+        "stddev": 29.87752778706208,
         "runs": [
-          2664,
-          2549,
-          2604
+          2644,
+          2685,
+          2612
         ],
         "load": {
-          "before": 1.42,
-          "after": 1.38,
-          "foreignCores": 0.09506050967057866,
-          "foreignTop": "claude 0.01, firefox 0.01"
+          "before": 1.07,
+          "after": 0.97,
+          "foreignCores": 0.19793852047797808,
+          "foreignTop": "firefox 0.04, Isolated Web Co 0.01, claude 0.01"
         }
       },
       "jbrowse-release-2.4.0": {
-        "median": 3940,
-        "mean": 3932.6666666666665,
-        "stddev": 27.438820836342238,
+        "median": 3998,
+        "mean": 3995.3333333333335,
+        "stddev": 63.71464161050861,
         "runs": [
-          3940,
-          3962,
-          3896
+          4072,
+          3916,
+          3998
         ],
         "load": {
-          "before": 1.31,
-          "after": 1.38,
-          "foreignCores": 0.09504487214636899,
-          "foreignTop": "claude 0.01, firefox 0.01"
+          "before": 1.39,
+          "after": 0.97,
+          "foreignCores": 0.19790602655771866,
+          "foreignTop": "firefox 0.04, Isolated Web Co 0.01, claude 0.01"
         }
       },
       "igv": {
-        "median": 1608,
-        "mean": 1608,
-        "stddev": 62.8702367314349,
+        "median": 1494,
+        "mean": 1541,
+        "stddev": 71.47493733237313,
         "runs": [
-          1685,
-          1608,
-          1531
+          1487,
+          1642,
+          1494
         ],
         "load": {
-          "before": 1.28,
-          "after": 1.38,
-          "foreignCores": 0.09503097644328284,
-          "foreignTop": "claude 0.01, firefox 0.01"
+          "before": 1.49,
+          "after": 0.97,
+          "foreignCores": 0.19787354330422133,
+          "foreignTop": "firefox 0.04, Isolated Web Co 0.01, claude 0.01"
         }
       },
       "igv-deep": {
-        "median": 1516,
-        "mean": 1497.3333333333333,
-        "stddev": 30.739045022396013,
+        "median": 1543,
+        "mean": 1527,
+        "stddev": 74.35052118176442,
         "runs": [
-          1454,
-          1522,
-          1516
+          1543,
+          1429,
+          1609
         ],
         "load": {
-          "before": 1.26,
-          "after": 1.38,
-          "foreignCores": 0.09501534863324064,
-          "foreignTop": "claude 0.01, firefox 0.01"
+          "before": 1.49,
+          "after": 0.97,
+          "foreignCores": 0.1980270235772573,
+          "foreignTop": "firefox 0.04, Isolated Web Co 0.01, claude 0.01"
         }
+      },
+      "genomespy": {
+        "median": null,
+        "mean": null,
+        "stddev": null,
+        "runs": [],
+        "load": {
+          "before": 0,
+          "after": 0
+        },
+        "unsupported": "no cram reader"
+      },
+      "gosling": {
+        "median": null,
+        "mean": null,
+        "stddev": null,
+        "runs": [],
+        "load": {
+          "before": 0,
+          "after": 0
+        },
+        "unsupported": "no cram reader"
       }
     },
     "200x-shortread-cram@19kb": {
       "jbrowse": {
-        "median": 2420,
-        "mean": 2413.3333333333335,
-        "stddev": 78.5252967025418,
+        "median": 2447,
+        "mean": 2480.3333333333335,
+        "stddev": 96.81023820971737,
         "runs": [
-          2506,
-          2314,
-          2420
+          2612,
+          2382,
+          2447
         ],
         "load": {
-          "before": 1.36,
-          "after": 1.99,
-          "foreignCores": 0.09028056747785373,
-          "foreignTop": "firefox 0.01"
+          "before": 1.22,
+          "after": 1.39,
+          "foreignCores": 0.06342389629497025,
+          "foreignTop": "fwupd 0.01"
         }
       },
       "jbrowse-release-4.3.0": {
-        "median": 3026,
-        "mean": 3008.3333333333335,
-        "stddev": 29.32954520994525,
+        "median": 3045,
+        "mean": 3058,
+        "stddev": 31.187604375242845,
         "runs": [
-          3026,
-          3032,
-          2967
+          3045,
+          3101,
+          3028
         ],
         "load": {
-          "before": 1.25,
-          "after": 1.99,
-          "foreignCores": 0.09037768358297397,
-          "foreignTop": "firefox 0.01"
+          "before": 1.12,
+          "after": 1.39,
+          "foreignCores": 0.06341822230174293,
+          "foreignTop": "fwupd 0.01"
         }
       },
       "jbrowse-release-2.4.0": {
-        "median": 5193,
-        "mean": 5187,
-        "stddev": 15.297058540778355,
+        "median": 5164,
+        "mean": 5165.333333333333,
+        "stddev": 95.53475225743189,
         "runs": [
-          5166,
-          5202,
-          5193
+          5283,
+          5049,
+          5164
         ],
         "load": {
-          "before": 1.39,
-          "after": 1.99,
-          "foreignCores": 0.09047286870864867,
-          "foreignTop": "firefox 0.01"
+          "before": 1.03,
+          "after": 1.39,
+          "foreignCores": 0.06351257330285204,
+          "foreignTop": "fwupd 0.01"
         }
       },
       "igv": {
-        "median": 5327,
-        "mean": 5311.666666666667,
-        "stddev": 73.47259504211229,
+        "median": 5353,
+        "mean": 5343.333333333333,
+        "stddev": 30.575952787916336,
         "runs": [
-          5327,
-          5215,
-          5393
+          5375,
+          5353,
+          5302
         ],
         "load": {
-          "before": 1.36,
-          "after": 1.99,
-          "foreignCores": 0.09046426344546342,
-          "foreignTop": "firefox 0.01"
+          "before": 1.17,
+          "after": 1.39,
+          "foreignCores": 0.06360690930052221,
+          "foreignTop": "fwupd 0.01"
         }
       },
       "igv-deep": {
-        "median": 5509,
-        "mean": 5457.333333333333,
-        "stddev": 202.1457120220186,
+        "median": 5203,
+        "mean": 5213.666666666667,
+        "stddev": 145.53197434088344,
         "runs": [
-          5509,
-          5675,
-          5188
+          5041,
+          5397,
+          5203
         ],
         "load": {
-          "before": 1.37,
-          "after": 1.99,
-          "foreignCores": 0.09045565981908958,
-          "foreignTop": "firefox 0.01"
+          "before": 1.24,
+          "after": 1.39,
+          "foreignCores": 0.06360248447204912,
+          "foreignTop": "fwupd 0.01"
         }
+      },
+      "genomespy": {
+        "median": null,
+        "mean": null,
+        "stddev": null,
+        "runs": [],
+        "load": {
+          "before": 0,
+          "after": 0
+        },
+        "unsupported": "no cram reader"
+      },
+      "gosling": {
+        "median": null,
+        "mean": null,
+        "stddev": null,
+        "runs": [],
+        "load": {
+          "before": 0,
+          "after": 0
+        },
+        "unsupported": "no cram reader"
       }
     },
     "1000x-shortread-cram@19kb": {
       "jbrowse": {
-        "median": 2947,
-        "mean": 2948,
-        "stddev": 3.7416573867739413,
+        "median": 3073,
+        "mean": 3068.6666666666665,
+        "stddev": 79.66736401368435,
         "runs": [
-          2944,
-          2953,
-          2947
+          3073,
+          3164,
+          2969
         ],
         "load": {
-          "before": 0.41,
-          "after": 1.15,
-          "foreignCores": 0.08550428806391044,
-          "foreignTop": "firefox 0.02"
+          "before": 1.15,
+          "after": 1.62,
+          "foreignCores": 0.03866118439412904,
+          "foreignTop": ""
         }
       },
       "jbrowse-release-4.3.0": {
-        "median": 5884,
-        "mean": 5876.333333333333,
-        "stddev": 70.02063188010295,
+        "median": 5710,
+        "mean": 5742.333333333333,
+        "stddev": 85.97027910207625,
         "runs": [
-          5787,
-          5958,
-          5884
+          5860,
+          5657,
+          5710
         ],
         "load": {
-          "before": 0.42,
-          "after": 1.15,
-          "foreignCores": 0.08557300136931557,
-          "foreignTop": "firefox 0.02"
+          "before": 1.06,
+          "after": 1.62,
+          "foreignCores": 0.03865988971327016,
+          "foreignTop": ""
         }
       },
       "jbrowse-release-2.4.0": {
-        "median": 13126,
-        "mean": 13328,
-        "stddev": 434.8271687310565,
+        "median": 13289,
+        "mean": 13320.666666666666,
+        "stddev": 65.5862451704285,
         "runs": [
-          12926,
-          13126,
-          13932
+          13289,
+          13412,
+          13261
         ],
         "load": {
-          "before": 0.43,
-          "after": 1.15,
-          "foreignCores": 0.08556986002665182,
-          "foreignTop": "firefox 0.02"
+          "before": 1.2,
+          "after": 1.62,
+          "foreignCores": 0.038658595119120606,
+          "foreignTop": ""
         }
       },
       "igv": {
-        "median": 27202,
-        "mean": 27281.333333333332,
-        "stddev": 137.68643925803136,
+        "median": 26512,
+        "mean": 26654.333333333332,
+        "stddev": 301.0540741387759,
         "runs": [
-          27475,
-          27202,
-          27167
+          26378,
+          26512,
+          27073
         ],
         "load": {
-          "before": 0.62,
-          "after": 1.15,
-          "foreignCores": 0.08556703301544022,
-          "foreignTop": "firefox 0.02"
+          "before": 1.15,
+          "after": 1.62,
+          "foreignCores": 0.03865758827250144,
+          "foreignTop": ""
         }
       },
       "igv-deep": {
-        "median": 27572,
-        "mean": 27322.333333333332,
-        "stddev": 565.9047819397025,
+        "median": 26555,
+        "mean": 26715,
+        "stddev": 414.20123933502015,
         "runs": [
-          26539,
-          27572,
-          27856
+          26307,
+          27283,
+          26555
         ],
         "load": {
-          "before": 0.75,
-          "after": 1.15,
-          "foreignCores": 0.08556420619101701,
-          "foreignTop": "firefox 0.02"
+          "before": 1.08,
+          "after": 1.62,
+          "foreignCores": 0.03865658147832668,
+          "foreignTop": ""
         }
+      },
+      "genomespy": {
+        "median": null,
+        "mean": null,
+        "stddev": null,
+        "runs": [],
+        "load": {
+          "before": 0,
+          "after": 0
+        },
+        "unsupported": "no cram reader"
+      },
+      "gosling": {
+        "median": null,
+        "mean": null,
+        "stddev": null,
+        "runs": [],
+        "load": {
+          "before": 0,
+          "after": 0
+        },
+        "unsupported": "no cram reader"
       }
     },
     "20x-longread-cram@19kb": {
       "jbrowse": {
         "median": 2336,
-        "mean": 2346.3333333333335,
-        "stddev": 29.892399628593814,
+        "mean": 2332,
+        "stddev": 10.198039027185569,
         "runs": [
-          2387,
           2336,
-          2316
+          2318,
+          2342
         ],
         "load": {
-          "before": 2.31,
-          "after": 1.79,
-          "foreignCores": 0.08899410984497337,
-          "foreignTop": "firefox 0.01, claude 0.01"
+          "before": 0.84,
+          "after": 0.82,
+          "foreignCores": 0.05464718501768232,
+          "foreignTop": ""
         }
       },
       "jbrowse-release-4.3.0": {
-        "median": 2989,
-        "mean": 2917.3333333333335,
-        "stddev": 125.4122092231144,
+        "median": 2773,
+        "mean": 2792,
+        "stddev": 106.5864281541823,
         "runs": [
-          3022,
-          2989,
-          2741
+          2672,
+          2773,
+          2931
         ],
         "load": {
-          "before": 2.31,
-          "after": 1.79,
-          "foreignCores": 0.08898268830391008,
-          "foreignTop": "firefox 0.01, claude 0.01"
+          "before": 0.78,
+          "after": 0.82,
+          "foreignCores": 0.05464005681406247,
+          "foreignTop": ""
         }
       },
       "jbrowse-release-2.4.0": {
-        "median": 4163,
-        "mean": 4193.666666666667,
-        "stddev": 84.48010942753857,
+        "median": 4114,
+        "mean": 4400,
+        "stddev": 464.39279351284796,
         "runs": [
-          4163,
-          4109,
-          4309
+          4031,
+          4114,
+          5055
         ],
         "load": {
-          "before": 2.21,
-          "after": 1.79,
-          "foreignCores": 0.0889725382838566,
-          "foreignTop": "firefox 0.01, claude 0.01"
+          "before": 0.71,
+          "after": 0.82,
+          "foreignCores": 0.05463451394121888,
+          "foreignTop": ""
         }
       },
       "igv": {
-        "median": 3818,
-        "mean": 3788.6666666666665,
-        "stddev": 138.7307544210087,
+        "median": 3463,
+        "mean": 3497.3333333333335,
+        "stddev": 62.473105324522564,
         "runs": [
-          3942,
-          3606,
-          3818
+          3585,
+          3444,
+          3463
         ],
         "load": {
-          "before": 2.53,
-          "after": 1.79,
-          "foreignCores": 0.08896239057911093,
-          "foreignTop": "firefox 0.01, claude 0.01"
+          "before": 0.74,
+          "after": 0.82,
+          "foreignCores": 0.05477308294209511,
+          "foreignTop": ""
         }
       },
       "igv-deep": {
-        "median": 3796,
-        "mean": 3804,
-        "stddev": 15.748015748023622,
+        "median": 3584,
+        "mean": 3573.6666666666665,
+        "stddev": 62.0770131011114,
         "runs": [
-          3790,
-          3796,
-          3826
+          3584,
+          3493,
+          3644
         ],
         "load": {
-          "before": 2.49,
-          "after": 1.79,
-          "foreignCores": 0.08895097717780215,
-          "foreignTop": "firefox 0.01, claude 0.01"
+          "before": 0.76,
+          "after": 0.82,
+          "foreignCores": 0.05476832130748309,
+          "foreignTop": ""
         }
+      },
+      "genomespy": {
+        "median": null,
+        "mean": null,
+        "stddev": null,
+        "runs": [],
+        "load": {
+          "before": 0,
+          "after": 0
+        },
+        "unsupported": "no cram reader"
+      },
+      "gosling": {
+        "median": null,
+        "mean": null,
+        "stddev": null,
+        "runs": [],
+        "load": {
+          "before": 0,
+          "after": 0
+        },
+        "unsupported": "no cram reader"
       }
     },
     "200x-longread-cram@19kb": {
       "jbrowse": {
-        "median": 2946,
-        "mean": 2926,
-        "stddev": 87.69644614616186,
+        "median": 2952,
+        "mean": 2968.6666666666665,
+        "stddev": 61.55936610748649,
         "runs": [
-          2946,
-          3022,
-          2810
+          2952,
+          3051,
+          2903
         ],
         "load": {
-          "before": 1.32,
-          "after": 1.54,
-          "foreignCores": 0.07228755970860688,
-          "foreignTop": "firefox 0.01"
+          "before": 1.06,
+          "after": 1.8,
+          "foreignCores": 0.1496903259573738,
+          "foreignTop": "firefox 0.03"
         }
       },
       "jbrowse-release-4.3.0": {
-        "median": 3984,
-        "mean": 3983.6666666666665,
-        "stddev": 73.89331649223915,
+        "median": 3843,
+        "mean": 3898,
+        "stddev": 98.99831648400222,
         "runs": [
-          4074,
-          3984,
-          3893
+          4037,
+          3814,
+          3843
         ],
         "load": {
-          "before": 1.21,
-          "after": 1.54,
-          "foreignCores": 0.07223326706428117,
-          "foreignTop": "firefox 0.01"
+          "before": 0.97,
+          "after": 1.8,
+          "foreignCores": 0.1497397726281523,
+          "foreignTop": "firefox 0.03"
         }
       },
       "jbrowse-release-2.4.0": {
-        "median": 7785,
-        "mean": 7779,
-        "stddev": 72.79194094586754,
+        "median": 7626,
+        "mean": 7625.333333333333,
+        "stddev": 137.98872739788888,
         "runs": [
-          7687,
-          7865,
-          7785
+          7794,
+          7456,
+          7626
         ],
         "load": {
-          "before": 1.36,
-          "after": 1.54,
-          "foreignCores": 0.07238250586196364,
-          "foreignTop": "firefox 0.01"
+          "before": 1.06,
+          "after": 1.8,
+          "foreignCores": 0.14949847361535232,
+          "foreignTop": "firefox 0.03"
         }
       },
       "igv": {
-        "median": 19666,
-        "mean": 19716.666666666668,
-        "stddev": 112.80169423471538,
+        "median": 18062,
+        "mean": 18232,
+        "stddev": 241.83189753766285,
         "runs": [
-          19873,
-          19611,
-          19666
+          18062,
+          18060,
+          18574
         ],
         "load": {
-          "before": 2.09,
-          "after": 1.54,
-          "foreignCores": 0.07237955430505447,
-          "foreignTop": "firefox 0.01"
+          "before": 1.28,
+          "after": 1.8,
+          "foreignCores": 0.149724100637855,
+          "foreignTop": "firefox 0.03"
         }
       },
       "igv-deep": {
-        "median": 18584,
-        "mean": 18857.666666666668,
-        "stddev": 562.9839153021061,
+        "median": 18409,
+        "mean": 18193,
+        "stddev": 309.01240536047527,
         "runs": [
-          18347,
-          18584,
-          19642
+          17756,
+          18414,
+          18409
         ],
         "load": {
-          "before": 1.98,
-          "after": 1.54,
-          "foreignCores": 0.07237623409124516,
-          "foreignTop": "firefox 0.01"
+          "before": 1.36,
+          "after": 1.8,
+          "foreignCores": 0.14971626587283254,
+          "foreignTop": "firefox 0.03"
         }
+      },
+      "genomespy": {
+        "median": null,
+        "mean": null,
+        "stddev": null,
+        "runs": [],
+        "load": {
+          "before": 0,
+          "after": 0
+        },
+        "unsupported": "no cram reader"
+      },
+      "gosling": {
+        "median": null,
+        "mean": null,
+        "stddev": null,
+        "runs": [],
+        "load": {
+          "before": 0,
+          "after": 0
+        },
+        "unsupported": "no cram reader"
       }
     },
     "1000x-longread-cram@19kb": {
       "jbrowse": {
-        "median": 5922,
-        "mean": 5892.333333333333,
-        "stddev": 59.734598200893785,
+        "median": 5380,
+        "mean": 5387.666666666667,
+        "stddev": 40.778534658431376,
         "runs": [
-          5809,
-          5922,
-          5946
+          5441,
+          5380,
+          5342
         ],
         "load": {
-          "before": 5.47,
-          "after": 2.23,
-          "foreignCores": 0.17037822962022442,
-          "foreignTop": "Isolated Web Co 0.05, firefox 0.03"
+          "before": 1.39,
+          "after": 1.27,
+          "foreignCores": 0.035896426615552895,
+          "foreignTop": ""
         }
       },
       "jbrowse-release-4.3.0": {
-        "median": 9571,
-        "mean": 9649.666666666666,
-        "stddev": 176.38279079572612,
+        "median": 8866,
+        "mean": 8845.333333333334,
+        "stddev": 145.2568606144149,
         "runs": [
-          9894,
-          9571,
-          9484
+          9012,
+          8866,
+          8658
         ],
         "load": {
-          "before": 5.67,
-          "after": 2.23,
-          "foreignCores": 0.17031728914708022,
-          "foreignTop": "Isolated Web Co 0.05, firefox 0.03"
+          "before": 1.36,
+          "after": 1.27,
+          "foreignCores": 0.035959988362740496,
+          "foreignTop": ""
         }
       },
       "jbrowse-release-2.4.0": {
-        "median": 23107,
-        "mean": 23440.666666666668,
-        "stddev": 645.218481515284,
+        "median": 22329,
+        "mean": 22034.333333333332,
+        "stddev": 577.0051030007351,
         "runs": [
-          24343,
-          23107,
-          22872
+          22546,
+          21228,
+          22329
         ],
         "load": {
-          "before": 4.63,
-          "after": 2.23,
-          "foreignCores": 0.1703912989703473,
-          "foreignTop": "Isolated Web Co 0.05, firefox 0.03"
+          "before": 1.35,
+          "after": 1.27,
+          "foreignCores": 0.03598076462333599,
+          "foreignTop": ""
         }
       },
       "igv": {
-        "median": 58107,
-        "mean": 58154.666666666664,
-        "stddev": 365.3074808371101,
+        "median": 52443,
+        "mean": 52617.333333333336,
+        "stddev": 426.8444941922318,
         "runs": [
-          57733,
-          58107,
-          58624
+          53205,
+          52204,
+          52443
         ],
         "load": {
-          "before": 3.5,
-          "after": 2.23,
-          "foreignCores": 0.17036802275696278,
-          "foreignTop": "Isolated Web Co 0.05, firefox 0.03"
+          "before": 1.31,
+          "after": 1.27,
+          "foreignCores": 0.03595883451449181,
+          "foreignTop": ""
         }
       },
       "igv-deep": {
-        "median": 59177,
-        "mean": 59203.666666666664,
-        "stddev": 1491.8584234288305,
+        "median": 51930,
+        "mean": 52193.666666666664,
+        "stddev": 428.48285328068323,
         "runs": [
-          57390,
-          59177,
-          61044
+          52798,
+          51853,
+          51930
         ],
         "load": {
-          "before": 2.75,
-          "after": 2.23,
-          "foreignCores": 0.17040370876386793,
-          "foreignTop": "Isolated Web Co 0.05, firefox 0.03"
+          "before": 1.17,
+          "after": 1.27,
+          "foreignCores": 0.03595821915903569,
+          "foreignTop": ""
         }
+      },
+      "genomespy": {
+        "median": null,
+        "mean": null,
+        "stddev": null,
+        "runs": [],
+        "load": {
+          "before": 0,
+          "after": 0
+        },
+        "unsupported": "no cram reader"
+      },
+      "gosling": {
+        "median": null,
+        "mean": null,
+        "stddev": null,
+        "runs": [],
+        "load": {
+          "before": 0,
+          "after": 0
+        },
+        "unsupported": "no cram reader"
+      }
+    },
+    "20x-shortread-bam@100kb": {
+      "jbrowse": {
+        "median": 2398,
+        "mean": 2372.3333333333335,
+        "stddev": 76.08912902350477,
+        "runs": [
+          2398,
+          2269,
+          2450
+        ],
+        "load": {
+          "before": 1.27,
+          "after": 1.64,
+          "foreignCores": 0.0529846266280393,
+          "foreignTop": ""
+        }
+      },
+      "jbrowse-release-4.3.0": {
+        "median": 3299,
+        "mean": 3266.6666666666665,
+        "stddev": 61.17915403868289,
+        "runs": [
+          3299,
+          3181,
+          3320
+        ],
+        "load": {
+          "before": 2.53,
+          "after": 1.64,
+          "foreignCores": 0.052979095440667846,
+          "foreignTop": ""
+        }
+      },
+      "jbrowse-release-2.4.0": {
+        "median": 4217,
+        "mean": 4239.666666666667,
+        "stddev": 32.05550741379015,
+        "runs": [
+          4217,
+          4285,
+          4217
+        ],
+        "load": {
+          "before": 2.33,
+          "after": 1.64,
+          "foreignCores": 0.052974256598950165,
+          "foreignTop": ""
+        }
+      },
+      "igv": {
+        "median": 2942,
+        "mean": 2920.3333333333335,
+        "stddev": 143.29999612312938,
+        "runs": [
+          3084,
+          2942,
+          2735
+        ],
+        "load": {
+          "before": 2.26,
+          "after": 1.64,
+          "foreignCores": 0.05296941864106226,
+          "foreignTop": ""
+        }
+      },
+      "igv-deep": {
+        "median": 2979,
+        "mean": 2962.3333333333335,
+        "stddev": 70.39570693980959,
+        "runs": [
+          2979,
+          3039,
+          2869
+        ],
+        "load": {
+          "before": 2.08,
+          "after": 1.64,
+          "foreignCores": 0.05296527252328828,
+          "foreignTop": ""
+        }
+      },
+      "genomespy": {
+        "median": 2168,
+        "mean": 2158.3333333333335,
+        "stddev": 14.383632673594278,
+        "runs": [
+          2169,
+          2168,
+          2138
+        ],
+        "load": {
+          "before": 2,
+          "after": 1.64,
+          "foreignCores": 0.052960436206156196,
+          "foreignTop": ""
+        }
+      },
+      "gosling": {
+        "median": null,
+        "mean": null,
+        "stddev": null,
+        "runs": [],
+        "load": {
+          "before": 0,
+          "after": 0
+        },
+        "unsupported": "Gosling's BAM fetcher declines a tile wider than 20 kb"
+      }
+    },
+    "20x-shortread-cram@100kb": {
+      "jbrowse": {
+        "median": 2406,
+        "mean": 2384.3333333333335,
+        "stddev": 32.78549814916481,
+        "runs": [
+          2406,
+          2338,
+          2409
+        ],
+        "load": {
+          "before": 1.64,
+          "after": 1.84,
+          "foreignCores": 0.05601631543167791,
+          "foreignTop": ""
+        }
+      },
+      "jbrowse-release-4.3.0": {
+        "median": 3244,
+        "mean": 3255.3333333333335,
+        "stddev": 36.01234356285202,
+        "runs": [
+          3244,
+          3304,
+          3218
+        ],
+        "load": {
+          "before": 1.5,
+          "after": 1.84,
+          "foreignCores": 0.056010223225208815,
+          "foreignTop": ""
+        }
+      },
+      "jbrowse-release-2.4.0": {
+        "median": 5380,
+        "mean": 5317.666666666667,
+        "stddev": 97.48960058499686,
+        "runs": [
+          5380,
+          5393,
+          5180
+        ],
+        "load": {
+          "before": 2.1,
+          "after": 1.84,
+          "foreignCores": 0.056004893631481145,
+          "foreignTop": ""
+        }
+      },
+      "igv": {
+        "median": 2841,
+        "mean": 2852.3333333333335,
+        "stddev": 70.67452786463372,
+        "runs": [
+          2772,
+          2944,
+          2841
+        ],
+        "load": {
+          "before": 1.86,
+          "after": 1.84,
+          "foreignCores": 0.055999565051920705,
+          "foreignTop": ""
+        }
+      },
+      "igv-deep": {
+        "median": 2922,
+        "mean": 2945,
+        "stddev": 48.14561246884289,
+        "runs": [
+          2922,
+          3012,
+          2901
+        ],
+        "load": {
+          "before": 1.71,
+          "after": 1.84,
+          "foreignCores": 0.055994237486238066,
+          "foreignTop": ""
+        }
+      },
+      "genomespy": {
+        "median": null,
+        "mean": null,
+        "stddev": null,
+        "runs": [],
+        "load": {
+          "before": 0,
+          "after": 0
+        },
+        "unsupported": "no cram reader"
+      },
+      "gosling": {
+        "median": null,
+        "mean": null,
+        "stddev": null,
+        "runs": [],
+        "load": {
+          "before": 0,
+          "after": 0
+        },
+        "unsupported": "no cram reader"
+      }
+    },
+    "200x-shortread-bam@100kb": {
+      "jbrowse": {
+        "median": 3298,
+        "mean": 3332,
+        "stddev": 55.3052137385497,
+        "runs": [
+          3410,
+          3288,
+          3298
+        ],
+        "load": {
+          "before": 1.84,
+          "after": 1.31,
+          "foreignCores": 0.04440197841726625,
+          "foreignTop": ""
+        }
+      },
+      "jbrowse-release-4.3.0": {
+        "median": 5296,
+        "mean": 5286.333333333333,
+        "stddev": 69.33173075070958,
+        "runs": [
+          5366,
+          5197,
+          5296
+        ],
+        "load": {
+          "before": 1.69,
+          "after": 1.31,
+          "foreignCores": 0.0444405191551886,
+          "foreignTop": ""
+        }
+      },
+      "jbrowse-release-2.4.0": {
+        "median": 13742,
+        "mean": 13634.333333333334,
+        "stddev": 167.33266932139168,
+        "runs": [
+          13763,
+          13398,
+          13742
+        ],
+        "load": {
+          "before": 1.64,
+          "after": 1.31,
+          "foreignCores": 0.04447870000160579,
+          "foreignTop": ""
+        }
+      },
+      "igv": {
+        "median": 18591,
+        "mean": 18594.666666666668,
+        "stddev": 40.49965706301996,
+        "runs": [
+          18646,
+          18591,
+          18547
+        ],
+        "load": {
+          "before": 1.47,
+          "after": 1.31,
+          "foreignCores": 0.04447727163249255,
+          "foreignTop": ""
+        }
+      },
+      "igv-deep": {
+        "median": 18501,
+        "mean": 18469.333333333332,
+        "stddev": 325.32889341232647,
+        "runs": [
+          18851,
+          18501,
+          18056
+        ],
+        "load": {
+          "before": 1.33,
+          "after": 1.31,
+          "foreignCores": 0.044476200415860555,
+          "foreignTop": ""
+        }
+      },
+      "genomespy": {
+        "median": 7756,
+        "mean": 7676.666666666667,
+        "stddev": 147.4433978025315,
+        "runs": [
+          7804,
+          7756,
+          7470
+        ],
+        "load": {
+          "before": 1.16,
+          "after": 1.31,
+          "foreignCores": 0.044474950728337584,
+          "foreignTop": ""
+        }
+      },
+      "gosling": {
+        "median": null,
+        "mean": null,
+        "stddev": null,
+        "runs": [],
+        "load": {
+          "before": 0,
+          "after": 0
+        },
+        "unsupported": "Gosling's BAM fetcher declines a tile wider than 20 kb"
+      }
+    },
+    "200x-shortread-cram@100kb": {
+      "jbrowse": {
+        "median": 3179,
+        "mean": 3190,
+        "stddev": 16.990193249832878,
+        "runs": [
+          3214,
+          3177,
+          3179
+        ],
+        "load": {
+          "before": 1.31,
+          "after": 1.36,
+          "foreignCores": 0.04307120934670761,
+          "foreignTop": ""
+        }
+      },
+      "jbrowse-release-4.3.0": {
+        "median": 6505,
+        "mean": 6519.333333333333,
+        "stddev": 76.2029454082248,
+        "runs": [
+          6619,
+          6505,
+          6434
+        ],
+        "load": {
+          "before": 1.37,
+          "after": 1.36,
+          "foreignCores": 0.04306954312756823,
+          "foreignTop": ""
+        }
+      },
+      "jbrowse-release-2.4.0": {
+        "median": 16521,
+        "mean": 16693.333333333332,
+        "stddev": 253.68002592942858,
+        "runs": [
+          16521,
+          17052,
+          16507
+        ],
+        "load": {
+          "before": 1.31,
+          "after": 1.36,
+          "foreignCores": 0.043067877037339955,
+          "foreignTop": ""
+        }
+      },
+      "igv": {
+        "median": 18813,
+        "mean": 18636.333333333332,
+        "stddev": 337.50489708381355,
+        "runs": [
+          18813,
+          18932,
+          18164
+        ],
+        "load": {
+          "before": 1.83,
+          "after": 1.36,
+          "foreignCores": 0.043066211076007846,
+          "foreignTop": ""
+        }
+      },
+      "igv-deep": {
+        "median": 18426,
+        "mean": 18428.333333333332,
+        "stddev": 382.5322063420136,
+        "runs": [
+          18426,
+          17961,
+          18898
+        ],
+        "load": {
+          "before": 1.72,
+          "after": 1.36,
+          "foreignCores": 0.04306510050672136,
+          "foreignTop": ""
+        }
+      },
+      "genomespy": {
+        "median": null,
+        "mean": null,
+        "stddev": null,
+        "runs": [],
+        "load": {
+          "before": 0,
+          "after": 0
+        },
+        "unsupported": "no cram reader"
+      },
+      "gosling": {
+        "median": null,
+        "mean": null,
+        "stddev": null,
+        "runs": [],
+        "load": {
+          "before": 0,
+          "after": 0
+        },
+        "unsupported": "no cram reader"
+      }
+    },
+    "1000x-shortread-bam@100kb": {
+      "jbrowse": {
+        "median": 7279,
+        "mean": 7277.333333333333,
+        "stddev": 3.858612300930075,
+        "runs": [
+          7279,
+          7272,
+          7281
+        ],
+        "load": {
+          "before": 1.36,
+          "after": 1.37,
+          "foreignCores": 0.02904235406740457,
+          "foreignTop": ""
+        }
+      },
+      "jbrowse-release-4.3.0": {
+        "median": 13662,
+        "mean": 13674.666666666666,
+        "stddev": 55.43364401596641,
+        "runs": [
+          13662,
+          13748,
+          13614
+        ],
+        "load": {
+          "before": 1.67,
+          "after": 1.37,
+          "foreignCores": 0.02906108155944034,
+          "foreignTop": ""
+        }
+      },
+      "jbrowse-release-2.4.0": {
+        "median": 57990,
+        "mean": 57841.333333333336,
+        "stddev": 487.4869798831099,
+        "runs": [
+          57990,
+          58350,
+          57184
+        ],
+        "load": {
+          "before": 1.49,
+          "after": 1.37,
+          "foreignCores": 0.029070376002238343,
+          "foreignTop": ""
+        }
+      },
+      "igv": {
+        "median": 110589,
+        "mean": 110708.33333333333,
+        "stddev": 329.42407656730586,
+        "runs": [
+          111158,
+          110589,
+          110378
+        ],
+        "load": {
+          "before": 1.08,
+          "after": 1.37,
+          "foreignCores": 0.029051151150675147,
+          "foreignTop": ""
+        }
+      },
+      "igv-deep": {
+        "median": 110976,
+        "mean": 110936.66666666667,
+        "stddev": 742.7163358615156,
+        "runs": [
+          110008,
+          111826,
+          110976
+        ],
+        "load": {
+          "before": 1.09,
+          "after": 1.37,
+          "foreignCores": 0.029050930000866164,
+          "foreignTop": ""
+        }
+      },
+      "genomespy": {
+        "median": 30682,
+        "mean": 30535.333333333332,
+        "stddev": 363.7419720381774,
+        "runs": [
+          30035,
+          30889,
+          30682
+        ],
+        "load": {
+          "before": 1.43,
+          "after": 1.37,
+          "foreignCores": 0.029060279621931147,
+          "foreignTop": ""
+        }
+      },
+      "gosling": {
+        "median": null,
+        "mean": null,
+        "stddev": null,
+        "runs": [],
+        "load": {
+          "before": 0,
+          "after": 0
+        },
+        "unsupported": "Gosling's BAM fetcher declines a tile wider than 20 kb"
+      }
+    },
+    "1000x-shortread-cram@100kb": {
+      "jbrowse": {
+        "median": 6081,
+        "mean": 6076.333333333333,
+        "stddev": 11.897712198383164,
+        "runs": [
+          6060,
+          6088,
+          6081
+        ],
+        "load": {
+          "before": 1.26,
+          "after": 2.43,
+          "foreignCores": 0.027128327904126563,
+          "foreignTop": ""
+        }
+      },
+      "jbrowse-release-4.3.0": {
+        "median": 19227,
+        "mean": 19154,
+        "stddev": 177.11201728473048,
+        "runs": [
+          19325,
+          19227,
+          18910
+        ],
+        "load": {
+          "before": 1.21,
+          "after": 2.43,
+          "foreignCores": 0.02712809210996481,
+          "foreignTop": ""
+        }
+      },
+      "jbrowse-release-2.4.0": {
+        "median": 57508,
+        "mean": 56972,
+        "stddev": 808.7426455100947,
+        "runs": [
+          57508,
+          55829,
+          57579
+        ],
+        "load": {
+          "before": 1.39,
+          "after": 2.43,
+          "foreignCores": 0.02712785631990198,
+          "foreignTop": ""
+        }
+      },
+      "igv": {
+        "median": 125486,
+        "mean": 125065,
+        "stddev": 743.559457384994,
+        "runs": [
+          124020,
+          125689,
+          125486
+        ],
+        "load": {
+          "before": 1.57,
+          "after": 2.43,
+          "foreignCores": 0.027137330343398245,
+          "foreignTop": ""
+        }
+      },
+      "igv-deep": {
+        "median": 125663,
+        "mean": 125629.66666666667,
+        "stddev": 67.14329618228629,
+        "runs": [
+          125690,
+          125663,
+          125536
+        ],
+        "load": {
+          "before": 2.79,
+          "after": 2.43,
+          "foreignCores": 0.027137120683894025,
+          "foreignTop": ""
+        }
+      },
+      "genomespy": {
+        "median": null,
+        "mean": null,
+        "stddev": null,
+        "runs": [],
+        "load": {
+          "before": 0,
+          "after": 0
+        },
+        "unsupported": "no cram reader"
+      },
+      "gosling": {
+        "median": null,
+        "mean": null,
+        "stddev": null,
+        "runs": [],
+        "load": {
+          "before": 0,
+          "after": 0
+        },
+        "unsupported": "no cram reader"
+      }
+    },
+    "20x-longread-bam@100kb": {
+      "jbrowse": {
+        "median": 2490,
+        "mean": 2515.6666666666665,
+        "stddev": 86.43430388965304,
+        "runs": [
+          2425,
+          2632,
+          2490
+        ],
+        "load": {
+          "before": 2.43,
+          "after": 1.56,
+          "foreignCores": 0.04778926351721194,
+          "foreignTop": ""
+        }
+      },
+      "jbrowse-release-4.3.0": {
+        "median": 4052,
+        "mean": 4049,
+        "stddev": 12.027745701779143,
+        "runs": [
+          4052,
+          4033,
+          4062
+        ],
+        "load": {
+          "before": 2.24,
+          "after": 1.56,
+          "foreignCores": 0.0478512040084233,
+          "foreignTop": ""
+        }
+      },
+      "jbrowse-release-2.4.0": {
+        "median": 4784,
+        "mean": 4789,
+        "stddev": 24.34474618201362,
+        "runs": [
+          4784,
+          4821,
+          4762
+        ],
+        "load": {
+          "before": 2.14,
+          "after": 1.56,
+          "foreignCores": 0.04791282956170008,
+          "foreignTop": ""
+        }
+      },
+      "igv": {
+        "median": 7682,
+        "mean": 7623.333333333333,
+        "stddev": 112.44356609230941,
+        "runs": [
+          7466,
+          7722,
+          7682
+        ],
+        "load": {
+          "before": 1.88,
+          "after": 1.56,
+          "foreignCores": 0.04790943571184736,
+          "foreignTop": ""
+        }
+      },
+      "igv-deep": {
+        "median": 7643,
+        "mean": 7730.333333333333,
+        "stddev": 151.17612980302883,
+        "runs": [
+          7643,
+          7943,
+          7605
+        ],
+        "load": {
+          "before": 2.26,
+          "after": 1.56,
+          "foreignCores": 0.04784288473921386,
+          "foreignTop": ""
+        }
+      },
+      "genomespy": {
+        "median": 11501,
+        "mean": 11633,
+        "stddev": 245.42751815284825,
+        "runs": [
+          11977,
+          11421,
+          11501
+        ],
+        "load": {
+          "before": 2.07,
+          "after": 1.56,
+          "foreignCores": 0.04790511696188783,
+          "foreignTop": ""
+        }
+      },
+      "gosling": {
+        "median": null,
+        "mean": null,
+        "stddev": null,
+        "runs": [],
+        "load": {
+          "before": 0,
+          "after": 0
+        },
+        "unsupported": "Gosling's BAM fetcher declines a tile wider than 20 kb"
+      }
+    },
+    "20x-longread-cram@100kb": {
+      "jbrowse": {
+        "median": 2610,
+        "mean": 2565.6666666666665,
+        "stddev": 63.40522235764355,
+        "runs": [
+          2611,
+          2476,
+          2610
+        ],
+        "load": {
+          "before": 1.43,
+          "after": 1.4,
+          "foreignCores": 0.05555931973710779,
+          "foreignTop": ""
+        }
+      },
+      "jbrowse-release-4.3.0": {
+        "median": 3812,
+        "mean": 3826,
+        "stddev": 93.60555539069249,
+        "runs": [
+          3947,
+          3812,
+          3719
+        ],
+        "load": {
+          "before": 1.4,
+          "after": 1.4,
+          "foreignCores": 0.055809147957755885,
+          "foreignTop": ""
+        }
+      },
+      "jbrowse-release-2.4.0": {
+        "median": 5348,
+        "mean": 5341,
+        "stddev": 66.72830483885132,
+        "runs": [
+          5256,
+          5348,
+          5419
+        ],
+        "load": {
+          "before": 1.28,
+          "after": 1.4,
+          "foreignCores": 0.055889575747309427,
+          "foreignTop": ""
+        }
+      },
+      "igv": {
+        "median": 7689,
+        "mean": 7658.333333333333,
+        "stddev": 73.49074015744357,
+        "runs": [
+          7557,
+          7689,
+          7729
+        ],
+        "load": {
+          "before": 1.48,
+          "after": 1.4,
+          "foreignCores": 0.055970939143244726,
+          "foreignTop": ""
+        }
+      },
+      "igv-deep": {
+        "median": 7802,
+        "mean": 7729.333333333333,
+        "stddev": 146.4794259349149,
+        "runs": [
+          7802,
+          7861,
+          7525
+        ],
+        "load": {
+          "before": 1.4,
+          "after": 1.4,
+          "foreignCores": 0.05596714787688728,
+          "foreignTop": ""
+        }
+      },
+      "genomespy": {
+        "median": null,
+        "mean": null,
+        "stddev": null,
+        "runs": [],
+        "load": {
+          "before": 0,
+          "after": 0
+        },
+        "unsupported": "no cram reader"
+      },
+      "gosling": {
+        "median": null,
+        "mean": null,
+        "stddev": null,
+        "runs": [],
+        "load": {
+          "before": 0,
+          "after": 0
+        },
+        "unsupported": "no cram reader"
+      }
+    },
+    "200x-longread-bam@100kb": {
+      "jbrowse": {
+        "median": 4316,
+        "mean": 4312.333333333333,
+        "stddev": 33.98365620248782,
+        "runs": [
+          4352,
+          4269,
+          4316
+        ],
+        "load": {
+          "before": 1.4,
+          "after": 1.18,
+          "foreignCores": 0.02890144145577652,
+          "foreignTop": ""
+        }
+      },
+      "jbrowse-release-4.3.0": {
+        "median": 7781,
+        "mean": 7831,
+        "stddev": 72.1295131459146,
+        "runs": [
+          7781,
+          7933,
+          7779
+        ],
+        "load": {
+          "before": 1.29,
+          "after": 1.18,
+          "foreignCores": 0.028857670209626957,
+          "foreignTop": ""
+        }
+      },
+      "jbrowse-release-2.4.0": {
+        "median": 17225,
+        "mean": 17206.333333333332,
+        "stddev": 32.22145592958553,
+        "runs": [
+          17225,
+          17161,
+          17233
+        ],
+        "load": {
+          "before": 1.63,
+          "after": 1.18,
+          "foreignCores": 0.028871801102798862,
+          "foreignTop": ""
+        }
+      },
+      "igv": {
+        "median": 39913,
+        "mean": 39867.333333333336,
+        "stddev": 178.8935127076689,
+        "runs": [
+          39913,
+          40060,
+          39629
+        ],
+        "load": {
+          "before": 1.47,
+          "after": 1.18,
+          "foreignCores": 0.028914902819022422,
+          "foreignTop": ""
+        }
+      },
+      "igv-deep": {
+        "median": 39844,
+        "mean": 39941.666666666664,
+        "stddev": 486.25393457419847,
+        "runs": [
+          40580,
+          39844,
+          39401
+        ],
+        "load": {
+          "before": 1.36,
+          "after": 1.18,
+          "foreignCores": 0.028885639194210926,
+          "foreignTop": ""
+        }
+      },
+      "genomespy": {
+        "median": 104719,
+        "mean": 103925.66666666667,
+        "stddev": 1974.8070510530615,
+        "runs": [
+          104719,
+          105848,
+          101210
+        ],
+        "load": {
+          "before": 1.36,
+          "after": 1.18,
+          "foreignCores": 0.028885346725411497,
+          "foreignTop": ""
+        }
+      },
+      "gosling": {
+        "median": null,
+        "mean": null,
+        "stddev": null,
+        "runs": [],
+        "load": {
+          "before": 0,
+          "after": 0
+        },
+        "unsupported": "Gosling's BAM fetcher declines a tile wider than 20 kb"
+      }
+    },
+    "200x-longread-cram@100kb": {
+      "jbrowse": {
+        "median": 4637,
+        "mean": 4670,
+        "stddev": 51.697840058039816,
+        "runs": [
+          4637,
+          4743,
+          4630
+        ],
+        "load": {
+          "before": 1.18,
+          "after": 1.47,
+          "foreignCores": 0.038110310194997894,
+          "foreignTop": ""
+        }
+      },
+      "jbrowse-release-4.3.0": {
+        "median": 6485,
+        "mean": 6499.666666666667,
+        "stddev": 72.59629620181889,
+        "runs": [
+          6595,
+          6485,
+          6419
+        ],
+        "load": {
+          "before": 1.07,
+          "after": 1.47,
+          "foreignCores": 0.03810935119039359,
+          "foreignTop": ""
+        }
+      },
+      "jbrowse-release-2.4.0": {
+        "median": 15795,
+        "mean": 15795,
+        "stddev": 108.59404526338756,
+        "runs": [
+          15662,
+          15928,
+          15795
+        ],
+        "load": {
+          "before": 1.06,
+          "after": 1.47,
+          "foreignCores": 0.03819237662268733,
+          "foreignTop": ""
+        }
+      },
+      "igv": {
+        "median": 39175,
+        "mean": 39204.666666666664,
+        "stddev": 195.8610618667109,
+        "runs": [
+          39458,
+          38981,
+          39175
+        ],
+        "load": {
+          "before": 1.33,
+          "after": 1.47,
+          "foreignCores": 0.03819152237670993,
+          "foreignTop": ""
+        }
+      },
+      "igv-deep": {
+        "median": 38935,
+        "mean": 39001,
+        "stddev": 99.76973488989535,
+        "runs": [
+          38926,
+          38935,
+          39142
+        ],
+        "load": {
+          "before": 1.22,
+          "after": 1.47,
+          "foreignCores": 0.03819077494282628,
+          "foreignTop": ""
+        }
+      },
+      "genomespy": {
+        "median": null,
+        "mean": null,
+        "stddev": null,
+        "runs": [],
+        "load": {
+          "before": 0,
+          "after": 0
+        },
+        "unsupported": "no cram reader"
+      },
+      "gosling": {
+        "median": null,
+        "mean": null,
+        "stddev": null,
+        "runs": [],
+        "load": {
+          "before": 0,
+          "after": 0
+        },
+        "unsupported": "no cram reader"
+      }
+    },
+    "1000x-longread-bam@100kb": {
+      "jbrowse": {
+        "median": 11164,
+        "mean": 11232,
+        "stddev": 99.00841715059718,
+        "runs": [
+          11164,
+          11160,
+          11372
+        ],
+        "load": {
+          "before": 1.47,
+          "after": 1.74,
+          "foreignCores": 0.029850334023978364,
+          "foreignTop": ""
+        }
+      },
+      "jbrowse-release-4.3.0": {
+        "median": 24447,
+        "mean": 24542.666666666668,
+        "stddev": 222.41752528871362,
+        "runs": [
+          24331,
+          24850,
+          24447
+        ],
+        "load": {
+          "before": 1.35,
+          "after": 1.74,
+          "foreignCores": 0.02985832426197003,
+          "foreignTop": ""
+        }
+      },
+      "jbrowse-release-2.4.0": {
+        "median": 60472,
+        "mean": 60401.333333333336,
+        "stddev": 298.15581310598134,
+        "runs": [
+          60472,
+          60006,
+          60726
+        ],
+        "load": {
+          "before": 1.27,
+          "after": 1.74,
+          "foreignCores": 0.029854165448129192,
+          "foreignTop": ""
+        }
+      },
+      "igv": {
+        "unsettled": 631579,
+        "median": null,
+        "mean": null,
+        "stddev": null,
+        "runs": [
+          null
+        ],
+        "load": {
+          "before": 1.71,
+          "after": 1.74,
+          "foreignCores": 0.0298540684393348,
+          "foreignTop": ""
+        }
+      },
+      "igv-deep": {
+        "unsettled": 631579,
+        "median": null,
+        "mean": null,
+        "stddev": null,
+        "runs": [
+          null
+        ],
+        "load": {
+          "before": 0.04,
+          "after": 1.74,
+          "foreignCores": 0.029858045323627225,
+          "foreignTop": ""
+        }
+      },
+      "genomespy": {
+        "unsettled": 631579,
+        "median": null,
+        "mean": null,
+        "stddev": null,
+        "runs": [
+          null
+        ],
+        "load": {
+          "before": 0,
+          "after": 1.74,
+          "foreignCores": 0.029853898675461614,
+          "foreignTop": ""
+        }
+      },
+      "gosling": {
+        "median": null,
+        "mean": null,
+        "stddev": null,
+        "runs": [],
+        "load": {
+          "before": 0,
+          "after": 0
+        },
+        "unsupported": "Gosling's BAM fetcher declines a tile wider than 20 kb"
+      }
+    },
+    "1000x-longread-cram@100kb": {
+      "jbrowse": {
+        "median": 12915,
+        "mean": 12905.333333333334,
+        "stddev": 34.56716489515576,
+        "runs": [
+          12942,
+          12859,
+          12915
+        ],
+        "load": {
+          "before": 1.74,
+          "after": 1.34,
+          "foreignCores": 0.03186927018548693,
+          "foreignTop": ""
+        }
+      },
+      "jbrowse-release-4.3.0": {
+        "median": 18551,
+        "mean": 18493.333333333332,
+        "stddev": 209.35827876845207,
+        "runs": [
+          18551,
+          18213,
+          18716
+        ],
+        "load": {
+          "before": 1.47,
+          "after": 1.34,
+          "foreignCores": 0.03186910166031911,
+          "foreignTop": ""
+        }
+      },
+      "jbrowse-release-2.4.0": {
+        "median": 57579,
+        "mean": 60303.666666666664,
+        "stddev": 5370.751426838602,
+        "runs": [
+          67806,
+          57579,
+          55526
+        ],
+        "load": {
+          "before": 1.4,
+          "after": 1.34,
+          "foreignCores": 0.031868933136933605,
+          "foreignTop": ""
+        }
+      },
+      "igv": {
+        "unsettled": 631579,
+        "median": null,
+        "mean": null,
+        "stddev": null,
+        "runs": [
+          null
+        ],
+        "load": {
+          "before": 1.13,
+          "after": 1.34,
+          "foreignCores": 0.03186880206442153,
+          "foreignTop": ""
+        }
+      },
+      "igv-deep": {
+        "unsettled": 631579,
+        "median": null,
+        "mean": null,
+        "stddev": null,
+        "runs": [
+          null
+        ],
+        "load": {
+          "before": 0.15,
+          "after": 1.34,
+          "foreignCores": 0.031868614819845986,
+          "foreignTop": ""
+        }
+      },
+      "genomespy": {
+        "median": null,
+        "mean": null,
+        "stddev": null,
+        "runs": [],
+        "load": {
+          "before": 0,
+          "after": 0
+        },
+        "unsupported": "no cram reader"
+      },
+      "gosling": {
+        "median": null,
+        "mean": null,
+        "stddev": null,
+        "runs": [],
+        "load": {
+          "before": 0,
+          "after": 0
+        },
+        "unsupported": "no cram reader"
       }
     }
   },
   "dates": {
-    "20x-shortread-bam@19kb": "2026-08-24",
-    "200x-shortread-bam@19kb": "2026-08-24",
-    "1000x-shortread-bam@19kb": "2026-08-24",
-    "20x-longread-bam@19kb": "2026-08-25",
-    "200x-longread-bam@19kb": "2026-08-24",
-    "1000x-longread-bam@19kb": "2026-08-25",
-    "20x-shortread-cram@19kb": "2026-08-24",
-    "200x-shortread-cram@19kb": "2026-08-24",
-    "1000x-shortread-cram@19kb": "2026-08-25",
-    "20x-longread-cram@19kb": "2026-08-24",
-    "200x-longread-cram@19kb": "2026-08-24",
-    "1000x-longread-cram@19kb": "2026-08-24"
+    "20x-shortread-bam@19kb": "2026-08-31",
+    "200x-shortread-bam@19kb": "2026-08-30",
+    "1000x-shortread-bam@19kb": "2026-08-30",
+    "20x-longread-bam@19kb": "2026-08-30",
+    "200x-longread-bam@19kb": "2026-08-31",
+    "1000x-longread-bam@19kb": "2026-08-30",
+    "20x-shortread-cram@19kb": "2026-08-31",
+    "200x-shortread-cram@19kb": "2026-08-30",
+    "1000x-shortread-cram@19kb": "2026-08-30",
+    "20x-longread-cram@19kb": "2026-08-30",
+    "200x-longread-cram@19kb": "2026-08-31",
+    "1000x-longread-cram@19kb": "2026-08-30",
+    "20x-shortread-bam@100kb": "2026-08-30",
+    "20x-shortread-cram@100kb": "2026-08-30",
+    "200x-shortread-bam@100kb": "2026-08-30",
+    "200x-shortread-cram@100kb": "2026-08-30",
+    "1000x-shortread-bam@100kb": "2026-08-30",
+    "1000x-shortread-cram@100kb": "2026-08-30",
+    "20x-longread-bam@100kb": "2026-08-30",
+    "20x-longread-cram@100kb": "2026-08-30",
+    "200x-longread-bam@100kb": "2026-08-30",
+    "200x-longread-cram@100kb": "2026-08-30",
+    "1000x-longread-bam@100kb": "2026-08-30",
+    "1000x-longread-cram@100kb": "2026-08-30"
   },
   "jbrowseBuilds": {
     "jbrowse": "current",
