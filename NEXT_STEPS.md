@@ -90,11 +90,17 @@ should quote — see the standing constraint at the end of this file. The 100 kb
 window roughly quintuples the bytes per cell, so the full run is longer than the
 19 kb matrix was; `WINDOWS=19kb` restores the old scope.
 
-**The figures still draw four arms.** `scripts/arms.R` names v2.4.0, v4.3.0, the
-build under test and igv.js, and returns `NA` for anything else, so GenomeSpy and
-Gosling land in `results/crosstool.md` and in no figure. Whether they belong in
-the paper's figures is a design decision about those figures, not a gap in the
-measurement.
+**`scripts/arms.R` now draws GenomeSpy too — closed 2026-08-31.** It was four
+arms (v2.4.0, v4.3.0, the build under test, igv.js) returning `NA` for anything
+else, so GenomeSpy and Gosling landed in `results/crosstool.md` and in no
+figure. GenomeSpy is a fifth arm now, cold-load only (it is not in the zoom/pan
+JSON `panchart.R` reads), which meant the "every arm measured" completeness
+gate in `scripts/render/charts.R` had to become format-aware — GenomeSpy reads
+no CRAM, so requiring five arms on a CRAM case would have dropped CRAM from the
+figure entirely for a comparator that was never going to be there. Gosling
+stays out: its BAM fetcher declines a tile over 20kb, so it has no stock 100kb
+cell, and the "patched" arm that raises the cap reads a whole tile rather than
+the window, an upper bound rather than a result comparable to the other five.
 
 **A probe that queries the DOM for canvases misses igv.js entirely.** igv 3.x
 calls `parentDiv.attachShadow()` and puts its whole UI inside, so
@@ -439,8 +445,6 @@ From the 2026-08-05 handoff:
 - **`ecosystem/zarr.json` is transcribed, not measured here.** Its numbers come
   from `measure_signal_latency.ts` in `jbrowse-components`. Re-running that
   harness means hand-updating the JSON.
-- **`data/test.bw` is byte-identical to `data/200x.shortread.bw`.** Kept as a
-  generic fixture name; drop it if nothing ends up wanting it.
 - **TypeScript 7.0.2 is available**; the repo is on 5.9.3 deliberately, so root
   and `ecosystem/` share one compiler. Upgrade both together or neither.
 - **`build_webgl.log` / `gen_alignments.log`** still sit at the repo root. They

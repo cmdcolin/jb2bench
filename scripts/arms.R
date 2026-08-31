@@ -6,7 +6,7 @@
 # with no older JBrowse. A reader comparing two figures from the same run was
 # comparing two different sets of programs.
 #
-# Four arms, and the reason for each:
+# Five arms, and the reason for each:
 #
 #   v2.4.0        what the 2023 Genome Biology paper benchmarked as "jb2 parallel",
 #                 and therefore the version a reader has already seen numbers for.
@@ -18,9 +18,20 @@
 #                 says (main) so nobody quotes it as a shipped release.
 #   igv.js        the other tool. One outside comparison is worth more than three
 #                 more of our own versions.
+#   GenomeSpy     the other other tool, and the one whose BAM path is closest to
+#                 comparable: it decodes through @gmod/bam like this repo, where
+#                 igv.js does not. Cold load only -- it is not in the zoom/pan
+#                 JSON panchart.R reads, so it cannot appear in those figures.
 #
 # v4.1.15 was an arm until 2026-08-24 and is not any more. It sat between two
 # releases and moved no conclusion; the column it occupied is igv's now.
+#
+# Gosling is deliberately not an arm. Its BAM fetcher declines a tile wider than
+# 20kb, so the 100kb window has no stock cell at all, and the "patched" arm that
+# raises the cap reads a whole tile rather than the requested window -- an upper
+# bound, not a result comparable to the other four. results/crosstool.md keeps
+# both columns; a chart with fixed arms is the wrong place for a comparator that
+# needs its own caveat on every cell.
 
 # Build directory -> arm label. The key is the directory under builds/, which is
 # what resolveBuild() records, so a figure cannot be labelled with a version that
@@ -31,15 +42,24 @@ ARM_BUILD <- c(
   "current"        = "5.0.0 (main)"
 )
 
-# Oldest to newest, so a legend reads as a timeline and the other tool sits at
+# Not a build directory -- GenomeSpy is measured once, not staged per version --
+# so it gets its own constant rather than a slot in ARM_BUILD. The version is
+# written here rather than read from the run because crosstool.json does not
+# record one for it the way it does igvVersion; scripts/crosstool/runner.ts and
+# scripts/paperfigs/common.R's PERF_SERIES both hardcode "0.85.0" for the same
+# reason.
+GENOMESPY_LABEL <- "GenomeSpy 0.85.0"
+
+# Oldest to newest, so a legend reads as a timeline and the other tools sit at
 # the end rather than in the middle of our own history.
-ARM_LEVELS <- c(unname(ARM_BUILD), "igv.js")
+ARM_LEVELS <- c(unname(ARM_BUILD), "igv.js", GENOMESPY_LABEL)
 
 ARM_COL <- c(
   "v2.4.0 (2023 paper)" = "#c1462f",
   "v4.3.0"              = "#6a7fa8",
   "5.0.0 (main)"        = "#12796e",
-  "igv.js"              = "#7a5ea8"
+  "igv.js"              = "#7a5ea8",
+  "GenomeSpy 0.85.0"    = "#d4a017"
 )
 
 #' Label a recorded tool id.
@@ -47,10 +67,14 @@ ARM_COL <- c(
 #' JBrowse arms are `jbrowse` (the build under test) or `jbrowse-<build>`; the
 #' igv arms are `igv` and `igv-deep`. `under_test` is the build directory port
 #' 8000 served, which is the only way to know what the bare `jbrowse` id meant.
+#' `genomespy` is cold-load only -- panchart.R's zoom/pan JSON has no such key,
+#' so this branch is simply never reached there. `gosling` falls through to
+#' NA_character_ on purpose; see the header comment for why it stays out.
 arm_label <- function(tool_id, under_test, igv_version = NULL) {
   igv_name <- if (is.null(igv_version)) "igv.js" else paste("igv.js", igv_version)
   vapply(tool_id, function(id) {
     if (id == "igv") return(igv_name)
+    if (id == "genomespy") return(GENOMESPY_LABEL)
     if (id == "jbrowse") return(unname(ARM_BUILD[under_test]) %||% NA_character_)
     if (startsWith(id, "jbrowse-")) {
       return(unname(ARM_BUILD[sub("^jbrowse-", "", id)]) %||% NA_character_)
@@ -60,9 +84,11 @@ arm_label <- function(tool_id, under_test, igv_version = NULL) {
 }
 
 # Levels carrying the measured igv version, so the legend says 3.8.5 rather than
-# leaving a reader to find it in the prose.
+# leaving a reader to find it in the prose. GenomeSpy has no equivalent
+# per-run version to splice in -- see GENOMESPY_LABEL.
 arm_levels <- function(igv_version = NULL) {
-  c(unname(ARM_BUILD), if (is.null(igv_version)) "igv.js" else paste("igv.js", igv_version))
+  c(unname(ARM_BUILD), if (is.null(igv_version)) "igv.js" else paste("igv.js", igv_version),
+    GENOMESPY_LABEL)
 }
 
 arm_colours <- function(igv_version = NULL) {

@@ -85,8 +85,7 @@ except the reference is untracked and regenerable — roughly 750 MB.
   three tools share the alignment workload rather than falling back to signal.
   This bullet claimed the opposite until 2026-08-23 — "signal is the only
   workload a tool with no alignment track can share" — which was true of an
-  earlier harness design and never true of the file. `test.bw` is a
-  byte-identical copy of `200x.shortread.bw`, kept as a generic fixture name.
+  earlier harness design and never true of the file.
 - `R103.model` — the pbsim error model for the long-read simulation. Tracked.
 - `hg19_17.chrom.sizes` — chr17's size, left over from the variant-matrix work.
   Nothing in this repo currently reads it.

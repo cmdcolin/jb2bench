@@ -1,3 +1,5 @@
+.DS_Store
+
 # Simulated alignments — ~750 MB, and reproducible. Regenerate with
 # shell/generate_alignments.sh (needs wgsim, pbsim, minimap2, samtools), then
 # shell/load_alignments.sh to wire them into every build under builds/.

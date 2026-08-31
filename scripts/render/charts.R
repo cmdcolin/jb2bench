@@ -149,13 +149,22 @@ cold_df <- cold_rows |>
   filter(!is.na(program)) |>
   as_matrix_facets()
 
-# Only cases where every arm was measured. A case missing one arm draws a line
-# that stops, which reads as "this tool got slower and then failed" rather than
-# "nobody ran it"; the caption names what was dropped instead.
+# Only cases where every arm that *can* appear was measured. A case missing an
+# arm it should have draws a line that stops, which reads as "this tool got
+# slower and then failed" rather than "nobody ran it"; the caption names what
+# was dropped instead. "Should have" is format-dependent since GenomeSpy has no
+# CRAM reader (results/crosstool.md) -- expecting five arms on a CRAM case would
+# mark every CRAM case incomplete and drop the whole format from this figure,
+# for a comparator that was never going to be there.
 n_arms <- length(arm_levels(cold_igv))
+cram_arm_levels <- setdiff(arm_levels(cold_igv), GENOMESPY_LABEL)
+expected_n <- cold_df |>
+  distinct(case, fmt) |>
+  mutate(n_expected = ifelse(fmt == "CRAM", length(cram_arm_levels), n_arms))
 complete <- cold_df |>
   count(case) |>
-  filter(n == n_arms) |>
+  left_join(expected_n, by = "case") |>
+  filter(n == n_expected) |>
   pull(case)
 dropped <- setdiff(unique(cold_df$case), complete)
 cold_df <- cold_df |> filter(case %in% complete)
@@ -219,7 +228,7 @@ p_cold <- ggplot(cold_df, aes(coverage, median, colour = program, group = progra
                 peak_foreign, FOREIGN_MAX)
       },
       "Arms are measured back to back within each case, so contention lands on all of them at once and the ratios between them survive it better than the values do.\n",
-      "igv.js parses alignments on the main thread where JBrowse decodes in a worker, and JBrowse boots an application shell where igv mounts a widget. Both are inside these numbers, and a cold load is where they weigh most — results/figures/interaction.png is the same four arms with startup out of the number.\n",
+      "igv.js parses alignments on the main thread where JBrowse decodes in a worker, and JBrowse boots an application shell where igv mounts a widget. Both are inside these numbers, and a cold load is where they weigh most — results/figures/interaction.png is the JBrowse-and-igv.js arms of this figure with startup out of the number; GenomeSpy is not in that comparison, since it is not measured on the zoom/pan interactions.\n",
       if (length(missing_fmt)) {
         paste0("No ", paste(missing_fmt, collapse = " or "),
                " row: those cases have not been run since the runner started enumerating formats.\n")

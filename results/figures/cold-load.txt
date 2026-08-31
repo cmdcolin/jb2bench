@@ -18,6 +18,8 @@ Measured 2026-08-31 on one workstation.  Worst cell saw 0.10 cores of foreign CP
 so the absolute seconds stand. Peak 1-min load was 2.7, which counts this benchmark's own six renders and is context, not a verdict.  Arms are
 measured back to back within each case, so contention lands on all of them at once and the ratios between them survive it better than the values do.
 igv.js parses alignments on the main thread where JBrowse decodes in a worker, and JBrowse boots an application shell where igv mounts a widget. Both
-are inside these numbers, and a cold load is where they weigh most — results/figures/interaction.png is the same four arms with startup out of the
-number.
+are inside these numbers, and a cold load is where they weigh most — results/figures/interaction.png is the JBrowse-and-igv.js arms of this figure
+with startup out of the number; GenomeSpy is not in that comparison, since it is not measured on the zoom/pan interactions.  Excluded, because not
+every arm has a cell there: 1000x-longread-bam. igv.js at 1000x long read reaches 2.3 GB of renderer heap and does not reliably finish — see
+results/crosstool.md.
 
