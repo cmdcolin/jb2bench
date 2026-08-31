@@ -8,15 +8,15 @@ Region `chr22_mask:124000-143000` (19kb). In-page navigation→render-complete t
 
 | case | current | release-4.3.0 | release-2.4.0 | speedup vs release-4.3.0 | speedup vs release-2.4.0 | measured | foreign | by | load |
 |---|---:|---:|---:|---:|---:|---|---:|---|---:|
-| 20x-shortread-bam | 1764 ±45 | 2302 ±61 | 2232 ±7 | 1.31× | 1.27× | 2026-08-28 | 0.12 | firefox-bin 0.03, Isolated Web Co 0.02, claude 0.01 | 1.3 |
-| 20x-shortread-cram | 1818 ±5 | 2273 ±63 | 3631 ±36 | 1.25× | 2.00× | 2026-08-28 | 0.12 | Isolated Web Co 0.02, firefox-bin 0.02, claude 0.01 | 1.3 |
-| 200x-shortread-bam | 1967 ±47 | 2815 ±64 | 4035 ±78 | 1.43× | 2.05× | 2026-08-28 | 0.11 | Isolated Web Co 0.02, firefox-bin 0.02, claude 0.01 | 2.6 |
-| 200x-shortread-cram | 1920 ±51 | 2669 ±35 | 3463 ±44 | 1.39× | 1.80× | 2026-08-28 | 0.12 | Isolated Web Co 0.02, firefox-bin 0.02, claude 0.01 | 2.1 |
-| 1000x-shortread-bam | 2822 ±5 | 4568 ±70 | 7392 ±158 | 1.62× | 2.62× | 2026-08-28 | 0.10 | firefox-bin 0.02, Isolated Web Co 0.02 | 2.3 |
-| 1000x-shortread-cram | 2613 ±38 | 5532 ±122 | 9693 ±954 | 2.12× | 3.71× | 2026-08-28 | 0.11 | firefox-bin 0.03, Isolated Web Co 0.02 | 2.2 |
-| 20x-longread-bam | 1812 ±35 | 2557 ±64 | 2928 ±5 | 1.41× | 1.62× | 2026-08-28 | 0.12 | firefox-bin 0.02, Isolated Web Co 0.02, claude 0.01 | 2.2 |
-| 20x-longread-cram | 1912 ±40 | 2420 ±53 | 3829 ±53 | 1.27× | 2.00× | 2026-08-28 | 0.13 | Isolated Web Co 0.02, firefox-bin 0.02, claude 0.01 | 1.4 |
-| 200x-longread-bam | 2419 ±38 | 5740 ±148 | 7093 ±82 | 2.37× | 2.93× | 2026-08-28 | 0.11 | Isolated Web Co 0.02, firefox-bin 0.02 | 1.5 |
-| 200x-longread-cram | 2464 ±69 | 3585 ±36 | 5147 ±127 | 1.46× | 2.09× | 2026-08-28 | 0.10 | firefox-bin 0.02, Isolated Web Co 0.02 | 1.7 |
-| 1000x-longread-bam | 4621 ±81 | 18600 ±1430 | 21434 ±320 | 4.03× | 4.64× | 2026-08-28 | 0.09 | firefox-bin 0.02, Isolated Web Co 0.01 | 2.0 |
-| 1000x-longread-cram | 4913 ±68 | 8779 ±120 | 16885 ±1739 | 1.79× | 3.44× | 2026-08-28 | 0.08 | firefox-bin 0.02, Isolated Web Co 0.02 | 2.0 |
+| 20x-shortread-bam | 1219 ±40 | 2321 ±65 | 2246 ±44 | 1.90× | 1.84× | 2026-08-31 | 0.13 | htop 0.02, http-server 0.02, ptyxis 0.01 | 1.1 |
+| 20x-shortread-cram | 1217 ±37 | 2267 ±37 | 3572 ±50 | 1.86× | 2.94× | 2026-08-31 | 0.12 | htop 0.02, http-server 0.01, ptyxis 0.01 | 1.4 |
+| 200x-shortread-bam | 1411 ±42 | 2742 ±45 | 4039 ±62 | 1.94× | 2.86× | 2026-08-31 | 0.12 | htop 0.02, http-server 0.02, ptyxis 0.01 | 1.4 |
+| 200x-shortread-cram | 1419 ±55 | 2609 ±22 | 3490 ±517 | 1.84× | 2.46× | 2026-08-31 | 0.12 | htop 0.02, http-server 0.02, ptyxis 0.01 | 1.4 |
+| 1000x-shortread-bam | 2218 ±50 | 4508 ±124 | 7142 ±158 | 2.03× | 3.22× | 2026-08-31 | 0.12 | http-server 0.03, htop 0.02, ptyxis 0.01 | 1.6 |
+| 1000x-shortread-cram | 2011 ±36 | 5422 ±143 | 10120 ±868 | 2.70× | 5.03× | 2026-08-31 | 0.12 | htop 0.02, ptyxis 0.02, http-server 0.02 | 1.6 |
+| 20x-longread-bam | 1214 ±57 | 2566 ±49 | 2938 ±37 | 2.11× | 2.42× | 2026-08-31 | 0.12 | htop 0.02, http-server 0.02, ptyxis 0.01 | 1.8 |
+| 20x-longread-cram | 1317 ±41 | 2381 ±112 | 3734 ±59 | 1.81× | 2.83× | 2026-08-31 | 0.12 | htop 0.02, http-server 0.02, ptyxis 0.01 | 1.6 |
+| 200x-longread-bam | 1812 ±39 | 5540 ±115 | 6927 ±42 | 3.06× | 3.82× | 2026-08-31 | 0.14 | http-server 0.05, htop 0.02, ptyxis 0.02 | 1.8 |
+| 200x-longread-cram | 1723 ±68 | 3512 ±84 | 4944 ±123 | 2.04× | 2.87× | 2026-08-31 | 0.12 | http-server 0.03, htop 0.02, ptyxis 0.01 | 2.1 |
+| 1000x-longread-bam | 4106 ±38 | 18170 ±957 | 21232 ±284 | 4.43× | 5.17× | 2026-08-31 | 0.16 | http-server 0.08, htop 0.02, ptyxis 0.01 | 1.4 |
+| 1000x-longread-cram | 3410 ±61 | 8503 ±64 | 17478 ±1367 | 2.49× | 5.13× | 2026-08-31 | 0.14 | http-server 0.05, htop 0.02, ptyxis 0.01 | 2.9 |

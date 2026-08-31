@@ -56,18 +56,18 @@ answers rather than assumes; see "What each step actually did".
 
 | case | JBrowse (current) | JBrowse (release-4.3.0) | JBrowse (release-2.4.0) | igv.js 3.8.5 | igv.js 3.8.5 (depth 10000) | ratio | load | date |
 | --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | --- |
-| 20x-shortread-bam | 657 ms | 1193 ms | 1476 ms | 518 ms | 508 ms | 0.79x | 1.3 | 2026-08-29 |
-| 20x-shortread-cram | 653 ms † | 1153 ms † | 1445 ms | 509 ms | 526 ms | — | 0.7 | 2026-08-29 |
-| 200x-shortread-bam | 866 ms | 1428 ms | 3409 ms | 4304 ms | 4276 ms | 4.97x | 0.9 | 2026-08-29 |
-| 200x-shortread-cram | 771 ms | 1214 ms | 3960 ms | 4015 ms | 3870 ms | 5.21x | 1.1 | 2026-08-29 |
-| 1000x-shortread-bam | 1500 ms | 4147 ms | 8393 ms | 25906 ms | 26057 ms | 17.27x | 1.1 | 2026-08-29 |
-| 1000x-shortread-cram | 1246 ms | 4335 ms | 5522 ms | 24610 ms | 24868 ms | 19.75x | 2.2 | 2026-08-29 |
-| 20x-longread-bam | 675 ms † | 1276 ms † | 1655 ms † | 2654 ms | 2730 ms | — | 2.2 | 2026-08-29 |
-| 20x-longread-cram | 687 ms † | 1224 ms † | 1509 ms † | 2622 ms † | 2601 ms † | — | 1.0 | 2026-08-29 |
-| 200x-longread-bam | 914 ms † | 2662 ms † | 3734 ms † | 16472 ms | 16563 ms | — | 1.1 | 2026-08-29 |
-| 200x-longread-cram | 1242 ms | 1474 ms | 4275 ms | 16161 ms | 16420 ms | 13.02x | 1.1 | 2026-08-29 |
-| 1000x-longread-bam | 1972 ms † | 6187 ms † | 7783 ms † | — | — | — | 1.1 | 2026-08-29 |
-| 1000x-longread-cram | 3106 ms | 4789 ms | 8087 ms | — | — | — | 0.2 | 2026-08-29 |
+| 20x-shortread-bam | 506 ms | 1198 ms | 1460 ms | 509 ms | 505 ms | 1.00x | 1.0 | 2026-08-31 |
+| 20x-shortread-cram | 505 ms † | 1167 ms † | 1432 ms | 513 ms | 515 ms | — | 1.0 | 2026-08-31 |
+| 200x-shortread-bam | 506 ms | 1332 ms | 3411 ms | 4120 ms | 4166 ms | 8.14x | 1.3 | 2026-08-31 |
+| 200x-shortread-cram | 504 ms | 1140 ms | 3858 ms | 3908 ms | 3885 ms | 7.75x | 1.5 | 2026-08-31 |
+| 1000x-shortread-bam | 885 ms | 4054 ms | 7900 ms | 25692 ms | 25706 ms | 29.02x | 1.5 | 2026-08-31 |
+| 1000x-shortread-cram | 650 ms | 4345 ms | 5141 ms | 23992 ms | 24271 ms | 36.91x | 1.6 | 2026-08-31 |
+| 20x-longread-bam | 506 ms † | 1280 ms † | 1642 ms † | 2613 ms | 2637 ms | — | 1.6 | 2026-08-31 |
+| 20x-longread-cram | 505 ms † | 1218 ms † | 1504 ms † | 2582 ms † | 2618 ms † | — | 0.9 | 2026-08-31 |
+| 200x-longread-bam | 506 ms † | 2637 ms † | 3562 ms † | 16131 ms | 16452 ms | — | 1.2 | 2026-08-31 |
+| 200x-longread-cram | 504 ms | 1430 ms | 4178 ms | 15840 ms | 16059 ms | 31.40x | 1.2 | 2026-08-31 |
+| 1000x-longread-bam | 1399 ms † | 7739 ms † | 7729 ms † | — | — | — | 1.0 | 2026-08-31 |
+| 1000x-longread-cram | 1672 ms | 4801 ms | 7836 ms | — | — | — | 0.1 | 2026-08-31 |
 
 `ratio` is igv ÷ JBrowse: above 1.0 means JBrowse got content back sooner.
 
@@ -123,12 +123,12 @@ been removed for exactly this reason.
 
 | case | tool | steps | cached | requests | bytes | draws/step |
 | --- | --- | ---: | ---: | ---: | ---: | ---: |
-| 20x-shortread-bam | jbrowse | 5 | 3 | 2 | 512 KB | 42–50 |
+| 20x-shortread-bam | jbrowse | 5 | 3 | 2 | 512 KB | 43–50 |
 | 20x-shortread-bam | jbrowse-release-4.3.0 | 5 | 3 | 4 | 1536 KB | 10–16 |
 | 20x-shortread-bam | jbrowse-release-2.4.0 | 5 | 1 | 4 | 930 KB | 5–9 |
 | 20x-shortread-bam | igv | 5 | 0 | 7 | 995 KB | 94199–95329 |
 | 20x-shortread-bam | igv-deep | 5 | 0 | 7 | 995 KB | 94199–95329 |
-| 20x-shortread-cram | jbrowse | 5 | 5 | 0 | — | 42–50 |
+| 20x-shortread-cram | jbrowse | 5 | 5 | 0 | — | 43–50 |
 | 20x-shortread-cram | jbrowse-release-4.3.0 | 5 | 5 | 0 | — | 10–16 |
 | 20x-shortread-cram | jbrowse-release-2.4.0 | 5 | 4 | 4 | 109 KB | 5–9 |
 | 20x-shortread-cram | igv | 5 | 4 | 2 | 176 KB | 94182–95327 |
@@ -139,20 +139,20 @@ been removed for exactly this reason.
 | 200x-shortread-bam | igv | 5 | 0 | 27 | 23267 KB | 249693–251073 |
 | 200x-shortread-bam | igv-deep | 5 | 0 | 27 | 23267 KB | 249693–251073 |
 | 200x-shortread-cram | jbrowse | 5 | 0 | 8 | 2048 KB | 47–50 |
-| 200x-shortread-cram | jbrowse-release-4.3.0 | 5 | 0 | 11 | 2816 KB | 10–14 |
+| 200x-shortread-cram | jbrowse-release-4.3.0 | 5 | 0 | 11 | 2816 KB | 10–16 |
 | 200x-shortread-cram | jbrowse-release-2.4.0 | 5 | 0 | 81 | 2139 KB | 5–9 |
 | 200x-shortread-cram | igv | 5 | 0 | 47 | 2521 KB | 249691–251028 |
 | 200x-shortread-cram | igv-deep | 5 | 0 | 47 | 2521 KB | 249691–251028 |
 | 1000x-shortread-bam | jbrowse | 5 | 0 | 10 | 33536 KB | 47–50 |
 | 1000x-shortread-bam | jbrowse-release-4.3.0 | 5 | 1 | 16 | 59904 KB | 6–10 |
 | 1000x-shortread-bam | jbrowse-release-2.4.0 | 5 | 3 | 10 | 33604 KB | 1–6 |
-| 1000x-shortread-bam | igv | 4 | 0 | 106 | 121034 KB | 247995–249277 |
+| 1000x-shortread-bam | igv | 4 | 0 | 106 | 121034 KB | 247795–249524 |
 | 1000x-shortread-bam | igv-deep | 4 | 0 | 106 | 121034 KB | 250782–252709 |
 | 1000x-shortread-cram | jbrowse | 5 | 0 | 43 | 11008 KB | 47–50 |
 | 1000x-shortread-cram | jbrowse-release-4.3.0 | 5 | 0 | 73 | 18688 KB | 6–10 |
 | 1000x-shortread-cram | jbrowse-release-2.4.0 | 5 | 1 | 407 | 11145 KB | 1–4 |
-| 1000x-shortread-cram | igv | 5 | 0 | 273 | 13545 KB | 247922–249241 |
-| 1000x-shortread-cram | igv-deep | 5 | 0 | 268 | 13452 KB | 250638–252528 |
+| 1000x-shortread-cram | igv | 5 | 0 | 278 | 13624 KB | 247907–249531 |
+| 1000x-shortread-cram | igv-deep | 5 | 0 | 281 | 13648 KB | 250638–252528 |
 | 20x-longread-bam | jbrowse | 5 | 5 | 0 | — | 47–50 |
 | 20x-longread-bam | jbrowse-release-4.3.0 | 5 | 5 | 0 | — | 10–16 |
 | 20x-longread-bam | jbrowse-release-2.4.0 | 5 | 5 | 0 | — | 5–9 |
@@ -171,8 +171,8 @@ been removed for exactly this reason.
 | 200x-longread-cram | jbrowse | 5 | 3 | 5 | 8448 KB | 45–45 |
 | 200x-longread-cram | jbrowse-release-4.3.0 | 5 | 3 | 5 | 8448 KB | 8–14 |
 | 200x-longread-cram | jbrowse-release-2.4.0 | 5 | 3 | 21 | 8820 KB | 4–9 |
-| 200x-longread-cram | igv | 5 | 1 | 12 | 5974 KB | 1354058–1585083 |
-| 200x-longread-cram | igv-deep | 5 | 1 | 12 | 5974 KB | 1354058–1585083 |
+| 200x-longread-cram | igv | 5 | 2 | 12 | 5974 KB | 1354058–1585083 |
+| 200x-longread-cram | igv-deep | 5 | 2 | 12 | 5974 KB | 1354058–1585083 |
 | 1000x-longread-bam | jbrowse | 5 | 5 | 0 | — | 45–45 |
 | 1000x-longread-bam | jbrowse-release-4.3.0 | 5 | 5 | 0 | — | 2–4 |
 | 1000x-longread-bam | jbrowse-release-2.4.0 | 5 | 5 | 0 | — | 1–4 |
