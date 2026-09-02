@@ -1,0 +1,10 @@
+{
+  "matrix": "100-kb-window-maf-0-samples.bin",
+  "n": 2504,
+  "v": 3105,
+  "distanceMs": 4416.8,
+  "clusterMs": 84.2,
+  "totalMs": 4501,
+  "clusterShare": 0.0187,
+  "note": "first call in a fresh process, the one a user waits on"
+}

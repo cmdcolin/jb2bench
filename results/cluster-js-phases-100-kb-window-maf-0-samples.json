@@ -2,19 +2,53 @@
   "matrix": "100-kb-window-maf-0-samples.bin",
   "rows": 2504,
   "cols": 3105,
+  "impl": "naive",
+  "note": "sweep in one process; absolute times carry GC pressure, see compare.mjs",
   "budgetMs": 1800000,
   "results": [
     {
+      "n": 150,
+      "v": 3105,
+      "distanceMs": 106.3,
+      "clusterMs": 33.9,
+      "totalMs": 140.5,
+      "clusterShare": 0.242
+    },
+    {
+      "n": 300,
+      "v": 3105,
+      "distanceMs": 327,
+      "clusterMs": 96,
+      "totalMs": 423.1,
+      "clusterShare": 0.227
+    },
+    {
+      "n": 600,
+      "v": 3105,
+      "distanceMs": 1466.8,
+      "clusterMs": 731.5,
+      "totalMs": 2198.3,
+      "clusterShare": 0.3328
+    },
+    {
+      "n": 1200,
+      "v": 3105,
+      "distanceMs": 5952,
+      "clusterMs": 7265,
+      "totalMs": 13217.2,
+      "clusterShare": 0.5497
+    },
+    {
       "n": 2504,
       "v": 3105,
-      "distanceMs": 34984.6,
-      "clusterMs": 130077.1,
-      "totalMs": 165061.9,
-      "clusterShare": 0.7881
+      "distanceMs": 25972.3,
+      "clusterMs": 75416.9,
+      "totalMs": 101389.3,
+      "clusterShare": 0.7438
     }
   ],
   "exponents": {
-    "distance": null,
-    "cluster": null
+    "distance": 1.95,
+    "cluster": 2.74
   }
 }

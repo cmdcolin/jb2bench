@@ -13,10 +13,16 @@
 // nothing about which phase you are waiting on; the sweep tells you both, and
 // projects the rest.
 //
-// Usage: node scripts/cluster/jsphases.mjs [matrix.bin] [--ns=200,400,800] [--budget=SECONDS]
-//   results/cluster-js-phases.md + .json
+// --impl=opt swaps greenelab for optimized-hclust.mjs, the same sweep run
+// against the algorithm the wasm uses, ported to plain JS. greenelab answers
+// "what does the reference JS cost"; --impl=opt answers "how much of that was
+// the algorithm and how much was the runtime".
+//
+// Usage: node scripts/cluster/jsphases.mjs [matrix.bin] [--impl=naive|opt] [--ns=200,400,800] [--budget=SECONDS]
+//   results/cluster-js-phases-SLUG.json  (or cluster-jsopt-phases-SLUG.json)
 import { readFileSync, writeFileSync } from 'node:fs'
 import { clusterData as greenelab } from './vendor/greenelab-hclust.js'
+import { hierarchicalCluster as optimized } from './optimized-hclust.mjs'
 
 const args = process.argv.slice(2)
 const binPath = args.find(a => !a.startsWith('--')) ??
@@ -24,6 +30,13 @@ const binPath = args.find(a => !a.startsWith('--')) ??
 const NS = (args.find(a => a.startsWith('--ns='))?.slice(5) ?? '150,300,600,1200')
   .split(',').map(Number)
 const BUDGET_MS = Number(args.find(a => a.startsWith('--budget='))?.slice(9) ?? 240) * 1000
+const IMPL = args.find(a => a.startsWith('--impl='))?.slice(7) ?? 'naive'
+if (IMPL !== 'naive' && IMPL !== 'opt') {
+  throw new Error(`--impl must be naive or opt, got ${IMPL}`)
+}
+const run = IMPL === 'naive'
+  ? data => greenelab({ data, onProgress: () => {} })
+  : data => optimized({ data })
 
 // Layout written by hclust's `pnpm bench:real --dump`: uint32 rows, uint32
 // columns, then float32 row-major.
@@ -31,7 +44,7 @@ const buf = readFileSync(binPath)
 const rows = buf.readUInt32LE(0)
 const cols = buf.readUInt32LE(4)
 const values = new Float32Array(buf.buffer, buf.byteOffset + 8, rows * cols)
-console.log(`matrix ${binPath.split('/').pop()}: ${rows} x ${cols}`)
+console.log(`matrix ${binPath.split('/').pop()}: ${rows} x ${cols}   impl ${IMPL}`)
 
 // A prefix of the rows, as plain arrays — the shape greenelab's API takes.
 function subsample(n) {
@@ -47,7 +60,7 @@ for (const n of NS) {
   if (n > rows) { console.log(`skip N=${n}: matrix has ${rows} rows`); continue }
   const data = subsample(n)
   const t = performance.now()
-  const r = greenelab({ data, onProgress: () => {} })
+  const r = run(data)
   const totalMs = performance.now() - t
   const row = {
     n, v: cols,
@@ -75,6 +88,13 @@ function exponent(key) {
 }
 const out = {
   matrix: binPath.split('/').pop(), rows, cols,
+  impl: IMPL,
+  // A sweep measures SHAPE, not absolute cost. Every N runs in the one process
+  // and subsample() leaves ~62MB of dead JS arrays behind each time, so the
+  // last N in a sweep runs against a loaded heap: N=2504 reports ~23s here for
+  // a call that takes ~15s cold. Read the exponents from this file and the
+  // absolute times from compare.mjs, which forks per implementation.
+  note: 'sweep in one process; absolute times carry GC pressure, see compare.mjs',
   budgetMs: BUDGET_MS,
   results,
   exponents: { distance: exponent('distanceMs'), cluster: exponent('clusterMs') },
@@ -84,6 +104,7 @@ const out = {
 // exactly what happened, leaving a figure built from one matrix reading a file
 // written by another.
 const slug = binPath.split('/').pop().replace(/\.bin$/, '')
-writeFileSync(`results/cluster-js-phases-${slug}.json`, JSON.stringify(out, null, 2))
+const outPath = `results/cluster-${IMPL === 'opt' ? 'jsopt' : 'js'}-phases-${slug}.json`
+writeFileSync(outPath, JSON.stringify(out, null, 2))
 console.log(`\nmeasured scaling: distance ~ N^${out.exponents.distance}, merge ~ N^${out.exponents.cluster}`)
-console.log(`wrote results/cluster-js-phases-${slug}.json`)
+console.log(`wrote ${outPath}`)

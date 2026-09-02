@@ -1,0 +1,37 @@
+{
+  "matrix": "100-kb-window-maf-0-samples.bin",
+  "n": 2504,
+  "v": 3105,
+  "note": "each implementation in its own process, first call, no warmup",
+  "results": [
+    {
+      "impl": "naive",
+      "n": 2504,
+      "v": 3105,
+      "distanceMs": 33746.8,
+      "clusterMs": 104142,
+      "totalMs": 137889.1
+    },
+    {
+      "impl": "opt",
+      "n": 2504,
+      "v": 3105,
+      "distanceMs": 14644.6,
+      "clusterMs": 164.2,
+      "totalMs": 14810.3
+    },
+    {
+      "impl": "wasm",
+      "n": 2504,
+      "v": 3105,
+      "distanceMs": 3275.7,
+      "clusterMs": 21.2,
+      "totalMs": 3296.9
+    }
+  ],
+  "speedups": {
+    "algorithm": 9.31,
+    "runtime": 4.49,
+    "combined": 41.82
+  }
+}
