@@ -1,10 +1,12 @@
 #!/usr/bin/env python3
 """Build the results deck as a .pptx that imports cleanly into Google Slides.
 
-Figures come from results/figures/ (written by charts.R, which reads the
-runners' JSON) so no number is retyped on its way to a slide. The technique
-tables are transcribed from ~/paper's Table `tab:speedup-strategies` and its
-Materials and methods section, which are the record for what was done and why.
+Figures come from results/figures/paper/png/ (written by scripts/paperfigs,
+which reads the runners' JSON) so no number is retyped on its way to a slide.
+A figure that is not on disk is skipped rather than crashing the build, so a
+partial run still produces a deck. The technique tables are transcribed from
+~/paper's Table `tab:speedup-strategies` and its Materials and methods section,
+which are the record for what was done and why.
 
     scratchpad/pptxenv/bin/python scripts/render/deck.py   # -> results/jb2-results.pptx
 """
@@ -17,7 +19,7 @@ from pptx.enum.text import MSO_ANCHOR, PP_ALIGN
 from pptx.util import Emu, Inches, Pt
 
 ROOT = Path(__file__).resolve().parents[2]
-FIGS = ROOT / "results" / "figures"
+FIGS = ROOT / "results" / "figures" / "paper" / "png"
 OUT = ROOT / "results" / "jb2-results.pptx"
 
 INK = RGBColor(0x14, 0x1C, 0x1E)
@@ -319,34 +321,29 @@ footnote(
 # ------------------------------------------------------------------ figures
 for name, title, sub, eyebrow, note in [
     (
-        "cold-load.png",
+        "perf-coldload-combined.png",
         "End to end: cold load to rendered reads",
-        "Navigation → render-complete, median of 6 runs after a warmup. Lower is better.",
+        "Navigation → render-complete, median of three interleaved rounds. Lower is better.",
         "result — initial load",
-        "Fetch-dominated, so it understates the renderer difference. Every build parses in a worker and pulls the same bytes.",
+        "Fetch-dominated, so it understates the renderer difference. Every build parses in a worker and pulls the same bytes. A hollow point is a run abandoned at the paint ceiling — a bound, not a measurement.",
     ),
     (
-        "speedup-vs-published.png",
-        "Against the version the paper benchmarked",
-        "Cold-load median of v2.4.0 ÷ median of current HEAD.",
-        "result — initial load",
-        "Cumulative, not isolated: three years separate v2.4.0 from HEAD and almost none of it is the renderer.",
-    ),
-    (
-        "interaction.png",
+        "perf-interaction.png",
         "What an interaction costs you",
         "Time-to-content: seconds a loading indicator sits on the track before correct content is back.",
         "result — interactivity",
-        "Zoom in is the current renderer's best case and pan its worst. On a pan the region is new to both, so both pay the fetch.",
+        "Zoom in is the current renderer's best case and pan its worst: this work redraws a zoom without refetching at all, which is the zero on that row. On a pan the region is new to every arm, so all of them pay the fetch.",
     ),
     (
-        "parsers.png",
+        "parser-time.png",
         "The parser layer underneath",
         "Decode only — no browser, no GPU. 2023 release against current, both built from source at pinned tags.",
         "result — decoding",
-        "BigWig is the honest exception: 1.1–1.3× at 20x and 6–22% slower above it, on 1–3 ms operations.",
+        "The two alignment readers. BigWig is the honest exception and is not plotted: 1.1–1.3× at 20x and 6–22% slower above it, on 1–3 ms operations.",
     ),
 ]:
+    if not (FIGS / name).exists():
+        continue
     s = prs.slides.add_slide(BLANK)
     top = slide_head(s, title, sub, eyebrow=eyebrow)
     picture(s, name, top + Inches(0.06))

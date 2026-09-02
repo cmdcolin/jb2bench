@@ -1,10 +1,18 @@
 # The arms every figure in this repo draws, named and coloured in one place.
 #
-# Sourced by scripts/render/charts.R and scripts/crosstool/panchart.R. It used to
-# be two lists that drifted: the render figures ran v2.4.0/v4.1.15/v4.3.0/current
-# with no igv column at all, and the cross-tool figures ran current-against-igv
-# with no older JBrowse. A reader comparing two figures from the same run was
-# comparing two different sets of programs.
+# Sourced by scripts/paperfigs/common.R. It used to be two lists that drifted:
+# the render figures ran v2.4.0/v4.1.15/v4.3.0/current with no igv column at all,
+# and the cross-tool figures ran current-against-igv with no older JBrowse. A
+# reader comparing two figures from the same run was comparing two different sets
+# of programs.
+#
+# Its two consumers -- scripts/render/charts.R and scripts/crosstool/panchart.R --
+# were deleted on 2026-09-02, so the arm naming and colouring below (ARM_BUILD,
+# ARM_COL, arm_label, arm_levels, arm_colours) and paper_fig() have no caller
+# left. They are kept because the runs' JSON still records the tool ids they
+# decode, and a figure drawn from that JSON again would need them; what the
+# paperfigs scripts use is the formatting half further down -- fmt_time,
+# fmt_ratio, fmt_slower, endpoint_labels and the type sizes.
 #
 # Five arms, and the reason for each:
 #

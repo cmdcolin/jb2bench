@@ -220,17 +220,20 @@ timings: render interaction crosstool parsers cram-samtools
 paper-tables:
 	$(NODE) scripts/render/papertables.ts
 
+# The ecosystem sweep curves. This target used to draw two more sets into
+# results/figures/ -- scripts/render/charts.R's four-arm render charts and
+# scripts/crosstool/panchart.R's zoom/pan pair -- and both were deleted on
+# 2026-09-02: the manuscript figures under results/figures/paper/ draw the same
+# JSON and carry more (GenomeSpy, igv.js at both windows, the foreign-CPU gate),
+# so the older set was a second answer to the same question that nobody read.
 figures:
-	Rscript scripts/render/charts.R
-	Rscript scripts/crosstool/panchart.R
 	Rscript ecosystem/sweepchart.R
 
 # The manuscript figures, ported from the paper repo when the manuscript moved
-# to a Google Doc. Separate from `figures` above, which draws this repo's own
-# four-arm charts into results/figures/: these carry the comparators that set
-# does not (igv.js at both windows, GenomeSpy) and are gated on foreign CPU
-# per cell. Both draw the same JSON, so a conclusion should not depend on which
-# one you read; where they disagree, these are the ones the manuscript quotes.
+# to a Google Doc, and since 2026-09-02 the only figures this repo draws of the
+# render and cross-tool runs. They carry what the deleted four-arm set did not:
+# igv.js at both windows, GenomeSpy, and a foreign-CPU gate that drops a
+# contended cell rather than plotting it.
 #
 # Two targets, because the scripts are written as two halves. `paper-data`
 # re-reads results/ and rewrites the CSVs, and is what a fresh benchmark

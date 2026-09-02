@@ -31,8 +31,7 @@ numbers describe the same bytes.
 | `ecosystem/` | the parser-library benchmarks, self-contained |
 | `screenshots/` | puppeteer verify/probe output (untracked) |
 | `Makefile`, `scripts/gate.ts` | every benchmark in one place, and the preflight that decides whether a timing is worth keeping |
-| `results/figures/` | the ggplot2 figures, laid out like the 2023 paper's Fig 8: format × read type, time against coverage. Every one draws the same four arms — v2.4.0, v4.3.0, the build under test, igv.js — from `scripts/arms.R` |
-| `scripts/paperfigs/`, `results/figures/paper/` | the manuscript's own figures, ported here when the manuscript moved to a Google Doc. They draw the same JSON as the set above, and carry what it does not: GenomeSpy, igv.js at both windows, and a foreign-CPU gate that drops a contended cell rather than plotting it |
+| `scripts/paperfigs/`, `results/figures/paper/` | the ggplot2 figures, laid out like the 2023 paper's Fig 8: format × read type, time against coverage. Carries GenomeSpy and igv.js at both windows, and a foreign-CPU gate that drops a contended cell rather than plotting it. A second four-arm set under `results/figures/` was deleted on 2026-09-02 — it drew the same JSON and answered the same question with less |
 
 ## Where the conclusions are
 
@@ -342,9 +341,9 @@ that leaves the JBrowse family, and since 2026-08-24 it runs three JBrowse arms
 rather than one: the build under test, the last release, and the version the 2023
 paper benchmarked. The paper's own Fig 8 is igv.js against v2.4.0, so a matrix
 with only a current-JBrowse column answers half of what a reader of it is asking.
-It is also what `results/figures/cold-load.png` is drawn from — a figure carrying
-another tool has to come from the instrument all the arms share, and only this one
-does. Both tools read the same indexed BAMs out of
+It is also what the cold-load figures under `results/figures/paper/` are drawn
+from — a figure carrying another tool has to come from the instrument all the
+arms share, and only this one does. Both tools read the same indexed BAMs out of
 `data/` over HTTP range requests and draw a pileup, so the workload is genuinely
 shared; `crosstool/index.html` is an igv.js page driven entirely by URL
 parameters, the way the runners drive a JBrowse build.
@@ -647,10 +646,12 @@ separates them is the draw count. A genuine cache hit still shows a full 42–50
 draw burst; an abandoned step shows the 10-draw re-projection of stale content
 and nothing else.
 
-Figures: `Rscript scripts/crosstool/panchart.R` →
-`results/figures/interaction.png` (zoom and pan, all four arms) and
-`zoom-redraw.png`, drawn from the run's JSON so a slide cannot quote a number no
-run produced.
+Figures: `Rscript scripts/paperfigs/perf-interaction.R` →
+`results/figures/paper/perf-interaction.pdf` (zoom and pan), drawn from the
+run's JSON so a slide cannot quote a number no run produced. The zoom-redraw
+figure that used to sit beside it went with `scripts/crosstool/panchart.R` on
+2026-09-02; the draw counts it plotted are still recorded in
+`results/crosstool-pan.md`.
 
 **The numbers live in [`results/crosstool-pan.md`](results/crosstool-pan.md) and
 are deliberately not repeated here.** An earlier draft of this section did copy
