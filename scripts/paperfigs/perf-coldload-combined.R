@@ -22,7 +22,9 @@ source("scripts/paperfigs/common.R")
 DRAWN <- c("Release 2.4.0", "This work", "igv.js 3.8.5", "GenomeSpy 0.85.0")
 REPEL_SEED <- 7
 # In log10 coverage units: how far right of its point an endpoint label starts.
-ENDPOINT_NUDGE <- 0.5
+ENDPOINT_NUDGE <- 0.16
+# In log10 seconds: how far below its point a reference-curve label starts.
+REFERENCE_DROP <- -0.12
 
 all <- read.csv("results/paper/perf.csv", stringsAsFactors = FALSE)
 all <- subset(all, panel == "Cold load" & session == "cross-tool" &
@@ -71,7 +73,7 @@ on_line <- function(df) {
 CELL <- c("reads", "format", "window")
 ends <- endpoint_labels(meas, cell = CELL,
                         x = "coverage", y = "s", series = "series",
-                        reference = "This work")
+                        reference = "This work", ratio = fmt_slower_terse)
 ends <- subset(ends, series != "This work")
 inner <- meas[!is_endpoint(meas, ends, CELL, "coverage", "series"), ]
 
@@ -80,7 +82,13 @@ labels <- rbind(
   txt(ends, ends$label, "bold"),
   on_line(meas)
 )
-labels$nudge <- ifelse(labels$face == "bold", ENDPOINT_NUDGE, 0)
+labels$nudge <- ifelse(labels$face == "bold", ENDPOINT_NUDGE,
+                       ifelse(labels$label == "", 0, -0.07))
+# This work is the bottom curve in every cell, so its own times start below it,
+# in the empty band under the curve, rather than in the same strip as the
+# comparators' bold verdicts at the same x.
+labels$nudge_y <- ifelse(labels$series == "This work" & labels$label != "",
+                         REFERENCE_DROP, 0)
 
 note <- if (nrow(dropped)) {
   geom_text(data = dropped, label = "gap: cell measured under external load",
@@ -93,7 +101,8 @@ fig <- ggplot(meas, aes(x = coverage, y = s, colour = series)) +
   geom_point(size = POINT_S) +
   geom_text_repel(data = labels, aes(label = label, fontface = face,
                                      size = face),
-                  nudge_x = labels$nudge, lineheight = 0.9,
+                  nudge_x = labels$nudge, nudge_y = labels$nudge_y,
+                  lineheight = 0.9,
                   seed = REPEL_SEED, show.legend = FALSE,
                   box.padding = 0.35, point.padding = 0.15,
                   force = 3, force_pull = 0.4,
@@ -105,9 +114,9 @@ fig <- ggplot(meas, aes(x = coverage, y = s, colour = series)) +
   note +
   facet_grid(reads ~ window + format) +
   scale_x_log10(breaks = c(20, 200, 1000), labels = c("20×", "200×", "1000×"),
-                expand = expansion(mult = c(0.3, 0.8))) +
+                expand = expansion(mult = c(0.22, 0.22))) +
   time_scale_y("time (log scale)", breaks = c(1, 2, 5, 10, 20, 60, 120, 600),
-               expand = expansion(mult = c(0.22, 0.15))) +
+               expand = expansion(mult = c(0.22, 0.28))) +
   scale_colour_discrete(drop = FALSE,
                         breaks = intersect(PERF_SERIES,
                                            unique(as.character(d$series))),
@@ -118,7 +127,8 @@ fig <- ggplot(meas, aes(x = coverage, y = s, colour = series)) +
                         }) +
   guides(colour = guide_legend(nrow = 1)) +
   labs(x = "coverage", colour = NULL,
-       caption = "* no CRAM support. Bold: that tool's time divided by JBrowse 5.0.0's at the same point.") +
+       caption = paste("* no CRAM support. Bold: that tool's time at its last coverage,",
+                       "and how many times slower that is than JBrowse 5.0.0 at the same point.")) +
   paper_theme() +
   theme(plot.caption = element_text(size = rel(0.8), hjust = 0, colour = "grey30"))
 

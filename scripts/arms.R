@@ -129,6 +129,17 @@ fmt_ratio <- function(r) ifelse(r < 9.95, sprintf("%.1f×", r),
 fmt_slower <- function(r) ifelse(r >= 1, paste(fmt_ratio(r), "slower"),
                                  paste(fmt_ratio(1 / r), "faster"))
 
+# The same thing for a panel that cannot spare the word. "9.5x slower" is three
+# times the width of "9.5x", and in a cell where four series end within a decade
+# of each other that width is the difference between four labels the repel
+# solver can separate and four it cannot -- it settles them on top of one
+# another and the numbers are unreadable, which is worse than terse. The
+# direction moves to the figure's caption, which says it once for every cell.
+# "faster" stays spelled out: it is the exception, and a bare ratio in the
+# unexpected direction reads as the expected one.
+fmt_slower_terse <- function(r) ifelse(r >= 1, fmt_ratio(r),
+                                       paste(fmt_ratio(1 / r), "faster"))
+
 #' The last measured point of every series in a cell, with its ratio to the
 #' reference series at that same point.
 #'
@@ -137,14 +148,15 @@ fmt_slower <- function(r) ifelse(r >= 1, paste(fmt_ratio(r), "slower"),
 #' their label; every other arm gets fmt_slower. A series whose endpoint has no
 #' reference measurement at the same x gets no label at all, since a ratio
 #' against a cell nobody measured is not a ratio.
-endpoint_labels <- function(df, cell, x, y, series, reference) {
+endpoint_labels <- function(df, cell, x, y, series, reference,
+                            ratio = fmt_slower) {
   key <- function(d) do.call(paste, c(d[c(cell, x)], sep = "|"))
   ref <- df[df[[series]] == reference, ]
   ord <- df[order(-df[[x]]), ]
   ends <- ord[!duplicated(ord[c(cell, series)]), ]
   ends$ref_y <- ref[[y]][match(key(ends), key(ref))]
   ends$label <- ifelse(ends[[series]] == reference, fmt_time(ends[[y]]),
-                       paste0(fmt_time(ends[[y]]), "\n", fmt_slower(ends[[y]] / ends$ref_y)))
+                       paste0(fmt_time(ends[[y]]), "\n", ratio(ends[[y]] / ends$ref_y)))
   ends[!is.na(ends$ref_y) & is.finite(ends[[y]]), ]
 }
 

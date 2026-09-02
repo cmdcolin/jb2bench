@@ -103,7 +103,14 @@ all$s <- all$ms / 1000
 # time it is drawn.
 REPEL_SEED <- 7
 # In log10 coverage units: how far right of its point an endpoint label starts.
-ENDPOINT_NUDGE <- 0.42
+# Small on purpose. A nudge large enough to clear the curve entirely needs a
+# right margin as wide as a third of the panel, and that margin is empty on
+# every cell -- the figure then spends a third of its width on nothing. The
+# labels sit over the panel instead and the repel solver moves them off the
+# lines, which is what it is for.
+ENDPOINT_NUDGE <- 0.16
+# In log10 seconds: how far below its point a reference-curve label starts.
+REFERENCE_DROP <- -0.12
 
 draw <- function(win, out, width_label) {
   d <- subset(all, window == win)
@@ -157,7 +164,7 @@ draw <- function(win, out, width_label) {
   CELL <- c("reads", "format")
   ends <- endpoint_labels(meas, cell = CELL,
                           x = "coverage", y = "s", series = "series",
-                          reference = "This work")
+                          reference = "This work", ratio = fmt_slower_terse)
   ends <- subset(ends, series != "This work")
   inner <- d[!is_endpoint(d, ends, CELL, "coverage", "series"), ]
 
@@ -166,7 +173,18 @@ draw <- function(win, out, width_label) {
     txt(ends, ends$label, "bold"),
     on_line(meas)
   )
-  labels$nudge <- ifelse(labels$face == "bold", ENDPOINT_NUDGE, 0)
+  # Bold verdicts go right, plain times go left. Without the leftward half the
+  # two meet in the same strip beside the last point -- this work's own endpoint
+  # time is a plain label at the same x as every comparator's bold one -- and
+  # the solver has to break the tie by luck rather than by rule.
+  labels$nudge <- ifelse(labels$face == "bold", ENDPOINT_NUDGE,
+                         ifelse(labels$label == "", 0, -0.07))
+  # This work is the bottom curve in every cell, so its own times start below
+  # it, in the empty band under the curve. Left level with the point they land
+  # in the same strip as the comparators' bold verdicts at the same x, and the
+  # solver then has to choose between two labels that both want to be there.
+  labels$nudge_y <- ifelse(labels$series == "This work" & labels$label != "",
+                           REFERENCE_DROP, 0)
 
   note <- if (nrow(dropped)) {
     geom_text(data = dropped, label = "gap: cell measured under external load",
@@ -180,23 +198,24 @@ draw <- function(win, out, width_label) {
     geom_point(data = subset(d, censored), size = POINT_S, shape = 1) +
     geom_text_repel(data = labels, aes(label = label, fontface = face,
                                        size = face),
-                    nudge_x = labels$nudge, lineheight = 0.9,
+                    nudge_x = labels$nudge, nudge_y = labels$nudge_y,
+                    lineheight = 0.9,
                     seed = REPEL_SEED, show.legend = FALSE,
-                    box.padding = 0.3, point.padding = 0.15,
+                    box.padding = 0.38, point.padding = 0.2,
                     min.segment.length = 0.25, segment.size = 0.25,
                     segment.alpha = 0.5, max.overlaps = Inf,
-                    max.time = 2, max.iter = 30000) +
+                    max.time = 5, max.iter = 60000) +
     scale_size_manual(values = c(plain = POINT_LABEL, bold = ENDPOINT_LABEL),
                       guide = "none") +
     note +
     facet_grid(reads ~ format) +
     scale_x_log10(breaks = c(20, 200, 1000), labels = c("20×", "200×", "1000×"),
-                  expand = expansion(mult = c(0.2, 0.5))) +
+                  expand = expansion(mult = c(0.16, 0.2))) +
     # More labelled breaks than the shared default, for the same reason the
     # points are labelled: three decades carrying one gridline each is not a
     # scale a reader can place a value on.
     time_scale_y("time (log scale)", breaks = c(1, 2, 5, 10, 20, 60, 120, 600),
-                 expand = expansion(mult = c(0.17, 0.15))) +
+                 expand = expansion(mult = c(0.17, 0.28))) +
     # drop = FALSE keeps every series the colour it has in the other figure and
     # in the other window, which is the whole point of a shared PERF_SERIES:
     # these two figures are meant to be compared by overlay. `breaks` then
@@ -215,7 +234,8 @@ draw <- function(win, out, width_label) {
          caption = paste(
            sprintf("%s window, navigation to render-complete,", width_label),
            "median of three interleaved rounds in one session.",
-           "Bold: that tool's time divided by this work's at the same point.",
+           "Bold: that tool's time at its last coverage, and how many times",
+           "slower that is than this work at the same point.",
            "Hollow: gave up at the paint ceiling.",
            ABSENT, sep = "\n")) +
     paper_theme() +

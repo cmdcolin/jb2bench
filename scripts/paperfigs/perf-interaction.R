@@ -69,13 +69,17 @@ LABEL_COLS <- c("panel", "reads", "coverage", "s", "series", "label")
 
 pan_ends <- endpoint_labels(subset(plotted, panel == "Pan, both refetch"),
                             cell = c("panel", "reads"), x = "coverage", y = "s",
-                            series = "series", reference = "This work")
+                            series = "series", reference = "This work",
+                            ratio = fmt_slower_terse)
 pan_ends$label <- sub("\n", " · ", pan_ends$label, fixed = TRUE)
 
 zoom <- subset(plotted, panel == "Zoom in, within loaded data")
 zoom <- zoom[order(-zoom$coverage), ]
 zoom_ends <- zoom[!duplicated(zoom[c("panel", "reads", "series")]), ]
-zoom_ends$label <- ifelse(zoom_ends$series == "This work", "0 s · no refetch",
+# Plain "0 s", not "0 s, no refetch": the caption says what the zero is, and
+# spelled out in the panel the phrase is wider than the gutter that holds every
+# other endpoint label, so it alone would set the figure's right margin.
+zoom_ends$label <- ifelse(zoom_ends$series == "This work", "0 s",
                           fmt_time(zoom_ends$s))
 
 ends <- rbind(pan_ends[LABEL_COLS], zoom_ends[LABEL_COLS])
@@ -100,7 +104,7 @@ fig <- ggplot(plotted, aes(x = coverage, y = s, colour = series)) +
   drop_note +
   facet_wrap(~panel + reads, nrow = 2, scales = "free_y") +
   scale_x_log10(breaks = c(20, 200, 1000), labels = c("20×", "200×", "1000×"),
-                expand = expansion(mult = c(0.08, 0.85))) +
+                expand = expansion(mult = c(0.08, 0.3))) +
   scale_y_continuous(expand = expansion(mult = c(0.05, 0.12))) +
   # drop = FALSE keeps "This work" the colour it is in the cold-load figure;
   # `breaks` keeps the legend to the three builds this run measured, which is
@@ -114,7 +118,8 @@ fig <- ggplot(plotted, aes(x = coverage, y = s, colour = series)) +
   labs(x = "coverage", y = "seconds", colour = NULL,
        caption = paste("time-to-content after a 2× zoom in and after a one-viewport pan,",
                        "median of five steps; zero is a redraw with no refetch.",
-                       "Bold: that release's time divided by this work's at the same point",
+                       "Bold: that release's time at 1000×, and how many times slower",
+                       "that is than this work at the same point",
                        sep = "\n")) +
   paper_theme() +
   theme(plot.caption = element_text(size = rel(0.8), hjust = 0, face = "italic",
