@@ -69,8 +69,7 @@ LABEL_COLS <- c("panel", "reads", "coverage", "s", "series", "label")
 
 pan_ends <- endpoint_labels(subset(plotted, panel == "Pan, both refetch"),
                             cell = c("panel", "reads"), x = "coverage", y = "s",
-                            series = "series", reference = "This work",
-                            ratio = fmt_slower_terse)
+                            series = "series", reference = "This work")
 pan_ends$label <- sub("\n", " · ", pan_ends$label, fixed = TRUE)
 
 zoom <- subset(plotted, panel == "Zoom in, within loaded data")

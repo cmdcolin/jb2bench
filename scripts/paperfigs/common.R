@@ -17,10 +17,71 @@
 dir.create("results/figures/paper/pdf", showWarnings = FALSE, recursive = TRUE)
 dir.create("results/figures/paper/png", showWarnings = FALSE, recursive = TRUE)
 
-# fmt_time, fmt_ratio, fmt_slower, endpoint_labels and the label/line sizes live
-# in scripts/arms.R, shared with the repo's own figures so both sets label a
-# point the same way.
-source("scripts/arms.R")
+# These lived in scripts/arms.R while the repo drew a second figure set that
+# shared them. That set and its two scripts went on 2026-09-02, and what was
+# left of arms.R was the arm naming and colouring they alone used; the half
+# below is everything that had a caller, so it moves here rather than leaving a
+# file named for arms that no longer names any.
+
+# Type and stroke sizes every figure draws its data with. geom_text sizes are
+# in mm, so points are converted through ggplot2's .pt.
+POINT_LABEL <- 10 / .pt
+ENDPOINT_LABEL <- 12 / .pt
+LINE_W <- 0.9
+POINT_S <- 2.3
+
+# Durations in the unit a person would say out loud -- 10 ms, 1 s, 1 min --
+# rather than a bare number a reader has to convert.
+fmt_time <- function(s) {
+  n <- function(x) trimws(formatC(x, format = "fg", digits = 2, drop0trailing = TRUE))
+  ifelse(is.na(s), "",
+  ifelse(s < 0.9995, paste0(round(s * 1000), " ms"),
+  ifelse(s < 9.95,   paste0(n(round(s, 1)), " s"),
+  ifelse(s < 59.5,   paste0(round(s), " s"),
+  ifelse(s < 3540,   paste0(n(round(s / 60, 1)), " min"),
+                     paste0(n(round(s / 3600, 1)), " h"))))))
+}
+
+fmt_ratio <- function(r) ifelse(r < 9.95, sprintf("%.1f×", r),
+                                sprintf("%s×", trimws(format(round(r), big.mark = ","))))
+
+# The endpoint label every comparator carries: its time divided by the build
+# under test at the same cell.
+#
+# The bare ratio, not "9.5x slower". The word is three times the width of the
+# number, and in a cell where four series end within a decade of each other that
+# width is the difference between four labels the repel solver can separate and
+# four it cannot -- it settles them on top of one another and the numbers are
+# unreadable, which is worse than terse. Every figure's caption says the
+# direction once, for every cell on it. "faster" stays spelled out: it is the
+# exception, and a bare ratio in the unexpected direction reads as the expected
+# one.
+fmt_slower <- function(r) ifelse(r >= 1, fmt_ratio(r),
+                                 paste(fmt_ratio(1 / r), "faster"))
+
+#' The last measured point of every series in a cell, with its ratio to the
+#' reference series at that same point.
+#'
+#' `cell` names the columns that identify a panel, `x` the sweep, `y` the
+#' measurement and `series` the arm. Rows for the reference arm get its time as
+#' their label; every other arm gets fmt_slower. A series whose endpoint has no
+#' reference measurement at the same x gets no label at all, since a ratio
+#' against a cell nobody measured is not a ratio.
+endpoint_labels <- function(df, cell, x, y, series, reference) {
+  key <- function(d) do.call(paste, c(d[c(cell, x)], sep = "|"))
+  ref <- df[df[[series]] == reference, ]
+  ord <- df[order(-df[[x]]), ]
+  ends <- ord[!duplicated(ord[c(cell, series)]), ]
+  ends$ref_y <- ref[[y]][match(key(ends), key(ref))]
+  ends$label <- ifelse(ends[[series]] == reference, fmt_time(ends[[y]]),
+                       paste0(fmt_time(ends[[y]]), "\n", fmt_slower(ends[[y]] / ends$ref_y)))
+  ends[!is.na(ends$ref_y) & is.finite(ends[[y]]), ]
+}
+
+is_endpoint <- function(df, ends, cell, x, series) {
+  key <- function(d) do.call(paste, c(d[c(cell, x, series)], sep = "|"))
+  key(df) %in% key(ends)
+}
 
 TIME_BREAKS <- c(0.001, 0.01, 0.1, 1, 10, 60, 600, 3600)
 TIME_MINOR <- c(outer(c(2, 5), 10^(-4:3)))
@@ -118,11 +179,9 @@ curve_obstacles <- function(df, cell) {
 #' drawn from. Both figures that call this used to carry their own copy, and the
 #' copies had already diverged -- the combined one dropped the censored rows
 #' before labelling, so an abandoned run appeared as a curve that simply stopped.
-coldload_labels <- function(d, meas, cell, reference,
-                            ratio = fmt_slower_terse) {
+coldload_labels <- function(d, meas, cell, reference) {
   ends <- endpoint_labels(meas, cell = cell, x = "coverage", y = "s",
-                          series = "series", reference = reference,
-                          ratio = ratio)
+                          series = "series", reference = reference)
   ends <- ends[ends$series != reference, ]
   inner <- d[!is_endpoint(d, ends, cell, "coverage", "series"), ]
 

@@ -90,7 +90,7 @@ should quote — see the standing constraint at the end of this file. The 100 kb
 window roughly quintuples the bytes per cell, so the full run is longer than the
 19 kb matrix was; `WINDOWS=19kb` restores the old scope.
 
-**`scripts/arms.R` now draws GenomeSpy too — closed 2026-08-31.** It was four
+**The figure arms drew GenomeSpy too — closed 2026-08-31.** It was four
 arms (v2.4.0, v4.3.0, the build under test, igv.js) returning `NA` for anything
 else, so GenomeSpy and Gosling landed in `results/crosstool.md` and in no
 figure. GenomeSpy is a fifth arm now, cold-load only (it is not in the zoom/pan
@@ -98,8 +98,9 @@ JSON the interaction figure reads), which meant the "every arm measured"
 completeness gate in the figure scripts had to become format-aware — GenomeSpy
 reads no CRAM, so requiring five arms on a CRAM case would have dropped CRAM
 from the figure entirely for a comparator that was never going to be there.
-(`scripts/render/charts.R`, where that gate lived, was deleted on 2026-09-02
-along with the rest of the four-arm figure set.) Gosling
+(`scripts/render/charts.R`, where that gate lived, and `scripts/arms.R`, which
+named the arms for it, were both deleted on 2026-09-02 along with the rest of
+the four-arm figure set; `results/figures/paper/` names its own series.) Gosling
 stays out: its BAM fetcher declines a tile over 20kb, so it has no stock 100kb
 cell, and the "patched" arm that raises the cap reads a whole tile rather than
 the window, an upper bound rather than a result comparable to the other five.
