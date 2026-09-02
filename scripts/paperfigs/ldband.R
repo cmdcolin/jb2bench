@@ -35,8 +35,7 @@
 #
 #   Rscript scripts/paperfigs/ldband.R
 #
-# Stock ggplot2 throughout: default theme, default discrete colour scale, no
-# bespoke palette or typography.
+# Stock discrete colour scale; type sizes come from common.R's paper_theme.
 
 suppressPackageStartupMessages({
   library(ggplot2)
@@ -112,12 +111,12 @@ axis <- unique(subset(d, !declined, select = c("band", "window", "output_mib")))
 axis <- axis[order(axis$band), ]
 
 fig <- ggplot(long, aes(x = band, y = s, colour = series)) +
-  geom_line() +
-  geom_point(size = 2.2) +
-  geom_text(aes(label = fmt_time(s)), vjust = -1.1, size = 2.2,
+  geom_line(linewidth = LINE_W) +
+  geom_point(size = POINT_S) +
+  geom_text(aes(label = fmt_time(s)), vjust = -1.1, size = POINT_LABEL,
             show.legend = FALSE) +
   geom_text(data = ratio, aes(x = band, y = mid, label = lab), hjust = -0.2,
-            size = 2.3, fontface = "bold", inherit.aes = FALSE) +
+            size = ENDPOINT_LABEL, fontface = "bold", inherit.aes = FALSE) +
   # Shared scales, deliberately: the panels are here to be compared with each
   # other, and free scales would hide that they land in the same place.
   facet_wrap(~panel, nrow = 1) +
@@ -134,10 +133,10 @@ fig <- ggplot(long, aes(x = band, y = s, colour = series)) +
                           format(d$num_snps[1], big.mark = ","),
                           format(d$num_samples[1], big.mark = ","),
                           toupper(d$adapter[1]))) +
-  theme(legend.position = "top")
+  paper_theme()
 
 ggsave("results/figures/paper/pdf/ldband.pdf", fig,
-       width = 180, height = 88, units = "mm", device = cairo_pdf)
+       width = 230, height = 115, units = "mm", device = cairo_pdf)
 cat("wrote results/figures/paper/pdf/ldband.pdf\n")
 
 # PNG at the same geometry, for the documents and slides that will not take a
@@ -145,7 +144,7 @@ cat("wrote results/figures/paper/pdf/ldband.pdf\n")
 # reachable by name rather than by whatever order a manuscript happens to
 # reference it in.
 ggsave("results/figures/paper/png/ldband.png", fig,
-       width = 180, height = 88, units = "mm", dpi = 300, device = ragg::agg_png)
+       width = 230, height = 115, units = "mm", dpi = 300, device = ragg::agg_png)
 cat("wrote results/figures/paper/png/ldband.png\n")
 
 # ---- draft caption ----------------------------------------------------------

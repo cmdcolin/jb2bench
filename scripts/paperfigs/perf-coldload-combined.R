@@ -20,8 +20,9 @@ suppressPackageStartupMessages({
 source("scripts/paperfigs/common.R")
 
 DRAWN <- c("Release 2.4.0", "This work", "igv.js 3.8.5", "GenomeSpy 0.85.0")
-RATIO_ARMS <- c("igv.js 3.8.5", "GenomeSpy 0.85.0")
 REPEL_SEED <- 7
+# In log10 coverage units: how far right of its point an endpoint label starts.
+ENDPOINT_NUDGE <- 0.5
 
 all <- read.csv("results/paper/perf.csv", stringsAsFactors = FALSE)
 all <- subset(all, panel == "Cold load" & session == "cross-tool" &
@@ -64,39 +65,49 @@ on_line <- function(df) {
   }))
 }
 
-cell <- function(x) paste(x$coverage, x$reads, x$format, x$window)
-mine <- subset(meas, series == "This work")
-rat <- subset(meas, series %in% RATIO_ARMS)
-rat$this_work <- mine$s[match(cell(rat), cell(mine))]
-rat <- subset(rat, !is.na(this_work))
+# Every comparator's last point carries its ratio to this work at that cell,
+# bold and pushed to the right of the curve so it reads as the series' verdict
+# rather than as one more number on the point.
+CELL <- c("reads", "format", "window")
+ends <- endpoint_labels(meas, cell = CELL,
+                        x = "coverage", y = "s", series = "series",
+                        reference = "This work")
+ends <- subset(ends, series != "This work")
+inner <- meas[!is_endpoint(meas, ends, CELL, "coverage", "series"), ]
 
 labels <- rbind(
-  txt(meas, fmt_time(meas$s), "plain"),
-  txt(rat, fmt_ratio(rat$s / rat$this_work), "bold"),
+  txt(inner, fmt_time(inner$s), "plain"),
+  txt(ends, ends$label, "bold"),
   on_line(meas)
 )
+labels$nudge <- ifelse(labels$face == "bold", ENDPOINT_NUDGE, 0)
 
 note <- if (nrow(dropped)) {
   geom_text(data = dropped, label = "gap: cell measured under external load",
-            x = Inf, y = -Inf, hjust = 1.04, vjust = -0.8, size = 2.1,
+            x = Inf, y = -Inf, hjust = 1.04, vjust = -0.8, size = POINT_LABEL,
             inherit.aes = FALSE)
 }
 
 fig <- ggplot(meas, aes(x = coverage, y = s, colour = series)) +
-  geom_line() +
-  geom_point(size = 1.6) +
-  geom_text_repel(data = labels, aes(label = label, fontface = face),
-                  size = 2.15, seed = REPEL_SEED, show.legend = FALSE,
-                  box.padding = 0.22, point.padding = 0.1,
-                  min.segment.length = 0.25, segment.size = 0.2,
+  geom_line(linewidth = LINE_W) +
+  geom_point(size = POINT_S) +
+  geom_text_repel(data = labels, aes(label = label, fontface = face,
+                                     size = face),
+                  nudge_x = labels$nudge, lineheight = 0.9,
+                  seed = REPEL_SEED, show.legend = FALSE,
+                  box.padding = 0.35, point.padding = 0.15,
+                  force = 3, force_pull = 0.4,
+                  min.segment.length = 0.25, segment.size = 0.25,
                   segment.alpha = 0.5, max.overlaps = Inf,
-                  max.time = 1.5, max.iter = 20000) +
+                  max.time = 5, max.iter = 60000) +
+  scale_size_manual(values = c(plain = POINT_LABEL, bold = ENDPOINT_LABEL),
+                    guide = "none") +
   note +
   facet_grid(reads ~ window + format) +
   scale_x_log10(breaks = c(20, 200, 1000), labels = c("20×", "200×", "1000×"),
-                expand = expansion(mult = c(0.3, 0.3))) +
+                expand = expansion(mult = c(0.3, 0.8))) +
   time_scale_y("time (log scale)", breaks = c(1, 2, 5, 10, 20, 60, 120, 600),
-               expand = expansion(mult = c(0.17, 0.15))) +
+               expand = expansion(mult = c(0.22, 0.15))) +
   scale_colour_discrete(drop = FALSE,
                         breaks = intersect(PERF_SERIES,
                                            unique(as.character(d$series))),
@@ -107,16 +118,15 @@ fig <- ggplot(meas, aes(x = coverage, y = s, colour = series)) +
                         }) +
   guides(colour = guide_legend(nrow = 1)) +
   labs(x = "coverage", colour = NULL,
-       caption = "* no CRAM support") +
-  theme(legend.position = "top",
-        legend.text = element_text(size = 8.5),
-        plot.caption = element_text(size = 7.5, hjust = 0, colour = "grey30"))
+       caption = "* no CRAM support. Bold: that tool's time divided by JBrowse 5.0.0's at the same point.") +
+  paper_theme() +
+  theme(plot.caption = element_text(size = rel(0.8), hjust = 0, colour = "grey30"))
 
 ggsave("results/figures/paper/pdf/perf-coldload-combined.pdf", fig,
-       width = 320, height = 150, units = "mm", device = cairo_pdf)
+       width = 360, height = 190, units = "mm", device = cairo_pdf)
 cat("wrote results/figures/paper/pdf/perf-coldload-combined.pdf\n")
 
 ggsave("results/figures/paper/png/perf-coldload-combined.png", fig,
-       width = 320, height = 150, units = "mm", dpi = 300,
+       width = 360, height = 190, units = "mm", dpi = 300,
        device = ragg::agg_png)
 cat("wrote results/figures/paper/png/perf-coldload-combined.png\n")

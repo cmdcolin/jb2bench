@@ -14,8 +14,7 @@
 #
 #   Rscript scripts/paperfigs/cluster-endtoend.R
 #
-# Stock ggplot2 throughout: default theme, default discrete colour scale, no
-# bespoke palette or typography.
+# Stock discrete colour scale; type sizes come from common.R's paper_theme.
 
 suppressPackageStartupMessages({
   library(ggplot2)
@@ -50,28 +49,30 @@ step <- do.call(rbind, lapply(seq_len(nrow(total) - 1), function(i) {
 headline <- fmt_ratio(total$s[total$config == "JS"] / min(total$s))
 
 fig <- ggplot(total, aes(x = config, y = s)) +
-  geom_line(aes(group = 1), colour = "grey60") +
-  geom_point(aes(colour = config), size = 2.6, show.legend = FALSE) +
-  geom_text(aes(label = fmt_time(s)), vjust = -1.3, size = 2.5) +
+  geom_line(aes(group = 1), colour = "grey60", linewidth = LINE_W) +
+  geom_point(aes(colour = config), size = POINT_S + 0.5, show.legend = FALSE) +
+  geom_text(aes(label = fmt_time(s)), vjust = -1.3, size = POINT_LABEL) +
   geom_text(data = step, aes(x = x, y = mid, label = lab), hjust = -0.25,
-            size = 2.5, fontface = "bold", inherit.aes = FALSE) +
-  annotate("text", x = Inf, y = Inf, hjust = 1.06, vjust = 1.6, size = 2.7,
+            size = ENDPOINT_LABEL, fontface = "bold", inherit.aes = FALSE) +
+  annotate("text", x = Inf, y = Inf, hjust = 1.06, vjust = 1.6, size = ENDPOINT_LABEL,
            fontface = "bold", label = paste(headline, "vs JS, end to end")) +
   time_scale_y("time (log scale)", expand = expansion(mult = c(0.12, 0.2))) +
   scale_x_discrete(expand = expansion(add = 0.65)) +
   labs(x = "distance-build implementation",
        subtitle = sprintf("clustering a %s matrix,\nsamples × ALT-allele columns",
-                          total$matrix[1]))
+                          total$matrix[1])) +
+  paper_theme() +
+  theme(plot.subtitle = element_text(size = rel(0.8)))
 
 # Not 180 mm like its siblings. Three points do not need the full column width,
 # and stretched to it the panel becomes a letterbox strip with the data spread
 # thin across it. Include this one at its natural width rather than at
 # \linewidth, or the type comes out larger than in every other figure.
 ggsave("results/figures/paper/pdf/cluster-endtoend.pdf", fig,
-       width = 88, height = 78, units = "mm", device = cairo_pdf)
+       width = 115, height = 100, units = "mm", device = cairo_pdf)
 cat("wrote results/figures/paper/pdf/cluster-endtoend.pdf\n")
 ggsave("results/figures/paper/png/cluster-endtoend.png", fig,
-       width = 88, height = 78, units = "mm", dpi = 300, device = ragg::agg_png)
+       width = 115, height = 100, units = "mm", dpi = 300, device = ragg::agg_png)
 cat("wrote results/figures/paper/png/cluster-endtoend.png\n")
 
 # ---- draft caption ----------------------------------------------------------

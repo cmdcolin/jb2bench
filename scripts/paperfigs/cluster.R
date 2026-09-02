@@ -18,11 +18,11 @@
 #
 #   Rscript scripts/paperfigs/cluster.R
 #
-# Stock ggplot2 throughout: default theme, default discrete colour scale, no
-# bespoke palette or typography.
+# Stock discrete colour scale; type sizes come from common.R's paper_theme.
 
 suppressPackageStartupMessages({
   library(ggplot2)
+  library(ggrepel)
   library(ragg)
 })
 source("scripts/paperfigs/common.R")
@@ -74,14 +74,15 @@ ratio_js <- data.frame(v = w$v, rows = w$rows,
 # Both axes are logarithmic, so a slope of one is linear cost in columns and the
 # vertical gap between two curves is their ratio at every size.
 fig <- ggplot(d, aes(x = v, y = s, colour = series)) +
-  geom_line() +
-  geom_point(size = 2.2) +
-  geom_text(aes(label = fmt_time(s)), vjust = -1.1, size = 2.1,
-            show.legend = FALSE) +
+  geom_line(linewidth = LINE_W) +
+  geom_point(size = POINT_S) +
+  geom_text_repel(aes(label = fmt_time(s)), nudge_y = 0.13, direction = "y",
+                  size = POINT_LABEL, seed = 7, segment.colour = NA,
+                  box.padding = 0.1, show.legend = FALSE) +
   geom_text(data = ratio_wasm, aes(x = v, y = mid, label = lab),
-            size = 2.4, fontface = "bold", inherit.aes = FALSE) +
+            size = ENDPOINT_LABEL, fontface = "bold", inherit.aes = FALSE) +
   geom_text(data = ratio_js, aes(x = v, y = mid, label = lab),
-            size = 2.4, fontface = "bold", inherit.aes = FALSE) +
+            size = ENDPOINT_LABEL, fontface = "bold", inherit.aes = FALSE) +
   facet_wrap(~rows) +
   time_scale_y("time (log scale)", breaks = c(0.1, 1, 10, 60, 600, 3600),
                expand = expansion(mult = c(0.1, 0.14))) +
@@ -92,17 +93,17 @@ fig <- ggplot(d, aes(x = v, y = s, colour = series)) +
                 labels = function(x) format(x, big.mark = ",", scientific = FALSE, trim = TRUE),
                 expand = expansion(mult = c(0.12, 0.16))) +
   labs(x = "variant columns (log scale)", colour = NULL) +
-  theme(legend.position = "top")
+  paper_theme()
 
 ggsave("results/figures/paper/pdf/cluster-speedup.pdf", fig,
-       width = 180, height = 110, units = "mm", device = cairo_pdf)
+       width = 240, height = 140, units = "mm", device = cairo_pdf)
 cat("wrote results/figures/paper/pdf/cluster-speedup.pdf\n")
 
 # PNG at the same geometry, for the documents and slides that will not take a
 # PDF. Written beside the PDF and named for its subject; see the note in
 # scripts/paperfigs/ldband.R.
 ggsave("results/figures/paper/png/cluster-speedup.png", fig,
-       width = 180, height = 110, units = "mm", dpi = 300, device = ragg::agg_png)
+       width = 240, height = 140, units = "mm", dpi = 300, device = ragg::agg_png)
 cat("wrote results/figures/paper/png/cluster-speedup.png\n")
 
 # ---- draft caption ----------------------------------------------------------

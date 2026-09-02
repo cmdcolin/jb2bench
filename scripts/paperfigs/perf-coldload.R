@@ -43,8 +43,7 @@
 #
 #   Rscript scripts/paperfigs/perf-coldload.R
 #
-# Stock ggplot2 throughout: default theme, default discrete colour scale, no
-# bespoke palette or typography.
+# Stock discrete colour scale; type sizes come from common.R's paper_theme.
 
 suppressPackageStartupMessages({
   library(ggplot2)
@@ -62,12 +61,6 @@ source("scripts/paperfigs/common.R")
 # ceiling result is stated in the prose instead. results/crosstool.md in
 # jb2bench keeps the cells.
 DRAWN <- c("Release 2.4.0", "This work", "igv.js 3.8.5", "GenomeSpy 0.85.0")
-
-# Which comparators carry a bold ratio against this work. igv.js is the tool a
-# reader is most likely to have used; GenomeSpy is the one that decodes BAM
-# through the same @gmod/bam this work does, so its ratio is much closer to a
-# comparison of render paths alone.
-RATIO_ARMS <- c("igv.js 3.8.5", "GenomeSpy 0.85.0")
 
 # GenomeSpy reads no CRAM. perf-data.R drops those cells rather than recording a
 # zero, so the series simply stops where its capability does. Said on the figure,
@@ -109,6 +102,8 @@ all$s <- all$ms / 1000
 # rebuild reshuffles every label and the figure is a different picture each
 # time it is drawn.
 REPEL_SEED <- 7
+# In log10 coverage units: how far right of its point an endpoint label starts.
+ENDPOINT_NUDGE <- 0.42
 
 draw <- function(win, out, width_label) {
   d <- subset(all, window == win)
@@ -154,44 +149,49 @@ draw <- function(win, out, width_label) {
     }))
   }
 
-  # The ratio is a comparator's own node -- its colour, its point -- so it is
+  # Every comparator's last measured point carries its ratio to this work at
+  # that cell, bold and pushed right of the curve so it reads as the series'
+  # verdict rather than as one more number on the point. The ratio is the
+  # comparator's own node -- its colour, its leader line -- so it is
   # unambiguous which curve it belongs to.
-  #
-  # Picked by series name rather than by reshape: reshape orders its wide
-  # columns by first appearance in the data, and "This work" appears first here,
-  # so naming them in series order silently inverted every ratio.
-  cell <- function(x) paste(x$coverage, x$reads, x$format)
-  mine <- subset(meas, series == "This work")
-  rat <- subset(meas, series %in% RATIO_ARMS)
-  rat$this_work <- mine$s[match(cell(rat), cell(mine))]
-  rat <- subset(rat, !is.na(this_work))
+  CELL <- c("reads", "format")
+  ends <- endpoint_labels(meas, cell = CELL,
+                          x = "coverage", y = "s", series = "series",
+                          reference = "This work")
+  ends <- subset(ends, series != "This work")
+  inner <- d[!is_endpoint(d, ends, CELL, "coverage", "series"), ]
 
   labels <- rbind(
-    txt(d, ifelse(d$censored, paste0(">", fmt_time(d$s)), fmt_time(d$s)), "plain"),
-    txt(rat, fmt_ratio(rat$s / rat$this_work), "bold"),
+    txt(inner, ifelse(inner$censored, paste0(">", fmt_time(inner$s)), fmt_time(inner$s)), "plain"),
+    txt(ends, ends$label, "bold"),
     on_line(meas)
   )
+  labels$nudge <- ifelse(labels$face == "bold", ENDPOINT_NUDGE, 0)
 
   note <- if (nrow(dropped)) {
     geom_text(data = dropped, label = "gap: cell measured under external load",
-              x = Inf, y = -Inf, hjust = 1.04, vjust = -0.8, size = 2.1,
+              x = Inf, y = -Inf, hjust = 1.04, vjust = -0.8, size = POINT_LABEL,
               inherit.aes = FALSE)
   }
 
   fig <- ggplot(d, aes(x = coverage, y = s, colour = series)) +
-    geom_line(data = meas) +
-    geom_point(data = meas, size = 1.6) +
-    geom_point(data = subset(d, censored), size = 1.6, shape = 1) +
-    geom_text_repel(data = labels, aes(label = label, fontface = face),
-                    size = 2.15, seed = REPEL_SEED, show.legend = FALSE,
-                    box.padding = 0.22, point.padding = 0.1,
-                    min.segment.length = 0.25, segment.size = 0.2,
+    geom_line(data = meas, linewidth = LINE_W) +
+    geom_point(data = meas, size = POINT_S) +
+    geom_point(data = subset(d, censored), size = POINT_S, shape = 1) +
+    geom_text_repel(data = labels, aes(label = label, fontface = face,
+                                       size = face),
+                    nudge_x = labels$nudge, lineheight = 0.9,
+                    seed = REPEL_SEED, show.legend = FALSE,
+                    box.padding = 0.3, point.padding = 0.15,
+                    min.segment.length = 0.25, segment.size = 0.25,
                     segment.alpha = 0.5, max.overlaps = Inf,
-                    max.time = 1.5, max.iter = 20000) +
+                    max.time = 2, max.iter = 30000) +
+    scale_size_manual(values = c(plain = POINT_LABEL, bold = ENDPOINT_LABEL),
+                      guide = "none") +
     note +
     facet_grid(reads ~ format) +
     scale_x_log10(breaks = c(20, 200, 1000), labels = c("20×", "200×", "1000×"),
-                  expand = expansion(mult = c(0.3, 0.3))) +
+                  expand = expansion(mult = c(0.2, 0.5))) +
     # More labelled breaks than the shared default, for the same reason the
     # points are labelled: three decades carrying one gridline each is not a
     # scale a reader can place a value on.
@@ -208,21 +208,26 @@ draw <- function(win, out, width_label) {
                           breaks = intersect(PERF_SERIES,
                                              unique(as.character(d$series)))) +
     guides(colour = guide_legend(nrow = 1)) +
+    # Below the panels, not above them, and in the same place as on every other
+    # figure here: three lines of provenance between the reader and the legend
+    # read as a title, and the eye has to cross them before reaching the data.
     labs(x = "coverage", colour = NULL,
-         subtitle = paste(
-           sprintf("%s window, navigation to render-complete, median of three interleaved rounds in one session.", width_label),
-           "Bold: comparator divided by this work. Hollow: gave up at the paint ceiling.",
+         caption = paste(
+           sprintf("%s window, navigation to render-complete,", width_label),
+           "median of three interleaved rounds in one session.",
+           "Bold: that tool's time divided by this work's at the same point.",
+           "Hollow: gave up at the paint ceiling.",
            ABSENT, sep = "\n")) +
-    theme(legend.position = "top",
-          legend.text = element_text(size = 8.5),
-          plot.subtitle = element_text(size = 7.6, lineheight = 1.3))
+    paper_theme() +
+    theme(plot.caption = element_text(size = rel(0.8), hjust = 0, face = "italic",
+                                      lineheight = 1.25, margin = margin(t = 8)))
 
   ggsave(sprintf("results/figures/paper/pdf/%s.pdf", out), fig,
-         width = 180, height = 185, units = "mm", device = cairo_pdf)
+         width = 200, height = 200, units = "mm", device = cairo_pdf)
   cat(sprintf("wrote results/figures/paper/pdf/%s.pdf\n", out))
 
   ggsave(sprintf("results/figures/paper/png/%s.png", out), fig,
-         width = 180, height = 185, units = "mm", dpi = 300,
+         width = 200, height = 200, units = "mm", dpi = 300,
          device = ragg::agg_png)
   cat(sprintf("wrote results/figures/paper/png/%s.png\n", out))
 }

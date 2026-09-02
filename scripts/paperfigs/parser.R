@@ -28,8 +28,8 @@
 #
 #   Rscript scripts/paperfigs/parser.R
 #
-# Stock ggplot2 throughout: default theme, default discrete colour scale, no
-# bespoke palette or typography. cowplot stitches the two readers together
+# Stock discrete colour scale; type sizes come from common.R's paper_theme.
+# cowplot stitches the two readers together
 # because each carries its own version pair -- see the note above panel_plot().
 
 suppressPackageStartupMessages({
@@ -80,10 +80,10 @@ panel_plot <- function(pkg) {
   dp$arm <- factor(dp$arm, levels = levels(dp$arm), labels = arm_labels)
 
   ggplot(dp, aes(x = coverage, y = s, colour = arm)) +
-    geom_line() +
-    geom_point(size = 1.5) +
-    geom_text(data = subset(span, package == pkg), aes(label = lab),
-              x = -Inf, y = Inf, hjust = -0.25, vjust = 1.5, size = 2.6,
+    geom_line(linewidth = LINE_W) +
+    geom_point(size = POINT_S) +
+    geom_text(data = subset(span, package == pkg), aes(label = paste(lab, "faster")),
+              x = -Inf, y = Inf, hjust = -0.15, vjust = 1.5, size = ENDPOINT_LABEL,
               fontface = "bold", inherit.aes = FALSE) +
     facet_grid(reads ~ .) +
     scale_x_log10(breaks = c(20, 200, 1000), labels = c("20×", "200×", "1000×"),
@@ -91,9 +91,8 @@ panel_plot <- function(pkg) {
     time_scale_y("time (log scale)", breaks = c(0.01, 0.1, 1, 10),
                  limits = y_range, expand = expansion(mult = 0.12)) +
     labs(x = "coverage", colour = NULL, title = pkg) +
-    theme(legend.position = "top", legend.text = element_text(size = 8),
-          legend.key.size = unit(4, "mm"),
-          plot.title = element_text(hjust = 0.5, face = "bold", size = 11))
+    paper_theme() +
+    theme(plot.title = element_text(hjust = 0.5, face = "bold", size = rel(1.05)))
 }
 
 grid <- cowplot::plot_grid(plotlist = lapply(panels, panel_plot), nrow = 1)
@@ -102,14 +101,15 @@ caption <- cowplot::ggdraw() +
   cowplot::draw_label(
     paste("parsing one 19 kb window, current release against the 2023 version;",
           "bold: times faster, over that panel's three coverages", sep = "\n"),
-    size = 8, fontface = "italic", lineheight = 1.1)
+    size = 11, fontface = "italic", lineheight = 1.1)
 
 fig <- cowplot::plot_grid(grid, caption, ncol = 1, rel_heights = c(1, 0.13))
 
 ggsave("results/figures/paper/pdf/parser-time.pdf", fig,
-       width = 170, height = 112, units = "mm", device = cairo_pdf)
+       width = 220, height = 145, units = "mm", device = cairo_pdf, bg = "white")
 cat("wrote results/figures/paper/pdf/parser-time.pdf\n")
 
 ggsave("results/figures/paper/png/parser-time.png", fig,
-       width = 170, height = 112, units = "mm", dpi = 300, device = ragg::agg_png)
+       width = 220, height = 145, units = "mm", dpi = 300, device = ragg::agg_png,
+       bg = "white")
 cat("wrote results/figures/paper/png/parser-time.png\n")

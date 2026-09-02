@@ -101,6 +101,58 @@ arm_colours <- function(igv_version = NULL) {
 
 `%||%` <- function(a, b) if (is.null(a) || length(a) == 0 || is.na(a)) b else a
 
+# Type and stroke sizes every figure draws its data with. geom_text sizes are
+# in mm, so points are converted through ggplot2's .pt.
+POINT_LABEL <- 10 / .pt
+ENDPOINT_LABEL <- 12 / .pt
+LINE_W <- 0.9
+POINT_S <- 2.3
+
+# Durations in the unit a person would say out loud -- 10 ms, 1 s, 1 min --
+# rather than a bare number a reader has to convert.
+fmt_time <- function(s) {
+  n <- function(x) trimws(formatC(x, format = "fg", digits = 2, drop0trailing = TRUE))
+  ifelse(is.na(s), "",
+  ifelse(s < 0.9995, paste0(round(s * 1000), " ms"),
+  ifelse(s < 9.95,   paste0(n(round(s, 1)), " s"),
+  ifelse(s < 59.5,   paste0(round(s), " s"),
+  ifelse(s < 3540,   paste0(n(round(s / 60, 1)), " min"),
+                     paste0(n(round(s / 3600, 1)), " h"))))))
+}
+
+fmt_ratio <- function(r) ifelse(r < 9.95, sprintf("%.1f×", r),
+                                sprintf("%s×", trimws(format(round(r), big.mark = ","))))
+
+# The endpoint label every comparator carries: its time divided by the build
+# under test at the same cell. A comparator that came in under the reference
+# says so rather than printing "0.8× slower".
+fmt_slower <- function(r) ifelse(r >= 1, paste(fmt_ratio(r), "slower"),
+                                 paste(fmt_ratio(1 / r), "faster"))
+
+#' The last measured point of every series in a cell, with its ratio to the
+#' reference series at that same point.
+#'
+#' `cell` names the columns that identify a panel, `x` the sweep, `y` the
+#' measurement and `series` the arm. Rows for the reference arm get its time as
+#' their label; every other arm gets fmt_slower. A series whose endpoint has no
+#' reference measurement at the same x gets no label at all, since a ratio
+#' against a cell nobody measured is not a ratio.
+endpoint_labels <- function(df, cell, x, y, series, reference) {
+  key <- function(d) do.call(paste, c(d[c(cell, x)], sep = "|"))
+  ref <- df[df[[series]] == reference, ]
+  ord <- df[order(-df[[x]]), ]
+  ends <- ord[!duplicated(ord[c(cell, series)]), ]
+  ends$ref_y <- ref[[y]][match(key(ends), key(ref))]
+  ends$label <- ifelse(ends[[series]] == reference, fmt_time(ends[[y]]),
+                       paste0(fmt_time(ends[[y]]), "\n", fmt_slower(ends[[y]] / ends$ref_y)))
+  ends[!is.na(ends$ref_y) & is.finite(ends[[y]]), ]
+}
+
+is_endpoint <- function(df, ends, cell, x, series) {
+  key <- function(d) do.call(paste, c(d[c(cell, x, series)], sep = "|"))
+  key(df) %in% key(ends)
+}
+
 #' Save a figure for a paper: no title, no subtitle, no caption.
 #'
 #' Every figure here used to carry its provenance inside the image -- what was

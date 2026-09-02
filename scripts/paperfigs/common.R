@@ -17,18 +17,13 @@
 dir.create("results/figures/paper/pdf", showWarnings = FALSE, recursive = TRUE)
 dir.create("results/figures/paper/png", showWarnings = FALSE, recursive = TRUE)
 
+# fmt_time, fmt_ratio, fmt_slower, endpoint_labels and the label/line sizes live
+# in scripts/arms.R, shared with the repo's own figures so both sets label a
+# point the same way.
+source("scripts/arms.R")
+
 TIME_BREAKS <- c(0.001, 0.01, 0.1, 1, 10, 60, 600, 3600)
 TIME_MINOR <- c(outer(c(2, 5), 10^(-4:3)))
-
-fmt_time <- function(s) {
-  n <- function(x) trimws(formatC(x, format = "fg", digits = 2, drop0trailing = TRUE))
-  ifelse(is.na(s), "",
-  ifelse(s < 0.9995, paste0(round(s * 1000), " ms"),
-  ifelse(s < 9.95,   paste0(n(round(s, 1)), " s"),
-  ifelse(s < 59.5,   paste0(round(s), " s"),
-  ifelse(s < 3540,   paste0(n(round(s / 60, 1)), " min"),
-                     paste0(n(round(s / 3600, 1)), " h"))))))
-}
 
 # `breaks` is a parameter because a narrow faceted panel cannot carry all eight
 # without the labels touching; the minor gridlines are what keep the decade
@@ -43,12 +38,6 @@ time_scale_x <- function(name = "time", breaks = TIME_BREAKS, ...) {
                 minor_breaks = TIME_MINOR, ...)
 }
 
-# "Faster by" for a label: 3 significant-ish digits below 10x, none above,
-# because "1.8x" and "3,400x" both need to be read at a glance and neither
-# wants the other's precision.
-fmt_ratio <- function(r) ifelse(r < 9.95, sprintf("%.1f×", r),
-                                sprintf("%s×", trimws(format(round(r), big.mark = ","))))
-
 # One series order for every measured-time figure, so a series keeps its colour
 # across all of them: pair this with `scale_colour_discrete(drop = FALSE)` and
 # limit the legend with `breaks` rather than by dropping levels. Ordered oldest
@@ -57,3 +46,16 @@ fmt_ratio <- function(r) ifelse(r < 9.95, sprintf("%.1f×", r),
 # scripts that both draw "This work" and must agree on its colour.
 PERF_SERIES <- c("Release 2.4.0", "Release 4.1.15", "Release 4.3.0",
                  "This work", "igv.js 3.8.5", "GenomeSpy 0.85.0")
+
+# One type scale for every manuscript figure. The stock 11 pt base at 180 mm
+# printed labels at 6 pt, which is legible on paper and not on a screen or a
+# slide, where these figures are actually read.
+PAPER_BASE <- 15
+paper_theme <- function(base = PAPER_BASE) {
+  theme_grey(base_size = base) +
+    theme(legend.position = "top",
+          legend.text = element_text(size = rel(0.95)),
+          legend.key.size = unit(5.5, "mm"),
+          strip.text = element_text(size = rel(0.95)),
+          panel.spacing = unit(1, "lines"))
+}
