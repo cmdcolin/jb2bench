@@ -32,14 +32,18 @@ POINT_S <- 2.3
 
 # Durations in the unit a person would say out loud -- 10 ms, 1 s, 1 min --
 # rather than a bare number a reader has to convert.
+# The microsecond branch is for the wasm-gate figure, whose cheapest measured
+# routine walks a buffer's block headers in a few tens of microseconds. Without
+# it the bottom two decades of that axis both label as "0 ms".
 fmt_time <- function(s) {
   n <- function(x) trimws(formatC(x, format = "fg", digits = 2, drop0trailing = TRUE))
   ifelse(is.na(s), "",
+  ifelse(s < 0.0009995, paste0(n(signif(s * 1e6, 2)), " \u00b5s"),
   ifelse(s < 0.9995, paste0(round(s * 1000), " ms"),
   ifelse(s < 9.95,   paste0(n(round(s, 1)), " s"),
   ifelse(s < 59.5,   paste0(round(s), " s"),
   ifelse(s < 3540,   paste0(n(round(s / 60, 1)), " min"),
-                     paste0(n(round(s / 3600, 1)), " h"))))))
+                     paste0(n(round(s / 3600, 1)), " h")))))))
 }
 
 fmt_ratio <- function(r) ifelse(r < 9.95, sprintf("%.1f×", r),
@@ -84,7 +88,7 @@ is_endpoint <- function(df, ends, cell, x, series) {
 }
 
 TIME_BREAKS <- c(0.001, 0.01, 0.1, 1, 10, 60, 600, 3600)
-TIME_MINOR <- c(outer(c(2, 5), 10^(-4:3)))
+TIME_MINOR <- c(outer(c(2, 5), 10^(-6:3)))
 
 # `breaks` is a parameter because a narrow faceted panel cannot carry all eight
 # without the labels touching; the minor gridlines are what keep the decade

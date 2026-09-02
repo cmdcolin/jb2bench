@@ -26,7 +26,8 @@ LOGDIR := results/logs
         corpus corpus-paper render interaction crosstool crosstool-cold \
         crosstool-zoom crosstool-pan crosstool-bundles \
         parsers parsers-count cram-samtools multibam backends clean-logs \
-        formats toolcheck shots paper-tables paper-figs paper-data wait-quiet
+        formats toolcheck shots paper-tables paper-figs paper-data wait-quiet \
+        wasmgate
 
 help:
 	@echo "preflight"
@@ -55,6 +56,7 @@ help:
 	@echo "  make crosstool-pan   just the pan"
 	@echo "  make parsers         the parser libraries, 2023 vs current, + the sweep"
 	@echo "  make cram-samtools   @gmod/cram against samtools, the 2019 paper's benchmark"
+	@echo "  make wasmgate        is a routine worth compiling to wasm, or is the copy bigger?"
 	@echo "  make multibam        multi-track pan"
 	@echo "  make backends        webgl vs webgpu vs canvas"
 	@echo ""
@@ -247,6 +249,7 @@ paper-figs:
 	Rscript scripts/paperfigs/ldband.R
 	Rscript scripts/paperfigs/cluster-endtoend.R
 	Rscript scripts/paperfigs/cluster.R
+	Rscript scripts/paperfigs/wasmgate.R
 
 # The cluster pair reads jbrowse-components, not this repo, so it is skipped
 # rather than fatal when that checkout is not beside us: the other four are the
@@ -256,11 +259,27 @@ paper-data:
 	Rscript scripts/paperfigs/perf-data.R .
 	Rscript scripts/paperfigs/parser-data.R .
 	Rscript scripts/paperfigs/ldband-data.R .
+	Rscript scripts/paperfigs/wasmgate-data.R .
 	@if [ -d $(JB2) ]; then \
 	   Rscript scripts/paperfigs/cluster-data.R $(JB2); \
 	   Rscript scripts/paperfigs/clusterphases-data.R . $(JB2) \
 	     || echo "clusterphases.csv left as committed, for the reason above"; \
 	 else echo "no $(JB2); the clustering CSVs are left as committed"; fi
+
+# What a wasm port has to beat before it is worth writing: the cost of copying
+# its input into the wasm heap and its result back out. Reads BAM through the
+# GMOD checkouts beside this one rather than through a pinned install, because
+# what it compares is one library's two implementations of the same routine --
+# @gmod/bgzf-filehandle ships both the Rust/libdeflate inflate and the pako one.
+# GMOD= names where those checkouts are; the run records each one's git rev.
+#
+# Under `timings` rather than `counts`: it is a timing, and this one carries the
+# extra hazard that its two sides are bound by different resources -- inflate by
+# the CPU, the floor by memory bandwidth -- so contention need not land on them
+# equally. Run it on an idle box or read only the direction.
+GMOD ?= $(HOME)/src/gmod
+wasmgate: | $(LOGDIR)
+	GMOD=$(GMOD) $(NODE) scripts/wasmgate.ts 2>&1 | tee $(LOGDIR)/wasmgate-$(STAMP).log
 
 report:
 	$(NODE) scripts/render/report.ts > results/report.html

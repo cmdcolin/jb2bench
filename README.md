@@ -21,9 +21,11 @@ numbers describe the same bytes.
 | `scripts/render/` | the render and zoom-interaction benchmarks |
 | `scripts/flamegraph/` | CPU-profile capture and the flamegraph toolkit |
 | `scripts/ld/` | the WebGPU LD compute-shader benchmarks (unrelated to render) |
+| `scripts/bgzfpool/` | the BGZF inflate pool on vs off, measured twice: the query on its own and the same query through a jbrowse pan |
 | `scripts/crosstool/` | the igv.js comparison: paint-quiescence profiler and matrix |
 | `crosstool/` | the igv.js and GenomeSpy harness pages, plus symlinks to `data/` and the tool bundles |
 | `scripts/probe.ts`, `scripts/gpucheck.ts` | dev helpers: render testids, GPU backend |
+| `scripts/wasmgate.ts` | the wasm admission test: a routine's cost in JS against the cost of copying its bytes across the wasm boundary. Reads the GMOD checkouts beside this one, since what it compares is one library's two implementations of the same routine |
 | `shell/` | regenerate the corpus (alignments and variants), load it into the builds |
 | `builds/` | the jbrowse-web builds under test (untracked, staged by hand) |
 | `results/` | every measured table, plus the raw JSON and run logs behind it |
@@ -43,6 +45,7 @@ Every number lives in a file; nothing is summarized only here.
 | [`results/interaction.md`](results/interaction.md) | how long does a zoom make you wait? |
 | [`results/interaction-cpu.md`](results/interaction-cpu.md) | where does per-frame main-thread time go during a zoom? |
 | [`results/crampool.md`](results/crampool.md) | does @gmod/cram's slice worker pool make a pan faster? (no run of record yet) |
+| [`results/bgzfpool.md`](results/bgzfpool.md) | does the BGZF inflate pool make a pan faster, for BAM and for tabix VCF? (no run of record yet) |
 | [`results/ld-gpu-vs-cpu.md`](results/ld-gpu-vs-cpu.md) | is the LD compute shader worth it vs the CPU path? |
 | [`results/ld-dispatch-limit.md`](results/ld-dispatch-limit.md) | where does the LD dispatch break, and how loudly? |
 | [`flame/FINDINGS.md`](flame/FINDINGS.md) | why is 1000x-shortread a regression? |
@@ -51,6 +54,7 @@ Every number lives in a file; nothing is summarized only here.
 | [`results/crosstool.md`](results/crosstool.md) | how does the render time compare against igv.js? |
 | [`results/crosstool-pan.md`](results/crosstool-pan.md) | and how does a *pan* compare, with startup out of the number? |
 | [`results/crosstool-zoom.md`](results/crosstool-zoom.md) | and a *zoom*, where nothing has to be fetched at all? |
+| [`results/wasmgate.md`](results/wasmgate.md) | is a routine worth compiling to wasm, or does the copy cost more than the work? |
 | [`results/quiescence.md`](results/quiescence.md) | which completion detector, and what does being wrong cost? |
 | [`ecosystem/README.md`](ecosystem/README.md) | how much faster did the parser libraries get since 2023? |
 | [`ecosystem/results/sweep.md`](ecosystem/results/sweep.md) | *where* along the majors did the parsers get faster? |

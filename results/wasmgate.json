@@ -1,0 +1,1207 @@
+{
+  "measured": "2026-09-02",
+  "host": {
+    "platform": "darwin",
+    "arch": "x64",
+    "node": "v24.4.0",
+    "cpus": 16
+  },
+  "load": {
+    "median": 8.78125,
+    "min": 8.25146484375,
+    "max": 9.75244140625
+  },
+  "reps": 21,
+  "floorModule": "@gmod/cram htscodecs (emscripten)",
+  "libraries": {
+    "bgzf-filehandle": {
+      "rev": "0bd6b38",
+      "describe": "v6.6.0-31-g0bd6b38",
+      "dirty": false
+    },
+    "bam-js": {
+      "rev": "10293a2",
+      "describe": "v9.0.1",
+      "dirty": false
+    },
+    "cram-js": {
+      "rev": "a15d938",
+      "describe": "v14.0.0",
+      "dirty": false
+    }
+  },
+  "files": [
+    "../gmod/bgzf-filehandle/test/data/shortreads_300x.bam",
+    "../gmod/bgzf-filehandle/test/data/chr22_nanopore_subset.bam"
+  ],
+  "rows": [
+    {
+      "file": "shortreads_300x.bam",
+      "candidate": "BGZF inflate",
+      "layer": "@gmod/bgzf-filehandle",
+      "units": 1,
+      "inBytes": 1749,
+      "outBytes": 5144,
+      "js": {
+        "median": 0.23216099999996231,
+        "min": 0.12666200000001027,
+        "max": 0.5480359999999678
+      },
+      "wasm": {
+        "median": 0.030661000000009153,
+        "min": 0.029834999999991396,
+        "max": 0.07554900000002363
+      },
+      "floor": {
+        "median": 0.004414999999994507,
+        "min": 0.001829999999984011,
+        "max": 0.030403999999975895
+      },
+      "load": 8.25146484375
+    },
+    {
+      "file": "shortreads_300x.bam",
+      "candidate": "BGZF block scan",
+      "layer": "@gmod/bgzf-filehandle",
+      "units": 1,
+      "inBytes": 1749,
+      "outBytes": 32,
+      "js": {
+        "median": 0.0007029999999872416,
+        "min": 0.0006789999999909924,
+        "max": 0.0327909999999747
+      },
+      "wasm": null,
+      "floor": {
+        "median": 0.0007029999999872416,
+        "min": 0.0006910000000175387,
+        "max": 0.001059999999995398
+      },
+      "load": 8.25146484375
+    },
+    {
+      "file": "shortreads_300x.bam",
+      "candidate": "BGZF inflate",
+      "layer": "@gmod/bgzf-filehandle",
+      "units": 4,
+      "inBytes": 53599,
+      "outBytes": 200707,
+      "js": {
+        "median": 2.2291549999999916,
+        "min": 1.8555539999999837,
+        "max": 5.482163999999955
+      },
+      "wasm": {
+        "median": 0.6340400000000272,
+        "min": 0.53755799999999,
+        "max": 1.1533489999999347
+      },
+      "floor": {
+        "median": 0.16070400000000973,
+        "min": 0.030735000000049695,
+        "max": 2.3259160000000065
+      },
+      "load": 8.25146484375
+    },
+    {
+      "file": "shortreads_300x.bam",
+      "candidate": "BGZF block scan",
+      "layer": "@gmod/bgzf-filehandle",
+      "units": 4,
+      "inBytes": 53599,
+      "outBytes": 128,
+      "js": {
+        "median": 0.0037960000000794025,
+        "min": 0.0035440000000335203,
+        "max": 0.04325899999992089
+      },
+      "wasm": null,
+      "floor": {
+        "median": 0.004019999999968604,
+        "min": 0.0037839999999960128,
+        "max": 0.03717199999994136
+      },
+      "load": 8.25146484375
+    },
+    {
+      "file": "shortreads_300x.bam",
+      "candidate": "BGZF inflate",
+      "layer": "@gmod/bgzf-filehandle",
+      "units": 16,
+      "inBytes": 258369,
+      "outBytes": 982216,
+      "js": {
+        "median": 10.411522999999988,
+        "min": 8.921445999999946,
+        "max": 17.622184999999945
+      },
+      "wasm": {
+        "median": 4.592364000000089,
+        "min": 2.8176980000002914,
+        "max": 11.394729000000098
+      },
+      "floor": {
+        "median": 0.2702599999997801,
+        "min": 0.1166880000000674,
+        "max": 1.890570999999909
+      },
+      "load": 8.25146484375
+    },
+    {
+      "file": "shortreads_300x.bam",
+      "candidate": "BGZF block scan",
+      "layer": "@gmod/bgzf-filehandle",
+      "units": 16,
+      "inBytes": 258369,
+      "outBytes": 512,
+      "js": {
+        "median": 0.001948999999967782,
+        "min": 0.0015159999998104468,
+        "max": 0.0032559999999648426
+      },
+      "wasm": null,
+      "floor": {
+        "median": 0.01823500000000422,
+        "min": 0.014650000000074215,
+        "max": 0.05349000000023807
+      },
+      "load": 8.25146484375
+    },
+    {
+      "file": "shortreads_300x.bam",
+      "candidate": "BGZF inflate",
+      "layer": "@gmod/bgzf-filehandle",
+      "units": 64,
+      "inBytes": 1098342,
+      "outBytes": 4109037,
+      "js": {
+        "median": 46.2922779999999,
+        "min": 39.75425300000006,
+        "max": 70.31584999999995
+      },
+      "wasm": {
+        "median": 12.984167999999954,
+        "min": 11.485298000000057,
+        "max": 16.936056000000008
+      },
+      "floor": {
+        "median": 1.8117080000001806,
+        "min": 1.1744149999999536,
+        "max": 4.944920999999795
+      },
+      "load": 9.75244140625
+    },
+    {
+      "file": "shortreads_300x.bam",
+      "candidate": "BGZF block scan",
+      "layer": "@gmod/bgzf-filehandle",
+      "units": 64,
+      "inBytes": 1098342,
+      "outBytes": 2048,
+      "js": {
+        "median": 0.008079000000179803,
+        "min": 0.005615999999918131,
+        "max": 1.5042440000001989
+      },
+      "wasm": null,
+      "floor": {
+        "median": 0.06316100000003644,
+        "min": 0.062361999999666295,
+        "max": 0.07232799999974304
+      },
+      "load": 9.75244140625
+    },
+    {
+      "file": "shortreads_300x.bam",
+      "candidate": "BGZF inflate",
+      "layer": "@gmod/bgzf-filehandle",
+      "units": 256,
+      "inBytes": 4580289,
+      "outBytes": 16612160,
+      "js": {
+        "median": 163.4423200000001,
+        "min": 158.2127499999997,
+        "max": 191.07268999999997
+      },
+      "wasm": {
+        "median": 50.288588000001255,
+        "min": 48.14867100000083,
+        "max": 61.299833000000945
+      },
+      "floor": {
+        "median": 6.125606999999945,
+        "min": 5.28633599999921,
+        "max": 10.734345999999277
+      },
+      "load": 9.37158203125
+    },
+    {
+      "file": "shortreads_300x.bam",
+      "candidate": "BGZF block scan",
+      "layer": "@gmod/bgzf-filehandle",
+      "units": 256,
+      "inBytes": 4580289,
+      "outBytes": 8192,
+      "js": {
+        "median": 0.01424100000076578,
+        "min": 0.014030000000275322,
+        "max": 0.03890700000010838
+      },
+      "wasm": null,
+      "floor": {
+        "median": 0.43790699999954086,
+        "min": 0.33172799999920244,
+        "max": 0.8356189999994967
+      },
+      "load": 9.37158203125
+    },
+    {
+      "file": "shortreads_300x.bam",
+      "candidate": "BGZF inflate",
+      "layer": "@gmod/bgzf-filehandle",
+      "units": 287,
+      "inBytes": 5113181,
+      "outBytes": 18534283,
+      "js": {
+        "median": 181.18931599999996,
+        "min": 174.2951410000005,
+        "max": 192.13527000000067
+      },
+      "wasm": {
+        "median": 58.45802100000037,
+        "min": 55.88664600000084,
+        "max": 70.7979919999998
+      },
+      "floor": {
+        "median": 5.772762000000512,
+        "min": 5.079078999999183,
+        "max": 7.392528000000311
+      },
+      "load": 8.78125
+    },
+    {
+      "file": "shortreads_300x.bam",
+      "candidate": "BGZF block scan",
+      "layer": "@gmod/bgzf-filehandle",
+      "units": 287,
+      "inBytes": 5113181,
+      "outBytes": 9184,
+      "js": {
+        "median": 0.01670399999966321,
+        "min": 0.016366000001653447,
+        "max": 0.05693599999904109
+      },
+      "wasm": null,
+      "floor": {
+        "median": 0.42055900000013935,
+        "min": 0.34086999999999534,
+        "max": 0.5752840000004653
+      },
+      "load": 8.78125
+    },
+    {
+      "file": "shortreads_300x.bam",
+      "candidate": "BAM record walk",
+      "layer": "@gmod/bam",
+      "units": 2680,
+      "inBytes": 927866,
+      "outBytes": 21440,
+      "js": {
+        "median": 0.043916999999055406,
+        "min": 0.04268899999988207,
+        "max": 0.11152499999843712
+      },
+      "wasm": null,
+      "floor": {
+        "median": 0.054180999999516644,
+        "min": 0.05338300000039453,
+        "max": 0.07365200000094774
+      },
+      "load": 8.78125
+    },
+    {
+      "file": "shortreads_300x.bam",
+      "candidate": "BAM field decode",
+      "layer": "@gmod/bam",
+      "units": 2680,
+      "inBytes": 927866,
+      "outBytes": 42880,
+      "js": {
+        "median": 0.3532549999999901,
+        "min": 0.2153359999992972,
+        "max": 4.641403999999966
+      },
+      "wasm": null,
+      "floor": {
+        "median": 0.062486999999237014,
+        "min": 0.05707500000062282,
+        "max": 0.14189099999930477
+      },
+      "load": 8.78125
+    },
+    {
+      "file": "shortreads_300x.bam",
+      "candidate": "BAM sequence decode",
+      "layer": "@gmod/bam",
+      "units": 2680,
+      "inBytes": 927866,
+      "outBytes": 396640,
+      "js": {
+        "median": 1.7493680000006862,
+        "min": 1.445369999999457,
+        "max": 3.7549070000022766
+      },
+      "wasm": null,
+      "floor": {
+        "median": 0.12953399999969406,
+        "min": 0.09892599999875529,
+        "max": 0.14646499999798834
+      },
+      "load": 8.78125
+    },
+    {
+      "file": "shortreads_300x.bam",
+      "candidate": "BAM CIGAR decode",
+      "layer": "@gmod/bam",
+      "units": 2680,
+      "inBytes": 927866,
+      "outBytes": 11693,
+      "js": {
+        "median": 0.483632999999827,
+        "min": 0.4064509999989241,
+        "max": 1.1615490000003774
+      },
+      "wasm": null,
+      "floor": {
+        "median": 0.05407299999933457,
+        "min": 0.05279499999960535,
+        "max": 0.0570850000003702
+      },
+      "load": 8.78125
+    },
+    {
+      "file": "shortreads_300x.bam",
+      "candidate": "BAM record walk",
+      "layer": "@gmod/bam",
+      "units": 10719,
+      "inBytes": 3706800,
+      "outBytes": 85752,
+      "js": {
+        "median": 0.20861100000183797,
+        "min": 0.19018099999811966,
+        "max": 0.44815399999788497
+      },
+      "wasm": null,
+      "floor": {
+        "median": 0.2923850000006496,
+        "min": 0.2451199999995879,
+        "max": 0.8454770000025746
+      },
+      "load": 8.78125
+    },
+    {
+      "file": "shortreads_300x.bam",
+      "candidate": "BAM field decode",
+      "layer": "@gmod/bam",
+      "units": 10719,
+      "inBytes": 3706800,
+      "outBytes": 171504,
+      "js": {
+        "median": 0.8927220000005036,
+        "min": 0.7461930000026769,
+        "max": 2.0325139999986277
+      },
+      "wasm": null,
+      "floor": {
+        "median": 0.31058800000027986,
+        "min": 0.2610080000013113,
+        "max": 0.7970510000013746
+      },
+      "load": 8.78125
+    },
+    {
+      "file": "shortreads_300x.bam",
+      "candidate": "BAM sequence decode",
+      "layer": "@gmod/bam",
+      "units": 10719,
+      "inBytes": 3706800,
+      "outBytes": 1586412,
+      "js": {
+        "median": 6.645316999998613,
+        "min": 5.864008000000467,
+        "max": 14.202366999998048
+      },
+      "wasm": null,
+      "floor": {
+        "median": 0.6348939999988943,
+        "min": 0.5589120000004186,
+        "max": 5.7450320000025386
+      },
+      "load": 8.78125
+    },
+    {
+      "file": "shortreads_300x.bam",
+      "candidate": "BAM CIGAR decode",
+      "layer": "@gmod/bam",
+      "units": 10719,
+      "inBytes": 3706800,
+      "outBytes": 44519,
+      "js": {
+        "median": 1.9297910000022966,
+        "min": 1.3302369999983057,
+        "max": 3.137283000000025
+      },
+      "wasm": null,
+      "floor": {
+        "median": 0.28628000000026077,
+        "min": 0.24487900000167429,
+        "max": 0.6723859999983688
+      },
+      "load": 8.78125
+    },
+    {
+      "file": "shortreads_300x.bam",
+      "candidate": "BAM record walk",
+      "layer": "@gmod/bam",
+      "units": 26798,
+      "inBytes": 9259538,
+      "outBytes": 214384,
+      "js": {
+        "median": 1.7239520000002813,
+        "min": 0.7040670000023965,
+        "max": 2.5076829999998154
+      },
+      "wasm": null,
+      "floor": {
+        "median": 1.421241000000009,
+        "min": 1.1952329999985523,
+        "max": 2.7232680000015534
+      },
+      "load": 8.78125
+    },
+    {
+      "file": "shortreads_300x.bam",
+      "candidate": "BAM field decode",
+      "layer": "@gmod/bam",
+      "units": 26798,
+      "inBytes": 9259538,
+      "outBytes": 428768,
+      "js": {
+        "median": 4.1611529999972845,
+        "min": 3.331728999997722,
+        "max": 10.92599699999846
+      },
+      "wasm": null,
+      "floor": {
+        "median": 1.6683730000004289,
+        "min": 1.3222610000011628,
+        "max": 2.4403849999980594
+      },
+      "load": 8.78125
+    },
+    {
+      "file": "shortreads_300x.bam",
+      "candidate": "BAM sequence decode",
+      "layer": "@gmod/bam",
+      "units": 26798,
+      "inBytes": 9259538,
+      "outBytes": 3966104,
+      "js": {
+        "median": 19.461730999999418,
+        "min": 15.667059999999765,
+        "max": 28.87225000000035
+      },
+      "wasm": null,
+      "floor": {
+        "median": 2.5299660000018775,
+        "min": 2.1989400000020396,
+        "max": 15.693052000002353
+      },
+      "load": 8.71826171875
+    },
+    {
+      "file": "shortreads_300x.bam",
+      "candidate": "BAM CIGAR decode",
+      "layer": "@gmod/bam",
+      "units": 26798,
+      "inBytes": 9259538,
+      "outBytes": 110484,
+      "js": {
+        "median": 4.315460999998322,
+        "min": 4.0222369999974035,
+        "max": 8.04888800000117
+      },
+      "wasm": null,
+      "floor": {
+        "median": 1.3400479999982053,
+        "min": 1.194392000001244,
+        "max": 1.6765290000003006
+      },
+      "load": 8.71826171875
+    },
+    {
+      "file": "shortreads_300x.bam",
+      "candidate": "BAM record walk",
+      "layer": "@gmod/bam",
+      "units": 53596,
+      "inBytes": 18529139,
+      "outBytes": 428768,
+      "js": {
+        "median": 3.90411099999983,
+        "min": 3.639137000001938,
+        "max": 4.723147000000608
+      },
+      "wasm": null,
+      "floor": {
+        "median": 3.399508999998943,
+        "min": 2.7487870000004477,
+        "max": 4.13964599999963
+      },
+      "load": 8.71826171875
+    },
+    {
+      "file": "shortreads_300x.bam",
+      "candidate": "BAM field decode",
+      "layer": "@gmod/bam",
+      "units": 53596,
+      "inBytes": 18529139,
+      "outBytes": 857536,
+      "js": {
+        "median": 7.047753999999259,
+        "min": 6.510020000001532,
+        "max": 17.39045199999964
+      },
+      "wasm": null,
+      "floor": {
+        "median": 3.0709120000028634,
+        "min": 2.815522000000783,
+        "max": 3.816640000000916
+      },
+      "load": 8.71826171875
+    },
+    {
+      "file": "shortreads_300x.bam",
+      "candidate": "BAM sequence decode",
+      "layer": "@gmod/bam",
+      "units": 53596,
+      "inBytes": 18529139,
+      "outBytes": 7932208,
+      "js": {
+        "median": 44.17098100000294,
+        "min": 35.646426999999676,
+        "max": 93.69033800000034
+      },
+      "wasm": null,
+      "floor": {
+        "median": 6.224769000000379,
+        "min": 4.814237999999023,
+        "max": 40.544660000003205
+      },
+      "load": 8.71826171875
+    },
+    {
+      "file": "shortreads_300x.bam",
+      "candidate": "BAM CIGAR decode",
+      "layer": "@gmod/bam",
+      "units": 53596,
+      "inBytes": 18529139,
+      "outBytes": 224241,
+      "js": {
+        "median": 8.614134000003105,
+        "min": 8.098981999999523,
+        "max": 13.653787999999622
+      },
+      "wasm": null,
+      "floor": {
+        "median": 3.397593000001507,
+        "min": 2.910106999999698,
+        "max": 5.517832999998063
+      },
+      "load": 8.71826171875
+    },
+    {
+      "file": "chr22_nanopore_subset.bam",
+      "candidate": "BGZF inflate",
+      "layer": "@gmod/bgzf-filehandle",
+      "units": 1,
+      "inBytes": 5720,
+      "outBytes": 65280,
+      "js": {
+        "median": 0.3376319999988482,
+        "min": 0.3231400000004214,
+        "max": 0.6217600000018138
+      },
+      "wasm": {
+        "median": 0.12431500000093365,
+        "min": 0.0798609999983455,
+        "max": 0.6598579999990761
+      },
+      "floor": {
+        "median": 0.014240000000427244,
+        "min": 0.013057000000117114,
+        "max": 0.039332000000285916
+      },
+      "load": 8.71826171875
+    },
+    {
+      "file": "chr22_nanopore_subset.bam",
+      "candidate": "BGZF block scan",
+      "layer": "@gmod/bgzf-filehandle",
+      "units": 1,
+      "inBytes": 5720,
+      "outBytes": 32,
+      "js": {
+        "median": 0.0008510000006936025,
+        "min": 0.0008239999988290947,
+        "max": 0.010774999998830026
+      },
+      "wasm": null,
+      "floor": {
+        "median": 0.0006629999988945201,
+        "min": 0.0006419999990612268,
+        "max": 0.006945000000996515
+      },
+      "load": 8.71826171875
+    },
+    {
+      "file": "chr22_nanopore_subset.bam",
+      "candidate": "BGZF inflate",
+      "layer": "@gmod/bgzf-filehandle",
+      "units": 4,
+      "inBytes": 62392,
+      "outBytes": 232252,
+      "js": {
+        "median": 2.3170939999981783,
+        "min": 2.200093999999808,
+        "max": 12.344343000000663
+      },
+      "wasm": {
+        "median": 0.7091349999973318,
+        "min": 0.6498030000002473,
+        "max": 2.8434350000025006
+      },
+      "floor": {
+        "median": 0.056416999999783,
+        "min": 0.033053999999538064,
+        "max": 0.112223999996786
+      },
+      "load": 8.71826171875
+    },
+    {
+      "file": "chr22_nanopore_subset.bam",
+      "candidate": "BGZF block scan",
+      "layer": "@gmod/bgzf-filehandle",
+      "units": 4,
+      "inBytes": 62392,
+      "outBytes": 128,
+      "js": {
+        "median": 0.0004490000028454233,
+        "min": 0.0004380000027595088,
+        "max": 0.0006670000002486631
+      },
+      "wasm": null,
+      "floor": {
+        "median": 0.0037520000005315524,
+        "min": 0.0034640000012586825,
+        "max": 0.03909199999907287
+      },
+      "load": 8.71826171875
+    },
+    {
+      "file": "chr22_nanopore_subset.bam",
+      "candidate": "BGZF inflate",
+      "layer": "@gmod/bgzf-filehandle",
+      "units": 16,
+      "inBytes": 600464,
+      "outBytes": 973472,
+      "js": {
+        "median": 15.653557999998156,
+        "min": 14.180348999998387,
+        "max": 42.17589699999735
+      },
+      "wasm": {
+        "median": 6.897629999999481,
+        "min": 5.174800000000687,
+        "max": 11.351440999998886
+      },
+      "floor": {
+        "median": 0.30481499999950756,
+        "min": 0.21827400000256603,
+        "max": 22.75549400000091
+      },
+      "load": 8.66064453125
+    },
+    {
+      "file": "chr22_nanopore_subset.bam",
+      "candidate": "BGZF block scan",
+      "layer": "@gmod/bgzf-filehandle",
+      "units": 16,
+      "inBytes": 600464,
+      "outBytes": 512,
+      "js": {
+        "median": 0.0011309999972581863,
+        "min": 0.0011190000004717149,
+        "max": 0.0014300000002549496
+      },
+      "wasm": null,
+      "floor": {
+        "median": 0.03711699999985285,
+        "min": 0.036007999999128515,
+        "max": 0.08667499999864958
+      },
+      "load": 8.66064453125
+    },
+    {
+      "file": "chr22_nanopore_subset.bam",
+      "candidate": "BGZF inflate",
+      "layer": "@gmod/bgzf-filehandle",
+      "units": 64,
+      "inBytes": 2520130,
+      "outBytes": 3911878,
+      "js": {
+        "median": 61.20673499999975,
+        "min": 59.04815899999812,
+        "max": 76.92807700000048
+      },
+      "wasm": {
+        "median": 23.141912999999477,
+        "min": 21.786745000001247,
+        "max": 26.587306999997963
+      },
+      "floor": {
+        "median": 1.5222819999980857,
+        "min": 1.1697120000026189,
+        "max": 8.453193000001193
+      },
+      "load": 8.66064453125
+    },
+    {
+      "file": "chr22_nanopore_subset.bam",
+      "candidate": "BGZF block scan",
+      "layer": "@gmod/bgzf-filehandle",
+      "units": 64,
+      "inBytes": 2520130,
+      "outBytes": 2048,
+      "js": {
+        "median": 0.006992999999056337,
+        "min": 0.006190999996761093,
+        "max": 0.01955699999962235
+      },
+      "wasm": null,
+      "floor": {
+        "median": 0.19592700000066543,
+        "min": 0.15622799999982817,
+        "max": 0.40956699999878765
+      },
+      "load": 8.66064453125
+    },
+    {
+      "file": "chr22_nanopore_subset.bam",
+      "candidate": "BGZF inflate",
+      "layer": "@gmod/bgzf-filehandle",
+      "units": 256,
+      "inBytes": 8853527,
+      "outBytes": 14485841,
+      "js": {
+        "median": 234.7740640000011,
+        "min": 217.15448399999877,
+        "max": 319.34707100000014
+      },
+      "wasm": {
+        "median": 86.80301999999938,
+        "min": 83.26169599999776,
+        "max": 92.56895900000382
+      },
+      "floor": {
+        "median": 6.244954000001599,
+        "min": 5.260945000001811,
+        "max": 13.411896999998135
+      },
+      "load": 8.41748046875
+    },
+    {
+      "file": "chr22_nanopore_subset.bam",
+      "candidate": "BGZF block scan",
+      "layer": "@gmod/bgzf-filehandle",
+      "units": 256,
+      "inBytes": 8853527,
+      "outBytes": 8192,
+      "js": {
+        "median": 0.04789400000299793,
+        "min": 0.026982999996107537,
+        "max": 0.07585899999685353
+      },
+      "wasm": null,
+      "floor": {
+        "median": 1.4265359999990324,
+        "min": 1.2480880000002799,
+        "max": 2.454954999993788
+      },
+      "load": 8.41748046875
+    },
+    {
+      "file": "chr22_nanopore_subset.bam",
+      "candidate": "BGZF inflate",
+      "layer": "@gmod/bgzf-filehandle",
+      "units": 447,
+      "inBytes": 14140716,
+      "outBytes": 24463464,
+      "js": {
+        "median": 428.0747590000028,
+        "min": 389.78111799999897,
+        "max": 528.5608169999978
+      },
+      "wasm": {
+        "median": 178.6148600000015,
+        "min": 157.138807000003,
+        "max": 240.10450900000433
+      },
+      "floor": {
+        "median": 11.112334999997984,
+        "min": 9.086597000001348,
+        "max": 33.729078999997
+      },
+      "load": 9.0185546875
+    },
+    {
+      "file": "chr22_nanopore_subset.bam",
+      "candidate": "BGZF block scan",
+      "layer": "@gmod/bgzf-filehandle",
+      "units": 447,
+      "inBytes": 14140716,
+      "outBytes": 14304,
+      "js": {
+        "median": 0.09216000000014901,
+        "min": 0.04700099999899976,
+        "max": 0.19181099999696016
+      },
+      "wasm": null,
+      "floor": {
+        "median": 2.9260949999952572,
+        "min": 2.553532999998424,
+        "max": 3.7674909999986994
+      },
+      "load": 9.0185546875
+    },
+    {
+      "file": "chr22_nanopore_subset.bam",
+      "candidate": "BAM record walk",
+      "layer": "@gmod/bam",
+      "units": 38,
+      "inBytes": 8899458,
+      "outBytes": 304,
+      "js": {
+        "median": 0.005445000002509914,
+        "min": 0.0043699999951059,
+        "max": 0.04006700000172714
+      },
+      "wasm": null,
+      "floor": {
+        "median": 1.8347070000017993,
+        "min": 1.3341029999937746,
+        "max": 3.384519999999611
+      },
+      "load": 9.0185546875
+    },
+    {
+      "file": "chr22_nanopore_subset.bam",
+      "candidate": "BAM field decode",
+      "layer": "@gmod/bam",
+      "units": 38,
+      "inBytes": 8899458,
+      "outBytes": 608,
+      "js": {
+        "median": 1.2093739999982063,
+        "min": 1.0040480000025127,
+        "max": 2.0008450000023004
+      },
+      "wasm": null,
+      "floor": {
+        "median": 1.9045200000036857,
+        "min": 1.25483499999973,
+        "max": 3.579977000001236
+      },
+      "load": 9.0185546875
+    },
+    {
+      "file": "chr22_nanopore_subset.bam",
+      "candidate": "BAM sequence decode",
+      "layer": "@gmod/bam",
+      "units": 38,
+      "inBytes": 8899458,
+      "outBytes": 5006308,
+      "js": {
+        "median": 17.21568400000251,
+        "min": 12.59694799999852,
+        "max": 30.15421599999536
+      },
+      "wasm": null,
+      "floor": {
+        "median": 4.812567000000854,
+        "min": 2.76073400000314,
+        "max": 14.044490000000224
+      },
+      "load": 9.4970703125
+    },
+    {
+      "file": "chr22_nanopore_subset.bam",
+      "candidate": "BAM CIGAR decode",
+      "layer": "@gmod/bam",
+      "units": 38,
+      "inBytes": 8899458,
+      "outBytes": 813887,
+      "js": {
+        "median": 16.379171000000497,
+        "min": 10.508190000000468,
+        "max": 132.2577769999989
+      },
+      "wasm": null,
+      "floor": {
+        "median": 2.2417089999944437,
+        "min": 1.418485000001965,
+        "max": 3.5885440000056406
+      },
+      "load": 9.4970703125
+    },
+    {
+      "file": "chr22_nanopore_subset.bam",
+      "candidate": "BAM record walk",
+      "layer": "@gmod/bam",
+      "units": 151,
+      "inBytes": 14967507,
+      "outBytes": 1208,
+      "js": {
+        "median": 0.011936000002606306,
+        "min": 0.011669999999867287,
+        "max": 0.012742999999318272
+      },
+      "wasm": null,
+      "floor": {
+        "median": 3.116685000000871,
+        "min": 2.3985570000004373,
+        "max": 5.998140999996394
+      },
+      "load": 9.4970703125
+    },
+    {
+      "file": "chr22_nanopore_subset.bam",
+      "candidate": "BAM field decode",
+      "layer": "@gmod/bam",
+      "units": 151,
+      "inBytes": 14967507,
+      "outBytes": 2416,
+      "js": {
+        "median": 2.751512000002549,
+        "min": 2.4054399999949965,
+        "max": 4.48100500000146
+      },
+      "wasm": null,
+      "floor": {
+        "median": 3.1911850000033155,
+        "min": 2.502064000000246,
+        "max": 5.659085999999661
+      },
+      "load": 9.4970703125
+    },
+    {
+      "file": "chr22_nanopore_subset.bam",
+      "candidate": "BAM sequence decode",
+      "layer": "@gmod/bam",
+      "units": 151,
+      "inBytes": 14967507,
+      "outBytes": 7876081,
+      "js": {
+        "median": 28.1204230000003,
+        "min": 19.313741000005393,
+        "max": 63.33444700000109
+      },
+      "wasm": null,
+      "floor": {
+        "median": 6.542539000001852,
+        "min": 5.180610000003071,
+        "max": 40.61789699999645
+      },
+      "load": 9.4970703125
+    },
+    {
+      "file": "chr22_nanopore_subset.bam",
+      "candidate": "BAM CIGAR decode",
+      "layer": "@gmod/bam",
+      "units": 151,
+      "inBytes": 14967507,
+      "outBytes": 1827785,
+      "js": {
+        "median": 29.7496719999981,
+        "min": 23.554125000002387,
+        "max": 40.54522899999574
+      },
+      "wasm": null,
+      "floor": {
+        "median": 4.058538999997836,
+        "min": 2.793229999995674,
+        "max": 50.220525999997335
+      },
+      "load": 9.537109375
+    },
+    {
+      "file": "chr22_nanopore_subset.bam",
+      "candidate": "BAM record walk",
+      "layer": "@gmod/bam",
+      "units": 379,
+      "inBytes": 18124428,
+      "outBytes": 3032,
+      "js": {
+        "median": 0.04844000000593951,
+        "min": 0.010494999994989485,
+        "max": 0.13637600000220118
+      },
+      "wasm": null,
+      "floor": {
+        "median": 3.562065000005532,
+        "min": 3.0572810000012396,
+        "max": 4.880788000002212
+      },
+      "load": 9.537109375
+    },
+    {
+      "file": "chr22_nanopore_subset.bam",
+      "candidate": "BAM field decode",
+      "layer": "@gmod/bam",
+      "units": 379,
+      "inBytes": 18124428,
+      "outBytes": 6064,
+      "js": {
+        "median": 5.118866999997408,
+        "min": 4.032720000002882,
+        "max": 6.988079999995534
+      },
+      "wasm": null,
+      "floor": {
+        "median": 3.4252509999932954,
+        "min": 2.9299769999997807,
+        "max": 6.349564999996801
+      },
+      "load": 9.537109375
+    },
+    {
+      "file": "chr22_nanopore_subset.bam",
+      "candidate": "BAM sequence decode",
+      "layer": "@gmod/bam",
+      "units": 379,
+      "inBytes": 18124428,
+      "outBytes": 9187902,
+      "js": {
+        "median": 29.44589000000269,
+        "min": 20.335693999993964,
+        "max": 110.22131100000115
+      },
+      "wasm": null,
+      "floor": {
+        "median": 7.1049480000001495,
+        "min": 5.376075000000128,
+        "max": 22.335980000003474
+      },
+      "load": 9.537109375
+    },
+    {
+      "file": "chr22_nanopore_subset.bam",
+      "candidate": "BAM CIGAR decode",
+      "layer": "@gmod/bam",
+      "units": 379,
+      "inBytes": 18124428,
+      "outBytes": 2489147,
+      "js": {
+        "median": 43.26227199999994,
+        "min": 34.68421600000147,
+        "max": 58.03317000000243
+      },
+      "wasm": null,
+      "floor": {
+        "median": 4.536213999999745,
+        "min": 3.690217000003031,
+        "max": 6.907253000004857
+      },
+      "load": 9.537109375
+    },
+    {
+      "file": "chr22_nanopore_subset.bam",
+      "candidate": "BAM record walk",
+      "layer": "@gmod/bam",
+      "units": 757,
+      "inBytes": 24361772,
+      "outBytes": 6056,
+      "js": {
+        "median": 0.06038399999670219,
+        "min": 0.0378599999967264,
+        "max": 0.1694710000010673
+      },
+      "wasm": null,
+      "floor": {
+        "median": 4.806599000003189,
+        "min": 3.9835690000036266,
+        "max": 5.7284250000011525
+      },
+      "load": 9.537109375
+    },
+    {
+      "file": "chr22_nanopore_subset.bam",
+      "candidate": "BAM field decode",
+      "layer": "@gmod/bam",
+      "units": 757,
+      "inBytes": 24361772,
+      "outBytes": 12112,
+      "js": {
+        "median": 6.449166999998852,
+        "min": 5.4193450000020675,
+        "max": 9.856291000003694
+      },
+      "wasm": null,
+      "floor": {
+        "median": 4.5445419999959995,
+        "min": 4.04447199999413,
+        "max": 6.211597000001348
+      },
+      "load": 9.537109375
+    },
+    {
+      "file": "chr22_nanopore_subset.bam",
+      "candidate": "BAM sequence decode",
+      "layer": "@gmod/bam",
+      "units": 757,
+      "inBytes": 24361772,
+      "outBytes": 11781017,
+      "js": {
+        "median": 26.997146999994584,
+        "min": 25.846188000003167,
+        "max": 41.55501899999945
+      },
+      "wasm": null,
+      "floor": {
+        "median": 8.510035999999673,
+        "min": 7.429834000002302,
+        "max": 20.99019799999951
+      },
+      "load": 9.537109375
+    },
+    {
+      "file": "chr22_nanopore_subset.bam",
+      "candidate": "BAM CIGAR decode",
+      "layer": "@gmod/bam",
+      "units": 757,
+      "inBytes": 24361772,
+      "outBytes": 3796559,
+      "js": {
+        "median": 59.64273400000093,
+        "min": 49.80923400000029,
+        "max": 80.9508499999938
+      },
+      "wasm": null,
+      "floor": {
+        "median": 6.144520000001648,
+        "min": 5.135491000000911,
+        "max": 14.768240999997943
+      },
+      "load": 9.65380859375
+    }
+  ]
+}
