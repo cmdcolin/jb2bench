@@ -59,3 +59,101 @@ paper_theme <- function(base = PAPER_BASE) {
           strip.text = element_text(size = rel(0.95)),
           panel.spacing = unit(1, "lines"))
 }
+
+# Seeded, because the repel solver starts from a random jitter: without it a
+# rebuild reshuffles every label and the figure is a different picture each time
+# it is drawn.
+REPEL_SEED <- 7
+# In log10 coverage units: how far right of its point an endpoint label starts.
+# Small on purpose. A nudge large enough to clear the curve entirely needs a
+# right margin as wide as a third of the panel, and that margin is empty on
+# every cell -- the figure then spends a third of its width on nothing. The
+# labels sit over the panel instead and the repel solver moves them off the
+# lines, which is what it is for.
+ENDPOINT_NUDGE <- 0.16
+# Plain times go the other way, so they and the bold verdicts do not both want
+# the strip immediately right of the last point.
+PLAIN_NUDGE <- -0.07
+# In log10 seconds: how far below its point a reference-curve label starts. The
+# reference is the bottom curve in every cell these figures draw, so the band
+# under it is empty and nothing else wants it.
+REFERENCE_DROP <- -0.12
+
+#' One row per drawn label, carrying the columns the facets key on.
+#'
+#' `cell` names those columns, so the same helper serves a figure faceted on
+#' (reads, format) and one faceted on (reads, format, window).
+label_rows <- function(df, cell, label, face) {
+  data.frame(df[c("coverage", "s", cell, "series")], label = label, face = face,
+             stringsAsFactors = FALSE)
+}
+
+# ggrepel pushes a label off other LABELS and off the POINTS of its own layer,
+# and knows nothing about the lines joining them -- so left alone it settles
+# bold ratios neatly into the gaps between points and straight through the
+# curves, which is the one place a number must not sit. Sampling each segment
+# into empty-labelled rows puts the curve into the layer as a row of obstacles
+# it does understand. An empty string has no box, so these push labels away
+# without drawing anything themselves.
+curve_obstacles <- function(df, cell) {
+  seg <- split(df, df[c("series", cell)], drop = TRUE)
+  do.call(rbind, lapply(seg, function(g) {
+    if (nrow(g) < 2) return(NULL)
+    g <- g[order(g$coverage), ]
+    i <- seq_len(nrow(g))
+    at <- seq(1, nrow(g), length.out = 40)
+    label_rows(data.frame(coverage = 10^approx(i, log10(g$coverage), xout = at)$y,
+                          s = 10^approx(i, log10(g$s), xout = at)$y,
+                          g[rep(1, length(at)), c(cell, "series"), drop = FALSE],
+                          row.names = NULL),
+               cell, "", "plain")
+  }))
+}
+
+#' Every point's label for a cold-load figure: plain times on the inner points,
+#' the comparator's bold verdict on its last one, and the curves as obstacles.
+#'
+#' `d` is every usable row including the ones abandoned at the paint ceiling,
+#' which get a ">" and no ratio; `meas` is the measured subset the curves are
+#' drawn from. Both figures that call this used to carry their own copy, and the
+#' copies had already diverged -- the combined one dropped the censored rows
+#' before labelling, so an abandoned run appeared as a curve that simply stopped.
+coldload_labels <- function(d, meas, cell, reference,
+                            ratio = fmt_slower_terse) {
+  ends <- endpoint_labels(meas, cell = cell, x = "coverage", y = "s",
+                          series = "series", reference = reference,
+                          ratio = ratio)
+  ends <- ends[ends$series != reference, ]
+  inner <- d[!is_endpoint(d, ends, cell, "coverage", "series"), ]
+
+  labels <- rbind(
+    label_rows(inner, cell,
+               ifelse(inner$censored, paste0(">", fmt_time(inner$s)),
+                      fmt_time(inner$s)), "plain"),
+    label_rows(ends, cell, ends$label, "bold"),
+    curve_obstacles(meas, cell)
+  )
+  labels$nudge <- ifelse(labels$face == "bold", ENDPOINT_NUDGE,
+                         ifelse(labels$label == "", 0, PLAIN_NUDGE))
+  labels$nudge_y <- ifelse(labels$series == reference & labels$label != "",
+                           REFERENCE_DROP, 0)
+  labels
+}
+
+# The layer coldload_labels feeds, and the size scale that gives `face` its two
+# sizes. Returned as a list so a figure adds both with one `+`.
+endpoint_repel <- function(labels) {
+  list(
+    ggrepel::geom_text_repel(
+      data = labels, aes(label = label, fontface = face, size = face),
+      nudge_x = labels$nudge, nudge_y = labels$nudge_y, lineheight = 0.9,
+      seed = REPEL_SEED, show.legend = FALSE,
+      box.padding = 0.38, point.padding = 0.2,
+      force = 3, force_pull = 0.4,
+      min.segment.length = 0.25, segment.size = 0.25,
+      segment.alpha = 0.5, max.overlaps = Inf,
+      max.time = 5, max.iter = 60000),
+    scale_size_manual(values = c(plain = POINT_LABEL, bold = ENDPOINT_LABEL),
+                      guide = "none")
+  )
+}

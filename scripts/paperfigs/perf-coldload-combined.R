@@ -20,11 +20,6 @@ suppressPackageStartupMessages({
 source("scripts/paperfigs/common.R")
 
 DRAWN <- c("Release 2.4.0", "This work", "igv.js 3.8.5", "GenomeSpy 0.85.0")
-REPEL_SEED <- 7
-# In log10 coverage units: how far right of its point an endpoint label starts.
-ENDPOINT_NUDGE <- 0.16
-# In log10 seconds: how far below its point a reference-curve label starts.
-REFERENCE_DROP <- -0.12
 
 all <- read.csv("results/paper/perf.csv", stringsAsFactors = FALSE)
 all <- subset(all, panel == "Cold load" & session == "cross-tool" &
@@ -46,49 +41,8 @@ d <- subset(d, usable)
 
 meas <- subset(d, !censored)
 
-txt <- function(df, label, face) {
-  data.frame(coverage = df$coverage, s = df$s, reads = df$reads,
-             format = df$format, window = df$window, series = df$series,
-             label = label, face = face, stringsAsFactors = FALSE)
-}
-
-on_line <- function(df) {
-  seg <- split(df, list(df$series, df$reads, df$format, df$window), drop = TRUE)
-  do.call(rbind, lapply(seg, function(g) {
-    if (nrow(g) < 2) return(NULL)
-    g <- g[order(g$coverage), ]
-    i <- seq_len(nrow(g))
-    at <- seq(1, nrow(g), length.out = 40)
-    txt(data.frame(coverage = 10^approx(i, log10(g$coverage), xout = at)$y,
-                   s = 10^approx(i, log10(g$s), xout = at)$y,
-                   reads = g$reads[1], format = g$format[1],
-                   window = g$window[1], series = g$series[1]),
-        "", "plain")
-  }))
-}
-
-# Every comparator's last point carries its ratio to this work at that cell,
-# bold and pushed to the right of the curve so it reads as the series' verdict
-# rather than as one more number on the point.
 CELL <- c("reads", "format", "window")
-ends <- endpoint_labels(meas, cell = CELL,
-                        x = "coverage", y = "s", series = "series",
-                        reference = "This work", ratio = fmt_slower_terse)
-ends <- subset(ends, series != "This work")
-inner <- meas[!is_endpoint(meas, ends, CELL, "coverage", "series"), ]
-
-labels <- rbind(
-  txt(inner, fmt_time(inner$s), "plain"),
-  txt(ends, ends$label, "bold"),
-  on_line(meas)
-)
-labels$nudge <- ifelse(labels$face == "bold", ENDPOINT_NUDGE,
-                       ifelse(labels$label == "", 0, -0.07))
-# This work is the bottom curve in every cell, so its own times start below it,
-# in the empty band under the curve, rather than in the same strip as the
-# comparators' bold verdicts at the same x.
-labels$nudge_y <- ifelse(labels$series == "This work" & labels$label != "",
-                         REFERENCE_DROP, 0)
+labels <- coldload_labels(d, meas, CELL, reference = "This work")
 
 note <- if (nrow(dropped)) {
   geom_text(data = dropped, label = "gap: cell measured under external load",
@@ -96,21 +50,16 @@ note <- if (nrow(dropped)) {
             inherit.aes = FALSE)
 }
 
-fig <- ggplot(meas, aes(x = coverage, y = s, colour = series)) +
-  geom_line(linewidth = LINE_W) +
-  geom_point(size = POINT_S) +
-  geom_text_repel(data = labels, aes(label = label, fontface = face,
-                                     size = face),
-                  nudge_x = labels$nudge, nudge_y = labels$nudge_y,
-                  lineheight = 0.9,
-                  seed = REPEL_SEED, show.legend = FALSE,
-                  box.padding = 0.35, point.padding = 0.15,
-                  force = 3, force_pull = 0.4,
-                  min.segment.length = 0.25, segment.size = 0.25,
-                  segment.alpha = 0.5, max.overlaps = Inf,
-                  max.time = 5, max.iter = 60000) +
-  scale_size_manual(values = c(plain = POINT_LABEL, bold = ENDPOINT_LABEL),
-                    guide = "none") +
+fig <- ggplot(d, aes(x = coverage, y = s, colour = series)) +
+  geom_line(data = meas, linewidth = LINE_W) +
+  geom_point(data = meas, size = POINT_S) +
+  # An arm abandoned at the paint ceiling is drawn hollow and left off the line,
+  # as it is in perf-coldload.R: dropping the row instead leaves a curve that
+  # simply stops, and a reader cannot tell a cell nobody measured from one the
+  # tool gave up on. This is why the labels come from the shared
+  # coldload_labels() rather than a copy of it -- the copy is what dropped them.
+  geom_point(data = subset(d, censored), size = POINT_S, shape = 1) +
+  endpoint_repel(labels) +
   note +
   facet_grid(reads ~ window + format) +
   scale_x_log10(breaks = c(20, 200, 1000), labels = c("20×", "200×", "1000×"),
@@ -128,15 +77,16 @@ fig <- ggplot(meas, aes(x = coverage, y = s, colour = series)) +
   guides(colour = guide_legend(nrow = 1)) +
   labs(x = "coverage", colour = NULL,
        caption = paste("* no CRAM support. Bold: that tool's time at its last coverage,",
-                       "and how many times slower that is than JBrowse 5.0.0 at the same point.")) +
+                       "and how many times slower that is than JBrowse 5.0.0 at the same point.",
+                       "Hollow: gave up at the paint ceiling.")) +
   paper_theme() +
   theme(plot.caption = element_text(size = rel(0.8), hjust = 0, colour = "grey30"))
 
 ggsave("results/figures/paper/pdf/perf-coldload-combined.pdf", fig,
-       width = 360, height = 190, units = "mm", device = cairo_pdf)
+       width = 360, height = 225, units = "mm", device = cairo_pdf)
 cat("wrote results/figures/paper/pdf/perf-coldload-combined.pdf\n")
 
 ggsave("results/figures/paper/png/perf-coldload-combined.png", fig,
-       width = 360, height = 190, units = "mm", dpi = 300,
+       width = 360, height = 225, units = "mm", dpi = 300,
        device = ragg::agg_png)
 cat("wrote results/figures/paper/png/perf-coldload-combined.png\n")

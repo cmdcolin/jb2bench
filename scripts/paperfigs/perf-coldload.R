@@ -98,20 +98,8 @@ all$s <- all$ms / 1000
 # that must not be ambiguous. Each label keeps its series' colour and grows a
 # leader line to its own point, so displacement never costs attribution.
 #
-# Seeded, because the repel solver starts from a random jitter: without it a
-# rebuild reshuffles every label and the figure is a different picture each
-# time it is drawn.
-REPEL_SEED <- 7
-# In log10 coverage units: how far right of its point an endpoint label starts.
-# Small on purpose. A nudge large enough to clear the curve entirely needs a
-# right margin as wide as a third of the panel, and that margin is empty on
-# every cell -- the figure then spends a third of its width on nothing. The
-# labels sit over the panel instead and the repel solver moves them off the
-# lines, which is what it is for.
-ENDPOINT_NUDGE <- 0.16
-# In log10 seconds: how far below its point a reference-curve label starts.
-REFERENCE_DROP <- -0.12
-
+# The layer itself is built by common.R's coldload_labels() and drawn by its
+# endpoint_repel(), shared with perf-coldload-combined.R.
 draw <- function(win, out, width_label) {
   d <- subset(all, window == win)
 
@@ -128,63 +116,8 @@ draw <- function(win, out, width_label) {
   # measurement.
   meas <- subset(d, !censored)
 
-  txt <- function(df, label, face) {
-    data.frame(coverage = df$coverage, s = df$s, reads = df$reads,
-               format = df$format, series = df$series, label = label,
-               face = face, stringsAsFactors = FALSE)
-  }
-
-  # ggrepel pushes a label off other LABELS and off the POINTS of its own layer,
-  # and knows nothing about the lines joining them -- so left alone it settles
-  # bold ratios neatly into the gaps between points and straight through the
-  # curves, which is the one place a number must not sit. Sampling each segment
-  # into empty-labelled rows puts the curve into the layer as a row of obstacles
-  # it does understand. An empty string has no box, so these push labels away
-  # without drawing anything themselves.
-  on_line <- function(df) {
-    seg <- split(df, list(df$series, df$reads, df$format), drop = TRUE)
-    do.call(rbind, lapply(seg, function(g) {
-      if (nrow(g) < 2) return(NULL)
-      g <- g[order(g$coverage), ]
-      i <- seq_len(nrow(g))
-      at <- seq(1, nrow(g), length.out = 40)
-      txt(data.frame(coverage = 10^approx(i, log10(g$coverage), xout = at)$y,
-                     s = 10^approx(i, log10(g$s), xout = at)$y,
-                     reads = g$reads[1], format = g$format[1],
-                     series = g$series[1]),
-          "", "plain")
-    }))
-  }
-
-  # Every comparator's last measured point carries its ratio to this work at
-  # that cell, bold and pushed right of the curve so it reads as the series'
-  # verdict rather than as one more number on the point. The ratio is the
-  # comparator's own node -- its colour, its leader line -- so it is
-  # unambiguous which curve it belongs to.
   CELL <- c("reads", "format")
-  ends <- endpoint_labels(meas, cell = CELL,
-                          x = "coverage", y = "s", series = "series",
-                          reference = "This work", ratio = fmt_slower_terse)
-  ends <- subset(ends, series != "This work")
-  inner <- d[!is_endpoint(d, ends, CELL, "coverage", "series"), ]
-
-  labels <- rbind(
-    txt(inner, ifelse(inner$censored, paste0(">", fmt_time(inner$s)), fmt_time(inner$s)), "plain"),
-    txt(ends, ends$label, "bold"),
-    on_line(meas)
-  )
-  # Bold verdicts go right, plain times go left. Without the leftward half the
-  # two meet in the same strip beside the last point -- this work's own endpoint
-  # time is a plain label at the same x as every comparator's bold one -- and
-  # the solver has to break the tie by luck rather than by rule.
-  labels$nudge <- ifelse(labels$face == "bold", ENDPOINT_NUDGE,
-                         ifelse(labels$label == "", 0, -0.07))
-  # This work is the bottom curve in every cell, so its own times start below
-  # it, in the empty band under the curve. Left level with the point they land
-  # in the same strip as the comparators' bold verdicts at the same x, and the
-  # solver then has to choose between two labels that both want to be there.
-  labels$nudge_y <- ifelse(labels$series == "This work" & labels$label != "",
-                           REFERENCE_DROP, 0)
+  labels <- coldload_labels(d, meas, CELL, reference = "This work")
 
   note <- if (nrow(dropped)) {
     geom_text(data = dropped, label = "gap: cell measured under external load",
@@ -196,17 +129,7 @@ draw <- function(win, out, width_label) {
     geom_line(data = meas, linewidth = LINE_W) +
     geom_point(data = meas, size = POINT_S) +
     geom_point(data = subset(d, censored), size = POINT_S, shape = 1) +
-    geom_text_repel(data = labels, aes(label = label, fontface = face,
-                                       size = face),
-                    nudge_x = labels$nudge, nudge_y = labels$nudge_y,
-                    lineheight = 0.9,
-                    seed = REPEL_SEED, show.legend = FALSE,
-                    box.padding = 0.38, point.padding = 0.2,
-                    min.segment.length = 0.25, segment.size = 0.25,
-                    segment.alpha = 0.5, max.overlaps = Inf,
-                    max.time = 5, max.iter = 60000) +
-    scale_size_manual(values = c(plain = POINT_LABEL, bold = ENDPOINT_LABEL),
-                      guide = "none") +
+    endpoint_repel(labels) +
     note +
     facet_grid(reads ~ format) +
     scale_x_log10(breaks = c(20, 200, 1000), labels = c("20×", "200×", "1000×"),
