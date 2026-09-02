@@ -3,13 +3,18 @@
 #
 # The sample-by-sample distance build behind row clustering, on real 1000
 # Genomes windows, as the pure-JS implementation JBrowse shipped with
-# (greenelab/hclust), the wasm that replaced it, the wasm after its kernel was
-# rewritten, and a deliberately naive WebGPU kernel.
+# (greenelab/hclust), the wasm that replaced it, and a deliberately naive
+# WebGPU kernel that keeps the wasm merge behind it.
+#
+# results/paper/cluster.csv also carries the pre-rewrite wasm build (hclust
+# 5.0.0); the figure draws only the current one. Two wasm curves a fixed
+# factor apart made the reader pick which wasm the GPU is being compared
+# against, and only one of them is the build anybody runs.
 #
 # One panel per row count, because the two dimensions of the matrix do not cost
 # the same. The distance build is O(n^2 v): doubling the columns doubles the
 # work, doubling the rows quadruples it, and the measurements say so — at
-# v ~ 2,300 the 5.1.0 build goes 2.1 s -> 9.3 s across the row doubling, and at
+# v ~ 2,300 the wasm build goes 2.1 s -> 9.3 s across the row doubling, and at
 # v ~ 22,400 it goes 23 s -> 98 s, both a factor of about four. A single axis of
 # n x v cannot show that: it moves the haplotype cases right by 2x when their
 # work went up by 4x, so the curve slopes it draws are not the algorithm's.
@@ -31,8 +36,10 @@ d <- read.csv("results/paper/cluster.csv", stringsAsFactors = FALSE)
 
 # Slowest first, so the stock discrete scale walks its colours in the same
 # direction the measurements improve.
-SERIES <- c("greenelab/hclust (JS)", "hclust 5.0.0 (wasm)",
-           "hclust 5.1.0 (wasm)", "WebGPU kernel")
+SERIES <- c("greenelab/hclust (JS)", "hclust (wasm)", "hybrid WebGPU + wasm")
+d$series <- c("greenelab/hclust (JS)" = SERIES[1], "hclust 5.1.0 (wasm)" = SERIES[2],
+              "WebGPU kernel" = SERIES[3])[d$series]
+d <- d[!is.na(d$series), ]
 d$series <- factor(d$series, levels = SERIES)
 
 # The 5,008-row cases are the same 2,504 individuals phased into haplotypes, so
@@ -44,9 +51,8 @@ d$rows <- factor(sprintf("%s %s", format(d$n, big.mark = ","), unit),
 
 # Two ratios per column, both against the GPU, because "how much faster" has
 # two honest answers here and neither subsumes the other: "vs wasm" is the
-# choice a reader actually faces, since the kernel rewrite is already released
-# and nobody runs the JS baseline any more; "vs JS" is where the whole system
-# started. The wasm badge sits at the geometric mean of the pair it compares,
+# choice a reader actually faces, since nobody runs the JS baseline any more;
+# "vs JS" is where the whole system started. The wasm badge sits at the geometric mean of the pair it compares,
 # which on a log axis is the midpoint of the gap it measures; the JS badge
 # would sit far above it if placed the same way, so it goes below the GPU
 # point instead, in the margin the axis already carries for the point's own
@@ -62,11 +68,11 @@ w <- reshape(d[, c("case", "v", "rows", "series", "s")], idvar = c("case", "v", 
 widest <- ave(w$v, w$rows, FUN = function(x) x == max(x))
 tag <- function(s) ifelse(widest == 1, paste("", s), "")
 ratio_wasm <- data.frame(v = w$v, rows = w$rows,
-                         mid = sqrt(w$`s.WebGPU kernel` * w$`s.hclust 5.1.0 (wasm)`),
-                         lab = paste0(fmt_ratio(w$`s.hclust 5.1.0 (wasm)` / w$`s.WebGPU kernel`), tag("vs wasm")))
+                         mid = sqrt(w$`s.hybrid WebGPU + wasm` * w$`s.hclust (wasm)`),
+                         lab = paste0(fmt_ratio(w$`s.hclust (wasm)` / w$`s.hybrid WebGPU + wasm`), tag("vs wasm")))
 ratio_js <- data.frame(v = w$v, rows = w$rows,
-                       mid = w$`s.WebGPU kernel` / 1.8,
-                       lab = paste0(fmt_ratio(w$`s.greenelab/hclust (JS)` / w$`s.WebGPU kernel`), tag("vs JS")))
+                       mid = w$`s.hybrid WebGPU + wasm` / 1.8,
+                       lab = paste0(fmt_ratio(w$`s.greenelab/hclust (JS)` / w$`s.hybrid WebGPU + wasm`), tag("vs JS")))
 
 # A line chart, not bars: geom_col draws from zero, which under log10 is minus
 # infinity, so ggplot starts the bars at 1 and the 310 ms GPU measurement
@@ -109,22 +115,19 @@ cat("wrote results/figures/paper/png/cluster-speedup.png\n")
 # ---- draft caption ----------------------------------------------------------
 #   The distance build behind row clustering, on five 1000 Genomes windows, for
 #   the pure-JS implementation JBrowse shipped with (greenelab/hclust 0.0.1),
-#   the wasm build that replaced it and ships today (hclust 5.0.0), the same
-#   library after its distance kernel was rewritten (5.1.0), and a deliberately
-#   naive WebGPU compute kernel. The build is O(n^2 v), so the panels split on
+#   the wasm build that replaced it (hclust 5.1.0), and a deliberately naive
+#   WebGPU compute kernel, which replaces only the distance build and leaves
+#   the agglomerative merge in the same wasm library, hence "hybrid". The build is O(n^2 v), so the panels split on
 #   the row count n and each panel sweeps the variant columns v; the 5,008-row
 #   cases are the same 2,504 individuals phased into haplotypes. Both axes are
 #   logarithmic and the time ticks are round durations, so within a panel a
 #   slope of one is cost linear in the columns, and a fixed vertical distance
 #   anywhere is a fixed factor. The bold labels give the WebGPU kernel's
-#   margin over two comparators, one per column: hclust 5.1.0, the faster of
-#   the two wasm builds and the honest one, since the rewrite is already
-#   released and the choice a reader faces is between it and the GPU rather
-#   than between the GPU and a build nobody runs any more; and the original JS
-#   implementation, where the whole system started. Both are named in full
+#   margin over two comparators, one per column: the wasm build, which is the
+#   choice a reader actually faces; and the original JS implementation, where
+#   the whole system started. Both are named in full
 #   only on each panel's widest column, which has the room; the narrower
 #   columns carry the bare number. Comparing the panels at matched v gives the
 #   row cost: about 4x for a 2x row count, at both window widths. The
-#   JS-to-wasm step is a steady 4-5x across every window, the constant factor
-#   of the same algorithm in C; the widening gap below it is the later
-#   algorithmic work.
+#   JS-to-wasm step is a steady 7-9x across every window; the widening gap
+#   below it is what the compute shader adds.
