@@ -1,5 +1,5 @@
-// Cross-tool interaction matrix: JBrowse against igv.js, same corpus and same
-// instrument, over one of two motions.
+// Cross-tool interaction matrix: JBrowse against igv.js and GenomeSpy, same
+// corpus and same instrument, over one of two motions.
 //
 //   MOTION=pan (default) — scroll sideways one full viewport at constant scale.
 //                          Both tools must go to the network for a region
@@ -48,7 +48,7 @@
 //
 // Usage: node scripts/crosstool/panrunner.ts
 //   CASES=20x-shortread,...     subset of rows (CASES=none regenerates report)
-//   TOOLS=jbrowse,igv,igv-deep  subset of columns
+//   TOOLS=jbrowse,igv,igv-deep,genomespy  subset of columns
 //   JBROWSE_PORTS=8000,8001,8004  one JBrowse arm per port; 8004 is the version
 //                               the 2023 paper benchmarked against igv.js
 //   MOTION=pan|zoom             which interaction to measure
@@ -80,7 +80,11 @@ const DEEP = 10000
 const JBROWSE_PORTS = (process.env.JBROWSE_PORTS ?? process.env.JBROWSE_PORT ?? '8000')
   .split(',')
   .map(Number)
-const IGV_PORT = Number(process.env.IGV_PORT ?? 8003)
+// One server for `crosstool/`, which holds igv's harness page at the root and
+// GenomeSpy's beside it. Named for what it serves rather than for igv, since it
+// stopped being igv's alone when the GenomeSpy arm landed; `IGV_PORT` stays the
+// spelling of the environment variable because every run script sets that one.
+const CROSSTOOL_PORT = Number(process.env.CROSSTOOL_PORT ?? process.env.IGV_PORT ?? 8003)
 
 const jbrowseArms = await Promise.all(
   JBROWSE_PORTS.map(async (port, i) => {
@@ -94,12 +98,22 @@ const jbrowseBuild = jbrowseArms[0]!.build
 const igvVersion = JSON.parse(
   fs.readFileSync('node_modules/igv/package.json', 'utf8'),
 ).version as string
-console.log(`igv.js ${igvVersion}`)
+const gsVersion = JSON.parse(
+  fs.readFileSync('node_modules/@genome-spy/core/package.json', 'utf8'),
+).version as string
+console.log(`igv.js ${igvVersion}, GenomeSpy ${gsVersion}`)
 
 interface Tool {
   id: string
   label: string
-  kind: 'jbrowse' | 'igv'
+  kind: 'jbrowse' | 'igv' | 'genomespy'
+  /**
+   * Container formats this arm can open, where it cannot open all of them.
+   * GenomeSpy 0.85.0 has no CRAM lazy source, so its CRAM cells are a
+   * capability limit and not a gap in the run -- recorded as `unsupported`
+   * rather than left blank, since blank already means "not measured this run".
+   */
+  formats?: string[]
   url: (track: string) => string
 }
 
@@ -118,13 +132,35 @@ const allTools: Tool[] = [
     id: 'igv',
     label: `igv.js ${igvVersion}`,
     kind: 'igv',
-    url: t => `http://localhost:${IGV_PORT}/?loc=${LOC}&track=${t}`,
+    url: t => `http://localhost:${CROSSTOOL_PORT}/?loc=${LOC}&track=${t}`,
   },
   {
     id: 'igv-deep',
     label: `igv.js ${igvVersion} (depth ${DEEP})`,
     kind: 'igv',
-    url: t => `http://localhost:${IGV_PORT}/?loc=${LOC}&track=${t}&depth=${DEEP}`,
+    url: t => `http://localhost:${CROSSTOOL_PORT}/?loc=${LOC}&track=${t}&depth=${DEEP}`,
+  },
+  {
+    // GenomeSpy, on the same BAM through its own lazy source. It joined the
+    // cold-load matrix on 2026-08-29 and this one only now, which left the
+    // motion runs answering "is a multi-second zoom what a browser costs" with
+    // a single foreign tool.
+    //
+    // It is the more informative of the two comparisons for a render claim, and
+    // for the reason that makes it awkward: `@genome-spy/core` depends on
+    // `@gmod/bam` ^7.1.19, the same decoder JBrowse reads through, so this
+    // column is largely renderer-against-renderer over a shared parser where
+    // the igv columns confound the two. What it cannot do is CRAM.
+    //
+    // The harness page is `crosstool/genomespy.html`, served beside igv's on
+    // the same port, and its header carries the whole account of why it
+    // declares no domain and navigates with `zoomTo` afterwards -- which is
+    // also the API this runner drives it by.
+    id: 'genomespy',
+    label: `GenomeSpy ${gsVersion}`,
+    kind: 'genomespy',
+    formats: ['bam'],
+    url: t => `http://localhost:${CROSSTOOL_PORT}/genomespy.html?loc=${LOC}&track=${t}`,
   },
 ]
 
@@ -145,6 +181,21 @@ const tools = toolFilter ? allTools.filter(t => toolFilter.includes(t.id)) : all
 // and then `-bam`, quietly substituting one format for another.
 const allCases = enumerateCases()
 const cases = selectCases(allCases)
+
+/**
+ * Why this arm cannot open this case, or null if it can.
+ *
+ * A capability limit is recorded rather than skipped, the way the cold-load
+ * matrix records it: a blank cell already means "not measured in the run that
+ * produced this row", and a reader cannot tell that from "this tool does not
+ * open CRAM". It also has to stay out of the interleaved rotation -- the
+ * instrument settles on a page that draws nothing, so an arm that cannot open
+ * the file would otherwise contribute the fastest number in the row.
+ */
+function unsupported(tool: Tool, c: { track: string }): string | null {
+  const fmt = c.track.split('.').pop()!
+  return tool.formats && !tool.formats.includes(fmt) ? `no ${fmt} reader` : null
+}
 
 const median = (a: number[]) => {
   const s = [...a].sort((x, y) => x - y)
@@ -244,6 +295,8 @@ interface Cell {
   loci: string[]
   load: LoadWindow
   failures: string[]
+  /** Set instead of a timing where the arm cannot open this case at all. */
+  unsupported?: string
 }
 type Row = Record<string, Cell>
 
@@ -253,6 +306,7 @@ const RESULTS = `results/crosstool-${MOTION}.json`
 const REPORT = `results/crosstool-${MOTION}.md`
 interface Recorded {
   igvVersion: string
+  gsVersion?: string
   jbrowseBuild: string
   /** every JBrowse arm this file holds, tool id → build directory */
   jbrowseBuilds: Record<string, string>
@@ -268,6 +322,7 @@ const prior: Recorded = fs.existsSync(RESULTS)
   ? JSON.parse(fs.readFileSync(RESULTS, 'utf8'))
   : {
       igvVersion,
+      gsVersion,
       jbrowseBuild,
       jbrowseBuilds: {},
       panDir: process.env.PAN_DIR ?? 'left',
@@ -292,7 +347,14 @@ for (const c of cases) {
   const bytes: Record<string, number> = {}
   const draws: Record<string, number[]> = {}
   const drawMs: Record<string, number[]> = {}
-  for (const t of tools) {
+  // Out of the rotation, not out of the row: an arm that cannot open this
+  // container is recorded below with its reason.
+  const measurable = tools.filter(t => {
+    const why = unsupported(t, c)
+    if (why) console.log(`${c.id} ${t.id}: unsupported — ${why}`)
+    return !why
+  })
+  for (const t of measurable) {
     runs[t.id] = []
     fetchedRuns[t.id] = []
     applied[t.id] = []
@@ -309,7 +371,7 @@ for (const c of cases) {
   // Interleaved: one round runs every tool back to back, so drift lands on all
   // of them rather than on whichever tool owned the clock at the time.
   for (let r = 0; r < RUNS; r++) {
-    for (const t of tools) {
+    for (const t of measurable) {
       const got = runOnce(t.url(c.track), t.kind)
       if (!got) {
         runs[t.id]!.push(null)
@@ -340,6 +402,25 @@ for (const c of cases) {
 
   const row: Row = prior.rows[c.id] ?? {}
   for (const t of tools) {
+    const why = unsupported(t, c)
+    if (why) {
+      row[t.id] = {
+        median: Number.NaN,
+        drawMedian: Number.NaN,
+        fetchedMedian: Number.NaN,
+        runs: [],
+        appliedSteps: [],
+        cachedSteps: 0,
+        requests: 0,
+        bytes: 0,
+        drawsPerStep: [],
+        loci: [],
+        load: { before: 0, after: 0 },
+        failures: [],
+        unsupported: why,
+      }
+      continue
+    }
     const vals = runs[t.id]!.filter((v): v is number => typeof v === 'number')
     row[t.id] = {
       median: vals.length ? median(vals) : Number.NaN,
@@ -364,18 +445,35 @@ for (const c of cases) {
   // Did the tools actually visit the same regions? They are driven by different
   // mechanisms, so this is checked rather than assumed — and a mismatch
   // invalidates the row rather than costing it a footnote.
+  // Every foreign arm against JBrowse, not igv alone. Each is driven by its own
+  // navigation API -- igv by `search`, GenomeSpy by `zoomTo` -- so each is its
+  // own chance to land somewhere else, and an arm nobody checks is an arm whose
+  // column means nothing. It is also the check that carries GenomeSpy's
+  // linearized-coordinate readback: a genome offset would put every step of
+  // that arm somewhere JBrowse never went.
   const jb = row.jbrowse?.loci ?? []
-  const ig = row.igv?.loci ?? []
-  if (jb.length && ig.length) {
-    const n = Math.min(jb.length, ig.length)
-    const bad: string[] = []
-    for (let i = 0; i < n; i++) {
-      const d = Math.abs(locusStart(jb[i]!) - locusStart(ig[i]!))
-      if (!(d <= 50)) bad.push(`step ${i + 1}: ${jb[i]} vs ${ig[i]}`)
+  const bad: string[] = []
+  let compared = 0
+  for (const t of measurable.filter(t => t.kind !== 'jbrowse')) {
+    const other = row[t.id]?.loci ?? []
+    if (jb.length && other.length) {
+      compared++
+      const n = Math.min(jb.length, other.length)
+      for (let i = 0; i < n; i++) {
+        const d = Math.abs(locusStart(jb[i]!) - locusStart(other[i]!))
+        if (!(d <= 50)) bad.push(`${t.id} step ${i + 1}: ${jb[i]} vs ${other[i]}`)
+      }
+      if (jb.length !== other.length) {
+        bad.push(
+          `${t.id} step counts differ: jbrowse ${jb.length}, ${t.id} ${other.length}`,
+        )
+      }
     }
-    if (jb.length !== ig.length) {
-      bad.push(`step counts differ: jbrowse ${jb.length}, igv ${ig.length}`)
-    }
+  }
+  // Only a run that actually compared something may clear a recorded mismatch:
+  // a re-run of the JBrowse arms alone has checked nothing and must not erase
+  // what a full run found.
+  if (compared) {
     if (bad.length) {
       prior.locusMismatch[c.id] = bad.join('; ')
       console.log(`  LOCUS MISMATCH ${c.id}: ${bad.join('; ')}`)
@@ -385,6 +483,7 @@ for (const c of cases) {
   }
 
   prior.igvVersion = igvVersion
+  prior.gsVersion = gsVersion
   prior.jbrowseBuild = jbrowseBuild
   prior.jbrowseBuilds = {
     ...prior.jbrowseBuilds,
@@ -399,7 +498,11 @@ for (const c of cases) {
 const cells: { key: string; load: LoadWindow; value: number }[] = []
 for (const [id, row] of Object.entries(prior.rows)) {
   for (const [tool, cell] of Object.entries(row)) {
-    cells.push({ key: `${id}/${tool}`, load: cell.load, value: cell.median })
+    // An unsupported cell carries a zeroed load window and no timing, so left
+    // in it would read as the quietest cell in the run.
+    if (!cell.unsupported) {
+      cells.push({ key: `${id}/${tool}`, load: cell.load, value: cell.median })
+    }
   }
 }
 const hot = outliers(cells)
@@ -431,7 +534,7 @@ const fmt = (v: number | undefined) =>
 const isZoom = MOTION === 'zoom'
 
 const lines: string[] = [
-  `# Cross-tool ${MOTION}: JBrowse against igv.js`,
+  `# Cross-tool ${MOTION}: JBrowse against igv.js and GenomeSpy`,
   '',
   ...(isZoom
     ? [
@@ -489,6 +592,15 @@ const lines: string[] = [
   'here run against an application that is already up, so far less of the number',
   'is startup.',
   '',
+  '**The GenomeSpy column is the one that isolates the renderer.**',
+  '`@genome-spy/core` reads BAM through `@gmod/bam` ^7.1.19 — the decoder this',
+  'JBrowse build reads through — so a JBrowse-against-GenomeSpy difference is',
+  'largely a difference in drawing. The igv.js columns are not that: igv',
+  'maintains its own readers, so they confound parser with renderer. That makes',
+  'GenomeSpy the more informative of the two comparisons and the narrower one:',
+  '0.85.0 has no CRAM lazy source, so its CRAM cells read `n/a` rather than a',
+  'timing.',
+  '',
   ...(isZoom
     ? [
         '**What a zoom prices.** Neither tool needs the network: both hold the',
@@ -530,6 +642,10 @@ const lines: string[] = [
  */
 const cell = (c: Cell | undefined) => {
   if (!c) return { text: '—', comparable: false }
+  // Distinct from a dash, which means nobody measured it. GenomeSpy has no CRAM
+  // reader, and timing the page it draws instead would make the tool that
+  // cannot open the file the fastest thing in the row.
+  if (c.unsupported) return { text: 'n/a', comparable: false }
   // On a zoom nothing is supposed to fetch, so restricting to fetched steps
   // would restrict to the failure mode. Every applied step counts.
   if (isZoom) {

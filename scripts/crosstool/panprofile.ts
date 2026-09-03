@@ -40,6 +40,13 @@
 //     locus-navigation API across builds of differing vintage.
 //   igv — `search(locus)` to pan, against the locus computed from the same
 //     start and width; `zoomIn()` to zoom.
+//   genomespy — `getScaleResolutionByName('pos').zoomTo(interval)` for both
+//     motions, which is the only navigation API this harness page has and the
+//     one it already uses to reach the benchmark window. It takes an explicit
+//     interval, so pan and zoom differ here only in which interval is asked
+//     for. Not animated: `zoomTo`'s second argument defaults to false, which
+//     takes the branch that sets the domain and requests one render, so this
+//     arm times a redraw rather than a transition.
 //
 // Both zoom drives halve the visible width about the centre, so the two tools
 // land on the same region by construction in the same way the pan does.
@@ -48,7 +55,7 @@
 // where each actually landed so the claim is checkable rather than assumed. A
 // step whose two tools disagree about the locus is reported, not averaged in.
 //
-// Usage: panprofile.ts <url> <jbrowse|igv> [screenshotDir]
+// Usage: panprofile.ts <url> <jbrowse|igv|genomespy> [screenshotDir]
 //   MOTION=pan|zoom   which interaction to time (default pan)
 // Prints JSON: per-step ms and landed locus.
 import crypto from 'crypto'
@@ -64,11 +71,13 @@ import {
   isContentDrawn,
 } from './drawclock.ts'
 
+const TOOLS = ['jbrowse', 'igv', 'genomespy'] as const
+type ToolKind = (typeof TOOLS)[number]
 const url = process.argv[2]
-const tool = process.argv[3] as 'jbrowse' | 'igv'
+const tool = process.argv[3] as ToolKind
 const shotDir = process.argv[4]
-if (!url || (tool !== 'jbrowse' && tool !== 'igv')) {
-  throw new Error('usage: panprofile.ts <url> <jbrowse|igv> [screenshotDir]')
+if (!url || !TOOLS.includes(tool)) {
+  throw new Error(`usage: panprofile.ts <url> <${TOOLS.join('|')}> [screenshotDir]`)
 }
 if (shotDir) {
   fs.mkdirSync(shotDir, { recursive: true })
@@ -340,6 +349,22 @@ try {
     )
     const err = await page.evaluate(() => (window as any).__igvState.error)
     if (err) throw new Error(`igv failed to start: ${err}`)
+  } else if (tool === 'genomespy') {
+    // Every failure on this page is silent -- `embed()` resolves, its promise
+    // does not reject, and GenomeSpy logs the exception itself so `pageerror`
+    // never fires. crosstool/genomespy.html records `zoomed` and `lazyLoaded`
+    // for that reason, and `ready` is only set after both. Waiting on anything
+    // weaker would let a dead page reach the step loop, where it would draw
+    // nothing and settle instantly.
+    await page.waitForFunction(
+      'window.__gsState && (window.__gsState.ready || window.__gsState.error)',
+      { timeout: READY_TIMEOUT, polling: 200 },
+    )
+    const state = await page.evaluate(() => (window as any).__gsState)
+    if (state.error) throw new Error(`genomespy failed to start: ${state.error}`)
+    if (state.lazyLoaded !== 'ok') {
+      throw new Error(`genomespy lazy data: ${state.lazyLoaded}`)
+    }
   } else {
     await page.waitForFunction(
       'window.JBrowseSession && window.JBrowseSession.views && window.JBrowseSession.views.length > 0',
@@ -381,7 +406,21 @@ try {
     lastNetworkAt = Date.now()
     const tStep = Date.now()
     const applied = await page.evaluate(
-      ({ tool, sign, locus, motion }) => {
+      ({ tool, sign, locus, motion, ref, from, to }) => {
+        if (tool === 'genomespy') {
+          const res = (window as any).gsApi.getScaleResolutionByName('pos')
+          // Deliberately NOT awaited, for igv's reason below: the instrument
+          // must not ask a tool when it has finished.
+          ;(window as any).__panPromise = res
+            .zoomTo([
+              { chrom: ref, pos: from },
+              { chrom: ref, pos: to },
+            ])
+            .catch((e: unknown) => {
+              ;(window as any).__panError = String(e)
+            })
+          return true
+        }
         if (tool === 'igv') {
           const b = (window as any).igvBrowser
           // Deliberately NOT awaited: neither call resolves on anything this
@@ -410,7 +449,15 @@ try {
         v.horizontalScroll(sign * v.width)
         return v.offsetPx !== before
       },
-      { tool, sign: PAN_SIGN, locus: target, motion: MOTION },
+      {
+        tool,
+        sign: PAN_SIGN,
+        locus: target,
+        motion: MOTION,
+        ref: REF,
+        from: Math.round(targetStart),
+        to: Math.round(targetEnd),
+      },
     )
 
     if (!applied) {
@@ -444,7 +491,22 @@ try {
       reference = await shot()
     }
 
-    const locus = await page.evaluate(tool => {
+    const locus = await page.evaluate(({ tool, ref }) => {
+      if (tool === 'genomespy') {
+        const err = (window as any).__panError
+        if (err) return `error: ${err}`
+        // `getDomain()` is linearized genome coordinates. The corpus is one
+        // contig at offset zero, so those are positions on it -- the same
+        // assumption crosstool/genomespy.html makes when it zooms to the
+        // benchmark window by {chrom, pos}. Nothing here has to trust it: the
+        // runner cross-checks every step's locus against JBrowse's, so a
+        // linearization offset would show up as a mismatch on every step
+        // rather than as a plausible wrong number.
+        const [lo, hi] = (window as any).gsApi
+          .getScaleResolutionByName('pos')
+          .getDomain()
+        return `${ref}:${Math.round(lo)}-${Math.round(hi)}`
+      }
       if (tool === 'igv') {
         const b = (window as any).igvBrowser
         const f = b.referenceFrameList?.[0]
@@ -457,7 +519,7 @@ try {
         v.visibleLocStrings ??
         `${v.displayedRegions?.[0]?.refName ?? ''}:${Math.round(v.offsetPx * v.bpPerPx)}-${Math.round((v.offsetPx + v.width) * v.bpPerPx)}`
       )
-    }, tool)
+    }, { tool, ref: REF })
 
     steps.push({
       step: i,

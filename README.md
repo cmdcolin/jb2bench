@@ -611,6 +611,15 @@ dominated by application boot and assembly resolution, which say nothing about a
 renderer, and the zoom result below is a JBrowse debounce rather than JBrowse's
 pixels. A pan runs against an application that is already up.
 
+**GenomeSpy is an arm here since 2026-09-02**, on both motions, driven through
+`getScaleResolutionByName('pos').zoomTo(interval)` — the same API
+`crosstool/genomespy.html` already uses to reach the benchmark window, and not
+animated, so what it times is a redraw. It is the column that isolates the
+renderer, since `@genome-spy/core` decodes BAM through the same `@gmod/bam` this
+build does, and the narrow one: 0.85.0 has no CRAM lazy source, so its CRAM
+cells read `n/a` rather than a timing. Every foreign arm's per-step loci are now
+cross-checked against JBrowse's, not igv's alone.
+
 **Paint quiescence cannot resolve it.** The screenshot detector needs six
 samples at best, and one `page.screenshot()` on this box measures anywhere from
 43 to 161 ms, putting its own floor between roughly 450 and 1100 ms — against
