@@ -158,11 +158,12 @@ ARMS := JBROWSE_PORTS=8000,8001,8004
 #
 # Cold load is a page load, so any harness page that draws can be an arm.
 # Pan and zoom are *motions*, and panrunner.ts moves each tool through its own
-# API -- `kind: 'jbrowse' | 'igv'` -- so an arm there costs a driver per tool.
-# GenomeSpy and Gosling have no driver yet, so naming them in a motion run would
-# have them silently filtered out and quietly narrow the table.
+# API -- `kind: 'jbrowse' | 'igv' | 'genomespy'` -- so an arm there costs a
+# driver per tool. GenomeSpy gained one on 2026-09-02 and is in both lists now;
+# Gosling has none, so naming it in a motion run would have it silently filtered
+# out and quietly narrow the table.
 TOOLARMS := TOOLS=jbrowse,jbrowse-release-4.3.0,jbrowse-release-2.4.0,igv,igv-deep,genomespy,gosling
-MOTIONARMS := TOOLS=jbrowse,jbrowse-release-4.3.0,jbrowse-release-2.4.0,igv,igv-deep
+MOTIONARMS := TOOLS=jbrowse,jbrowse-release-4.3.0,jbrowse-release-2.4.0,igv,igv-deep,genomespy
 
 # The Gosling harness is the one arm that needs a build step. gosling.js ships
 # ESM with bare specifiers, so a browser cannot load it out of node_modules the
