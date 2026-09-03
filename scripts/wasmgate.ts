@@ -23,6 +23,23 @@
 //   good; one that sits above it has a ceiling equal to the ratio, and what a
 //   port actually collects is somewhere under that.
 //
+// **Every candidate is a routine JBrowse actually runs, and CALL_SITES names
+// where.** That table is not documentation, it is the admission rule: a routine
+// with no call site is not measured, and the provenance travels into the JSON so
+// a reader of the figure can check it rather than take it on trust.
+//
+// This mattered. Until 2026-09-02 two of the six were `BamRecord.CIGAR` and
+// `BamRecord.seq` — the accessors that build a CIGAR *string* and a base
+// *string* — and the alignments renderer calls neither. It reads NUMERIC_CIGAR
+// and walks the packed SEQ, deliberately: `readBaseCounts.ts` in
+// jbrowse-components says in as many words that asking for the string makes the
+// feature "BUILD a string out of the packed ops it already held" and parse it
+// straight back. So those two rows measured work the program does not do, and
+// measured it generously, since most of what they cost is JS string
+// construction — which a wasm port could not remove anyway, the string still
+// having to be built on the JS side of the boundary. They are replaced here by
+// the two routines the render path actually reaches for.
+//
 // Two of the candidates are already ported, so the run carries their measured
 // wasm time next to their ceiling. That is what turns the figure from an
 // argument into a check: the realised speedup has to land between 1 and the
@@ -65,8 +82,47 @@ interface BamRecordFields {
   end: number
   flags: number
   mq: number
-  seq: string
-  CIGAR: string
+  seq_length: number
+  qual: Uint8Array | null
+  NUMERIC_CIGAR: ArrayLike<number>
+  NUMERIC_SEQ: Uint8Array
+  /** `undefined`, not null, on a record with no MD tag */
+  NUMERIC_MD: Uint8Array | undefined
+}
+
+/**
+ * Where JBrowse runs each routine, by file and symbol rather than by line, since
+ * lines move. Recorded into the run so the figure's rows can be checked against
+ * the program instead of trusted.
+ *
+ * `jb2` names jbrowse-components' alignments plugin; the rest are the parser
+ * libraries it reads through.
+ */
+const CALL_SITES: Record<string, { layer: string; callSite: string }> = {
+  'BGZF inflate': {
+    layer: '@gmod/bgzf-filehandle',
+    callSite: '@gmod/bam bamFile.ts › getRecordsForRange → unzipChunkSlice',
+  },
+  'BGZF block scan': {
+    layer: '@gmod/bgzf-filehandle',
+    callSite: '@gmod/bam streamBam.ts › streamBamRecords → scanBgzfBlocks',
+  },
+  'BAM record walk': {
+    layer: '@gmod/bam',
+    callSite: '@gmod/bam bamFile.ts › readBamFeatures',
+  },
+  'BAM field decode': {
+    layer: '@gmod/bam',
+    callSite: 'jb2 BamAdapter.ts › filterReadFlag(record.flags), record.start',
+  },
+  'BAM CIGAR unpack': {
+    layer: '@gmod/bam',
+    callSite: 'jb2 BamAdapter.ts › numericCigarHasSkip(record.NUMERIC_CIGAR)',
+  },
+  'BAM mismatch walk': {
+    layer: '@gmod/bam',
+    callSite: 'jb2 BamSlightlyLazyFeature.ts › forEachMismatch → forEachMismatchNumeric',
+  },
 }
 
 /** The subset of an emscripten module `htscodecs-wasm.ts` uses. */
@@ -88,6 +144,23 @@ const { scanBgzfBlocks } = (await import(
 const { inflateRaw } = (await import(
   path.join(GMOD, 'bgzf-filehandle/node_modules/pako-esm2/esm/main.js')
 )) as { inflateRaw: (input: Uint8Array) => Uint8Array }
+const { forEachMismatchNumeric } = (await import(
+  path.join(GMOD, 'bam-js/src/mismatches.ts')
+)) as {
+  forEachMismatchNumeric: (
+    cigar: ArrayLike<number>,
+    numericSeq: ArrayLike<number>,
+    seqLength: number,
+    md: ArrayLike<number> | undefined,
+    qual: ArrayLike<number> | null | undefined,
+    ref: undefined,
+    refStart: number,
+    windowStart: number,
+    windowEnd: number,
+    origin: number,
+    callback: (code: number, refPos: number, length: number) => void,
+  ) => void
+}
 const { default: BamRecord } = (await import(
   path.join(GMOD, 'bam-js/src/record.ts')
 )) as {
@@ -261,6 +334,8 @@ interface Cell {
   candidate: string
   /** which library the routine belongs to */
   layer: string
+  /** where JBrowse runs it; see CALL_SITES */
+  callSite: string
   /** records or blocks the sweep point covers */
   units: number
   inBytes: number
@@ -274,6 +349,8 @@ interface Cell {
 }
 
 const rows: Cell[] = []
+/** Per file: how many records carry MD, which decides which mismatch walk runs. */
+const mdCoverage: Record<string, { records: number; withMd: number }> = {}
 
 /**
  * What else the box was doing, recorded per cell.
@@ -287,8 +364,15 @@ const rows: Cell[] = []
  * RATIOS survive it; the absolute times do not, and a run whose load says the
  * box was busy is a run whose milliseconds should not be quoted.
  */
-const record = (c: Cell) => {
-  rows.push(c)
+const record = (c: Omit<Cell, 'layer' | 'callSite'>) => {
+  const site = CALL_SITES[c.candidate]
+  if (!site) {
+    throw new Error(
+      `no call site for "${c.candidate}". Every routine measured here has to be ` +
+        `one JBrowse runs; add it to CALL_SITES or do not measure it.`,
+    )
+  }
+  rows.push({ ...c, ...site })
   const marshalled = c.inBytes + c.outBytes
   console.log(
     `  ${c.candidate.padEnd(22)} ${String(c.units).padStart(6)}u ` +
@@ -306,6 +390,24 @@ const BGZF_HEADER = 18
 const BGZF_TRAILER = 8
 const payloadOf = (b: { inputOffset: number; compressedSize: number }) =>
   [b.inputOffset + BGZF_HEADER, b.inputOffset + b.compressedSize - BGZF_TRAILER] as const
+
+/**
+ * The unbound mismatch walk, exactly as `BamSlightlyLazyFeature.forEachMismatch`
+ * issues it: no reference, an unwindowed span, and read-relative origin.
+ *
+ * Unbound is what a record carrying MD gets in JBrowse. A record WITHOUT MD gets
+ * `withRegionRef(packedRef)` instead and the walk resolves substitutions against
+ * a packed reference, which is strictly more work — so on a corpus with no MD
+ * this measures a lower bound on the routine, and the run records which corpus
+ * that is. See BamAdapter.ts, where the two are chosen between.
+ */
+function walkMismatches(r: BamRecordFields, onEvent: () => void) {
+  forEachMismatchNumeric(
+    r.NUMERIC_CIGAR, r.NUMERIC_SEQ, r.seq_length, r.NUMERIC_MD,
+    r.qual, undefined, r.start,
+    Number.NEGATIVE_INFINITY, Number.POSITIVE_INFINITY, r.start, onEvent,
+  )
+}
 
 /** Record boundaries in a decompressed BAM, past its header and reference list. */
 function bamRecordSpans(plain: Uint8Array) {
@@ -352,7 +454,7 @@ for (const file of files) {
     const reps = n < 64 ? REPS * 4 : REPS
 
     record({
-      file: label, candidate: 'BGZF inflate', layer: '@gmod/bgzf-filehandle',
+      file: label, candidate: 'BGZF inflate',
       units: n, inBytes: end, outBytes: plainBytes,
       js: time(() => {
         for (const b of span) {
@@ -366,7 +468,7 @@ for (const file of files) {
     })
 
     record({
-      file: label, candidate: 'BGZF block scan', layer: '@gmod/bgzf-filehandle',
+      file: label, candidate: 'BGZF block scan',
       units: n, inBytes: end, outBytes: n * 32,
       js: time(() => scanBgzfBlocks(buf, 0, end), reps),
       wasm: null,
@@ -378,7 +480,17 @@ for (const file of files) {
   // The record layer, on the bytes the layer above hands it.
   const plain = await unzip(compressed)
   const { dv, first, spans } = bamRecordSpans(plain)
-  console.log(`  ${spans.length} records in ${(plain.length / 1e6).toFixed(1)} MB decompressed`)
+  // Truthiness, which is the test BamAdapter itself makes (`!record.NUMERIC_MD
+  // && packedRef`). The getter returns `undefined` for a record with no MD and
+  // never null, so `!== null` is true for every record and counts nothing.
+  const withMd = spans.filter(
+    ([s2, e]) => !!new BamRecord(plain, s2, e, 0, dv).NUMERIC_MD,
+  ).length
+  mdCoverage[label] = { records: spans.length, withMd }
+  console.log(
+    `  ${spans.length} records in ${(plain.length / 1e6).toFixed(1)} MB decompressed, ` +
+      `${withMd} carrying MD`,
+  )
 
   const fractions = [0.05, 0.2, 0.5, 1]
   for (const fraction of fractions) {
@@ -391,14 +503,21 @@ for (const file of files) {
     // the numeric CIGAR, the sequence start -- so a reused set measures cache
     // hits, and what a wasm port would replace is the decode.
     const records = () => span.map(([s, e]) => new BamRecord(plain, s, e, 0, dv))
+    // Sized on a throwaway set, outside every timed body: BamRecord memoizes what
+    // it decodes, so the records the timings run on have to be built fresh.
     const sized = records()
-    const seqBytes = sized.reduce((a, r) => a + r.seq.length, 0)
-    const cigarBytes = sized.reduce((a, r) => a + r.CIGAR.length, 0)
+    const cigarOps = sized.reduce((a, r) => a + r.NUMERIC_CIGAR.length, 0)
+    let mismatchEvents = 0
+    for (const r of sized) {
+      walkMismatches(r, () => {
+        mismatchEvents++
+      })
+    }
     const reps = fraction < 0.5 ? REPS * 2 : REPS
 
     const bam = (candidate: string, outBytes: number, js: () => unknown) =>
       record({
-        file: label, candidate, layer: '@gmod/bam',
+        file: label, candidate,
         units: take, inBytes: end - first, outBytes,
         js: time(js, reps),
         wasm: null,
@@ -427,18 +546,25 @@ for (const file of files) {
       return acc
     })
 
-    bam('BAM sequence decode', seqBytes, () => {
+    // The packed CIGAR the render path reads, not the string form. Four bytes an
+    // op out, which is what a wasm port would hand back.
+    bam('BAM CIGAR unpack', cigarOps * 4, () => {
       let acc = 0
       for (const r of records()) {
-        acc += r.seq.length
+        acc += r.NUMERIC_CIGAR.length
       }
       return acc
     })
 
-    bam('BAM CIGAR decode', cigarBytes, () => {
+    // The pileup hot path. Sixteen bytes an event out: a port has to return the
+    // mismatches it found, and (code, refPos, length, base) as four int32s is the
+    // cheapest packing that carries what the callback yields.
+    bam('BAM mismatch walk', mismatchEvents * 16, () => {
       let acc = 0
       for (const r of records()) {
-        acc += r.CIGAR.length
+        walkMismatches(r, () => {
+          acc++
+        })
       }
       return acc
     })
@@ -459,6 +585,7 @@ const out = {
   },
   reps: REPS,
   floorModule: '@gmod/cram htscodecs (emscripten)',
+  mdCoverage,
   libraries: {
     'bgzf-filehandle': provenance('bgzf-filehandle'),
     'bam-js': provenance('bam-js'),

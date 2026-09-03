@@ -26,6 +26,9 @@ m <- fromJSON(src, simplifyVector = FALSE)
 # visible as a gap between the two rather than invisible.
 rows <- do.call(rbind, lapply(m$rows, function(r) data.frame(
   file = r$file, layer = r$layer, candidate = r$candidate,
+  # Where JBrowse runs the routine. Carried into the CSV rather than left in the
+  # JSON because it is the reason the row is on the figure at all.
+  call_site = r$callSite,
   units = r$units, in_bytes = r$inBytes, out_bytes = r$outBytes,
   js_ms = r$js$min, js_median_ms = r$js$median,
   # A candidate with no shipped wasm implementation carries NA rather than a

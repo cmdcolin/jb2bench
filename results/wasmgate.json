@@ -1,5 +1,5 @@
 {
-  "measured": "2026-09-02",
+  "measured": "2026-09-03",
   "host": {
     "platform": "darwin",
     "arch": "x64",
@@ -7,12 +7,22 @@
     "cpus": 16
   },
   "load": {
-    "median": 8.78125,
-    "min": 8.25146484375,
-    "max": 9.75244140625
+    "median": 32.54833984375,
+    "min": 24.7568359375,
+    "max": 45.56298828125
   },
   "reps": 21,
   "floorModule": "@gmod/cram htscodecs (emscripten)",
+  "mdCoverage": {
+    "shortreads_300x.bam": {
+      "records": 53596,
+      "withMd": 52928
+    },
+    "chr22_nanopore_subset.bam": {
+      "records": 757,
+      "withMd": 0
+    }
+  },
   "libraries": {
     "bgzf-filehandle": {
       "rev": "0bd6b38",
@@ -38,1170 +48,1226 @@
     {
       "file": "shortreads_300x.bam",
       "candidate": "BGZF inflate",
-      "layer": "@gmod/bgzf-filehandle",
       "units": 1,
       "inBytes": 1749,
       "outBytes": 5144,
       "js": {
-        "median": 0.23216099999996231,
-        "min": 0.12666200000001027,
-        "max": 0.5480359999999678
+        "median": 0.6929649999999583,
+        "min": 0.2300199999999677,
+        "max": 10.0916229999998
       },
       "wasm": {
-        "median": 0.030661000000009153,
-        "min": 0.029834999999991396,
-        "max": 0.07554900000002363
+        "median": 0.1462699999999586,
+        "min": 0.08179700000005141,
+        "max": 9.711647999999968
       },
       "floor": {
-        "median": 0.004414999999994507,
-        "min": 0.001829999999984011,
-        "max": 0.030403999999975895
+        "median": 0.00857199999995828,
+        "min": 0.007749999999987267,
+        "max": 0.22368600000004335
       },
-      "load": 8.25146484375
+      "load": 35.12060546875,
+      "layer": "@gmod/bgzf-filehandle",
+      "callSite": "@gmod/bam bamFile.ts › getRecordsForRange → unzipChunkSlice"
     },
     {
       "file": "shortreads_300x.bam",
       "candidate": "BGZF block scan",
-      "layer": "@gmod/bgzf-filehandle",
       "units": 1,
       "inBytes": 1749,
       "outBytes": 32,
       "js": {
-        "median": 0.0007029999999872416,
-        "min": 0.0006789999999909924,
-        "max": 0.0327909999999747
+        "median": 0.0036119999999755237,
+        "min": 0.0033849999999802094,
+        "max": 0.010933999999906518
       },
       "wasm": null,
       "floor": {
-        "median": 0.0007029999999872416,
-        "min": 0.0006910000000175387,
-        "max": 0.001059999999995398
+        "median": 0.0034740000000965665,
+        "min": 0.0032999999998537533,
+        "max": 0.00416599999994105
       },
-      "load": 8.25146484375
+      "load": 35.12060546875,
+      "layer": "@gmod/bgzf-filehandle",
+      "callSite": "@gmod/bam streamBam.ts › streamBamRecords → scanBgzfBlocks"
     },
     {
       "file": "shortreads_300x.bam",
       "candidate": "BGZF inflate",
-      "layer": "@gmod/bgzf-filehandle",
       "units": 4,
       "inBytes": 53599,
       "outBytes": 200707,
       "js": {
-        "median": 2.2291549999999916,
-        "min": 1.8555539999999837,
-        "max": 5.482163999999955
+        "median": 9.346793000000162,
+        "min": 5.741774999999961,
+        "max": 23.92257500000005
       },
       "wasm": {
-        "median": 0.6340400000000272,
-        "min": 0.53755799999999,
-        "max": 1.1533489999999347
+        "median": 2.1775910000001204,
+        "min": 1.4261169999999765,
+        "max": 11.685077999999976
       },
       "floor": {
-        "median": 0.16070400000000973,
-        "min": 0.030735000000049695,
-        "max": 2.3259160000000065
+        "median": 0.3516130000002704,
+        "min": 0.06914000000006126,
+        "max": 9.439528999999766
       },
-      "load": 8.25146484375
+      "load": 35.12060546875,
+      "layer": "@gmod/bgzf-filehandle",
+      "callSite": "@gmod/bam bamFile.ts › getRecordsForRange → unzipChunkSlice"
     },
     {
       "file": "shortreads_300x.bam",
       "candidate": "BGZF block scan",
-      "layer": "@gmod/bgzf-filehandle",
       "units": 4,
       "inBytes": 53599,
       "outBytes": 128,
       "js": {
-        "median": 0.0037960000000794025,
-        "min": 0.0035440000000335203,
-        "max": 0.04325899999992089
+        "median": 0.004744999999729771,
+        "min": 0.00463999999965381,
+        "max": 0.08213900000009744
       },
       "wasm": null,
       "floor": {
-        "median": 0.004019999999968604,
-        "min": 0.0037839999999960128,
-        "max": 0.03717199999994136
+        "median": 0.015306999999666004,
+        "min": 0.00808999999981097,
+        "max": 0.04764000000022861
       },
-      "load": 8.25146484375
+      "load": 35.12060546875,
+      "layer": "@gmod/bgzf-filehandle",
+      "callSite": "@gmod/bam streamBam.ts › streamBamRecords → scanBgzfBlocks"
     },
     {
       "file": "shortreads_300x.bam",
       "candidate": "BGZF inflate",
-      "layer": "@gmod/bgzf-filehandle",
       "units": 16,
       "inBytes": 258369,
       "outBytes": 982216,
       "js": {
-        "median": 10.411522999999988,
-        "min": 8.921445999999946,
-        "max": 17.622184999999945
+        "median": 50.17576300000019,
+        "min": 36.032532000000174,
+        "max": 75.87675099999979
       },
       "wasm": {
-        "median": 4.592364000000089,
-        "min": 2.8176980000002914,
-        "max": 11.394729000000098
+        "median": 16.23602000000028,
+        "min": 7.377179999999498,
+        "max": 23.771659
       },
       "floor": {
-        "median": 0.2702599999997801,
-        "min": 0.1166880000000674,
-        "max": 1.890570999999909
+        "median": 0.8067699999992328,
+        "min": 0.4271420000004582,
+        "max": 15.794276999999056
       },
-      "load": 8.25146484375
+      "load": 31.7255859375,
+      "layer": "@gmod/bgzf-filehandle",
+      "callSite": "@gmod/bam bamFile.ts › getRecordsForRange → unzipChunkSlice"
     },
     {
       "file": "shortreads_300x.bam",
       "candidate": "BGZF block scan",
-      "layer": "@gmod/bgzf-filehandle",
       "units": 16,
       "inBytes": 258369,
       "outBytes": 512,
       "js": {
-        "median": 0.001948999999967782,
-        "min": 0.0015159999998104468,
-        "max": 0.0032559999999648426
+        "median": 0.004530000000158907,
+        "min": 0.004117000000405824,
+        "max": 0.015708000000813627
       },
       "wasm": null,
       "floor": {
-        "median": 0.01823500000000422,
-        "min": 0.014650000000074215,
-        "max": 0.05349000000023807
+        "median": 0.05957800000032876,
+        "min": 0.05135599999994156,
+        "max": 0.2854910000005475
       },
-      "load": 8.25146484375
+      "load": 31.7255859375,
+      "layer": "@gmod/bgzf-filehandle",
+      "callSite": "@gmod/bam streamBam.ts › streamBamRecords → scanBgzfBlocks"
     },
     {
       "file": "shortreads_300x.bam",
       "candidate": "BGZF inflate",
-      "layer": "@gmod/bgzf-filehandle",
       "units": 64,
       "inBytes": 1098342,
       "outBytes": 4109037,
       "js": {
-        "median": 46.2922779999999,
-        "min": 39.75425300000006,
-        "max": 70.31584999999995
+        "median": 180.19034000000102,
+        "min": 158.21780900000158,
+        "max": 227.7676250000004
       },
       "wasm": {
-        "median": 12.984167999999954,
-        "min": 11.485298000000057,
-        "max": 16.936056000000008
+        "median": 57.91914200000065,
+        "min": 46.80624800000078,
+        "max": 77.87165599999935
       },
       "floor": {
-        "median": 1.8117080000001806,
-        "min": 1.1744149999999536,
-        "max": 4.944920999999795
+        "median": 4.651219999999739,
+        "min": 3.186361999998553,
+        "max": 24.08455700000013
       },
-      "load": 9.75244140625
+      "load": 32.54833984375,
+      "layer": "@gmod/bgzf-filehandle",
+      "callSite": "@gmod/bam bamFile.ts › getRecordsForRange → unzipChunkSlice"
     },
     {
       "file": "shortreads_300x.bam",
       "candidate": "BGZF block scan",
-      "layer": "@gmod/bgzf-filehandle",
       "units": 64,
       "inBytes": 1098342,
       "outBytes": 2048,
       "js": {
-        "median": 0.008079000000179803,
-        "min": 0.005615999999918131,
-        "max": 1.5042440000001989
+        "median": 0.01908700000058161,
+        "min": 0.014883000001645996,
+        "max": 0.020220000000335858
       },
       "wasm": null,
       "floor": {
-        "median": 0.06316100000003644,
-        "min": 0.062361999999666295,
-        "max": 0.07232799999974304
+        "median": 0.23619800000051328,
+        "min": 0.1792139999997744,
+        "max": 0.585626999998567
       },
-      "load": 9.75244140625
+      "load": 32.54833984375,
+      "layer": "@gmod/bgzf-filehandle",
+      "callSite": "@gmod/bam streamBam.ts › streamBamRecords → scanBgzfBlocks"
     },
     {
       "file": "shortreads_300x.bam",
       "candidate": "BGZF inflate",
-      "layer": "@gmod/bgzf-filehandle",
       "units": 256,
       "inBytes": 4580289,
       "outBytes": 16612160,
       "js": {
-        "median": 163.4423200000001,
-        "min": 158.2127499999997,
-        "max": 191.07268999999997
+        "median": 810.5564870000017,
+        "min": 701.2287700000015,
+        "max": 986.8695120000048
       },
       "wasm": {
-        "median": 50.288588000001255,
-        "min": 48.14867100000083,
-        "max": 61.299833000000945
+        "median": 286.481240000001,
+        "min": 247.44073100000242,
+        "max": 342.35140200000023
       },
       "floor": {
-        "median": 6.125606999999945,
-        "min": 5.28633599999921,
-        "max": 10.734345999999277
+        "median": 27.63443100000586,
+        "min": 15.097600000000966,
+        "max": 48.93733899999643
       },
-      "load": 9.37158203125
+      "load": 24.7568359375,
+      "layer": "@gmod/bgzf-filehandle",
+      "callSite": "@gmod/bam bamFile.ts › getRecordsForRange → unzipChunkSlice"
     },
     {
       "file": "shortreads_300x.bam",
       "candidate": "BGZF block scan",
-      "layer": "@gmod/bgzf-filehandle",
       "units": 256,
       "inBytes": 4580289,
       "outBytes": 8192,
       "js": {
-        "median": 0.01424100000076578,
-        "min": 0.014030000000275322,
-        "max": 0.03890700000010838
+        "median": 0.06371999999828404,
+        "min": 0.05687400000169873,
+        "max": 10.788829999997688
       },
       "wasm": null,
       "floor": {
-        "median": 0.43790699999954086,
-        "min": 0.33172799999920244,
-        "max": 0.8356189999994967
+        "median": 2.21355400000175,
+        "min": 1.722449000000779,
+        "max": 13.669621000000916
       },
-      "load": 9.37158203125
+      "load": 24.7568359375,
+      "layer": "@gmod/bgzf-filehandle",
+      "callSite": "@gmod/bam streamBam.ts › streamBamRecords → scanBgzfBlocks"
     },
     {
       "file": "shortreads_300x.bam",
       "candidate": "BGZF inflate",
-      "layer": "@gmod/bgzf-filehandle",
       "units": 287,
       "inBytes": 5113181,
       "outBytes": 18534283,
       "js": {
-        "median": 181.18931599999996,
-        "min": 174.2951410000005,
-        "max": 192.13527000000067
+        "median": 1218.633041000001,
+        "min": 1098.5519239999994,
+        "max": 1549.606531999998
       },
       "wasm": {
-        "median": 58.45802100000037,
-        "min": 55.88664600000084,
-        "max": 70.7979919999998
+        "median": 413.7192709999945,
+        "min": 350.55679899999814,
+        "max": 600.0469840000005
       },
       "floor": {
-        "median": 5.772762000000512,
-        "min": 5.079078999999183,
-        "max": 7.392528000000311
+        "median": 30.637931999997818,
+        "min": 26.703716000003624,
+        "max": 56.306314000001294
       },
-      "load": 8.78125
+      "load": 32.67822265625,
+      "layer": "@gmod/bgzf-filehandle",
+      "callSite": "@gmod/bam bamFile.ts › getRecordsForRange → unzipChunkSlice"
     },
     {
       "file": "shortreads_300x.bam",
       "candidate": "BGZF block scan",
-      "layer": "@gmod/bgzf-filehandle",
       "units": 287,
       "inBytes": 5113181,
       "outBytes": 9184,
       "js": {
-        "median": 0.01670399999966321,
-        "min": 0.016366000001653447,
-        "max": 0.05693599999904109
+        "median": 0.08352000000013504,
+        "min": 0.07139599999936763,
+        "max": 0.8391540000011446
       },
       "wasm": null,
       "floor": {
-        "median": 0.42055900000013935,
-        "min": 0.34086999999999534,
-        "max": 0.5752840000004653
+        "median": 2.918405000003986,
+        "min": 1.8536539999913657,
+        "max": 16.510032999998657
       },
-      "load": 8.78125
+      "load": 32.67822265625,
+      "layer": "@gmod/bgzf-filehandle",
+      "callSite": "@gmod/bam streamBam.ts › streamBamRecords → scanBgzfBlocks"
     },
     {
       "file": "shortreads_300x.bam",
       "candidate": "BAM record walk",
-      "layer": "@gmod/bam",
       "units": 2680,
       "inBytes": 927866,
       "outBytes": 21440,
       "js": {
-        "median": 0.043916999999055406,
-        "min": 0.04268899999988207,
-        "max": 0.11152499999843712
+        "median": 0.2157980000047246,
+        "min": 0.14478099999541882,
+        "max": 10.064640999989933
       },
       "wasm": null,
       "floor": {
-        "median": 0.054180999999516644,
-        "min": 0.05338300000039453,
-        "max": 0.07365200000094774
+        "median": 0.2533450000046287,
+        "min": 0.19708099999115802,
+        "max": 0.4423699999897508
       },
-      "load": 8.78125
+      "load": 32.67822265625,
+      "layer": "@gmod/bam",
+      "callSite": "@gmod/bam bamFile.ts › readBamFeatures"
     },
     {
       "file": "shortreads_300x.bam",
       "candidate": "BAM field decode",
-      "layer": "@gmod/bam",
       "units": 2680,
       "inBytes": 927866,
       "outBytes": 42880,
       "js": {
-        "median": 0.3532549999999901,
-        "min": 0.2153359999992972,
-        "max": 4.641403999999966
+        "median": 1.3684289999946486,
+        "min": 0.5798990000039339,
+        "max": 14.675382999994326
       },
       "wasm": null,
       "floor": {
-        "median": 0.062486999999237014,
-        "min": 0.05707500000062282,
-        "max": 0.14189099999930477
+        "median": 0.25309199999901466,
+        "min": 0.16765899999882095,
+        "max": 0.6532869999937247
       },
-      "load": 8.78125
+      "load": 32.67822265625,
+      "layer": "@gmod/bam",
+      "callSite": "jb2 BamAdapter.ts › filterReadFlag(record.flags), record.start"
     },
     {
       "file": "shortreads_300x.bam",
-      "candidate": "BAM sequence decode",
-      "layer": "@gmod/bam",
+      "candidate": "BAM CIGAR unpack",
       "units": 2680,
       "inBytes": 927866,
-      "outBytes": 396640,
+      "outBytes": 12444,
       "js": {
-        "median": 1.7493680000006862,
-        "min": 1.445369999999457,
-        "max": 3.7549070000022766
+        "median": 1.4064569999900414,
+        "min": 0.5949810000020079,
+        "max": 16.3523409999907
       },
       "wasm": null,
       "floor": {
-        "median": 0.12953399999969406,
-        "min": 0.09892599999875529,
-        "max": 0.14646499999798834
+        "median": 0.23241199999756645,
+        "min": 0.16623499999695923,
+        "max": 0.6535929999954533
       },
-      "load": 8.78125
+      "load": 32.67822265625,
+      "layer": "@gmod/bam",
+      "callSite": "jb2 BamAdapter.ts › numericCigarHasSkip(record.NUMERIC_CIGAR)"
     },
     {
       "file": "shortreads_300x.bam",
-      "candidate": "BAM CIGAR decode",
-      "layer": "@gmod/bam",
+      "candidate": "BAM mismatch walk",
       "units": 2680,
       "inBytes": 927866,
-      "outBytes": 11693,
+      "outBytes": 21632,
       "js": {
-        "median": 0.483632999999827,
-        "min": 0.4064509999989241,
-        "max": 1.1615490000003774
+        "median": 17.717742999986513,
+        "min": 4.909950000001118,
+        "max": 65.94755700000678
       },
       "wasm": null,
       "floor": {
-        "median": 0.05407299999933457,
-        "min": 0.05279499999960535,
-        "max": 0.0570850000003702
+        "median": 0.3763020000042161,
+        "min": 0.22038400000019465,
+        "max": 15.062670999992406
       },
-      "load": 8.78125
+      "load": 32.67822265625,
+      "layer": "@gmod/bam",
+      "callSite": "jb2 BamSlightlyLazyFeature.ts › forEachMismatch → forEachMismatchNumeric"
     },
     {
       "file": "shortreads_300x.bam",
       "candidate": "BAM record walk",
-      "layer": "@gmod/bam",
       "units": 10719,
       "inBytes": 3706800,
       "outBytes": 85752,
       "js": {
-        "median": 0.20861100000183797,
-        "min": 0.19018099999811966,
-        "max": 0.44815399999788497
+        "median": 1.4336260000127368,
+        "min": 0.6124520000012126,
+        "max": 13.332792000001064
       },
       "wasm": null,
       "floor": {
-        "median": 0.2923850000006496,
-        "min": 0.2451199999995879,
-        "max": 0.8454770000025746
+        "median": 2.1025210000079824,
+        "min": 1.2234259999968344,
+        "max": 14.206797999999253
       },
-      "load": 8.78125
+      "load": 32.67822265625,
+      "layer": "@gmod/bam",
+      "callSite": "@gmod/bam bamFile.ts › readBamFeatures"
     },
     {
       "file": "shortreads_300x.bam",
       "candidate": "BAM field decode",
-      "layer": "@gmod/bam",
       "units": 10719,
       "inBytes": 3706800,
       "outBytes": 171504,
       "js": {
-        "median": 0.8927220000005036,
-        "min": 0.7461930000026769,
-        "max": 2.0325139999986277
+        "median": 6.753224999993108,
+        "min": 4.54123200000322,
+        "max": 24.809030000003986
       },
       "wasm": null,
       "floor": {
-        "median": 0.31058800000027986,
-        "min": 0.2610080000013113,
-        "max": 0.7970510000013746
+        "median": 1.948380999994697,
+        "min": 1.3141210000030696,
+        "max": 13.751938999994309
       },
-      "load": 8.78125
+      "load": 32.67822265625,
+      "layer": "@gmod/bam",
+      "callSite": "jb2 BamAdapter.ts › filterReadFlag(record.flags), record.start"
     },
     {
       "file": "shortreads_300x.bam",
-      "candidate": "BAM sequence decode",
-      "layer": "@gmod/bam",
+      "candidate": "BAM CIGAR unpack",
       "units": 10719,
       "inBytes": 3706800,
-      "outBytes": 1586412,
+      "outBytes": 46000,
       "js": {
-        "median": 6.645316999998613,
-        "min": 5.864008000000467,
-        "max": 14.202366999998048
+        "median": 8.094170999989728,
+        "min": 2.5916960000031395,
+        "max": 28.751122000001487
       },
       "wasm": null,
       "floor": {
-        "median": 0.6348939999988943,
-        "min": 0.5589120000004186,
-        "max": 5.7450320000025386
+        "median": 1.865072999993572,
+        "min": 1.1610100000107195,
+        "max": 18.539059000002453
       },
-      "load": 8.78125
+      "load": 32.67822265625,
+      "layer": "@gmod/bam",
+      "callSite": "jb2 BamAdapter.ts › numericCigarHasSkip(record.NUMERIC_CIGAR)"
     },
     {
       "file": "shortreads_300x.bam",
-      "candidate": "BAM CIGAR decode",
-      "layer": "@gmod/bam",
+      "candidate": "BAM mismatch walk",
       "units": 10719,
       "inBytes": 3706800,
-      "outBytes": 44519,
+      "outBytes": 94336,
       "js": {
-        "median": 1.9297910000022966,
-        "min": 1.3302369999983057,
-        "max": 3.137283000000025
+        "median": 32.83956300000136,
+        "min": 27.31634999999369,
+        "max": 47.77268599999661
       },
       "wasm": null,
       "floor": {
-        "median": 0.28628000000026077,
-        "min": 0.24487900000167429,
-        "max": 0.6723859999983688
+        "median": 1.8140710000006948,
+        "min": 1.177869000006467,
+        "max": 12.964613000003737
       },
-      "load": 8.78125
+      "load": 31.42236328125,
+      "layer": "@gmod/bam",
+      "callSite": "jb2 BamSlightlyLazyFeature.ts › forEachMismatch → forEachMismatchNumeric"
     },
     {
       "file": "shortreads_300x.bam",
       "candidate": "BAM record walk",
-      "layer": "@gmod/bam",
       "units": 26798,
       "inBytes": 9259538,
       "outBytes": 214384,
       "js": {
-        "median": 1.7239520000002813,
-        "min": 0.7040670000023965,
-        "max": 2.5076829999998154
+        "median": 4.9051630000030855,
+        "min": 3.5579579999903217,
+        "max": 19.37541599999531
       },
       "wasm": null,
       "floor": {
-        "median": 1.421241000000009,
-        "min": 1.1952329999985523,
-        "max": 2.7232680000015534
+        "median": 6.1416590000008,
+        "min": 3.675814000001992,
+        "max": 16.852937000003294
       },
-      "load": 8.78125
+      "load": 31.42236328125,
+      "layer": "@gmod/bam",
+      "callSite": "@gmod/bam bamFile.ts › readBamFeatures"
     },
     {
       "file": "shortreads_300x.bam",
       "candidate": "BAM field decode",
-      "layer": "@gmod/bam",
       "units": 26798,
       "inBytes": 9259538,
       "outBytes": 428768,
       "js": {
-        "median": 4.1611529999972845,
-        "min": 3.331728999997722,
-        "max": 10.92599699999846
+        "median": 25.197248999989824,
+        "min": 11.160149999996065,
+        "max": 74.83757100001094
       },
       "wasm": null,
       "floor": {
-        "median": 1.6683730000004289,
-        "min": 1.3222610000011628,
-        "max": 2.4403849999980594
+        "median": 6.003518000012264,
+        "min": 3.79820999999356,
+        "max": 20.2000340000086
       },
-      "load": 8.78125
+      "load": 31.42236328125,
+      "layer": "@gmod/bam",
+      "callSite": "jb2 BamAdapter.ts › filterReadFlag(record.flags), record.start"
     },
     {
       "file": "shortreads_300x.bam",
-      "candidate": "BAM sequence decode",
-      "layer": "@gmod/bam",
+      "candidate": "BAM CIGAR unpack",
       "units": 26798,
       "inBytes": 9259538,
-      "outBytes": 3966104,
+      "outBytes": 113488,
       "js": {
-        "median": 19.461730999999418,
-        "min": 15.667059999999765,
-        "max": 28.87225000000035
+        "median": 29.734079000001657,
+        "min": 13.160307999991346,
+        "max": 114.08196999999927
       },
       "wasm": null,
       "floor": {
-        "median": 2.5299660000018775,
-        "min": 2.1989400000020396,
-        "max": 15.693052000002353
+        "median": 4.830931000004057,
+        "min": 3.306250999987242,
+        "max": 17.597785000005388
       },
-      "load": 8.71826171875
+      "load": 31.42236328125,
+      "layer": "@gmod/bam",
+      "callSite": "jb2 BamAdapter.ts › numericCigarHasSkip(record.NUMERIC_CIGAR)"
     },
     {
       "file": "shortreads_300x.bam",
-      "candidate": "BAM CIGAR decode",
-      "layer": "@gmod/bam",
+      "candidate": "BAM mismatch walk",
       "units": 26798,
       "inBytes": 9259538,
-      "outBytes": 110484,
+      "outBytes": 227984,
       "js": {
-        "median": 4.315460999998322,
-        "min": 4.0222369999974035,
-        "max": 8.04888800000117
+        "median": 118.31888900000195,
+        "min": 93.21631199998956,
+        "max": 263.47685799999454
       },
       "wasm": null,
       "floor": {
-        "median": 1.3400479999982053,
-        "min": 1.194392000001244,
-        "max": 1.6765290000003006
+        "median": 5.204041999997571,
+        "min": 3.735608000002685,
+        "max": 18.339634999996633
       },
-      "load": 8.71826171875
+      "load": 32.42919921875,
+      "layer": "@gmod/bam",
+      "callSite": "jb2 BamSlightlyLazyFeature.ts › forEachMismatch → forEachMismatchNumeric"
     },
     {
       "file": "shortreads_300x.bam",
       "candidate": "BAM record walk",
-      "layer": "@gmod/bam",
       "units": 53596,
       "inBytes": 18529139,
       "outBytes": 428768,
       "js": {
-        "median": 3.90411099999983,
-        "min": 3.639137000001938,
-        "max": 4.723147000000608
+        "median": 18.574483999997028,
+        "min": 7.258648999995785,
+        "max": 36.03441999999632
       },
       "wasm": null,
       "floor": {
-        "median": 3.399508999998943,
-        "min": 2.7487870000004477,
-        "max": 4.13964599999963
+        "median": 19.552890999999363,
+        "min": 7.138525000002119,
+        "max": 26.211358000000473
       },
-      "load": 8.71826171875
+      "load": 32.42919921875,
+      "layer": "@gmod/bam",
+      "callSite": "@gmod/bam bamFile.ts › readBamFeatures"
     },
     {
       "file": "shortreads_300x.bam",
       "candidate": "BAM field decode",
-      "layer": "@gmod/bam",
       "units": 53596,
       "inBytes": 18529139,
       "outBytes": 857536,
       "js": {
-        "median": 7.047753999999259,
-        "min": 6.510020000001532,
-        "max": 17.39045199999964
+        "median": 47.63948199999868,
+        "min": 35.10500300000422,
+        "max": 159.63176200000453
       },
       "wasm": null,
       "floor": {
-        "median": 3.0709120000028634,
-        "min": 2.815522000000783,
-        "max": 3.816640000000916
+        "median": 20.852859000005992,
+        "min": 8.331149000005098,
+        "max": 57.03522499999963
       },
-      "load": 8.71826171875
+      "load": 33.99609375,
+      "layer": "@gmod/bam",
+      "callSite": "jb2 BamAdapter.ts › filterReadFlag(record.flags), record.start"
     },
     {
       "file": "shortreads_300x.bam",
-      "candidate": "BAM sequence decode",
-      "layer": "@gmod/bam",
+      "candidate": "BAM CIGAR unpack",
       "units": 53596,
       "inBytes": 18529139,
-      "outBytes": 7932208,
+      "outBytes": 233744,
       "js": {
-        "median": 44.17098100000294,
-        "min": 35.646426999999676,
-        "max": 93.69033800000034
+        "median": 57.428115000002435,
+        "min": 36.132279000012204,
+        "max": 169.61762499999895
       },
       "wasm": null,
       "floor": {
-        "median": 6.224769000000379,
-        "min": 4.814237999999023,
-        "max": 40.544660000003205
+        "median": 19.634948999999324,
+        "min": 7.450906999991275,
+        "max": 32.55665099999169
       },
-      "load": 8.71826171875
+      "load": 33.99609375,
+      "layer": "@gmod/bam",
+      "callSite": "jb2 BamAdapter.ts › numericCigarHasSkip(record.NUMERIC_CIGAR)"
     },
     {
       "file": "shortreads_300x.bam",
-      "candidate": "BAM CIGAR decode",
-      "layer": "@gmod/bam",
+      "candidate": "BAM mismatch walk",
       "units": 53596,
       "inBytes": 18529139,
-      "outBytes": 224241,
+      "outBytes": 566992,
       "js": {
-        "median": 8.614134000003105,
-        "min": 8.098981999999523,
-        "max": 13.653787999999622
+        "median": 238.54581999999937,
+        "min": 176.61352899999474,
+        "max": 533.1416909999971
       },
       "wasm": null,
       "floor": {
-        "median": 3.397593000001507,
-        "min": 2.910106999999698,
-        "max": 5.517832999998063
+        "median": 13.303344999992987,
+        "min": 6.952214999997523,
+        "max": 22.72585399998934
       },
-      "load": 8.71826171875
+      "load": 43.8681640625,
+      "layer": "@gmod/bam",
+      "callSite": "jb2 BamSlightlyLazyFeature.ts › forEachMismatch → forEachMismatchNumeric"
     },
     {
       "file": "chr22_nanopore_subset.bam",
       "candidate": "BGZF inflate",
-      "layer": "@gmod/bgzf-filehandle",
       "units": 1,
       "inBytes": 5720,
       "outBytes": 65280,
       "js": {
-        "median": 0.3376319999988482,
-        "min": 0.3231400000004214,
-        "max": 0.6217600000018138
+        "median": 1.4037589999934426,
+        "min": 0.9241350000083912,
+        "max": 29.843378999998095
       },
       "wasm": {
-        "median": 0.12431500000093365,
-        "min": 0.0798609999983455,
-        "max": 0.6598579999990761
+        "median": 0.32908900000620633,
+        "min": 0.2538409999979194,
+        "max": 10.234087999997428
       },
       "floor": {
-        "median": 0.014240000000427244,
-        "min": 0.013057000000117114,
-        "max": 0.039332000000285916
+        "median": 0.058562000005622394,
+        "min": 0.028778000007150695,
+        "max": 47.10795700000017
       },
-      "load": 8.71826171875
+      "load": 43.8681640625,
+      "layer": "@gmod/bgzf-filehandle",
+      "callSite": "@gmod/bam bamFile.ts › getRecordsForRange → unzipChunkSlice"
     },
     {
       "file": "chr22_nanopore_subset.bam",
       "candidate": "BGZF block scan",
-      "layer": "@gmod/bgzf-filehandle",
       "units": 1,
       "inBytes": 5720,
       "outBytes": 32,
       "js": {
-        "median": 0.0008510000006936025,
-        "min": 0.0008239999988290947,
-        "max": 0.010774999998830026
+        "median": 0.003172999990056269,
+        "min": 0.0022329999919747934,
+        "max": 0.23215899999195244
       },
       "wasm": null,
       "floor": {
-        "median": 0.0006629999988945201,
-        "min": 0.0006419999990612268,
-        "max": 0.006945000000996515
+        "median": 0.002658999990671873,
+        "min": 0.0020840000070165843,
+        "max": 0.028441999995266087
       },
-      "load": 8.71826171875
+      "load": 43.8681640625,
+      "layer": "@gmod/bgzf-filehandle",
+      "callSite": "@gmod/bam streamBam.ts › streamBamRecords → scanBgzfBlocks"
     },
     {
       "file": "chr22_nanopore_subset.bam",
       "candidate": "BGZF inflate",
-      "layer": "@gmod/bgzf-filehandle",
       "units": 4,
       "inBytes": 62392,
       "outBytes": 232252,
       "js": {
-        "median": 2.3170939999981783,
-        "min": 2.200093999999808,
-        "max": 12.344343000000663
+        "median": 12.29520799999591,
+        "min": 6.608513000013772,
+        "max": 55.51618700000108
       },
       "wasm": {
-        "median": 0.7091349999973318,
-        "min": 0.6498030000002473,
-        "max": 2.8434350000025006
+        "median": 2.843334999997751,
+        "min": 1.6830300000001444,
+        "max": 20.56448800000362
       },
       "floor": {
-        "median": 0.056416999999783,
-        "min": 0.033053999999538064,
-        "max": 0.112223999996786
+        "median": 0.16622899999492802,
+        "min": 0.08732200000667945,
+        "max": 0.7323789999936707
       },
-      "load": 8.71826171875
+      "load": 43.8681640625,
+      "layer": "@gmod/bgzf-filehandle",
+      "callSite": "@gmod/bam bamFile.ts › getRecordsForRange → unzipChunkSlice"
     },
     {
       "file": "chr22_nanopore_subset.bam",
       "candidate": "BGZF block scan",
-      "layer": "@gmod/bgzf-filehandle",
       "units": 4,
       "inBytes": 62392,
       "outBytes": 128,
       "js": {
-        "median": 0.0004490000028454233,
-        "min": 0.0004380000027595088,
-        "max": 0.0006670000002486631
+        "median": 0.0016709999908925965,
+        "min": 0.0014660000015283003,
+        "max": 0.003125000002910383
       },
       "wasm": null,
       "floor": {
-        "median": 0.0037520000005315524,
-        "min": 0.0034640000012586825,
-        "max": 0.03909199999907287
+        "median": 0.012590999991516583,
+        "min": 0.011164000010467134,
+        "max": 6.616561000002548
       },
-      "load": 8.71826171875
+      "load": 43.8681640625,
+      "layer": "@gmod/bgzf-filehandle",
+      "callSite": "@gmod/bam streamBam.ts › streamBamRecords → scanBgzfBlocks"
     },
     {
       "file": "chr22_nanopore_subset.bam",
       "candidate": "BGZF inflate",
-      "layer": "@gmod/bgzf-filehandle",
       "units": 16,
       "inBytes": 600464,
       "outBytes": 973472,
       "js": {
-        "median": 15.653557999998156,
-        "min": 14.180348999998387,
-        "max": 42.17589699999735
+        "median": 78.50947499999893,
+        "min": 59.63247399999818,
+        "max": 146.00703199999407
       },
       "wasm": {
-        "median": 6.897629999999481,
-        "min": 5.174800000000687,
-        "max": 11.351440999998886
+        "median": 28.14424500000314,
+        "min": 13.550464999992982,
+        "max": 56.86729999999807
       },
       "floor": {
-        "median": 0.30481499999950756,
-        "min": 0.21827400000256603,
-        "max": 22.75549400000091
+        "median": 0.8490160000073956,
+        "min": 0.4873890000017127,
+        "max": 32.97740600000543
       },
-      "load": 8.66064453125
+      "load": 45.56298828125,
+      "layer": "@gmod/bgzf-filehandle",
+      "callSite": "@gmod/bam bamFile.ts › getRecordsForRange → unzipChunkSlice"
     },
     {
       "file": "chr22_nanopore_subset.bam",
       "candidate": "BGZF block scan",
-      "layer": "@gmod/bgzf-filehandle",
       "units": 16,
       "inBytes": 600464,
       "outBytes": 512,
       "js": {
-        "median": 0.0011309999972581863,
-        "min": 0.0011190000004717149,
-        "max": 0.0014300000002549496
+        "median": 0.00792800000635907,
+        "min": 0.006877000007079914,
+        "max": 0.0207829999999376
       },
       "wasm": null,
       "floor": {
-        "median": 0.03711699999985285,
-        "min": 0.036007999999128515,
-        "max": 0.08667499999864958
+        "median": 0.1288500000082422,
+        "min": 0.09729599999263883,
+        "max": 8.801359999997658
       },
-      "load": 8.66064453125
+      "load": 45.56298828125,
+      "layer": "@gmod/bgzf-filehandle",
+      "callSite": "@gmod/bam streamBam.ts › streamBamRecords → scanBgzfBlocks"
     },
     {
       "file": "chr22_nanopore_subset.bam",
       "candidate": "BGZF inflate",
-      "layer": "@gmod/bgzf-filehandle",
       "units": 64,
       "inBytes": 2520130,
       "outBytes": 3911878,
       "js": {
-        "median": 61.20673499999975,
-        "min": 59.04815899999812,
-        "max": 76.92807700000048
+        "median": 299.1605569999956,
+        "min": 211.36844399999245,
+        "max": 358.73604199998954
       },
       "wasm": {
-        "median": 23.141912999999477,
-        "min": 21.786745000001247,
-        "max": 26.587306999997963
+        "median": 80.70769700000528,
+        "min": 68.01402499998221,
+        "max": 111.48281400001724
       },
       "floor": {
-        "median": 1.5222819999980857,
-        "min": 1.1697120000026189,
-        "max": 8.453193000001193
+        "median": 8.023320999986026,
+        "min": 3.7022330000181682,
+        "max": 17.11747200001264
       },
-      "load": 8.66064453125
+      "load": 44.27490234375,
+      "layer": "@gmod/bgzf-filehandle",
+      "callSite": "@gmod/bam bamFile.ts › getRecordsForRange → unzipChunkSlice"
     },
     {
       "file": "chr22_nanopore_subset.bam",
       "candidate": "BGZF block scan",
-      "layer": "@gmod/bgzf-filehandle",
       "units": 64,
       "inBytes": 2520130,
       "outBytes": 2048,
       "js": {
-        "median": 0.006992999999056337,
-        "min": 0.006190999996761093,
-        "max": 0.01955699999962235
+        "median": 0.0287769999995362,
+        "min": 0.02627199998823926,
+        "max": 0.06326999998418614
       },
       "wasm": null,
       "floor": {
-        "median": 0.19592700000066543,
-        "min": 0.15622799999982817,
-        "max": 0.40956699999878765
+        "median": 0.7523869999859016,
+        "min": 0.49163299999781884,
+        "max": 5.727822000015294
       },
-      "load": 8.66064453125
+      "load": 44.27490234375,
+      "layer": "@gmod/bgzf-filehandle",
+      "callSite": "@gmod/bam streamBam.ts › streamBamRecords → scanBgzfBlocks"
     },
     {
       "file": "chr22_nanopore_subset.bam",
       "candidate": "BGZF inflate",
-      "layer": "@gmod/bgzf-filehandle",
       "units": 256,
       "inBytes": 8853527,
       "outBytes": 14485841,
       "js": {
-        "median": 234.7740640000011,
-        "min": 217.15448399999877,
-        "max": 319.34707100000014
+        "median": 916.0087739999872,
+        "min": 711.9486169999873,
+        "max": 1279.5281959999993
       },
       "wasm": {
-        "median": 86.80301999999938,
-        "min": 83.26169599999776,
-        "max": 92.56895900000382
+        "median": 326.9034019999963,
+        "min": 297.31997399998363,
+        "max": 425.7974069999764
       },
       "floor": {
-        "median": 6.244954000001599,
-        "min": 5.260945000001811,
-        "max": 13.411896999998135
+        "median": 15.138449000020046,
+        "min": 11.39802399999462,
+        "max": 25.83882299999823
       },
-      "load": 8.41748046875
+      "load": 39.95458984375,
+      "layer": "@gmod/bgzf-filehandle",
+      "callSite": "@gmod/bam bamFile.ts › getRecordsForRange → unzipChunkSlice"
     },
     {
       "file": "chr22_nanopore_subset.bam",
       "candidate": "BGZF block scan",
-      "layer": "@gmod/bgzf-filehandle",
       "units": 256,
       "inBytes": 8853527,
       "outBytes": 8192,
       "js": {
-        "median": 0.04789400000299793,
-        "min": 0.026982999996107537,
-        "max": 0.07585899999685353
+        "median": 0.11322400000062771,
+        "min": 0.06807099998695776,
+        "max": 22.272335000016028
       },
       "wasm": null,
       "floor": {
-        "median": 1.4265359999990324,
-        "min": 1.2480880000002799,
-        "max": 2.454954999993788
+        "median": 3.545095000008587,
+        "min": 2.717292000015732,
+        "max": 5.152368999988539
       },
-      "load": 8.41748046875
+      "load": 39.95458984375,
+      "layer": "@gmod/bgzf-filehandle",
+      "callSite": "@gmod/bam streamBam.ts › streamBamRecords → scanBgzfBlocks"
     },
     {
       "file": "chr22_nanopore_subset.bam",
       "candidate": "BGZF inflate",
-      "layer": "@gmod/bgzf-filehandle",
       "units": 447,
       "inBytes": 14140716,
       "outBytes": 24463464,
       "js": {
-        "median": 428.0747590000028,
-        "min": 389.78111799999897,
-        "max": 528.5608169999978
+        "median": 1249.4477290000068,
+        "min": 1044.008901000023,
+        "max": 2004.7787790000148
       },
       "wasm": {
-        "median": 178.6148600000015,
-        "min": 157.138807000003,
-        "max": 240.10450900000433
+        "median": 407.2868320000125,
+        "min": 355.2090470000112,
+        "max": 551.2210159999959
       },
       "floor": {
-        "median": 11.112334999997984,
-        "min": 9.086597000001348,
-        "max": 33.729078999997
+        "median": 23.166966999997385,
+        "min": 18.93164799999795,
+        "max": 41.31928700002027
       },
-      "load": 9.0185546875
+      "load": 29.53759765625,
+      "layer": "@gmod/bgzf-filehandle",
+      "callSite": "@gmod/bam bamFile.ts › getRecordsForRange → unzipChunkSlice"
     },
     {
       "file": "chr22_nanopore_subset.bam",
       "candidate": "BGZF block scan",
-      "layer": "@gmod/bgzf-filehandle",
       "units": 447,
       "inBytes": 14140716,
       "outBytes": 14304,
       "js": {
-        "median": 0.09216000000014901,
-        "min": 0.04700099999899976,
-        "max": 0.19181099999696016
+        "median": 0.10596700001042336,
+        "min": 0.09214900000370108,
+        "max": 0.21978400001535192
       },
       "wasm": null,
       "floor": {
-        "median": 2.9260949999952572,
-        "min": 2.553532999998424,
-        "max": 3.7674909999986994
+        "median": 4.812963000003947,
+        "min": 4.332953999983147,
+        "max": 5.611504000000423
       },
-      "load": 9.0185546875
+      "load": 29.53759765625,
+      "layer": "@gmod/bgzf-filehandle",
+      "callSite": "@gmod/bam streamBam.ts › streamBamRecords → scanBgzfBlocks"
     },
     {
       "file": "chr22_nanopore_subset.bam",
       "candidate": "BAM record walk",
-      "layer": "@gmod/bam",
       "units": 38,
       "inBytes": 8899458,
       "outBytes": 304,
       "js": {
-        "median": 0.005445000002509914,
-        "min": 0.0043699999951059,
-        "max": 0.04006700000172714
+        "median": 0.011039000004529953,
+        "min": 0.010081999993417412,
+        "max": 0.2606720000039786
       },
       "wasm": null,
       "floor": {
-        "median": 1.8347070000017993,
-        "min": 1.3341029999937746,
-        "max": 3.384519999999611
+        "median": 3.375281000015093,
+        "min": 2.6543300000193994,
+        "max": 20.10864799999399
       },
-      "load": 9.0185546875
+      "load": 32.216796875,
+      "layer": "@gmod/bam",
+      "callSite": "@gmod/bam bamFile.ts › readBamFeatures"
     },
     {
       "file": "chr22_nanopore_subset.bam",
       "candidate": "BAM field decode",
-      "layer": "@gmod/bam",
       "units": 38,
       "inBytes": 8899458,
       "outBytes": 608,
       "js": {
-        "median": 1.2093739999982063,
-        "min": 1.0040480000025127,
-        "max": 2.0008450000023004
+        "median": 4.35256900000968,
+        "min": 3.250218999979552,
+        "max": 33.73302500002319
       },
       "wasm": null,
       "floor": {
-        "median": 1.9045200000036857,
-        "min": 1.25483499999973,
-        "max": 3.579977000001236
+        "median": 3.9355829999840353,
+        "min": 2.760941000015009,
+        "max": 19.627980999997817
       },
-      "load": 9.0185546875
+      "load": 32.216796875,
+      "layer": "@gmod/bam",
+      "callSite": "jb2 BamAdapter.ts › filterReadFlag(record.flags), record.start"
     },
     {
       "file": "chr22_nanopore_subset.bam",
-      "candidate": "BAM sequence decode",
-      "layer": "@gmod/bam",
+      "candidate": "BAM CIGAR unpack",
       "units": 38,
       "inBytes": 8899458,
-      "outBytes": 5006308,
+      "outBytes": 1382960,
       "js": {
-        "median": 17.21568400000251,
-        "min": 12.59694799999852,
-        "max": 30.15421599999536
+        "median": 11.835935999988578,
+        "min": 3.96929700000328,
+        "max": 55.1875
       },
       "wasm": null,
       "floor": {
-        "median": 4.812567000000854,
-        "min": 2.76073400000314,
-        "max": 14.044490000000224
+        "median": 10.562876000010874,
+        "min": 3.656678999977885,
+        "max": 29.755795999983093
       },
-      "load": 9.4970703125
+      "load": 32.216796875,
+      "layer": "@gmod/bam",
+      "callSite": "jb2 BamAdapter.ts › numericCigarHasSkip(record.NUMERIC_CIGAR)"
     },
     {
       "file": "chr22_nanopore_subset.bam",
-      "candidate": "BAM CIGAR decode",
-      "layer": "@gmod/bam",
+      "candidate": "BAM mismatch walk",
       "units": 38,
       "inBytes": 8899458,
-      "outBytes": 813887,
+      "outBytes": 2766192,
       "js": {
-        "median": 16.379171000000497,
-        "min": 10.508190000000468,
-        "max": 132.2577769999989
+        "median": 38.752000999986194,
+        "min": 28.769302000000607,
+        "max": 83.93216700002085
       },
       "wasm": null,
       "floor": {
-        "median": 2.2417089999944437,
-        "min": 1.418485000001965,
-        "max": 3.5885440000056406
+        "median": 7.946659999986878,
+        "min": 4.497080000001006,
+        "max": 35.90661700000055
       },
-      "load": 9.4970703125
+      "load": 31.318359375,
+      "layer": "@gmod/bam",
+      "callSite": "jb2 BamSlightlyLazyFeature.ts › forEachMismatch → forEachMismatchNumeric"
     },
     {
       "file": "chr22_nanopore_subset.bam",
       "candidate": "BAM record walk",
-      "layer": "@gmod/bam",
       "units": 151,
       "inBytes": 14967507,
       "outBytes": 1208,
       "js": {
-        "median": 0.011936000002606306,
-        "min": 0.011669999999867287,
-        "max": 0.012742999999318272
+        "median": 0.04014999998616986,
+        "min": 0.022689000004902482,
+        "max": 0.10480100000859238
       },
       "wasm": null,
       "floor": {
-        "median": 3.116685000000871,
-        "min": 2.3985570000004373,
-        "max": 5.998140999996394
+        "median": 6.1216739999945275,
+        "min": 4.639533999987179,
+        "max": 15.558210999995936
       },
-      "load": 9.4970703125
+      "load": 31.318359375,
+      "layer": "@gmod/bam",
+      "callSite": "@gmod/bam bamFile.ts › readBamFeatures"
     },
     {
       "file": "chr22_nanopore_subset.bam",
       "candidate": "BAM field decode",
-      "layer": "@gmod/bam",
       "units": 151,
       "inBytes": 14967507,
       "outBytes": 2416,
       "js": {
-        "median": 2.751512000002549,
-        "min": 2.4054399999949965,
-        "max": 4.48100500000146
+        "median": 7.0977550000243355,
+        "min": 4.830160000012256,
+        "max": 8.721072000014829
       },
       "wasm": null,
       "floor": {
-        "median": 3.1911850000033155,
-        "min": 2.502064000000246,
-        "max": 5.659085999999661
+        "median": 6.461956000013743,
+        "min": 5.348863999999594,
+        "max": 12.859813000017311
       },
-      "load": 9.4970703125
+      "load": 31.318359375,
+      "layer": "@gmod/bam",
+      "callSite": "jb2 BamAdapter.ts › filterReadFlag(record.flags), record.start"
     },
     {
       "file": "chr22_nanopore_subset.bam",
-      "candidate": "BAM sequence decode",
-      "layer": "@gmod/bam",
+      "candidate": "BAM CIGAR unpack",
       "units": 151,
       "inBytes": 14967507,
-      "outBytes": 7876081,
+      "outBytes": 3128980,
       "js": {
-        "median": 28.1204230000003,
-        "min": 19.313741000005393,
-        "max": 63.33444700000109
+        "median": 8.566820999985794,
+        "min": 4.657363999984227,
+        "max": 23.39888900000369
       },
       "wasm": null,
       "floor": {
-        "median": 6.542539000001852,
-        "min": 5.180610000003071,
-        "max": 40.61789699999645
+        "median": 12.902027999982238,
+        "min": 6.643105999974068,
+        "max": 39.01749800000107
       },
-      "load": 9.4970703125
+      "load": 31.318359375,
+      "layer": "@gmod/bam",
+      "callSite": "jb2 BamAdapter.ts › numericCigarHasSkip(record.NUMERIC_CIGAR)"
     },
     {
       "file": "chr22_nanopore_subset.bam",
-      "candidate": "BAM CIGAR decode",
-      "layer": "@gmod/bam",
+      "candidate": "BAM mismatch walk",
       "units": 151,
       "inBytes": 14967507,
-      "outBytes": 1827785,
+      "outBytes": 6259024,
       "js": {
-        "median": 29.7496719999981,
-        "min": 23.554125000002387,
-        "max": 40.54522899999574
+        "median": 50.95869599998696,
+        "min": 44.98156899999594,
+        "max": 66.9201260000118
       },
       "wasm": null,
       "floor": {
-        "median": 4.058538999997836,
-        "min": 2.793229999995674,
-        "max": 50.220525999997335
+        "median": 10.621939000004204,
+        "min": 7.493917000014335,
+        "max": 36.91662500001257
       },
-      "load": 9.537109375
+      "load": 29.53076171875,
+      "layer": "@gmod/bam",
+      "callSite": "jb2 BamSlightlyLazyFeature.ts › forEachMismatch → forEachMismatchNumeric"
     },
     {
       "file": "chr22_nanopore_subset.bam",
       "candidate": "BAM record walk",
-      "layer": "@gmod/bam",
       "units": 379,
       "inBytes": 18124428,
       "outBytes": 3032,
       "js": {
-        "median": 0.04844000000593951,
-        "min": 0.010494999994989485,
-        "max": 0.13637600000220118
+        "median": 0.05858700000680983,
+        "min": 0.025144999992335215,
+        "max": 0.14962099998956546
       },
       "wasm": null,
       "floor": {
-        "median": 3.562065000005532,
-        "min": 3.0572810000012396,
-        "max": 4.880788000002212
+        "median": 6.027585000003455,
+        "min": 5.278965000004973,
+        "max": 9.424670000007609
       },
-      "load": 9.537109375
+      "load": 29.53076171875,
+      "layer": "@gmod/bam",
+      "callSite": "@gmod/bam bamFile.ts › readBamFeatures"
     },
     {
       "file": "chr22_nanopore_subset.bam",
       "candidate": "BAM field decode",
-      "layer": "@gmod/bam",
       "units": 379,
       "inBytes": 18124428,
       "outBytes": 6064,
       "js": {
-        "median": 5.118866999997408,
-        "min": 4.032720000002882,
-        "max": 6.988079999995534
+        "median": 12.068261000007624,
+        "min": 6.8113329999905545,
+        "max": 23.031767000007676
       },
       "wasm": null,
       "floor": {
-        "median": 3.4252509999932954,
-        "min": 2.9299769999997807,
-        "max": 6.349564999996801
+        "median": 12.376868999999715,
+        "min": 6.093093999981647,
+        "max": 60.62925699999323
       },
-      "load": 9.537109375
+      "load": 29.53076171875,
+      "layer": "@gmod/bam",
+      "callSite": "jb2 BamAdapter.ts › filterReadFlag(record.flags), record.start"
     },
     {
       "file": "chr22_nanopore_subset.bam",
-      "candidate": "BAM sequence decode",
-      "layer": "@gmod/bam",
+      "candidate": "BAM CIGAR unpack",
       "units": 379,
       "inBytes": 18124428,
-      "outBytes": 9187902,
+      "outBytes": 4285228,
       "js": {
-        "median": 29.44589000000269,
-        "min": 20.335693999993964,
-        "max": 110.22131100000115
+        "median": 11.811291999998502,
+        "min": 9.191298000019742,
+        "max": 72.11659299998428
       },
       "wasm": null,
       "floor": {
-        "median": 7.1049480000001495,
-        "min": 5.376075000000128,
-        "max": 22.335980000003474
+        "median": 17.369948000006843,
+        "min": 9.25991699998849,
+        "max": 67.02187900000717
       },
-      "load": 9.537109375
+      "load": 29.53076171875,
+      "layer": "@gmod/bam",
+      "callSite": "jb2 BamAdapter.ts › numericCigarHasSkip(record.NUMERIC_CIGAR)"
     },
     {
       "file": "chr22_nanopore_subset.bam",
-      "candidate": "BAM CIGAR decode",
-      "layer": "@gmod/bam",
+      "candidate": "BAM mismatch walk",
       "units": 379,
       "inBytes": 18124428,
-      "outBytes": 2489147,
+      "outBytes": 8573232,
       "js": {
-        "median": 43.26227199999994,
-        "min": 34.68421600000147,
-        "max": 58.03317000000243
+        "median": 61.35777100000996,
+        "min": 57.94876599998679,
+        "max": 78.74582999999984
       },
       "wasm": null,
       "floor": {
-        "median": 4.536213999999745,
-        "min": 3.690217000003031,
-        "max": 6.907253000004857
+        "median": 12.303928000008455,
+        "min": 9.485568000003695,
+        "max": 41.30886200000532
       },
-      "load": 9.537109375
+      "load": 29.53076171875,
+      "layer": "@gmod/bam",
+      "callSite": "jb2 BamSlightlyLazyFeature.ts › forEachMismatch → forEachMismatchNumeric"
     },
     {
       "file": "chr22_nanopore_subset.bam",
       "candidate": "BAM record walk",
-      "layer": "@gmod/bam",
       "units": 757,
       "inBytes": 24361772,
       "outBytes": 6056,
       "js": {
-        "median": 0.06038399999670219,
-        "min": 0.0378599999967264,
-        "max": 0.1694710000010673
+        "median": 0.11261400001239963,
+        "min": 0.03669199999421835,
+        "max": 0.23680899999453686
       },
       "wasm": null,
       "floor": {
-        "median": 4.806599000003189,
-        "min": 3.9835690000036266,
-        "max": 5.7284250000011525
+        "median": 8.307151999993948,
+        "min": 7.334661000000779,
+        "max": 10.142917999997735
       },
-      "load": 9.537109375
+      "load": 29.53076171875,
+      "layer": "@gmod/bam",
+      "callSite": "@gmod/bam bamFile.ts › readBamFeatures"
     },
     {
       "file": "chr22_nanopore_subset.bam",
       "candidate": "BAM field decode",
-      "layer": "@gmod/bam",
       "units": 757,
       "inBytes": 24361772,
       "outBytes": 12112,
       "js": {
-        "median": 6.449166999998852,
-        "min": 5.4193450000020675,
-        "max": 9.856291000003694
+        "median": 10.323934999993071,
+        "min": 9.81572299997788,
+        "max": 11.9392939999816
       },
       "wasm": null,
       "floor": {
-        "median": 4.5445419999959995,
-        "min": 4.04447199999413,
-        "max": 6.211597000001348
+        "median": 7.3789580000157,
+        "min": 6.7961340000038035,
+        "max": 8.072804000024917
       },
-      "load": 9.537109375
+      "load": 27.80615234375,
+      "layer": "@gmod/bam",
+      "callSite": "jb2 BamAdapter.ts › filterReadFlag(record.flags), record.start"
     },
     {
       "file": "chr22_nanopore_subset.bam",
-      "candidate": "BAM sequence decode",
-      "layer": "@gmod/bam",
+      "candidate": "BAM CIGAR unpack",
       "units": 757,
       "inBytes": 24361772,
-      "outBytes": 11781017,
+      "outBytes": 6575784,
       "js": {
-        "median": 26.997146999994584,
-        "min": 25.846188000003167,
-        "max": 41.55501899999945
+        "median": 10.29331199999433,
+        "min": 9.65171299999929,
+        "max": 14.882478000014089
       },
       "wasm": null,
       "floor": {
-        "median": 8.510035999999673,
-        "min": 7.429834000002302,
-        "max": 20.99019799999951
+        "median": 11.948699000000488,
+        "min": 11.097653000004357,
+        "max": 25.666245000000345
       },
-      "load": 9.537109375
+      "load": 27.80615234375,
+      "layer": "@gmod/bam",
+      "callSite": "jb2 BamAdapter.ts › numericCigarHasSkip(record.NUMERIC_CIGAR)"
     },
     {
       "file": "chr22_nanopore_subset.bam",
-      "candidate": "BAM CIGAR decode",
-      "layer": "@gmod/bam",
+      "candidate": "BAM mismatch walk",
       "units": 757,
       "inBytes": 24361772,
-      "outBytes": 3796559,
+      "outBytes": 13157072,
       "js": {
-        "median": 59.64273400000093,
-        "min": 49.80923400000029,
-        "max": 80.9508499999938
+        "median": 88.0217399999965,
+        "min": 84.90567100001499,
+        "max": 287.5583770000085
       },
       "wasm": null,
       "floor": {
-        "median": 6.144520000001648,
-        "min": 5.135491000000911,
-        "max": 14.768240999997943
+        "median": 18.662219999998342,
+        "min": 15.540041000000201,
+        "max": 85.58175599999959
       },
-      "load": 9.65380859375
+      "load": 27.80615234375,
+      "layer": "@gmod/bam",
+      "callSite": "jb2 BamSlightlyLazyFeature.ts › forEachMismatch → forEachMismatchNumeric"
     }
   ]
 }
