@@ -736,11 +736,18 @@ times a composite for the two release arms and not a render. v2.4.0 reads 0.1 ms
 there, underneath a wait of seconds.
 
 Figure: `Rscript scripts/paperfigs/perf-crosstool-zoom.R` →
-`results/figures/paper/pdf/perf-crosstool-zoom.pdf`. Solid is the wait, dashed
-the drawing inside it, and only the current build and igv.js have a dashed line.
-A figure has no dagger to hang the worker caveat on, and left in, the release
-arms would sit at the bottom of the panel as the fastest renderers on it — so they are dropped from it and the caption says
-why. What the figure is for is the comparison neither the JBrowse-only
+`results/figures/paper/pdf/perf-crosstool-zoom.pdf`, two stacked panels because
+the run measures two different numbers and only some arms have both. The top
+panel is the wait, one line per arm and one legend; every JBrowse arm sits above
+igv.js and GenomeSpy on this motion, and the axis says so without help from the
+caption. The bottom panel puts the drawing under the wait for the current build
+and igv.js alone — a figure has no dagger to hang the worker caveat on, and left
+in, the release arms would sit at the bottom of it as the fastest renderers on
+the page. Drawn as one panel the two measures needed two legends and a fourth
+decade of axis for a 500 µs dashed line, and the reader had to work out which
+arms the dashed keys applied to.
+
+What the figure is for is the comparison neither the JBrowse-only
 `perf-interaction.pdf` nor the cold-load matrix can make: igv.js does not pay a
 multi-second zoom either, so what the old block renderer cost on this motion was
 JBrowse's and not the web's.
