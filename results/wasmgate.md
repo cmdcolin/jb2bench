@@ -1,8 +1,25 @@
 # When is a routine worth compiling to WebAssembly?
 
 Measured 2026-09-02 by `make wasmgate` (`scripts/wasmgate.ts`), which writes
-[`wasmgate.json`](wasmgate.json); the figure is
-`results/figures/paper/png/wasmgate.png`.
+[`wasmgate.json`](wasmgate.json). The figure is
+[`figures/paper/png/wasmgate.png`](figures/paper/png/wasmgate.png), drawn by
+`scripts/paperfigs/wasmgate.R` from `paper/wasmgate.csv`, in two panels:
+
+- **(a)** time against the bytes a routine would have to marshal, with the floor
+  drawn and the region under it shaded. This panel establishes what the floor
+  *is* — its points come from a dozen different input and output sizes and still
+  fall on one line, which is what says it is a memcpy pair rather than an artifact
+  of the module measured through.
+- **(b)** the same divided by that floor, which is the number the decision turns
+  on: how many times faster a *perfect* port could be. The floor becomes the 1×
+  line, and everything under it is a routine that comes out slower in wasm however
+  fast the wasm is. The one ported routine is drawn in both panels twice — solid
+  for JavaScript, dashed for the shipped wasm — so in (b) its ceiling and what it
+  actually collected sit on the same axis.
+
+The division is not cosmetic. In (a) every curve rises with payload size, so a
+verdict is a gap between two lines a decade apart and the eye has to measure it;
+in (b) the size dependence divides out and the verdict is a height.
 
 wasm runs at close to native speed, which is what makes it look like a free win
 for a CPU-bound routine. It is not free, and the reason is the boundary rather
