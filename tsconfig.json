@@ -9,7 +9,17 @@
     "noEmit": true,
     "allowImportingTsExtensions": true,
     "skipLibCheck": true,
-    "esModuleInterop": true
+    "esModuleInterop": true,
+    // scripts/bgzfpool/ bundles the reader libraries out of the jbrowse-components
+    // checkout beside this one rather than this repo's node_modules, so that the
+    // standalone arm of the pool figure measures the same code the staged build
+    // runs. Typechecking follows the same path. Without that checkout those two
+    // files do not typecheck, and they cannot run either.
+    "paths": {
+      "@gmod/bam": ["../jbrowse-components/plugins/alignments/node_modules/@gmod/bam/esm/index.d.ts"],
+      "@gmod/tabix": ["../jbrowse-components/plugins/variants/node_modules/@gmod/tabix/esm/index.d.ts"],
+      "@gmod/bgzf-filehandle": ["../jbrowse-components/packages/core/node_modules/@gmod/bgzf-filehandle/esm/index.d.ts"]
+    }
   },
   "include": ["scripts/**/*.ts"]
 }

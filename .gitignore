@@ -98,6 +98,13 @@ flame/*.svg
 /data/variants.browser.vcf.gz
 /data/variants.browser.vcf.gz.tbi
 
+# The BGZF worker pool figure's VCF corpus: the same generated callset at three
+# sample counts and both shapes, spanning the whole benchmark contig, bgzipped
+# and tabix indexed so a browser can range-request it. Regenerate with
+# shell/generate_bgzf_vcf.sh -- same policy as the file above.
+/data/variants.pool.*.vcf.gz
+/data/variants.pool.*.vcf.gz.tbi
+
 # The eight library versions ecosystem/ compares: each is a clone of a GMOD repo
 # at a tag pinned in ecosystem/versions.json, carrying its own .git and its own
 # node_modules. ecosystem/setup.sh rebuilds them in a few minutes.

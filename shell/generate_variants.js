@@ -18,19 +18,31 @@
 import { writeFileSync } from 'node:fs'
 
 const REF = 'chr22_mask'
-const START = 124_000
-const END = 143_000
+// Defaults are the shared benchmark window, which is what the ecosystem VCF
+// corpus wants and what every committed number was measured from. The BGZF
+// pool figure needs a file spanning several non-overlapping windows instead, so
+// the span is an optional pair of arguments rather than a second generator —
+// the RNG stream is consumed per variant, so a wider span emits the same
+// records first and then keeps going, and the default files stay byte-identical.
+const [, , samplesArg, shape, out, startArg, endArg] = process.argv
+const START = Number(startArg ?? 124_000)
+const END = Number(endArg ?? 143_000)
 // ~1 variant per 60 bp. 1000 Genomes runs nearer 1 per 130 bp genome-wide, but
 // the point of the corpus is the samples x variants product and a denser window
 // keeps the file a sensible size while still being a plausible density for a
 // common-variant region.
 const SPACING = 60
 
-const [, , samplesArg, shape, out] = process.argv
 const nSamples = Number(samplesArg)
-if (!Number.isFinite(nSamples) || !out || !['gtonly', 'wide'].includes(shape)) {
+if (
+  !Number.isFinite(nSamples) ||
+  !out ||
+  !['gtonly', 'wide'].includes(shape) ||
+  !Number.isFinite(START) ||
+  !Number.isFinite(END)
+) {
   console.error(
-    'usage: node generate_variants.js <samples> <gtonly|wide> <out.vcf>',
+    'usage: node generate_variants.js <samples> <gtonly|wide> <out.vcf> [start] [end]',
   )
   process.exit(1)
 }
