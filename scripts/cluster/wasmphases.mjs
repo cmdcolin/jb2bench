@@ -9,7 +9,9 @@
 // Usage: node --experimental-strip-types scripts/cluster/wasmphases.mjs [matrix.bin] [N]
 import { readFileSync, writeFileSync } from 'node:fs'
 
-const HCLUST = `${process.env.HOME}/src/gmod/hclust/src/index.ts`
+// HCLUST names the checkout to time, so one run can put two library versions
+// on the same matrix. Default is the working checkout.
+const HCLUST = process.env.HCLUST ?? `${process.env.HOME}/src/gmod/hclust/src/index.ts`
 const { clusterData } = await import(HCLUST)
 
 const args = process.argv.slice(2)
@@ -58,12 +60,14 @@ const out = {
   totalMs: +(t2 - t0).toFixed(1),
   clusterShare: +(clusterMs / (distanceMs + clusterMs)).toFixed(4),
   note: 'first call in a fresh process, the one a user waits on',
+  hclust: HCLUST,
 }
 console.log(`N=${n} V=${cols}  distance ${out.distanceMs.toFixed(0)} ms   merge ${out.clusterMs.toFixed(0)} ms   merge share ${(out.clusterShare*100).toFixed(2)}%`)
 // Per matrix, not a single slot: these scripts are run once per window, and a
 // fixed filename means the second run silently replaces the first — which is
 // exactly what happened, leaving a figure built from one matrix reading a file
 // written by another.
-const slug = binPath.split('/').pop().replace(/\.bin$/, '')
+const slug = binPath.split('/').pop().replace(/\.bin$/, '') +
+  (process.env.HCLUST_TAG ? `-${process.env.HCLUST_TAG}` : '')
 writeFileSync(`results/cluster-wasm-phases-${slug}.json`, JSON.stringify(out, null, 2))
 console.log(`wrote results/cluster-wasm-phases-${slug}.json`)

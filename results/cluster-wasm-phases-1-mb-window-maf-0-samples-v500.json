@@ -1,0 +1,11 @@
+{
+  "matrix": "1-mb-window-maf-0-samples.bin",
+  "n": 2504,
+  "v": 22513,
+  "distanceMs": 59884.5,
+  "clusterMs": 2.7,
+  "totalMs": 59887.3,
+  "clusterShare": 0,
+  "note": "first call in a fresh process, the one a user waits on",
+  "hclust": "/tmp/claude-1001/-home-cdiesh-src-jb2bench/519731e6-a4c3-4726-b055-619f408e01ea/scratchpad/hclust-500/src/index.ts"
+}

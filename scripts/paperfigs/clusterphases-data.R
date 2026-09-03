@@ -20,8 +20,13 @@ bench <- if (is.na(a[1])) Sys.getenv("JB2BENCH", ".") else a[1]
 jb2 <- if (is.na(a[2])) Sys.getenv("JB2", file.path(Sys.getenv("HOME"), "src/jbrowse-components")) else a[2]
 
 res <- file.path(bench, "results")
-gpu <- fromJSON(file.path(jb2, "agent-docs/measurements/cluster-distance-gpu.json"),
-                simplifyVector = FALSE)
+# CLUSTER_RECORD, as in cluster-data.R: a run that re-measures every arm on one
+# machine points both scripts at its own record, so the GPU row here comes off
+# the same box as the CPU rows beside it rather than out of the 2019 MacBook Pro
+# the jbrowse-components store holds.
+gpuRecord <- Sys.getenv("CLUSTER_RECORD",
+                        file.path(jb2, "agent-docs/measurements/cluster-distance-gpu.json"))
+gpu <- fromJSON(gpuRecord, simplifyVector = FALSE)
 
 files <- list.files(res, "^cluster-compare-.*\\.json$", full.names = TRUE)
 if (!length(files)) stop("no cluster-compare-*.json in ", res,
@@ -53,20 +58,44 @@ for (f in files) {
   # is not what the time scales with, and "MAF" reads as an allele frequency
   # rather than as a size.
   shape <- sprintf("%s × %s", format(cmp$n, big.mark = ","), format(cmp$v, big.mark = ","))
+
+  # hclust reports the distance/merge boundary through its progress callback,
+  # and the C side throttles those to one per 100 ms with the timer reset as the
+  # merge begins. A merge that finishes inside that interval is therefore never
+  # reported, and compare.mjs records the split as null rather than guessing --
+  # which is the wasm arm at N = 2504 on some sittings and not others. Left
+  # alone, `null / 1000` is numeric(0), data.frame() drops the row, and the
+  # config disappears from a CSV that still looks complete. The figure sums the
+  # phases, so an unresolved split costs it nothing as long as the TOTAL
+  # survives: emit one row carrying the whole call instead of two that vanish.
+  SPLIT_FLOOR <- 0.1
+  phasesFor <- function(cfg, r) {
+    if (is.null(r$distanceMs) || is.null(r$clusterMs)) {
+      list(list(config = cfg, phase = "total (split unresolved)",
+                s = r$totalMs / 1000))
+    } else {
+      list(list(config = cfg, phase = "distance", s = r$distanceMs / 1000),
+           list(config = cfg, phase = "merge", s = r$clusterMs / 1000))
+    }
+  }
+
   measured <- list()
   for (impl in names(config)) {
-    r <- byImpl[[impl]]
-    measured[[length(measured) + 1]] <-
-      list(config = config[[impl]], phase = "distance", s = r$distanceMs / 1000)
-    measured[[length(measured) + 1]] <-
-      list(config = config[[impl]], phase = "merge", s = r$clusterMs / 1000)
+    measured <- c(measured, phasesFor(config[[impl]], byImpl[[impl]]))
   }
   # The compute shader replaces only the distance build, so its merge is the
-  # wasm merge, carried across rather than re-measured.
+  # wasm merge, carried across rather than re-measured. When that merge was
+  # never resolved, carry the interval that hid it: the true value is somewhere
+  # under it, so the WebGPU point comes out slow rather than flattering, which
+  # is the direction an unmeasured quantity should err in a figure whose last
+  # step is the one it buys.
+  wasmMerge <- byImpl$wasm$clusterMs
   measured[[length(measured) + 1]] <-
     list(config = "WebGPU + wasm", phase = "distance", s = gpuS)
   measured[[length(measured) + 1]] <-
-    list(config = "WebGPU + wasm", phase = "merge", s = byImpl$wasm$clusterMs / 1000)
+    list(config = "WebGPU + wasm",
+         phase = if (is.null(wasmMerge)) "merge (upper bound)" else "merge",
+         s = if (is.null(wasmMerge)) SPLIT_FLOOR else wasmMerge / 1000)
 
   for (r in measured) {
     rows[[length(rows) + 1]] <- data.frame(

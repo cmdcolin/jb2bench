@@ -2,9 +2,9 @@
 
 Region `chr22_mask:124000-143000`. **time-to-content** = ms a loading indicator ("Downloading alignments...") is shown after a zoom before correct content returns; median over the measured steps. redraw = longest frame (ms) of the GPU redraw. A `≥` prefix marks a censored value: the step was still loading at MAX_WAIT (120000 ms), so the true figure is larger.
 
-Contamination, over the cells measured this run: worst **0.13 foreign cores** (`1000x-longread-bam / current / zoom-in` — http-server 0.03, htop 0.02, claude 0.01), median 0.09. That is CPU burned by processes outside this benchmark — its own tree and the corpus servers excluded. This box floors near 0.28 with nobody using it, so read the ceiling as a budget over that floor. Cells not measured this run keep their recorded figure and are absent from these two numbers.
+Contamination, over the cells measured this run: worst **0.24 foreign cores** (`20x-shortread-bam / current / zoom-in` — claude 0.09, ptyxis 0.06, gnome-shell 0.03), median 0.06. That is CPU burned by processes outside this benchmark — its own tree and the corpus servers excluded. This box floors near 0.28 with nobody using it, so read the ceiling as a budget over that floor. Cells not measured this run keep their recorded figure and are absent from these two numbers.
 
-Measured — in: 2026-08-31 (structural), out: 2026-08-31 (structural), pan: 2026-08-31 (structural). Comparisons *within* a section are same-run; comparisons across sections may not be.
+Measured — in: 2026-09-03 (structural), out: 2026-09-03 (structural), pan: 2026-09-03 (structural). Comparisons *within* a section are same-run; comparisons across sections may not be.
 
 ## Zoom IN — only the old renderer refetches
 
@@ -12,18 +12,18 @@ The new view is a strict subset of already-loaded reads, so the GPU branch re-pr
 
 | case | current | release-4.3.0 | release-2.4.0 | current redraw frame |
 |---|---:|---:|---:|---:|
-| 20x-shortread-bam | 0ms | 1063ms | 569ms | 17ms |
-| 20x-shortread-cram | 0ms | 1069ms | 591ms | 17ms |
-| 200x-shortread-bam | 0ms | 1081ms | 626ms | 17ms |
-| 200x-shortread-cram | 0ms | 1085ms | 609ms | 17ms |
-| 1000x-shortread-bam | 0ms | 1584ms | 688ms | 17ms |
-| 1000x-shortread-cram | 0ms | 1110ms | 696ms | 17ms |
-| 20x-longread-bam | 0ms | 1148ms | 664ms | 17ms |
-| 20x-longread-cram | 0ms | 1094ms | 618ms | 17ms |
-| 200x-longread-bam | 0ms | 2819ms | 1961ms | 17ms |
-| 200x-longread-cram | 0ms | 1191ms | 902ms | 33ms |
-| 1000x-longread-bam | 0ms | 11837ms | 6602ms | 17ms |
-| 1000x-longread-cram | 0ms | 2906ms | 2960ms | 33ms |
+| 20x-shortread-bam | 0ms | 1062ms | 565ms | 17ms |
+| 20x-shortread-cram | 0ms | 1061ms | 555ms | 17ms |
+| 200x-shortread-bam | 0ms | 1114ms | 629ms | 17ms |
+| 200x-shortread-cram | 0ms | 1067ms | 610ms | 17ms |
+| 1000x-shortread-bam | 0ms | 1645ms | 697ms | 17ms |
+| 1000x-shortread-cram | 0ms | 1113ms | 714ms | 17ms |
+| 20x-longread-bam | 0ms | 1165ms | 670ms | 17ms |
+| 20x-longread-cram | 0ms | 1081ms | 626ms | 17ms |
+| 200x-longread-bam | 0ms | 2881ms | 2047ms | 17ms |
+| 200x-longread-cram | 0ms | 1201ms | 894ms | 17ms |
+| 1000x-longread-bam | 0ms | 12604ms | 6505ms | 33ms |
+| 1000x-longread-cram | 0ms | 3016ms | 2329ms | 17ms |
 
 ## Zoom OUT — mostly refused, not measured
 
@@ -35,18 +35,18 @@ The honest reading: for anything heavier than 20x shortread, this comparison has
 
 | case | current | release-4.3.0 | release-2.4.0 | current redraw frame | drew/attempted |
 |---|---:|---:|---:|---:|---:|
-| 20x-shortread-bam | 54ms | 1915ms | 3183ms | 17ms | 4/4 |
-| 20x-shortread-cram | 35ms | 1846ms | 2269ms | 17ms | 4/4 |
-| 200x-shortread-bam | 334ms | 5361ms | 15893ms | 50ms | 4/4 |
-| 200x-shortread-cram | 259ms | 5053ms | 10188ms | 58ms | 4/4 |
-| 1000x-shortread-bam | 1587ms | 20154ms | 46696ms | 217ms | 4/4 |
-| 1000x-shortread-cram | 1153ms | 23600ms | _crash_ | 242ms | 4/4 |
-| 20x-longread-bam | 86ms | 2414ms | 1613ms | 17ms | 4/4 |
-| 20x-longread-cram | 97ms | 2149ms | 1770ms | 17ms | 4/4 |
-| 200x-longread-bam | 626ms | 6454ms | 12669ms | 150ms | 4/4 |
-| 200x-longread-cram | 705ms | 4113ms | 10567ms | 142ms | 4/4 |
-| 1000x-longread-bam | 2521ms | 26059ms | 41691ms | 633ms | 4/4 |
-| 1000x-longread-cram | 2981ms | 11690ms | ≥86220ms | 633ms | 4/4 |
+| 20x-shortread-bam | 353ms | 1829ms | 3278ms | 17ms | 4/4 |
+| 20x-shortread-cram | 344ms | 1805ms | 2306ms | 17ms | 4/4 |
+| 200x-shortread-bam | 684ms | 5266ms | 16182ms | 50ms | 4/4 |
+| 200x-shortread-cram | 602ms | 5157ms | 10143ms | 67ms | 4/4 |
+| 1000x-shortread-bam | 1874ms | 20379ms | 47717ms | 200ms | 4/4 |
+| 1000x-shortread-cram | 1484ms | 23880ms | _crash_ | 217ms | 4/4 |
+| 20x-longread-bam | 396ms | 2221ms | 1709ms | 17ms | 4/4 |
+| 20x-longread-cram | 405ms | 2053ms | 1785ms | 17ms | 4/4 |
+| 200x-longread-bam | 894ms | 6849ms | 12574ms | 192ms | 4/4 |
+| 200x-longread-cram | 1014ms | 4064ms | 10075ms | 167ms | 4/4 |
+| 1000x-longread-bam | 2952ms | 26352ms | 42808ms | 600ms | 4/4 |
+| 1000x-longread-cram | 3508ms | 11853ms | ≥91127ms | 600ms | 4/4 |
 
 ## PAN at constant zoom — both builds refetch
 
@@ -60,15 +60,15 @@ The pan runs **leftward** from the benchmark locus. pbsim's long reads run off t
 
 | case | current | release-4.3.0 | ratio | release-2.4.0 | current redraw frame | steps |
 |---|---:|---:|---:|---:|---:|---:|
-| 20x-shortread-bam | 26ms | 1116ms | 42.92× | 478ms | 17ms | 5/5 |
-| 20x-shortread-cram | 4ms | 1120ms | 280.00× | 70ms | 17ms | 5/5 |
-| 200x-shortread-bam | 212ms | 1303ms | 6.15× | 1875ms | 17ms | 5/5 |
-| 200x-shortread-cram | 134ms | 1126ms | 8.40× | 2290ms | 17ms | 5/5 |
-| 1000x-shortread-bam | 769ms | 4021ms | 5.23× | 11156ms | 67ms | 5/5 |
-| 1000x-shortread-cram | 515ms | 4369ms | 8.48× | 10647ms | 67ms | 5/5 |
-| 20x-longread-bam | 25ms | 1218ms | 48.72× | 171ms | 17ms | 5/5 |
-| 20x-longread-cram | 48ms | 1164ms | 24.25× | 111ms | 17ms | 5/5 |
-| 200x-longread-bam | 286ms | 2560ms | 8.95× | 4168ms | 33ms | 5/5 |
-| 200x-longread-cram | 389ms | 1450ms | 3.73× | 1594ms | 33ms | 5/5 |
-| 1000x-longread-bam | 1197ms | 11049ms | 9.23× | 21749ms | 183ms | 5/5 |
-| 1000x-longread-cram | 1494ms | 3808ms | 2.55× | 10924ms | 200ms | 5/5 |
+| 20x-shortread-bam | 214ms | 1139ms | 5.32× | 541ms | 17ms | 5/5 |
+| 20x-shortread-cram | 185ms | 1112ms | 6.01× | 47ms | 17ms | 5/5 |
+| 200x-shortread-bam | 818ms | 1266ms | 1.55× | 2533ms | 17ms | 5/5 |
+| 200x-shortread-cram | 213ms | 1162ms | 5.46× | 2162ms | 17ms | 5/5 |
+| 1000x-shortread-bam | 1296ms | 3951ms | 3.05× | 10296ms | 83ms | 5/5 |
+| 1000x-shortread-cram | 1113ms | 4284ms | 3.85× | 9212ms | 67ms | 5/5 |
+| 20x-longread-bam | 171ms | 1197ms | 7.00× | 200ms | 17ms | 5/5 |
+| 20x-longread-cram | 192ms | 1160ms | 6.04× | 91ms | 17ms | 5/5 |
+| 200x-longread-bam | 894ms | 2583ms | 2.89× | 4329ms | 33ms | 5/5 |
+| 200x-longread-cram | 946ms | 1399ms | 1.48× | 1422ms | 33ms | 5/5 |
+| 1000x-longread-bam | 1544ms | 10911ms | 7.07× | 20249ms | 200ms | 5/5 |
+| 1000x-longread-cram | 1944ms | 4208ms | 2.16× | 9235ms | 183ms | 5/5 |

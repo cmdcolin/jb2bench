@@ -1,0 +1,12 @@
+{
+  "window": "1 Mb, MAF 0, samples",
+  "matrix": "1-mb-window-maf-0-samples.bin",
+  "n": 2504,
+  "v": 22513,
+  "adapter": "amd gcn-4",
+  "computeMs": 5832,
+  "readbackMs": 5894,
+  "maxRelErr": 0,
+  "checkedPairs": 804,
+  "note": "naive kernel, one thread per pair, no tiling — a floor, not a claim"
+}

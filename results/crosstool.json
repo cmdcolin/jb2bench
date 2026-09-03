@@ -4,165 +4,165 @@
   "rows": {
     "20x-shortread-bam@19kb": {
       "jbrowse": {
-        "median": 1689,
-        "mean": 1679.3333333333333,
-        "stddev": 75.83461537377828,
+        "median": 1677,
+        "mean": 1664,
+        "stddev": 39.06404996924922,
         "runs": [
-          1767,
-          1689,
-          1582
+          1704,
+          1611,
+          1677
         ],
         "load": {
-          "before": 1.29,
-          "after": 0.84,
-          "foreignCores": 0.09967760063887865,
-          "foreignTop": "htop 0.02, ptyxis 0.01, claude 0.01"
+          "before": 0.49,
+          "after": 1.04,
+          "foreignCores": 0.0749047200234568,
+          "foreignTop": "claude 0.02"
         }
       },
       "igv": {
-        "median": 1396,
-        "mean": 1440.6666666666667,
-        "stddev": 81.48755869592746,
+        "median": 1485,
+        "mean": 1521,
+        "stddev": 95.71137166850481,
         "runs": [
-          1555,
-          1396,
-          1371
+          1652,
+          1485,
+          1426
         ],
         "load": {
-          "before": 1.14,
-          "after": 0.84,
-          "foreignCores": 0.09964665355785414,
-          "foreignTop": "htop 0.02, ptyxis 0.01, claude 0.01"
+          "before": 0.75,
+          "after": 1.04,
+          "foreignCores": 0.07488825382868357,
+          "foreignTop": "claude 0.02"
         }
       },
       "igv-deep": {
-        "median": 1432,
-        "mean": 1457.3333333333333,
-        "stddev": 77.22406072951328,
+        "median": 1546,
+        "mean": 1500,
+        "stddev": 68.61972505531239,
         "runs": [
-          1378,
-          1562,
-          1432
+          1546,
+          1403,
+          1551
         ],
         "load": {
-          "before": 1.13,
-          "after": 0.84,
-          "foreignCores": 0.09963634213404629,
-          "foreignTop": "htop 0.02, ptyxis 0.01, claude 0.01"
+          "before": 0.77,
+          "after": 1.04,
+          "foreignCores": 0.07488166937765015,
+          "foreignTop": "claude 0.02"
         }
       },
       "jbrowse-release-4.3.0": {
-        "median": 2604,
-        "mean": 2633.6666666666665,
-        "stddev": 42.66406242052229,
+        "median": 2788,
+        "mean": 2753.6666666666665,
+        "stddev": 123.65633380012886,
         "runs": [
-          2694,
-          2604,
-          2603
+          2885,
+          2788,
+          2588
         ],
         "load": {
-          "before": 1.26,
-          "after": 0.84,
-          "foreignCores": 0.09966728280960732,
-          "foreignTop": "htop 0.02, ptyxis 0.01, claude 0.01"
+          "before": 0.69,
+          "after": 1.04,
+          "foreignCores": 0.07490142620524197,
+          "foreignTop": "claude 0.02"
         }
       },
       "jbrowse-release-2.4.0": {
-        "median": 2508,
-        "mean": 2520.3333333333335,
-        "stddev": 29.48822740612863,
+        "median": 2557,
+        "mean": 2608,
+        "stddev": 81.49028571962836,
         "runs": [
-          2508,
-          2561,
-          2492
+          2557,
+          2723,
+          2544
         ],
         "load": {
-          "before": 1.24,
-          "after": 0.84,
-          "foreignCores": 0.09965844065590773,
-          "foreignTop": "htop 0.02, ptyxis 0.01, claude 0.01"
+          "before": 0.64,
+          "after": 1.04,
+          "foreignCores": 0.07489374175582915,
+          "foreignTop": "claude 0.02"
         }
       },
       "genomespy": {
-        "median": 1392,
-        "mean": 1388.6666666666667,
-        "stddev": 5.436502143433363,
+        "median": 1389,
+        "mean": 1368,
+        "stddev": 32.567877834864625,
         "runs": [
-          1381,
           1393,
-          1392
+          1389,
+          1322
         ],
         "load": {
-          "before": 1.13,
-          "after": 0.84,
-          "foreignCores": 0.09962750546916123,
-          "foreignTop": "htop 0.02, ptyxis 0.01, claude 0.01"
+          "before": 0.7,
+          "after": 1.04,
+          "foreignCores": 0.07487508608437328,
+          "foreignTop": "claude 0.02"
         }
       },
       "gosling": {
-        "median": 2446,
-        "mean": 2443.3333333333335,
-        "stddev": 17.249798710580816,
+        "median": 2429,
+        "mean": 2418.3333333333335,
+        "stddev": 29.555973263547855,
         "runs": [
-          2463,
-          2421,
-          2446
+          2429,
+          2448,
+          2378
         ],
         "load": {
-          "before": 1.12,
-          "after": 0.84,
-          "foreignCores": 0.09961719800765154,
-          "foreignTop": "htop 0.02, ptyxis 0.01, claude 0.01"
+          "before": 0.7,
+          "after": 1.04,
+          "foreignCores": 0.07486631016043108,
+          "foreignTop": "claude 0.02"
         }
       }
     },
     "200x-shortread-bam@19kb": {
       "jbrowse": {
-        "median": 1851,
-        "mean": 1832.6666666666667,
-        "stddev": 38.57748335781149,
+        "median": 1785,
+        "mean": 1773.3333333333333,
+        "stddev": 18.660713336371206,
         "runs": [
-          1779,
-          1868,
-          1851
+          1747,
+          1785,
+          1788
         ],
         "load": {
-          "before": 1.54,
-          "after": 1.18,
-          "foreignCores": 0.07486420946869686,
-          "foreignTop": "htop 0.02, ptyxis 0.01"
+          "before": 1.14,
+          "after": 1.3,
+          "foreignCores": 0.04513651228230277,
+          "foreignTop": ""
         }
       },
       "igv": {
-        "median": 5175,
-        "mean": 5119,
-        "stddev": 117.89260649704318,
+        "median": 5256,
+        "mean": 5272,
+        "stddev": 179.98518457547183,
         "runs": [
-          4955,
-          5227,
-          5175
+          5060,
+          5256,
+          5500
         ],
         "load": {
-          "before": 1.43,
-          "after": 1.18,
-          "foreignCores": 0.0749707293122318,
-          "foreignTop": "htop 0.02, ptyxis 0.01"
+          "before": 1.5,
+          "after": 1.3,
+          "foreignCores": 0.04517058740774813,
+          "foreignTop": ""
         }
       },
       "igv-deep": {
-        "median": 5281,
-        "mean": 5237.666666666667,
-        "stddev": 148.53132853225125,
+        "median": 5357,
+        "mean": 5317.666666666667,
+        "stddev": 176.12369390730922,
         "runs": [
-          5038,
-          5281,
-          5394
+          5511,
+          5085,
+          5357
         ],
         "load": {
-          "before": 1.29,
-          "after": 1.18,
-          "foreignCores": 0.07496846414732194,
-          "foreignTop": "htop 0.02, ptyxis 0.01"
+          "before": 1.42,
+          "after": 1.3,
+          "foreignCores": 0.04516921345495048,
+          "foreignTop": ""
         }
       },
       "igv-h300": {
@@ -194,117 +194,117 @@
         }
       },
       "jbrowse-release-4.3.0": {
-        "median": 3162,
-        "mean": 3184.3333333333335,
-        "stddev": 38.870154217456985,
+        "median": 3276,
+        "mean": 3280.6666666666665,
+        "stddev": 25.525586292102197,
         "runs": [
-          3152,
-          3162,
-          3239
+          3276,
+          3252,
+          3314
         ],
         "load": {
-          "before": 1.42,
-          "after": 1.18,
-          "foreignCores": 0.07486194731713068,
-          "foreignTop": "htop 0.02, ptyxis 0.01"
+          "before": 1.69,
+          "after": 1.3,
+          "foreignCores": 0.045135139245897085,
+          "foreignTop": ""
         }
       },
       "jbrowse-release-2.4.0": {
-        "median": 4329,
-        "mean": 4320.666666666667,
-        "stddev": 13.960261060914616,
+        "median": 4244,
+        "mean": 4235.333333333333,
+        "stddev": 17.441967269268172,
         "runs": [
-          4332,
-          4329,
-          4301
+          4251,
+          4211,
+          4244
         ],
         "load": {
-          "before": 1.38,
-          "after": 1.18,
-          "foreignCores": 0.07485968530227002,
-          "foreignTop": "htop 0.02, ptyxis 0.01"
+          "before": 1.64,
+          "after": 1.3,
+          "foreignCores": 0.04517178968501415,
+          "foreignTop": ""
         }
       },
       "genomespy": {
-        "median": 2382,
-        "mean": 2368.6666666666665,
-        "stddev": 36.353205574688396,
+        "median": 2462,
+        "mean": 2451.6666666666665,
+        "stddev": 24.390344173235626,
         "runs": [
-          2405,
-          2319,
-          2382
+          2418,
+          2475,
+          2462
         ],
         "load": {
-          "before": 1.42,
-          "after": 1.18,
-          "foreignCores": 0.0749667653634646,
-          "foreignTop": "htop 0.02, ptyxis 0.01"
+          "before": 1.2,
+          "after": 1.3,
+          "foreignCores": 0.04516818304520233,
+          "foreignTop": ""
         }
       },
       "gosling": {
-        "median": 54187,
-        "mean": 53436.666666666664,
-        "stddev": 1073.8846410216613,
+        "median": 51947,
+        "mean": 51867,
+        "stddev": 638.5614039907726,
         "runs": [
-          54205,
-          54187,
-          51918
+          51947,
+          51048,
+          52606
         ],
         "load": {
-          "before": 1.47,
-          "after": 1.18,
-          "foreignCores": 0.0749647835462671,
-          "foreignTop": "htop 0.02, ptyxis 0.01"
+          "before": 1.27,
+          "after": 1.3,
+          "foreignCores": 0.04516680923866546,
+          "foreignTop": ""
         }
       }
     },
     "1000x-shortread-bam@19kb": {
       "jbrowse": {
-        "median": 2801,
-        "mean": 2772.6666666666665,
-        "stddev": 108.41996536103898,
+        "median": 2601,
+        "mean": 2643.6666666666665,
+        "stddev": 75.67621085181847,
         "runs": [
-          2889,
-          2628,
-          2801
+          2750,
+          2601,
+          2580
         ],
         "load": {
-          "before": 1.5,
-          "after": 1.27,
-          "foreignCores": 0.07255365459779571,
-          "foreignTop": "htop 0.02, ptyxis 0.01"
+          "before": 1.68,
+          "after": 1.15,
+          "foreignCores": 0.041471117801587756,
+          "foreignTop": ""
         }
       },
       "igv": {
-        "median": 26555,
-        "mean": 26342.666666666668,
-        "stddev": 425.41770323086257,
+        "median": 26694,
+        "mean": 26742.333333333332,
+        "stddev": 567.2708543740126,
         "runs": [
-          26724,
-          26555,
-          25749
+          26073,
+          26694,
+          27460
         ],
         "load": {
-          "before": 1.28,
-          "after": 1.27,
-          "foreignCores": 0.07257122554098734,
-          "foreignTop": "htop 0.02, ptyxis 0.01"
+          "before": 1.95,
+          "after": 1.15,
+          "foreignCores": 0.041490014357062635,
+          "foreignTop": ""
         }
       },
       "igv-deep": {
-        "median": 26725,
-        "mean": 26790.333333333332,
-        "stddev": 140.10789493180684,
+        "median": 26266,
+        "mean": 26582,
+        "stddev": 464.6812527600685,
         "runs": [
-          26725,
-          26661,
-          26985
+          26241,
+          27239,
+          26266
         ],
         "load": {
-          "before": 1.37,
-          "after": 1.27,
-          "foreignCores": 0.07259126564531213,
-          "foreignTop": "htop 0.02, ptyxis 0.01"
+          "before": 1.63,
+          "after": 1.15,
+          "foreignCores": 0.04142606869770328,
+          "foreignTop": ""
         }
       },
       "igv-h300": {
@@ -336,51 +336,51 @@
         }
       },
       "jbrowse-release-4.3.0": {
-        "median": 4907,
+        "median": 4945,
         "mean": 4922.666666666667,
-        "stddev": 25.772509040103607,
+        "stddev": 44.917207788948275,
         "runs": [
-          4907,
-          4902,
-          4959
+          4945,
+          4963,
+          4860
         ],
         "load": {
-          "before": 1.38,
-          "after": 1.27,
-          "foreignCores": 0.07259512684998466,
-          "foreignTop": "htop 0.02, ptyxis 0.01"
+          "before": 1.62,
+          "after": 1.15,
+          "foreignCores": 0.04144924786270701,
+          "foreignTop": ""
         }
       },
       "jbrowse-release-2.4.0": {
-        "median": 10722,
-        "mean": 10791,
-        "stddev": 207.0957910404426,
+        "median": 10773,
+        "mean": 10788.333333333334,
+        "stddev": 67.82493805542488,
         "runs": [
-          10579,
-          10722,
-          11072
+          10714,
+          10773,
+          10878
         ],
         "load": {
-          "before": 1.35,
-          "after": 1.27,
-          "foreignCores": 0.07261532176906585,
-          "foreignTop": "htop 0.02, ptyxis 0.01"
+          "before": 2.14,
+          "after": 1.15,
+          "foreignCores": 0.04146954402475919,
+          "foreignTop": ""
         }
       },
       "genomespy": {
-        "median": 5647,
-        "mean": 5596.333333333333,
-        "stddev": 89.16401865226928,
+        "median": 5692,
+        "mean": 5744.333333333333,
+        "stddev": 76.856287243718,
         "runs": [
-          5647,
-          5671,
-          5471
+          5853,
+          5692,
+          5688
         ],
         "load": {
-          "before": 1.46,
-          "after": 1.27,
-          "foreignCores": 0.07259018458160739,
-          "foreignTop": "htop 0.02, ptyxis 0.01"
+          "before": 1.47,
+          "after": 1.15,
+          "foreignCores": 0.04146762068194921,
+          "foreignTop": ""
         }
       },
       "gosling": {
@@ -392,108 +392,108 @@
           null
         ],
         "load": {
-          "before": 1.51,
-          "after": 1.27,
-          "foreignCores": 0.0725679832866008,
-          "foreignTop": "htop 0.02, ptyxis 0.01"
+          "before": 1.31,
+          "after": 1.15,
+          "foreignCores": 0.04146700874665045,
+          "foreignTop": ""
         }
       }
     },
     "20x-longread-bam@19kb": {
       "jbrowse": {
-        "median": 1638,
-        "mean": 1640.3333333333333,
-        "stddev": 67.38117112533904,
+        "median": 1717,
+        "mean": 1722.6666666666667,
+        "stddev": 69.92535702844538,
         "runs": [
-          1724,
-          1638,
-          1559
+          1811,
+          1640,
+          1717
         ],
         "load": {
-          "before": 1.08,
-          "after": 1.62,
-          "foreignCores": 0.07468565255229029,
-          "foreignTop": "htop 0.02, ptyxis 0.01, claude 0.01"
+          "before": 1.44,
+          "after": 0.68,
+          "foreignCores": 0.04682929748573367,
+          "foreignTop": "claude 0.01"
         }
       },
       "igv": {
-        "median": 3476,
-        "mean": 3494.3333333333335,
-        "stddev": 66.19331956893804,
+        "median": 3456,
+        "mean": 3511,
+        "stddev": 90.07034288080992,
         "runs": [
-          3424,
-          3583,
-          3476
+          3456,
+          3439,
+          3638
         ],
         "load": {
-          "before": 1.07,
-          "after": 1.62,
-          "foreignCores": 0.07467920947311868,
-          "foreignTop": "htop 0.02, ptyxis 0.01, claude 0.01"
+          "before": 1.12,
+          "after": 0.68,
+          "foreignCores": 0.04689971912528711,
+          "foreignTop": "claude 0.01"
         }
       },
       "igv-deep": {
-        "median": 3589,
-        "mean": 3551,
-        "stddev": 120.60679914499016,
+        "median": 3565,
+        "mean": 3532.3333333333335,
+        "stddev": 50.499724971748336,
         "runs": [
-          3676,
-          3388,
-          3589
+          3461,
+          3565,
+          3571
         ],
         "load": {
-          "before": 1.55,
-          "after": 1.62,
-          "foreignCores": 0.07467724875662853,
-          "foreignTop": "htop 0.02, ptyxis 0.01, claude 0.01"
+          "before": 1.11,
+          "after": 0.68,
+          "foreignCores": 0.04689849131966574,
+          "foreignTop": "claude 0.01"
         }
       },
       "jbrowse-release-4.3.0": {
-        "median": 2888,
-        "mean": 2898,
-        "stddev": 22.37558192911788,
+        "median": 2980,
+        "mean": 2971,
+        "stddev": 36.08323710533743,
         "runs": [
-          2929,
-          2877,
-          2888
+          2980,
+          2923,
+          3010
         ],
         "load": {
-          "before": 1,
-          "after": 1.62,
-          "foreignCores": 0.07468313121499721,
-          "foreignTop": "htop 0.02, ptyxis 0.01, claude 0.01"
+          "before": 1.33,
+          "after": 0.68,
+          "foreignCores": 0.046827896260503876,
+          "foreignTop": "claude 0.01"
         }
       },
       "jbrowse-release-2.4.0": {
-        "median": 3240,
-        "mean": 3234,
-        "stddev": 16.08311744241976,
+        "median": 3333,
+        "mean": 3304.6666666666665,
+        "stddev": 62.49444419750891,
         "runs": [
-          3250,
-          3240,
-          3212
+          3218,
+          3363,
+          3333
         ],
         "load": {
-          "before": 1.08,
-          "after": 1.62,
-          "foreignCores": 0.07468089016920325,
-          "foreignTop": "htop 0.02, ptyxis 0.01, claude 0.01"
+          "before": 1.22,
+          "after": 0.68,
+          "foreignCores": 0.04690112241043399,
+          "foreignTop": "claude 0.01"
         }
       },
       "genomespy": {
-        "median": 4916,
-        "mean": 4978.333333333333,
-        "stddev": 101.88337559298975,
+        "median": 4735,
+        "mean": 4954.666666666667,
+        "stddev": 345.8827675512165,
         "runs": [
-          4916,
-          4897,
-          5122
+          4735,
+          4686,
+          5443
         ],
         "load": {
-          "before": 1.58,
-          "after": 1.62,
-          "foreignCores": 0.07471279456606854,
-          "foreignTop": "htop 0.02, ptyxis 0.01, claude 0.01"
+          "before": 1.09,
+          "after": 0.68,
+          "foreignCores": 0.046897263578329074,
+          "foreignTop": "claude 0.01"
         }
       },
       "gosling": {
@@ -505,220 +505,108 @@
           null
         ],
         "load": {
-          "before": 1.49,
-          "after": 1.62,
-          "foreignCores": 0.07471083307079437,
-          "foreignTop": "htop 0.02, ptyxis 0.01, claude 0.01"
+          "before": 1.24,
+          "after": 0.68,
+          "foreignCores": 0.046896035901272046,
+          "foreignTop": "claude 0.01"
         }
       }
     },
     "200x-longread-bam@19kb": {
       "jbrowse": {
-        "median": 2265,
-        "mean": 2260.3333333333335,
-        "stddev": 31.201851796897497,
+        "median": 2237,
+        "mean": 2215.6666666666665,
+        "stddev": 41.23375100839387,
         "runs": [
-          2265,
-          2220,
-          2296
-        ],
-        "load": {
-          "before": 1.31,
-          "after": 1.07,
-          "foreignCores": 0.07870060913667423,
-          "foreignTop": "htop 0.02, ptyxis 0.01"
-        }
-      },
-      "igv": {
-        "median": 18153,
-        "mean": 18136.333333333332,
-        "stddev": 325.1792667984162,
-        "runs": [
-          18526,
-          18153,
-          17730
-        ],
-        "load": {
-          "before": 1.29,
-          "after": 1.07,
-          "foreignCores": 0.07869719140901761,
-          "foreignTop": "htop 0.02, ptyxis 0.01"
-        }
-      },
-      "igv-deep": {
-        "median": 18267,
-        "mean": 18304.333333333332,
-        "stddev": 107.79404230084126,
-        "runs": [
-          18195,
-          18267,
-          18451
-        ],
-        "load": {
-          "before": 1.2,
-          "after": 1.07,
-          "foreignCores": 0.07869629987670841,
-          "foreignTop": "htop 0.02, ptyxis 0.01"
-        }
-      },
-      "jbrowse-release-4.3.0": {
-        "median": 5821,
-        "mean": 5884,
-        "stddev": 126.87789405566282,
-        "runs": [
-          5770,
-          5821,
-          6061
-        ],
-        "load": {
-          "before": 1.29,
-          "after": 1.07,
-          "foreignCores": 0.07871830214686455,
-          "foreignTop": "htop 0.02, ptyxis 0.01"
-        }
-      },
-      "jbrowse-release-2.4.0": {
-        "median": 8966,
-        "mean": 8973.666666666666,
-        "stddev": 27.084230754362505,
-        "runs": [
-          8945,
-          8966,
-          9010
-        ],
-        "load": {
-          "before": 1.09,
-          "after": 1.07,
-          "foreignCores": 0.07871711308905843,
-          "foreignTop": "htop 0.02, ptyxis 0.01"
-        }
-      },
-      "genomespy": {
-        "median": 41478,
-        "mean": 42025.666666666664,
-        "stddev": 1032.7020652422245,
-        "runs": [
-          41127,
-          43472,
-          41478
-        ],
-        "load": {
-          "before": 1.2,
-          "after": 1.07,
-          "foreignCores": 0.07869525978121085,
-          "foreignTop": "htop 0.02, ptyxis 0.01"
-        }
-      },
-      "gosling": {
-        "unsettled": 120000,
-        "median": null,
-        "mean": null,
-        "stddev": null,
-        "runs": [
-          null
-        ],
-        "load": {
-          "before": 1.09,
-          "after": 1.07,
-          "foreignCores": 0.07871265444219736,
-          "foreignTop": "htop 0.02, ptyxis 0.01"
-        }
-      }
-    },
-    "1000x-longread-bam@19kb": {
-      "jbrowse": {
-        "median": 4662,
-        "mean": 4691,
-        "stddev": 58.04021594262608,
-        "runs": [
-          4772,
-          4662,
-          4639
-        ],
-        "load": {
-          "before": 1.79,
-          "after": 2.55,
-          "foreignCores": 0.07713985530660118,
-          "foreignTop": "htop 0.02, ptyxis 0.01"
-        }
-      },
-      "igv": {
-        "median": 54881,
-        "mean": 54827.666666666664,
-        "stddev": 253.4854806273702,
-        "runs": [
-          55108,
-          54494,
-          54881
+          2158,
+          2237,
+          2252
         ],
         "load": {
           "before": 1.88,
-          "after": 2.55,
-          "foreignCores": 0.07713770953426338,
-          "foreignTop": "htop 0.02, ptyxis 0.01"
+          "after": 1.38,
+          "foreignCores": 0.04689322931882101,
+          "foreignTop": ""
+        }
+      },
+      "igv": {
+        "median": 18320,
+        "mean": 18160,
+        "stddev": 448.07811818922823,
+        "runs": [
+          17549,
+          18320,
+          18611
+        ],
+        "load": {
+          "before": 1.59,
+          "after": 1.38,
+          "foreignCores": 0.04683447922320523,
+          "foreignTop": ""
         }
       },
       "igv-deep": {
-        "median": 54556,
-        "mean": 54741.333333333336,
-        "stddev": 384.71663453623745,
+        "median": 17919,
+        "mean": 17872.666666666668,
+        "stddev": 211.97851044124468,
         "runs": [
-          55277,
-          54556,
-          54391
+          18106,
+          17919,
+          17593
         ],
         "load": {
-          "before": 1.58,
-          "after": 2.55,
-          "foreignCores": 0.0771369667947287,
-          "foreignTop": "htop 0.02, ptyxis 0.01"
+          "before": 1.55,
+          "after": 1.38,
+          "foreignCores": 0.04694685261967377,
+          "foreignTop": ""
         }
       },
       "jbrowse-release-4.3.0": {
-        "median": 19599,
-        "mean": 19717.666666666668,
-        "stddev": 310.3947307685633,
+        "median": 6299,
+        "mean": 6235.333333333333,
+        "stddev": 105.2372979931017,
         "runs": [
-          20143,
-          19599,
-          19411
+          6320,
+          6087,
+          6299
         ],
         "load": {
-          "before": 1.72,
-          "after": 2.55,
-          "foreignCores": 0.07713894746527379,
-          "foreignTop": "htop 0.02, ptyxis 0.01"
+          "before": 1.73,
+          "after": 1.38,
+          "foreignCores": 0.04681704411808846,
+          "foreignTop": ""
         }
       },
       "jbrowse-release-2.4.0": {
-        "median": 34070,
-        "mean": 34279,
-        "stddev": 379.8008249947157,
+        "median": 9077,
+        "mean": 9076.666666666666,
+        "stddev": 127.78193229961043,
         "runs": [
-          34812,
-          34070,
-          33955
+          9233,
+          8920,
+          9077
         ],
         "load": {
-          "before": 1.47,
-          "after": 2.55,
-          "foreignCores": 0.07713836975919103,
-          "foreignTop": "htop 0.02, ptyxis 0.01"
+          "before": 1.7,
+          "after": 1.38,
+          "foreignCores": 0.04689163847451192,
+          "foreignTop": ""
         }
       },
       "genomespy": {
-        "unsettled": 120000,
-        "median": null,
-        "mean": null,
-        "stddev": null,
+        "median": 42133,
+        "mean": 42439.666666666664,
+        "stddev": 901.7454679059324,
         "runs": [
-          null
+          43665,
+          41521,
+          42133
         ],
         "load": {
-          "before": 1.34,
-          "after": 2.55,
-          "foreignCores": 0.07713647164298514,
-          "foreignTop": "htop 0.02, ptyxis 0.01"
+          "before": 1.31,
+          "after": 1.38,
+          "foreignCores": 0.04690854059595691,
+          "foreignTop": ""
         }
       },
       "gosling": {
@@ -731,91 +619,203 @@
         ],
         "load": {
           "before": 1.06,
-          "after": 2.55,
-          "foreignCores": 0.0771358939739853,
-          "foreignTop": "htop 0.02, ptyxis 0.01"
+          "after": 1.38,
+          "foreignCores": 0.04688898730717923,
+          "foreignTop": ""
+        }
+      }
+    },
+    "1000x-longread-bam@19kb": {
+      "jbrowse": {
+        "median": 4640,
+        "mean": 4671.666666666667,
+        "stddev": 74.09153497907542,
+        "runs": [
+          4640,
+          4774,
+          4601
+        ],
+        "load": {
+          "before": 1.28,
+          "after": 1.49,
+          "foreignCores": 0.04362525089577053,
+          "foreignTop": ""
+        }
+      },
+      "igv": {
+        "median": 55068,
+        "mean": 54832.666666666664,
+        "stddev": 485.04318249913473,
+        "runs": [
+          54157,
+          55273,
+          55068
+        ],
+        "load": {
+          "before": 1.31,
+          "after": 1.49,
+          "foreignCores": 0.043624275413242805,
+          "foreignTop": ""
+        }
+      },
+      "igv-deep": {
+        "median": 55274,
+        "mean": 55370.666666666664,
+        "stddev": 196.01587237318876,
+        "runs": [
+          55274,
+          55194,
+          55644
+        ],
+        "load": {
+          "before": 1.19,
+          "after": 1.49,
+          "foreignCores": 0.04363459804102105,
+          "foreignTop": ""
+        }
+      },
+      "jbrowse-release-4.3.0": {
+        "median": 17296,
+        "mean": 17979,
+        "stddev": 1071.5344138197336,
+        "runs": [
+          17149,
+          19492,
+          17296
+        ],
+        "load": {
+          "before": 1.67,
+          "after": 1.49,
+          "foreignCores": 0.04363552728391678,
+          "foreignTop": ""
+        }
+      },
+      "jbrowse-release-2.4.0": {
+        "median": 34187,
+        "mean": 34270,
+        "stddev": 491.3742633336291,
+        "runs": [
+          34909,
+          33714,
+          34187
+        ],
+        "load": {
+          "before": 1.62,
+          "after": 1.49,
+          "foreignCores": 0.04362460056923817,
+          "foreignTop": ""
+        }
+      },
+      "genomespy": {
+        "unsettled": 120000,
+        "median": null,
+        "mean": null,
+        "stddev": null,
+        "runs": [
+          null
+        ],
+        "load": {
+          "before": 1.28,
+          "after": 1.49,
+          "foreignCores": 0.04362362511579316,
+          "foreignTop": ""
+        }
+      },
+      "gosling": {
+        "unsettled": 120000,
+        "median": null,
+        "mean": null,
+        "stddev": null,
+        "runs": [
+          null
+        ],
+        "load": {
+          "before": 1.14,
+          "after": 1.49,
+          "foreignCores": 0.043623299974338656,
+          "foreignTop": ""
         }
       }
     },
     "20x-shortread-cram@19kb": {
       "jbrowse": {
-        "median": 1681,
-        "mean": 1684.3333333333333,
-        "stddev": 37.63272807307785,
+        "median": 1758,
+        "mean": 1698.3333333333333,
+        "stddev": 143.12310163709498,
         "runs": [
-          1681,
-          1640,
-          1732
-        ],
-        "load": {
-          "before": 0.85,
-          "after": 1.54,
-          "foreignCores": 0.10015784726398433,
-          "foreignTop": "htop 0.02, ptyxis 0.01"
-        }
-      },
-      "jbrowse-release-4.3.0": {
-        "median": 2692,
-        "mean": 2757,
-        "stddev": 121.31226923385229,
-        "runs": [
-          2692,
-          2652,
-          2927
-        ],
-        "load": {
-          "before": 0.85,
-          "after": 1.54,
-          "foreignCores": 0.10014467429495125,
-          "foreignTop": "htop 0.02, ptyxis 0.01"
-        }
-      },
-      "jbrowse-release-2.4.0": {
-        "median": 3798,
-        "mean": 3828.6666666666665,
-        "stddev": 89.22381346304857,
-        "runs": [
-          3738,
-          3950,
-          3798
-        ],
-        "load": {
-          "before": 0.87,
-          "after": 1.54,
-          "foreignCores": 0.1001296237155077,
-          "foreignTop": "htop 0.02, ptyxis 0.01"
-        }
-      },
-      "igv": {
-        "median": 1482,
-        "mean": 1477.6666666666667,
-        "stddev": 21.044925490219462,
-        "runs": [
-          1450,
-          1482,
+          1758,
+          1836,
           1501
         ],
         "load": {
-          "before": 1.92,
-          "after": 1.54,
-          "foreignCores": 0.10011457765923835,
-          "foreignTop": "htop 0.02, ptyxis 0.01"
+          "before": 1.04,
+          "after": 1.14,
+          "foreignCores": 0.06984712704269784,
+          "foreignTop": "claude 0.01"
+        }
+      },
+      "jbrowse-release-4.3.0": {
+        "median": 2629,
+        "mean": 2666.3333333333335,
+        "stddev": 53.50597059103674,
+        "runs": [
+          2742,
+          2629,
+          2628
+        ],
+        "load": {
+          "before": 0.95,
+          "after": 1.14,
+          "foreignCores": 0.06983660868910357,
+          "foreignTop": "claude 0.01"
+        }
+      },
+      "jbrowse-release-2.4.0": {
+        "median": 3781,
+        "mean": 3842.6666666666665,
+        "stddev": 95.82043391446084,
+        "runs": [
+          3769,
+          3781,
+          3978
+        ],
+        "load": {
+          "before": 0.88,
+          "after": 1.14,
+          "foreignCores": 0.06982740772806721,
+          "foreignTop": "claude 0.01"
+        }
+      },
+      "igv": {
+        "median": 1604,
+        "mean": 1609,
+        "stddev": 117.22058977273005,
+        "runs": [
+          1755,
+          1604,
+          1468
+        ],
+        "load": {
+          "before": 0.81,
+          "after": 1.14,
+          "foreignCores": 0.06981689531229301,
+          "foreignTop": "claude 0.01"
         }
       },
       "igv-deep": {
-        "median": 1559,
-        "mean": 1563.6666666666667,
-        "stddev": 61.326086528400694,
+        "median": 1592,
+        "mean": 1538,
+        "stddev": 96.0937042682818,
         "runs": [
-          1559,
-          1641,
-          1491
+          1403,
+          1619,
+          1592
         ],
         "load": {
-          "before": 1.92,
-          "after": 1.54,
-          "foreignCores": 0.10009953612410447,
-          "foreignTop": "htop 0.02, ptyxis 0.01"
+          "before": 0.74,
+          "after": 1.14,
+          "foreignCores": 0.06980769954464942,
+          "foreignTop": "claude 0.01"
         }
       },
       "genomespy": {
@@ -843,83 +843,83 @@
     },
     "200x-shortread-cram@19kb": {
       "jbrowse": {
-        "median": 1873,
-        "mean": 1850,
-        "stddev": 36.12016980395672,
+        "median": 1905,
+        "mean": 1865,
+        "stddev": 96.50215887049713,
         "runs": [
-          1799,
-          1878,
-          1873
+          1905,
+          1958,
+          1732
         ],
         "load": {
-          "before": 1.18,
-          "after": 1.5,
-          "foreignCores": 0.0979272419627742,
-          "foreignTop": "htop 0.02, ptyxis 0.01"
+          "before": 1.3,
+          "after": 1.68,
+          "foreignCores": 0.07296828284095444,
+          "foreignTop": ""
         }
       },
       "jbrowse-release-4.3.0": {
-        "median": 3070,
-        "mean": 3124.3333333333335,
-        "stddev": 105.62301937656498,
+        "median": 3086,
+        "mean": 3134.3333333333335,
+        "stddev": 173.63627373206197,
         "runs": [
-          3070,
-          3272,
-          3031
+          2950,
+          3367,
+          3086
         ],
         "load": {
-          "before": 1.17,
-          "after": 1.5,
-          "foreignCores": 0.0979189577869885,
-          "foreignTop": "htop 0.02, ptyxis 0.01"
+          "before": 1.28,
+          "after": 1.68,
+          "foreignCores": 0.07285765057596241,
+          "foreignTop": ""
         }
       },
       "jbrowse-release-2.4.0": {
-        "median": 5099,
-        "mean": 5100.666666666667,
-        "stddev": 54.30981085913995,
+        "median": 5157,
+        "mean": 5196.333333333333,
+        "stddev": 112.89031057722457,
         "runs": [
-          5099,
-          5035,
-          5168
+          5157,
+          5350,
+          5082
         ],
         "load": {
-          "before": 1.08,
-          "after": 1.5,
-          "foreignCores": 0.09801641008289552,
-          "foreignTop": "htop 0.02, ptyxis 0.01"
+          "before": 1.33,
+          "after": 1.68,
+          "foreignCores": 0.07285155841712503,
+          "foreignTop": ""
         }
       },
       "igv": {
-        "median": 5188,
-        "mean": 5202.333333333333,
-        "stddev": 44.04795366668265,
+        "median": 5248,
+        "mean": 5340.666666666667,
+        "stddev": 154.97168200101018,
         "runs": [
-          5188,
-          5157,
-          5262
+          5215,
+          5559,
+          5248
         ],
         "load": {
-          "before": 1.37,
-          "after": 1.5,
-          "foreignCores": 0.09800915597940356,
-          "foreignTop": "htop 0.02, ptyxis 0.01"
+          "before": 1.21,
+          "after": 1.68,
+          "foreignCores": 0.07284394465114356,
+          "foreignTop": ""
         }
       },
       "igv-deep": {
-        "median": 5409,
-        "mean": 5359.666666666667,
-        "stddev": 85.05031190745602,
+        "median": 5476,
+        "mean": 5468.666666666667,
+        "stddev": 58.20271089524573,
         "runs": [
-          5409,
-          5430,
-          5240
+          5394,
+          5476,
+          5536
         ],
         "load": {
-          "before": 1.34,
-          "after": 1.5,
-          "foreignCores": 0.09800293903096477,
-          "foreignTop": "htop 0.02, ptyxis 0.01"
+          "before": 1.18,
+          "after": 1.68,
+          "foreignCores": 0.0728386159617939,
+          "foreignTop": ""
         }
       },
       "genomespy": {
@@ -947,83 +947,83 @@
     },
     "1000x-shortread-cram@19kb": {
       "jbrowse": {
-        "median": 2406,
-        "mean": 2442.6666666666665,
-        "stddev": 73.32272650564914,
+        "median": 2428,
+        "mean": 2421.6666666666665,
+        "stddev": 35.798820588890294,
         "runs": [
-          2406,
-          2545,
-          2377
+          2428,
+          2462,
+          2375
         ],
         "load": {
-          "before": 1.27,
-          "after": 1.08,
-          "foreignCores": 0.07727776203601065,
-          "foreignTop": "htop 0.02, ptyxis 0.01"
+          "before": 1.15,
+          "after": 1.44,
+          "foreignCores": 0.045764218009479475,
+          "foreignTop": ""
         }
       },
       "jbrowse-release-4.3.0": {
-        "median": 5861,
-        "mean": 5853.666666666667,
-        "stddev": 17.9133717900592,
+        "median": 5892,
+        "mean": 5915.333333333333,
+        "stddev": 74.5177085590324,
         "runs": [
-          5871,
-          5861,
-          5829
+          5892,
+          5838,
+          6016
         ],
         "load": {
-          "before": 2.45,
-          "after": 1.08,
-          "foreignCores": 0.07727577146978439,
-          "foreignTop": "htop 0.02, ptyxis 0.01"
+          "before": 1.53,
+          "after": 1.44,
+          "foreignCores": 0.04576286247445357,
+          "foreignTop": ""
         }
       },
       "jbrowse-release-2.4.0": {
-        "median": 13627,
-        "mean": 14208.333333333334,
-        "stddev": 1031.7436158701873,
+        "median": 13079,
+        "mean": 13170,
+        "stddev": 145.26068520651646,
         "runs": [
-          15658,
-          13627,
-          13340
+          13056,
+          13079,
+          13375
         ],
         "load": {
-          "before": 2.38,
-          "after": 1.08,
-          "foreignCores": 0.07727349666252009,
-          "foreignTop": "htop 0.02, ptyxis 0.01"
+          "before": 1.45,
+          "after": 1.44,
+          "foreignCores": 0.045798530892720415,
+          "foreignTop": ""
         }
       },
       "igv": {
-        "median": 26906,
-        "mean": 26980.666666666668,
-        "stddev": 382.5156496435436,
+        "median": 26770,
+        "mean": 27071,
+        "stddev": 462.20990902402775,
         "runs": [
-          26554,
-          27482,
-          26906
+          26719,
+          27724,
+          26770
         ],
         "load": {
-          "before": 1.9,
-          "after": 1.08,
-          "foreignCores": 0.07727150631602496,
-          "foreignTop": "htop 0.02, ptyxis 0.01"
+          "before": 1.24,
+          "after": 1.44,
+          "foreignCores": 0.04583419719811707,
+          "foreignTop": ""
         }
       },
       "igv-deep": {
-        "median": 26870,
-        "mean": 27014.666666666668,
-        "stddev": 223.2268402818582,
+        "median": 27333,
+        "mean": 27360,
+        "stddev": 217.61893299986562,
         "runs": [
-          26870,
-          27330,
-          26844
+          27333,
+          27639,
+          27108
         ],
         "load": {
-          "before": 1.58,
-          "after": 1.08,
-          "foreignCores": 0.07730659552938933,
-          "foreignTop": "htop 0.02, ptyxis 0.01"
+          "before": 1.34,
+          "after": 1.44,
+          "foreignCores": 0.045833179075192375,
+          "foreignTop": ""
         }
       },
       "genomespy": {
@@ -1051,83 +1051,83 @@
     },
     "20x-longread-cram@19kb": {
       "jbrowse": {
-        "median": 1653,
-        "mean": 1692.3333333333333,
-        "stddev": 74.76778866746176,
+        "median": 1710,
+        "mean": 1694.3333333333333,
+        "stddev": 41.90730511763101,
         "runs": [
-          1653,
-          1627,
-          1797
+          1736,
+          1637,
+          1710
         ],
         "load": {
-          "before": 1.62,
-          "after": 1.31,
-          "foreignCores": 0.09343518884864437,
-          "foreignTop": "htop 0.02, ptyxis 0.01, claude 0.01"
+          "before": 0.68,
+          "after": 1.88,
+          "foreignCores": 0.06051803437424347,
+          "foreignTop": ""
         }
       },
       "jbrowse-release-4.3.0": {
-        "median": 2807,
-        "mean": 2760,
-        "stddev": 89.28979038314888,
+        "median": 2682,
+        "mean": 2826.3333333333335,
+        "stddev": 214.09395652895535,
         "runs": [
-          2635,
-          2838,
-          2807
+          2682,
+          2668,
+          3129
         ],
         "load": {
-          "before": 1.49,
-          "after": 1.31,
-          "foreignCores": 0.09342665855142751,
-          "foreignTop": "htop 0.02, ptyxis 0.01, claude 0.01"
+          "before": 2.14,
+          "after": 1.88,
+          "foreignCores": 0.06051162579610603,
+          "foreignTop": ""
         }
       },
       "jbrowse-release-2.4.0": {
-        "median": 4066,
-        "mean": 4038.6666666666665,
-        "stddev": 45.16881913690264,
+        "median": 4002,
+        "mean": 4019,
+        "stddev": 48.46304433964778,
         "runs": [
-          4066,
-          3975,
-          4075
+          4002,
+          4085,
+          3970
         ],
         "load": {
-          "before": 1.37,
-          "after": 1.31,
-          "foreignCores": 0.09341670850639487,
-          "foreignTop": "htop 0.02, ptyxis 0.01, claude 0.01"
+          "before": 2.05,
+          "after": 1.88,
+          "foreignCores": 0.06050521857510205,
+          "foreignTop": ""
         }
       },
       "igv": {
-        "median": 3511,
-        "mean": 3535,
-        "stddev": 53.391634800469134,
+        "median": 3540,
+        "mean": 3501.6666666666665,
+        "stddev": 104.41689944108133,
         "runs": [
-          3609,
-          3511,
-          3485
+          3540,
+          3606,
+          3359
         ],
         "load": {
-          "before": 1.26,
-          "after": 1.31,
-          "foreignCores": 0.09340676058051871,
-          "foreignTop": "htop 0.02, ptyxis 0.01, claude 0.01"
+          "before": 1.89,
+          "after": 1.88,
+          "foreignCores": 0.060498812710800494,
+          "foreignTop": ""
         }
       },
       "igv-deep": {
-        "median": 3492,
-        "mean": 3472.6666666666665,
-        "stddev": 36.160137659521645,
+        "median": 3657,
+        "mean": 3640,
+        "stddev": 37.49666651850535,
         "runs": [
-          3422,
-          3492,
-          3504
+          3657,
+          3588,
+          3675
         ],
         "load": {
-          "before": 1.32,
-          "after": 1.31,
-          "foreignCores": 0.09339681477312203,
-          "foreignTop": "htop 0.02, ptyxis 0.01, claude 0.01"
+          "before": 1.9,
+          "after": 1.88,
+          "foreignCores": 0.060492408202770506,
+          "foreignTop": ""
         }
       },
       "genomespy": {
@@ -1155,83 +1155,83 @@
     },
     "200x-longread-cram@19kb": {
       "jbrowse": {
-        "median": 2181,
-        "mean": 2182.6666666666665,
-        "stddev": 7.039570693980959,
+        "median": 2265,
+        "mean": 2320.6666666666665,
+        "stddev": 91.74723731838226,
         "runs": [
-          2181,
-          2192,
-          2175
+          2265,
+          2247,
+          2450
         ],
         "load": {
-          "before": 0.99,
-          "after": 1.79,
-          "foreignCores": 0.08614280634838692,
-          "foreignTop": "htop 0.02, ptyxis 0.01"
+          "before": 1.38,
+          "after": 1.28,
+          "foreignCores": 0.05200694869116522,
+          "foreignTop": ""
         }
       },
       "jbrowse-release-4.3.0": {
-        "median": 4080,
-        "mean": 4077.3333333333335,
-        "stddev": 36.790699307780976,
+        "median": 4003,
+        "mean": 3993,
+        "stddev": 101.492200028705,
         "runs": [
-          4121,
-          4080,
-          4031
+          3864,
+          4003,
+          4112
         ],
         "load": {
-          "before": 0.91,
-          "after": 1.79,
-          "foreignCores": 0.0861395579354534,
-          "foreignTop": "htop 0.02, ptyxis 0.01"
+          "before": 1.27,
+          "after": 1.28,
+          "foreignCores": 0.05200441577557244,
+          "foreignTop": ""
         }
       },
       "jbrowse-release-2.4.0": {
-        "median": 7732,
-        "mean": 7766.666666666667,
-        "stddev": 75.91808450926271,
+        "median": 7507,
+        "mean": 7515,
+        "stddev": 123.42068978362852,
         "runs": [
-          7872,
-          7732,
-          7696
-        ],
-        "load": {
-          "before": 0.83,
-          "after": 1.79,
-          "foreignCores": 0.08613584576350769,
-          "foreignTop": "htop 0.02, ptyxis 0.01"
-        }
-      },
-      "igv": {
-        "median": 17888,
-        "mean": 17812.666666666668,
-        "stddev": 245.09227287334502,
-        "runs": [
-          18068,
-          17482,
-          17888
-        ],
-        "load": {
-          "before": 0.78,
-          "after": 1.79,
-          "foreignCores": 0.08613213391149924,
-          "foreignTop": "htop 0.02, ptyxis 0.01"
-        }
-      },
-      "igv-deep": {
-        "median": 17838,
-        "mean": 17842.333333333332,
-        "stddev": 58.459862774005515,
-        "runs": [
-          17838,
-          17916,
-          17773
+          7670,
+          7507,
+          7368
         ],
         "load": {
           "before": 1.32,
-          "after": 1.79,
-          "foreignCores": 0.08612888630340787,
-          "foreignTop": "htop 0.02, ptyxis 0.01"
+          "after": 1.28,
+          "foreignCores": 0.05200244590067902,
+          "foreignTop": ""
+        }
+      },
+      "igv": {
+        "median": 17779,
+        "mean": 17787.333333333332,
+        "stddev": 26.386023236217735,
+        "runs": [
+          17779,
+          17760,
+          17823
+        ],
+        "load": {
+          "before": 1.39,
+          "after": 1.28,
+          "foreignCores": 0.05200019479781384,
+          "foreignTop": ""
+        }
+      },
+      "igv-deep": {
+        "median": 17629,
+        "mean": 17863.333333333332,
+        "stddev": 391.5561546218144,
+        "runs": [
+          17546,
+          18415,
+          17629
+        ],
+        "load": {
+          "before": 1.41,
+          "after": 1.28,
+          "foreignCores": 0.05199794388983352,
+          "foreignTop": ""
         }
       },
       "genomespy": {
@@ -1259,83 +1259,83 @@
     },
     "1000x-longread-cram@19kb": {
       "jbrowse": {
-        "median": 4069,
-        "mean": 4064,
-        "stddev": 66.63832730993978,
+        "median": 4391,
+        "mean": 4351.666666666667,
+        "stddev": 85.48424156273222,
         "runs": [
-          4143,
-          4069,
-          3980
+          4391,
+          4431,
+          4233
         ],
         "load": {
-          "before": 2.55,
-          "after": 1.54,
-          "foreignCores": 0.07276625152175765,
-          "foreignTop": "htop 0.02, ptyxis 0.01"
+          "before": 1.49,
+          "after": 1.41,
+          "foreignCores": 0.04231040451311058,
+          "foreignTop": ""
         }
       },
       "jbrowse-release-4.3.0": {
-        "median": 8809,
-        "mean": 8919.333333333334,
-        "stddev": 267.59712670771006,
+        "median": 8917,
+        "mean": 8959,
+        "stddev": 76.24084644510886,
         "runs": [
-          9288,
-          8661,
-          8809
+          8917,
+          8894,
+          9066
         ],
         "load": {
-          "before": 2.67,
-          "after": 1.54,
-          "foreignCores": 0.07278640122380371,
-          "foreignTop": "htop 0.02, ptyxis 0.01"
+          "before": 1.26,
+          "after": 1.41,
+          "foreignCores": 0.04226676353690405,
+          "foreignTop": ""
         }
       },
       "jbrowse-release-2.4.0": {
-        "median": 21725,
-        "mean": 21778,
-        "stddev": 403.0541733646566,
+        "median": 22242,
+        "mean": 22345.666666666668,
+        "stddev": 229.6117496025749,
         "runs": [
-          22296,
-          21313,
-          21725
+          22242,
+          22131,
+          22664
         ],
         "load": {
-          "before": 2.34,
-          "after": 1.54,
-          "foreignCores": 0.0727853111454374,
-          "foreignTop": "htop 0.02, ptyxis 0.01"
+          "before": 1.3,
+          "after": 1.41,
+          "foreignCores": 0.04230877714813279,
+          "foreignTop": ""
         }
       },
       "igv": {
-        "median": 53116,
-        "mean": 53145.333333333336,
-        "stddev": 296.2986481388143,
+        "median": 53567,
+        "mean": 53486.666666666664,
+        "stddev": 117.16180644258132,
         "runs": [
-          53522,
-          52798,
-          53116
+          53572,
+          53567,
+          53321
         ],
         "load": {
-          "before": 1.88,
-          "after": 1.54,
-          "foreignCores": 0.07278422109972152,
-          "foreignTop": "htop 0.02, ptyxis 0.01"
+          "before": 1.33,
+          "after": 1.41,
+          "foreignCores": 0.04230805391499151,
+          "foreignTop": ""
         }
       },
       "igv-deep": {
-        "median": 53861,
-        "mean": 53724.333333333336,
-        "stddev": 469.73562304295757,
+        "median": 52877,
+        "mean": 52688.333333333336,
+        "stddev": 445.04406773062624,
         "runs": [
-          53861,
-          53093,
-          54219
+          52877,
+          53114,
+          52074
         ],
         "load": {
-          "before": 1.77,
-          "after": 1.54,
-          "foreignCores": 0.0728046810650059,
-          "foreignTop": "htop 0.02, ptyxis 0.01"
+          "before": 1.2,
+          "after": 1.41,
+          "foreignCores": 0.042371342186515885,
+          "foreignTop": ""
         }
       },
       "genomespy": {
@@ -1363,98 +1363,98 @@
     },
     "20x-shortread-bam@100kb": {
       "jbrowse": {
-        "median": 1787,
-        "mean": 1814,
-        "stddev": 84.24962907930218,
+        "median": 1746,
+        "mean": 1765.3333333333333,
+        "stddev": 38.43898484033567,
         "runs": [
-          1787,
-          1727,
-          1928
+          1746,
+          1819,
+          1731
         ],
         "load": {
-          "before": 0.04,
-          "after": 1.45,
-          "foreignCores": 0.060716291759170656,
+          "before": 1.41,
+          "after": 1.98,
+          "foreignCores": 0.055366669802313105,
           "foreignTop": ""
         }
       },
       "jbrowse-release-4.3.0": {
-        "median": 3198,
-        "mean": 3234.3333333333335,
-        "stddev": 61.548535500223096,
+        "median": 3265,
+        "mean": 3245.6666666666665,
+        "stddev": 33.9050963065371,
         "runs": [
+          3274,
           3198,
-          3321,
-          3184
+          3265
         ],
         "load": {
-          "before": 0.52,
-          "after": 1.45,
-          "foreignCores": 0.06071060830960038,
+          "before": 1.3,
+          "after": 1.98,
+          "foreignCores": 0.05536146197258163,
           "foreignTop": ""
         }
       },
       "jbrowse-release-2.4.0": {
-        "median": 4168,
-        "mean": 4163.333333333333,
-        "stddev": 88.24335039474016,
+        "median": 4154,
+        "mean": 4233,
+        "stddev": 126.12956301623608,
         "runs": [
-          4053,
-          4168,
-          4269
+          4154,
+          4134,
+          4411
         ],
         "load": {
-          "before": 0.66,
-          "after": 1.45,
-          "foreignCores": 0.06070492592394805,
+          "before": 1.19,
+          "after": 1.98,
+          "foreignCores": 0.055355511366683575,
           "foreignTop": ""
         }
       },
       "igv": {
-        "median": 2996,
-        "mean": 2961,
-        "stddev": 82.5873275186131,
+        "median": 2916,
+        "mean": 2866,
+        "stddev": 79.3473376995095,
         "runs": [
-          2996,
-          3040,
-          2847
+          2916,
+          2928,
+          2754
         ],
         "load": {
-          "before": 0.68,
-          "after": 1.45,
-          "foreignCores": 0.060700056154240005,
+          "before": 1.34,
+          "after": 1.98,
+          "foreignCores": 0.05534733137198949,
           "foreignTop": ""
         }
       },
       "igv-deep": {
-        "median": 2954,
-        "mean": 3002,
-        "stddev": 86.91758548571553,
+        "median": 2985,
+        "mean": 2964.6666666666665,
+        "stddev": 158.64495649790516,
         "runs": [
-          3124,
-          2954,
-          2928
+          2761,
+          3148,
+          2985
         ],
         "load": {
-          "before": 0.71,
-          "after": 1.45,
-          "foreignCores": 0.0606935643432024,
+          "before": 1.39,
+          "after": 1.98,
+          "foreignCores": 0.055342127179425694,
           "foreignTop": ""
         }
       },
       "genomespy": {
-        "median": 2099,
-        "mean": 2116.3333333333335,
-        "stddev": 28.122746823325937,
+        "median": 2120,
+        "mean": 2115.3333333333335,
+        "stddev": 41.77186719418811,
         "runs": [
-          2156,
-          2099,
-          2094
+          2164,
+          2120,
+          2062
         ],
         "load": {
-          "before": 0.73,
-          "after": 1.45,
-          "foreignCores": 0.060687073920601874,
+          "before": 1.52,
+          "after": 1.98,
+          "foreignCores": 0.055336923965448336,
           "foreignTop": ""
         }
       },
@@ -1472,82 +1472,82 @@
     },
     "20x-shortread-cram@100kb": {
       "jbrowse": {
-        "median": 1810,
-        "mean": 1811.3333333333333,
-        "stddev": 35.122009560324926,
+        "median": 1752,
+        "mean": 1750,
+        "stddev": 32.69046751985457,
         "runs": [
-          1855,
-          1810,
-          1769
+          1752,
+          1789,
+          1709
         ],
         "load": {
-          "before": 1.45,
-          "after": 1.54,
-          "foreignCores": 0.06801068739372697,
+          "before": 1.98,
+          "after": 1.51,
+          "foreignCores": 0.06319754464286488,
           "foreignTop": ""
         }
       },
       "jbrowse-release-4.3.0": {
-        "median": 3311,
-        "mean": 3253.6666666666665,
-        "stddev": 100.03110627310998,
+        "median": 3108,
+        "mean": 3160,
+        "stddev": 113.10467128579025,
         "runs": [
-          3113,
-          3311,
-          3337
+          3317,
+          3108,
+          3055
         ],
         "load": {
-          "before": 1.33,
-          "after": 1.54,
-          "foreignCores": 0.06800242865816003,
+          "before": 1.83,
+          "after": 1.51,
+          "foreignCores": 0.06319049213258224,
           "foreignTop": ""
         }
       },
       "jbrowse-release-2.4.0": {
-        "median": 5304,
-        "mean": 5362.333333333333,
-        "stddev": 103.68006344305329,
+        "median": 5237,
+        "mean": 5291.666666666667,
+        "stddev": 88.86444108240872,
         "runs": [
-          5275,
-          5508,
-          5304
+          5417,
+          5221,
+          5237
         ],
         "load": {
-          "before": 1.22,
-          "after": 1.54,
-          "foreignCores": 0.06799600658373398,
+          "before": 1.84,
+          "after": 1.51,
+          "foreignCores": 0.06318432247716795,
           "foreignTop": ""
         }
       },
       "igv": {
-        "median": 2899,
-        "mean": 2961.6666666666665,
-        "stddev": 98.68918661918111,
+        "median": 2976,
+        "mean": 2980,
+        "stddev": 25.468935326524086,
         "runs": [
-          2899,
-          2885,
-          3101
+          2951,
+          3013,
+          2976
         ],
         "load": {
-          "before": 1.19,
-          "after": 1.54,
-          "foreignCores": 0.06798958572218065,
+          "before": 2.07,
+          "after": 1.51,
+          "foreignCores": 0.06317815402639473,
           "foreignTop": ""
         }
       },
       "igv-deep": {
-        "median": 3020,
-        "mean": 3003.6666666666665,
-        "stddev": 104.74201109816867,
+        "median": 3151,
+        "mean": 3083,
+        "stddev": 104.76640682967036,
         "runs": [
-          3020,
-          2868,
-          3123
+          3151,
+          2935,
+          3163
         ],
         "load": {
-          "before": 1.09,
-          "after": 1.54,
-          "foreignCores": 0.0679822490794007,
+          "before": 1.91,
+          "after": 1.51,
+          "foreignCores": 0.06317198677990984,
           "foreignTop": ""
         }
       },
@@ -1576,98 +1576,98 @@
     },
     "200x-shortread-bam@100kb": {
       "jbrowse": {
-        "median": 2843,
-        "mean": 2839.3333333333335,
-        "stddev": 71.49048110685008,
+        "median": 2751,
+        "mean": 2711,
+        "stddev": 86.40987597877147,
         "runs": [
-          2925,
-          2843,
-          2750
+          2751,
+          2591,
+          2791
         ],
         "load": {
-          "before": 1.54,
-          "after": 1.72,
-          "foreignCores": 0.05595228753041129,
+          "before": 1.51,
+          "after": 1.82,
+          "foreignCores": 0.05071439020822377,
           "foreignTop": ""
         }
       },
       "jbrowse-release-4.3.0": {
-        "median": 5258,
-        "mean": 5255.666666666667,
-        "stddev": 38.818666758260626,
+        "median": 5253,
+        "mean": 5229.333333333333,
+        "stddev": 49.07364080870934,
         "runs": [
-          5207,
-          5258,
-          5302
+          5274,
+          5161,
+          5253
         ],
         "load": {
-          "before": 1.58,
-          "after": 1.72,
-          "foreignCores": 0.05598976725207014,
+          "before": 1.55,
+          "after": 1.82,
+          "foreignCores": 0.0507125355048723,
           "foreignTop": ""
         }
       },
       "jbrowse-release-2.4.0": {
-        "median": 13750,
-        "mean": 13575.666666666666,
-        "stddev": 256.5077430063705,
+        "median": 13363,
+        "mean": 13386.333333333334,
+        "stddev": 203.162223085122,
         "runs": [
-          13213,
-          13750,
-          13764
+          13646,
+          13363,
+          13150
         ],
         "load": {
-          "before": 1.49,
-          "after": 1.72,
-          "foreignCores": 0.05598559361599694,
+          "before": 1.39,
+          "after": 1.82,
+          "foreignCores": 0.05071088699355362,
           "foreignTop": ""
         }
       },
       "igv": {
-        "median": 19382,
-        "mean": 19381,
-        "stddev": 229.02838252059504,
+        "median": 18788,
+        "mean": 18585.333333333332,
+        "stddev": 311.6903734299295,
         "runs": [
-          19382,
-          19661,
-          19100
+          18145,
+          18823,
+          18788
         ],
         "load": {
-          "before": 1.54,
-          "after": 1.72,
-          "foreignCores": 0.05598383648169094,
+          "before": 1.2,
+          "after": 1.82,
+          "foreignCores": 0.05070944463406528,
           "foreignTop": ""
         }
       },
       "igv-deep": {
-        "median": 19257,
-        "mean": 19286.333333333332,
-        "stddev": 201.1141190689726,
+        "median": 19017,
+        "mean": 19012.333333333332,
+        "stddev": 423.7745731976954,
         "runs": [
-          19056,
-          19257,
-          19546
+          19017,
+          18491,
+          19529
         ],
         "load": {
-          "before": 1.57,
-          "after": 1.72,
-          "foreignCores": 0.055982299079648704,
+          "before": 1.2,
+          "after": 1.82,
+          "foreignCores": 0.05070779632368695,
           "foreignTop": ""
         }
       },
       "genomespy": {
-        "median": 7885,
-        "mean": 7911.333333333333,
-        "stddev": 201.31291287170052,
+        "median": 7787,
+        "mean": 7792.333333333333,
+        "stddev": 116.00383135435179,
         "runs": [
-          7885,
-          7679,
-          8170
+          7653,
+          7787,
+          7937
         ],
         "load": {
-          "before": 1.5,
-          "after": 1.72,
-          "foreignCores": 0.055980761762042974,
+          "before": 1.13,
+          "after": 1.82,
+          "foreignCores": 0.05070635414000536,
           "foreignTop": ""
         }
       },
@@ -1685,82 +1685,82 @@
     },
     "200x-shortread-cram@100kb": {
       "jbrowse": {
-        "median": 2637,
-        "mean": 2636,
-        "stddev": 23.280893453645632,
+        "median": 2673,
+        "mean": 2698,
+        "stddev": 57.10224747474189,
         "runs": [
-          2607,
-          2664,
-          2637
+          2644,
+          2777,
+          2673
         ],
         "load": {
-          "before": 1.72,
-          "after": 1.56,
-          "foreignCores": 0.050924898338657,
+          "before": 1.82,
+          "after": 1.78,
+          "foreignCores": 0.04930071725696229,
           "foreignTop": ""
         }
       },
       "jbrowse-release-4.3.0": {
-        "median": 6703,
-        "mean": 6590,
-        "stddev": 168.36270370839262,
+        "median": 6571,
+        "mean": 6568.333333333333,
+        "stddev": 7.586537784494029,
         "runs": [
-          6703,
-          6352,
-          6715
+          6576,
+          6571,
+          6558
         ],
         "load": {
-          "before": 1.66,
-          "after": 1.56,
-          "foreignCores": 0.05092255249294176,
+          "before": 1.68,
+          "after": 1.78,
+          "foreignCores": 0.049298818454532815,
           "foreignTop": ""
         }
       },
       "jbrowse-release-2.4.0": {
-        "median": 17566,
-        "mean": 17451.666666666668,
-        "stddev": 213.86963838334376,
+        "median": 16717,
+        "mean": 17144,
+        "stddev": 640.9903795429902,
         "runs": [
-          17637,
-          17566,
-          17152
+          16665,
+          18050,
+          16717
         ],
         "load": {
-          "before": 1.48,
-          "after": 1.56,
-          "foreignCores": 0.05096208203345632,
+          "before": 1.57,
+          "after": 1.78,
+          "foreignCores": 0.04929691979836132,
           "foreignTop": ""
         }
       },
       "igv": {
-        "median": 19576,
-        "mean": 19478.333333333332,
-        "stddev": 483.0212785743042,
+        "median": 19010,
+        "mean": 18948.666666666668,
+        "stddev": 162.65573733775543,
         "runs": [
-          18844,
-          19576,
-          20015
+          19010,
+          18726,
+          19110
         ],
         "load": {
-          "before": 1.35,
-          "after": 1.56,
-          "foreignCores": 0.0509603748539633,
+          "before": 1.59,
+          "after": 1.78,
+          "foreignCores": 0.04933802322695433,
           "foreignTop": ""
         }
       },
       "igv-deep": {
-        "median": 19317,
-        "mean": 19354,
-        "stddev": 180.31269136327222,
+        "median": 18360,
+        "mean": 18438,
+        "stddev": 147.0872756789882,
         "runs": [
-          19317,
-          19591,
-          19154
+          18360,
+          18644,
+          18310
         ],
         "load": {
-          "before": 1.17,
-          "after": 1.56,
-          "foreignCores": 0.050959094544401985,
+          "before": 1.4,
+          "after": 1.78,
+          "foreignCores": 0.0492937556963807,
           "foreignTop": ""
         }
       },
@@ -1789,98 +1789,98 @@
     },
     "1000x-shortread-bam@100kb": {
       "jbrowse": {
-        "median": 7019,
-        "mean": 6947.666666666667,
-        "stddev": 139.27750077533062,
+        "median": 6858,
+        "mean": 6913.666666666667,
+        "stddev": 141.53052281712553,
         "runs": [
-          7019,
-          6753,
-          7071
+          7108,
+          6775,
+          6858
         ],
         "load": {
-          "before": 1.44,
-          "after": 1.64,
-          "foreignCores": 0.03618490046416548,
+          "before": 1.63,
+          "after": 1.25,
+          "foreignCores": 0.035076051643888724,
           "foreignTop": ""
         }
       },
       "jbrowse-release-4.3.0": {
-        "median": 14224,
-        "mean": 14249.666666666666,
-        "stddev": 206.14935254702004,
+        "median": 13763,
+        "mean": 13738.333333333334,
+        "stddev": 107.56806630635735,
         "runs": [
-          14011,
-          14224,
-          14514
+          13596,
+          13856,
+          13763
         ],
         "load": {
-          "before": 1.45,
-          "after": 1.64,
-          "foreignCores": 0.03617548438399017,
+          "before": 1.61,
+          "after": 1.25,
+          "foreignCores": 0.03506624043046826,
           "foreignTop": ""
         }
       },
       "jbrowse-release-2.4.0": {
-        "median": 59520,
-        "mean": 60912.666666666664,
-        "stddev": 1975.18764228167,
+        "median": 57951,
+        "mean": 57732.666666666664,
+        "stddev": 864.2817184742999,
         "runs": [
-          59512,
-          59520,
-          63706
+          58665,
+          56582,
+          57951
         ],
         "load": {
-          "before": 1.99,
-          "after": 1.64,
-          "foreignCores": 0.03618437250935999,
+          "before": 2.23,
+          "after": 1.25,
+          "foreignCores": 0.03506590917249359,
           "foreignTop": ""
         }
       },
       "igv": {
-        "median": 115735,
-        "mean": 115917,
-        "stddev": 1043.2855154111298,
+        "median": 111387,
+        "mean": 111633.33333333333,
+        "stddev": 905.6645196882906,
         "runs": [
-          117276,
-          114740,
-          115735
+          111387,
+          112845,
+          110668
         ],
         "load": {
-          "before": 1.51,
-          "after": 1.64,
-          "foreignCores": 0.03618410853773454,
+          "before": 1.47,
+          "after": 1.25,
+          "foreignCores": 0.03507499133280236,
           "foreignTop": ""
         }
       },
       "igv-deep": {
-        "median": 116177,
-        "mean": 116340.66666666667,
-        "stddev": 742.6943441880306,
+        "median": 113094,
+        "mean": 112986,
+        "stddev": 229.45297266905624,
         "runs": [
-          116177,
-          115524,
-          117321
+          112667,
+          113197,
+          113094
         ],
         "load": {
-          "before": 1.99,
-          "after": 1.64,
-          "foreignCores": 0.03619299648647912,
+          "before": 2.92,
+          "after": 1.25,
+          "foreignCores": 0.03506531292391046,
           "foreignTop": ""
         }
       },
       "genomespy": {
-        "median": 32263,
-        "mean": 31872.333333333332,
-        "stddev": 609.9296862936106,
+        "median": 30566,
+        "mean": 30567.333333333332,
+        "stddev": 139.6240985248925,
         "runs": [
-          32343,
-          31011,
-          32263
+          30397,
+          30566,
+          30739
         ],
         "load": {
-          "before": 2.35,
-          "after": 1.64,
-          "foreignCores": 0.03618364659665742,
+          "before": 1.76,
+          "after": 1.25,
+          "foreignCores": 0.03506511417888868,
           "foreignTop": ""
         }
       },
@@ -1898,82 +1898,82 @@
     },
     "1000x-shortread-cram@100kb": {
       "jbrowse": {
-        "median": 6216,
-        "mean": 6167.333333333333,
-        "stddev": 83.36799279233142,
+        "median": 5770,
+        "mean": 5730.666666666667,
+        "stddev": 89.35447511021607,
         "runs": [
-          6216,
-          6050,
-          6236
+          5607,
+          5815,
+          5770
         ],
         "load": {
-          "before": 1.64,
-          "after": 2.02,
-          "foreignCores": 0.04378481110783369,
+          "before": 1.25,
+          "after": 2.52,
+          "foreignCores": 0.034887894070757604,
           "foreignTop": ""
         }
       },
       "jbrowse-release-4.3.0": {
-        "median": 20912,
-        "mean": 20577.333333333332,
-        "stddev": 486.07361125199503,
+        "median": 19356,
+        "mean": 19505.333333333332,
+        "stddev": 415.36275979223535,
         "runs": [
-          20912,
-          20930,
-          19890
+          19088,
+          20072,
+          19356
         ],
         "load": {
-          "before": 1.69,
-          "after": 2.02,
-          "foreignCores": 0.04376667869537475,
+          "before": 1.58,
+          "after": 2.52,
+          "foreignCores": 0.034887564575993846,
           "foreignTop": ""
         }
       },
       "jbrowse-release-2.4.0": {
-        "median": 61308,
-        "mean": 64932.333333333336,
-        "stddev": 5467.062241785396,
+        "median": 57907,
+        "mean": 57881.666666666664,
+        "stddev": 1028.125262580176,
         "runs": [
-          60830,
-          61308,
-          72659
+          56610,
+          57907,
+          59128
         ],
         "load": {
-          "before": 1.37,
-          "after": 2.02,
-          "foreignCores": 0.04379305797612766,
+          "before": 1.93,
+          "after": 2.52,
+          "foreignCores": 0.03488726803602773,
           "foreignTop": ""
         }
       },
       "igv": {
-        "median": 133019,
-        "mean": 132286,
-        "stddev": 1086.4919082380075,
+        "median": 128328,
+        "mean": 128434.66666666667,
+        "stddev": 676.1963883041343,
         "runs": [
-          133089,
-          130750,
-          133019
+          127665,
+          129311,
+          128328
         ],
         "load": {
-          "before": 1.52,
-          "after": 2.02,
-          "foreignCores": 0.043783835799032285,
+          "before": 1.35,
+          "after": 2.52,
+          "foreignCores": 0.03489644868427602,
           "foreignTop": ""
         }
       },
       "igv-deep": {
-        "median": 134489,
-        "mean": 134031.33333333334,
-        "stddev": 986.6158770711573,
+        "median": 126547,
+        "mean": 126642.66666666667,
+        "stddev": 1725.3591574574327,
         "runs": [
-          134944,
-          132661,
-          134489
+          126547,
+          128802,
+          124579
         ],
         "load": {
-          "before": 2.03,
-          "after": 2.02,
-          "foreignCores": 0.04377465275643055,
+          "before": 2.35,
+          "after": 2.52,
+          "foreignCores": 0.034905629193798596,
           "foreignTop": ""
         }
       },
@@ -2002,98 +2002,98 @@
     },
     "20x-longread-bam@100kb": {
       "jbrowse": {
-        "median": 1973,
-        "mean": 1967.3333333333333,
-        "stddev": 33.30999182761166,
+        "median": 1975,
+        "mean": 1997,
+        "stddev": 52.17917847826532,
         "runs": [
-          1924,
-          1973,
-          2005
+          2069,
+          1947,
+          1975
         ],
         "load": {
-          "before": 2.02,
-          "after": 1.27,
-          "foreignCores": 0.05926649876580232,
+          "before": 2.52,
+          "after": 1.34,
+          "foreignCores": 0.05841667146540849,
           "foreignTop": ""
         }
       },
       "jbrowse-release-4.3.0": {
-        "median": 4019,
-        "mean": 4014.6666666666665,
-        "stddev": 38.09053542402481,
+        "median": 3998,
+        "mean": 4015,
+        "stddev": 112.09817126073021,
         "runs": [
-          4059,
-          4019,
-          3966
+          3998,
+          3887,
+          4160
         ],
         "load": {
-          "before": 1.86,
-          "after": 1.27,
-          "foreignCores": 0.05926278597739636,
+          "before": 2.48,
+          "after": 1.34,
+          "foreignCores": 0.05854126679462672,
           "foreignTop": ""
         }
       },
       "jbrowse-release-2.4.0": {
-        "median": 4940,
-        "mean": 4956.333333333333,
-        "stddev": 69.95395310885266,
+        "median": 4836,
+        "mean": 4834.666666666667,
+        "stddev": 84.92087820763251,
         "runs": [
-          4880,
-          4940,
-          5049
+          4938,
+          4730,
+          4836
         ],
         "load": {
-          "before": 2.59,
-          "after": 1.27,
-          "foreignCores": 0.05938472910415396,
+          "before": 2.36,
+          "after": 1.34,
+          "foreignCores": 0.05860187193315903,
           "foreignTop": ""
         }
       },
       "igv": {
-        "median": 8129,
-        "mean": 8215.666666666666,
-        "stddev": 213.12489817527708,
+        "median": 7738,
+        "mean": 7768,
+        "stddev": 106.64270564209568,
         "runs": [
-          8509,
-          8129,
-          8009
+          7738,
+          7655,
+          7911
         ],
         "load": {
-          "before": 2.27,
-          "after": 1.27,
-          "foreignCores": 0.05938175326505575,
+          "before": 2.07,
+          "after": 1.34,
+          "foreignCores": 0.05859924767778189,
           "foreignTop": ""
         }
       },
       "igv-deep": {
-        "median": 8117,
-        "mean": 8088.333333333333,
-        "stddev": 56.811579414372524,
+        "median": 7839,
+        "mean": 7806,
+        "stddev": 122.67300708251456,
         "runs": [
-          8117,
-          8139,
-          8009
+          7937,
+          7642,
+          7839
         ],
         "load": {
-          "before": 2.08,
-          "after": 1.27,
-          "foreignCores": 0.05937914965048873,
+          "before": 2.14,
+          "after": 1.34,
+          "foreignCores": 0.05853227911261325,
           "foreignTop": ""
         }
       },
       "genomespy": {
-        "median": 11517,
-        "mean": 11878.666666666666,
-        "stddev": 588.0217305130445,
+        "median": 11519,
+        "mean": 11601.666666666666,
+        "stddev": 130.57394669517942,
         "runs": [
-          11517,
-          11411,
-          12708
+          11519,
+          11786,
+          11500
         ],
         "load": {
-          "before": 1.76,
-          "after": 1.27,
-          "foreignCores": 0.059376918162571415,
+          "before": 1.81,
+          "after": 1.34,
+          "foreignCores": 0.05859399987206649,
           "foreignTop": ""
         }
       },
@@ -2111,82 +2111,82 @@
     },
     "20x-longread-cram@100kb": {
       "jbrowse": {
-        "median": 2005,
-        "mean": 1993.6666666666667,
-        "stddev": 26.549743668986505,
+        "median": 1925,
+        "mean": 1976.6666666666667,
+        "stddev": 86.10974909317115,
         "runs": [
-          2005,
-          2019,
-          1957
+          2098,
+          1907,
+          1925
         ],
         "load": {
-          "before": 1.17,
-          "after": 1.3,
-          "foreignCores": 0.06512318930295033,
+          "before": 1.34,
+          "after": 1,
+          "foreignCores": 0.06630033795113645,
           "foreignTop": ""
         }
       },
       "jbrowse-release-4.3.0": {
-        "median": 3916,
-        "mean": 3913.3333333333335,
-        "stddev": 47.39432689913659,
+        "median": 3629,
+        "mean": 3662.6666666666665,
+        "stddev": 230.2612043359068,
         "runs": [
-          3854,
-          3970,
-          3916
+          3399,
+          3629,
+          3960
         ],
         "load": {
-          "before": 1.17,
-          "after": 1.3,
-          "foreignCores": 0.0651188894299328,
+          "before": 1.23,
+          "after": 1,
+          "foreignCores": 0.06629520714027504,
           "foreignTop": ""
         }
       },
       "jbrowse-release-2.4.0": {
-        "median": 5484,
-        "mean": 5602.333333333333,
-        "stddev": 179.50363660816333,
+        "median": 5429,
+        "mean": 5453,
+        "stddev": 48.00694394217014,
         "runs": [
-          5467,
-          5856,
-          5484
+          5410,
+          5429,
+          5520
         ],
         "load": {
-          "before": 1.36,
-          "after": 1.3,
-          "foreignCores": 0.0651955039859949,
+          "before": 1.13,
+          "after": 1,
+          "foreignCores": 0.06629007712347242,
           "foreignTop": ""
         }
       },
       "igv": {
-        "median": 8059,
-        "mean": 8244.666666666666,
-        "stddev": 278.2736462948337,
+        "median": 7622,
+        "mean": 7662,
+        "stddev": 63.77042156569664,
         "runs": [
-          8059,
-          8638,
-          8037
+          7612,
+          7622,
+          7752
         ],
         "load": {
-          "before": 1.44,
-          "after": 1.3,
-          "foreignCores": 0.06502615900050294,
+          "before": 1.04,
+          "after": 1,
+          "foreignCores": 0.06628608765926464,
           "foreignTop": ""
         }
       },
       "igv-deep": {
-        "median": 8611,
-        "mean": 8470,
-        "stddev": 220.2286690389484,
+        "median": 7629,
+        "mean": 7793.666666666667,
+        "stddev": 298.02945417450866,
         "runs": [
-          8159,
-          8611,
-          8640
+          8212,
+          7540,
+          7629
         ],
         "load": {
-          "before": 1.7,
-          "after": 1.3,
-          "foreignCores": 0.06518743450312278,
+          "before": 1.03,
+          "after": 1,
+          "foreignCores": 0.06628152885954253,
           "foreignTop": ""
         }
       },
@@ -2215,98 +2215,98 @@
     },
     "200x-longread-bam@100kb": {
       "jbrowse": {
-        "median": 3825,
-        "mean": 3831.6666666666665,
-        "stddev": 24.944382578492945,
+        "median": 3737,
+        "mean": 3753.6666666666665,
+        "stddev": 76.84327484490032,
         "runs": [
-          3825,
-          3865,
-          3805
+          3855,
+          3669,
+          3737
         ],
         "load": {
-          "before": 1.19,
-          "after": 1.95,
-          "foreignCores": 0.037948682240714814,
+          "before": 1,
+          "after": 1.17,
+          "foreignCores": 0.03664999327916632,
           "foreignTop": ""
         }
       },
       "jbrowse-release-4.3.0": {
-        "median": 8115,
-        "mean": 8107.333333333333,
-        "stddev": 136.05472755067677,
+        "median": 7878,
+        "mean": 7935.666666666667,
+        "stddev": 120.98025550569076,
         "runs": [
-          8270,
-          7937,
-          8115
+          7878,
+          7825,
+          8104
         ],
         "load": {
-          "before": 1.18,
-          "after": 1.95,
-          "foreignCores": 0.03794825946304438,
+          "before": 1.08,
+          "after": 1.17,
+          "foreignCores": 0.03666387350105684,
           "foreignTop": ""
         }
       },
       "jbrowse-release-2.4.0": {
-        "median": 18000,
-        "mean": 17907.666666666668,
-        "stddev": 153.76244303759253,
+        "median": 17545,
+        "mean": 17625,
+        "stddev": 252.191726007549,
         "runs": [
-          17691,
-          18032,
-          18000
+          17545,
+          17364,
+          17966
         ],
         "load": {
-          "before": 1.07,
-          "after": 1.95,
-          "foreignCores": 0.03796176250642508,
+          "before": 1.05,
+          "after": 1.17,
+          "foreignCores": 0.03666345408631653,
           "foreignTop": ""
         }
       },
       "igv": {
-        "median": 41716,
-        "mean": 41723,
-        "stddev": 234.7949459989858,
+        "median": 40498,
+        "mean": 40409.333333333336,
+        "stddev": 660.2632471640047,
         "runs": [
-          42014,
-          41439,
-          41716
+          39560,
+          41170,
+          40498
         ],
         "load": {
-          "before": 1.32,
-          "after": 1.95,
-          "foreignCores": 0.03794741393596327,
+          "before": 1.23,
+          "after": 1.17,
+          "foreignCores": 0.036663087106290175,
           "foreignTop": ""
         }
       },
       "igv-deep": {
-        "median": 41699,
-        "mean": 41954.666666666664,
-        "stddev": 390.91715519048563,
+        "median": 39421,
+        "mean": 39501,
+        "stddev": 150.64527871792066,
         "runs": [
-          41699,
-          42507,
-          41658
+          39370,
+          39712,
+          39421
         ],
         "load": {
-          "before": 1.22,
-          "after": 1.95,
-          "foreignCores": 0.037960969550458135,
+          "before": 1.21,
+          "after": 1.17,
+          "foreignCores": 0.036662667709541415,
           "foreignTop": ""
         }
       },
       "genomespy": {
-        "median": 108754,
-        "mean": 108430.66666666667,
-        "stddev": 869.9395892180612,
+        "median": 105342,
+        "mean": 106520.66666666667,
+        "stddev": 2158.8055854003055,
         "runs": [
-          108754,
-          109297,
-          107241
+          104671,
+          109549,
+          105342
         ],
         "load": {
-          "before": 1.28,
-          "after": 1.95,
-          "foreignCores": 0.037946674130674825,
+          "before": 1.26,
+          "after": 1.17,
+          "foreignCores": 0.03666230074525718,
           "foreignTop": ""
         }
       },
@@ -2324,82 +2324,82 @@
     },
     "200x-longread-cram@100kb": {
       "jbrowse": {
-        "median": 3905,
-        "mean": 3906,
-        "stddev": 5.354126134736337,
+        "median": 3882,
+        "mean": 3881.3333333333335,
+        "stddev": 13.888444437333106,
         "runs": [
-          3900,
-          3913,
-          3905
+          3882,
+          3864,
+          3898
         ],
         "load": {
-          "before": 1.95,
-          "after": 1.31,
-          "foreignCores": 0.04454183076231816,
+          "before": 1.17,
+          "after": 1.57,
+          "foreignCores": 0.042749973178106415,
           "foreignTop": ""
         }
       },
       "jbrowse-release-4.3.0": {
-        "median": 6724,
-        "mean": 6752,
-        "stddev": 65.13575566972925,
+        "median": 6518,
+        "mean": 6504.333333333333,
+        "stddev": 63.20513340614739,
         "runs": [
-          6690,
-          6724,
-          6842
+          6421,
+          6574,
+          6518
         ],
         "load": {
-          "before": 1.87,
-          "after": 1.31,
-          "foreignCores": 0.044540764771580345,
+          "before": 1.96,
+          "after": 1.57,
+          "foreignCores": 0.0427490323698762,
           "foreignTop": ""
         }
       },
       "jbrowse-release-2.4.0": {
-        "median": 16863,
-        "mean": 16895.666666666668,
-        "stddev": 57.13337222869155,
+        "median": 16197,
+        "mean": 16162.666666666666,
+        "stddev": 73.14065596886287,
         "runs": [
-          16863,
-          16976,
-          16848
+          16197,
+          16061,
+          16230
         ],
         "load": {
-          "before": 1.73,
-          "after": 1.31,
-          "foreignCores": 0.04453993570294789,
+          "before": 2.18,
+          "after": 1.57,
+          "foreignCores": 0.04274797401011285,
           "foreignTop": ""
         }
       },
       "igv": {
-        "median": 41274,
-        "mean": 41580.666666666664,
-        "stddev": 718.5421970134314,
+        "median": 39809,
+        "mean": 40374.333333333336,
+        "stddev": 803.748440468506,
         "runs": [
-          41274,
-          42573,
-          40895
+          39809,
+          41511,
+          39803
         ],
         "load": {
-          "before": 1.75,
-          "after": 1.31,
-          "foreignCores": 0.044538988233731314,
+          "before": 2.15,
+          "after": 1.57,
+          "foreignCores": 0.04277465869673532,
           "foreignTop": ""
         }
       },
       "igv-deep": {
-        "median": 41990,
-        "mean": 42103.333333333336,
-        "stddev": 432.07509635350294,
+        "median": 40363,
+        "mean": 40123.333333333336,
+        "stddev": 615.3483205108757,
         "runs": [
-          42680,
-          41640,
-          41990
+          40728,
+          40363,
+          39279
         ],
         "load": {
-          "before": 1.43,
-          "after": 1.31,
-          "foreignCores": 0.04453804080482368,
+          "before": 1.58,
+          "after": 1.57,
+          "foreignCores": 0.04277383506629334,
           "foreignTop": ""
         }
       },
@@ -2428,51 +2428,51 @@
     },
     "1000x-longread-bam@100kb": {
       "jbrowse": {
-        "median": 11071,
-        "mean": 11071,
-        "stddev": 5,
+        "median": 10665,
+        "mean": 10800.666666666666,
+        "stddev": 255.10041595854412,
         "runs": [
-          11066,
-          null,
-          11076
+          10579,
+          10665,
+          11158
         ],
         "load": {
-          "before": 1.31,
-          "after": 1.48,
-          "foreignCores": 0.10201526224151632,
-          "foreignTop": "chrome 0.02"
+          "before": 1.57,
+          "after": 1.71,
+          "foreignCores": 0.04139104791653563,
+          "foreignTop": "claude 0.01"
         }
       },
       "jbrowse-release-4.3.0": {
-        "median": 25687,
-        "mean": 25312.333333333332,
-        "stddev": 582.967885526772,
+        "median": 24999,
+        "mean": 24794,
+        "stddev": 299.8677486270684,
         "runs": [
-          24489,
-          25687,
-          25761
+          24370,
+          24999,
+          25013
         ],
         "load": {
-          "before": 1.09,
-          "after": 1.48,
-          "foreignCores": 0.10201144349725104,
-          "foreignTop": "chrome 0.02"
+          "before": 1.44,
+          "after": 1.71,
+          "foreignCores": 0.0413908629771527,
+          "foreignTop": "claude 0.01"
         }
       },
       "jbrowse-release-2.4.0": {
-        "median": 63127,
-        "mean": 63342,
-        "stddev": 964.5002160013582,
+        "median": 60285,
+        "mean": 60540,
+        "stddev": 647.3798472818463,
         "runs": [
-          63127,
-          62283,
-          64616
+          59906,
+          60285,
+          61429
         ],
         "load": {
-          "before": 0.97,
-          "after": 1.48,
-          "foreignCores": 0.1020286817730623,
-          "foreignTop": "chrome 0.02"
+          "before": 1.35,
+          "after": 1.71,
+          "foreignCores": 0.04139074528931495,
+          "foreignTop": "claude 0.01"
         }
       },
       "igv": {
@@ -2484,10 +2484,10 @@
           null
         ],
         "load": {
-          "before": 1.37,
-          "after": 1.48,
-          "foreignCores": 0.10201793918026758,
-          "foreignTop": "chrome 0.02"
+          "before": 1.18,
+          "after": 1.71,
+          "foreignCores": 0.041390627602146436,
+          "foreignTop": "claude 0.01"
         }
       },
       "igv-deep": {
@@ -2499,10 +2499,10 @@
           null
         ],
         "load": {
-          "before": 0.49,
-          "after": 1.48,
-          "foreignCores": 0.10213307413872727,
-          "foreignTop": "chrome 0.02"
+          "before": 0.3,
+          "after": 1.71,
+          "foreignCores": 0.041390493103344764,
+          "foreignTop": "claude 0.01"
         }
       },
       "genomespy": {
@@ -2514,10 +2514,10 @@
           null
         ],
         "load": {
-          "before": 0.28,
-          "after": 1.48,
-          "foreignCores": 0.1021502762562336,
-          "foreignTop": "chrome 0.02"
+          "before": 0.08,
+          "after": 1.71,
+          "foreignCores": 0.041390375417610335,
+          "foreignTop": "claude 0.01"
         }
       },
       "gosling": {
@@ -2534,51 +2534,51 @@
     },
     "1000x-longread-cram@100kb": {
       "jbrowse": {
-        "median": 10839,
-        "mean": 10821,
-        "stddev": 72.16647421067486,
+        "median": 11212,
+        "mean": 11236.333333333334,
+        "stddev": 48.47221426297292,
         "runs": [
-          10839,
-          10899,
-          10725
+          11304,
+          11193,
+          11212
         ],
         "load": {
-          "before": 2.39,
-          "after": 1.66,
-          "foreignCores": 0.04649164414084788,
-          "foreignTop": ""
+          "before": 1.71,
+          "after": 1.57,
+          "foreignCores": 0.042258035625904286,
+          "foreignTop": "claude 0.01"
         }
       },
       "jbrowse-release-4.3.0": {
-        "median": 18436,
-        "mean": 18505.666666666668,
-        "stddev": 300.8569242827708,
+        "median": 18466,
+        "mean": 18594.666666666668,
+        "stddev": 232.46552910533256,
         "runs": [
-          18904,
-          18177,
-          18436
+          18397,
+          18466,
+          18921
         ],
         "load": {
-          "before": 2.07,
-          "after": 1.66,
-          "foreignCores": 0.04649137088417648,
-          "foreignTop": ""
+          "before": 1.56,
+          "after": 1.57,
+          "foreignCores": 0.0422578115379379,
+          "foreignTop": "claude 0.01"
         }
       },
       "jbrowse-release-2.4.0": {
-        "median": 59822,
-        "mean": 62234.333333333336,
-        "stddev": 3619.9930325285927,
+        "median": 56463,
+        "mean": 60356.333333333336,
+        "stddev": 5940.38956822044,
         "runs": [
-          67351,
-          59822,
-          59530
+          55856,
+          68750,
+          56463
         ],
         "load": {
-          "before": 1.78,
-          "after": 1.66,
-          "foreignCores": 0.046497002468555246,
-          "foreignTop": ""
+          "before": 1.4,
+          "after": 1.57,
+          "foreignCores": 0.04226347947513847,
+          "foreignTop": "claude 0.01"
         }
       },
       "igv": {
@@ -2590,10 +2590,10 @@
           null
         ],
         "load": {
-          "before": 1.17,
-          "after": 1.66,
-          "foreignCores": 0.046496783840207584,
-          "foreignTop": ""
+          "before": 1.63,
+          "after": 1.57,
+          "foreignCores": 0.04226328026217007,
+          "foreignTop": "claude 0.01"
         }
       },
       "igv-deep": {
@@ -2605,10 +2605,10 @@
           null
         ],
         "load": {
-          "before": 0.06,
-          "after": 1.66,
-          "foreignCores": 0.04649656521391588,
-          "foreignTop": ""
+          "before": 0.8,
+          "after": 1.57,
+          "foreignCores": 0.04226310595236328,
+          "foreignTop": "claude 0.01"
         }
       },
       "genomespy": {
@@ -2636,30 +2636,30 @@
     }
   },
   "dates": {
-    "20x-shortread-bam@19kb": "2026-08-31",
-    "200x-shortread-bam@19kb": "2026-08-31",
-    "1000x-shortread-bam@19kb": "2026-08-31",
-    "20x-longread-bam@19kb": "2026-08-31",
-    "200x-longread-bam@19kb": "2026-08-31",
-    "1000x-longread-bam@19kb": "2026-08-31",
-    "20x-shortread-cram@19kb": "2026-08-31",
-    "200x-shortread-cram@19kb": "2026-08-31",
-    "1000x-shortread-cram@19kb": "2026-08-31",
-    "20x-longread-cram@19kb": "2026-08-31",
-    "200x-longread-cram@19kb": "2026-08-31",
-    "1000x-longread-cram@19kb": "2026-08-31",
-    "20x-shortread-bam@100kb": "2026-08-31",
-    "20x-shortread-cram@100kb": "2026-08-31",
-    "200x-shortread-bam@100kb": "2026-08-31",
-    "200x-shortread-cram@100kb": "2026-08-31",
-    "1000x-shortread-bam@100kb": "2026-08-31",
-    "1000x-shortread-cram@100kb": "2026-08-31",
-    "20x-longread-bam@100kb": "2026-08-31",
-    "20x-longread-cram@100kb": "2026-08-31",
-    "200x-longread-bam@100kb": "2026-08-31",
-    "200x-longread-cram@100kb": "2026-08-31",
-    "1000x-longread-bam@100kb": "2026-08-31",
-    "1000x-longread-cram@100kb": "2026-08-31"
+    "20x-shortread-bam@19kb": "2026-09-03",
+    "200x-shortread-bam@19kb": "2026-09-03",
+    "1000x-shortread-bam@19kb": "2026-09-03",
+    "20x-longread-bam@19kb": "2026-09-03",
+    "200x-longread-bam@19kb": "2026-09-03",
+    "1000x-longread-bam@19kb": "2026-09-03",
+    "20x-shortread-cram@19kb": "2026-09-03",
+    "200x-shortread-cram@19kb": "2026-09-03",
+    "1000x-shortread-cram@19kb": "2026-09-03",
+    "20x-longread-cram@19kb": "2026-09-03",
+    "200x-longread-cram@19kb": "2026-09-03",
+    "1000x-longread-cram@19kb": "2026-09-03",
+    "20x-shortread-bam@100kb": "2026-09-03",
+    "20x-shortread-cram@100kb": "2026-09-03",
+    "200x-shortread-bam@100kb": "2026-09-03",
+    "200x-shortread-cram@100kb": "2026-09-03",
+    "1000x-shortread-bam@100kb": "2026-09-03",
+    "1000x-shortread-cram@100kb": "2026-09-03",
+    "20x-longread-bam@100kb": "2026-09-03",
+    "20x-longread-cram@100kb": "2026-09-03",
+    "200x-longread-bam@100kb": "2026-09-03",
+    "200x-longread-cram@100kb": "2026-09-03",
+    "1000x-longread-bam@100kb": "2026-09-03",
+    "1000x-longread-cram@100kb": "2026-09-03"
   },
   "jbrowseBuilds": {
     "jbrowse": "current",

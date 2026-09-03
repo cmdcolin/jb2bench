@@ -27,7 +27,14 @@ a <- commandArgs(trailingOnly = TRUE)
 jb2 <- if (is.na(a[1])) Sys.getenv("JB2", file.path(Sys.getenv("HOME"), "src/jbrowse-components")) else a[1]
 bench <- if (is.na(a[2])) Sys.getenv("JB2BENCH", ".") else a[2]
 
-record <- file.path(jb2, "agent-docs/measurements/cluster-distance-gpu.json")
+# CLUSTER_RECORD names a record measured somewhere other than the
+# jbrowse-components store. The store's own record is a 2019 MacBook Pro, and
+# joining its wasm and WebGPU columns to JS columns swept on a different box is
+# the cross-machine mixing the header above exists to forbid -- so a run that
+# re-measures all four arms on one machine points this at its own record rather
+# than editing the store's.
+record <- Sys.getenv("CLUSTER_RECORD",
+                     file.path(jb2, "agent-docs/measurements/cluster-distance-gpu.json"))
 if (!file.exists(record)) {
   stop("no ", record, "; pass the jbrowse-components path as an argument")
 }

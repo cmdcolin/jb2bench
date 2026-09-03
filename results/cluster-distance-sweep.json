@@ -1,0 +1,88 @@
+{
+  "machine": "Intel(R) Core(TM) i9-9880H CPU @ 2.30GHz, linux 7.0.0-30-generic, single threaded",
+  "measured": "2026-09-03",
+  "note": "distance build only, one process per (implementation, window), first call",
+  "busyThreshold": 8,
+  "results": [
+    {
+      "window": "100 kb, MAF 0, samples",
+      "impl": "naive",
+      "n": 2504,
+      "v": 3105,
+      "s": 20.53,
+      "load": 0.6
+    },
+    {
+      "window": "100 kb, MAF 0, samples",
+      "impl": "opt",
+      "n": 2504,
+      "v": 3105,
+      "s": 10.68,
+      "load": 0.7
+    },
+    {
+      "window": "1 Mb, MAF 0.05, samples",
+      "impl": "naive",
+      "n": 2504,
+      "v": 2357,
+      "s": 15.76,
+      "load": 0.9
+    },
+    {
+      "window": "1 Mb, MAF 0.05, samples",
+      "impl": "opt",
+      "n": 2504,
+      "v": 2357,
+      "s": 7.52,
+      "load": 0.9
+    },
+    {
+      "window": "1 Mb, MAF 0.05, haplotypes",
+      "impl": "naive",
+      "n": 5008,
+      "v": 2311,
+      "s": 60.29,
+      "load": 1
+    },
+    {
+      "window": "1 Mb, MAF 0.05, haplotypes",
+      "impl": "opt",
+      "n": 5008,
+      "v": 2311,
+      "s": 29.78,
+      "load": 1
+    },
+    {
+      "window": "1 Mb, MAF 0, samples",
+      "impl": "naive",
+      "n": 2504,
+      "v": 22513,
+      "s": 143.43,
+      "load": 1
+    },
+    {
+      "window": "1 Mb, MAF 0, samples",
+      "impl": "opt",
+      "n": 2504,
+      "v": 22513,
+      "s": 78.63,
+      "load": 1
+    },
+    {
+      "window": "1 Mb, MAF 0, haplotypes",
+      "impl": "naive",
+      "n": 5008,
+      "v": 22382,
+      "s": 569.19,
+      "load": 1
+    },
+    {
+      "window": "1 Mb, MAF 0, haplotypes",
+      "impl": "opt",
+      "n": 5008,
+      "v": 22382,
+      "s": 306.33,
+      "load": 1
+    }
+  ]
+}

@@ -8,30 +8,30 @@
       "impl": "naive",
       "n": 2504,
       "v": 3105,
-      "distanceMs": 33746.8,
-      "clusterMs": 104142,
-      "totalMs": 137889.1
+      "distanceMs": 20356.5,
+      "clusterMs": 60271.2,
+      "totalMs": 80627.9
     },
     {
       "impl": "opt",
       "n": 2504,
       "v": 3105,
-      "distanceMs": 14644.6,
-      "clusterMs": 164.2,
-      "totalMs": 14810.3
+      "distanceMs": 9947.8,
+      "clusterMs": 117.8,
+      "totalMs": 10066.6
     },
     {
       "impl": "wasm",
       "n": 2504,
       "v": 3105,
-      "distanceMs": 3275.7,
-      "clusterMs": 21.2,
-      "totalMs": 3296.9
+      "distanceMs": null,
+      "clusterMs": null,
+      "totalMs": 2162.7
     }
   ],
   "speedups": {
-    "algorithm": 9.31,
-    "runtime": 4.49,
-    "combined": 41.82
+    "algorithm": 8.01,
+    "runtime": 4.65,
+    "combined": 37.28
   }
 }

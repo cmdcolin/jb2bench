@@ -99,7 +99,10 @@ fig <- ggplot(d, aes(x = coverage, y = s, colour = series, linetype = measure)) 
   # a legend key never stands for a curve that is not on the page.
   scale_colour_discrete(drop = FALSE,
                         breaks = PERF_SERIES[PERF_SERIES %in% d$series]) +
-  guides(colour = guide_legend(order = 1),
+  # Two rows for the colour keys. GenomeSpy became a sixth arm on 2026-09-03
+  # and seven keys on one row run off both ends of a 240 mm canvas, which
+  # clipped "Release 2.4.0" and the linetype pair rather than shrinking to fit.
+  guides(colour = guide_legend(order = 1, nrow = 2),
          linetype = guide_legend(order = 2,
                                  override.aes = list(linewidth = 0.6))) +
   labs(x = "coverage", colour = NULL, linetype = NULL,

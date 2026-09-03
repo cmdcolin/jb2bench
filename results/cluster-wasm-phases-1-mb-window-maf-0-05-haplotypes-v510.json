@@ -1,0 +1,11 @@
+{
+  "matrix": "1-mb-window-maf-0-05-haplotypes.bin",
+  "n": 5008,
+  "v": 2311,
+  "distanceMs": 6914.8,
+  "clusterMs": 350.6,
+  "totalMs": 7265.4,
+  "clusterShare": 0.0483,
+  "note": "first call in a fresh process, the one a user waits on",
+  "hclust": "/home/cdiesh/src/gmod/hclust/src/index.ts"
+}

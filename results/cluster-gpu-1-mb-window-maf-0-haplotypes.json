@@ -1,0 +1,12 @@
+{
+  "window": "1 Mb, MAF 0, haplotypes",
+  "matrix": "1-mb-window-maf-0-haplotypes.bin",
+  "n": 5008,
+  "v": 22382,
+  "adapter": "amd gcn-4",
+  "computeMs": 13102,
+  "readbackMs": 13203,
+  "maxRelErr": 0,
+  "checkedPairs": 824,
+  "note": "naive kernel, one thread per pair, no tiling — a floor, not a claim"
+}

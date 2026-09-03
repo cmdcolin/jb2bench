@@ -1,0 +1,63 @@
+{
+  "id": "cluster-distance-local",
+  "measured": "2026-09-03",
+  "published": false,
+  "machine": "Intel(R) Core(TM) i9-9880H CPU @ 2.30GHz, linux 7.0.0-30-generic",
+  "source": {
+    "kind": "hand",
+    "repro": "wasm columns: HCLUST=<checkout>/src/index.ts node --experimental-strip-types scripts/cluster/wasmphases.mjs <matrix.bin> <N>, once per window per library version, each the first call in a fresh process, taken as that file's totalMs -- the whole clusterData call, for the reason in this script's header. Cross-checked against `pnpm bench:real` in the hclust checkout, which agrees within 1% on the windows it shares. GPU column: node scripts/cluster/gpusweep.mjs, which drives jbrowse-web browser-tests/probe-gpu-distance-matrix.ts on the same .bin, headed Chrome, upload and readback included. JS columns come from results/cluster-distance-sweep.json, swept on this same box.",
+    "notes": "Every arm on one machine, which is the point: the jbrowse-components record this stands in for mixes a 2019 MacBook Pro (wasm, WebGPU) with a different Linux box (JS). Every arm is also the first call in a fresh process, where that record timed wasm warm. The JS and WebGPU arms are the distance build alone and the wasm arms carry their merge with them, which overstates wasm by under 5%. Matrices are 1000 Genomes phase 3 chr22:20-21 Mb dumped by `pnpm bench:real --dump` in @gmod/hclust (a7ba2a3), byte-identical across all four arms. The kernel is naive -- one thread per pair, no tiling -- so the GPU column is a floor."
+  },
+  "rows": [
+    {
+      "values": {
+        "window": "100 kb, MAF 0, samples",
+        "n": 2504,
+        "v": 3105,
+        "hclust500": 7.42,
+        "hclustNew": 2.28,
+        "gpu": 0.73
+      }
+    },
+    {
+      "values": {
+        "window": "1 Mb, MAF 0.05, samples",
+        "n": 2504,
+        "v": 2357,
+        "hclust500": 5.87,
+        "hclustNew": 1.69,
+        "gpu": 0.4
+      }
+    },
+    {
+      "values": {
+        "window": "1 Mb, MAF 0.05, haplotypes",
+        "n": 5008,
+        "v": 2311,
+        "hclust500": 24.36,
+        "hclustNew": 7.27,
+        "gpu": 1.36
+      }
+    },
+    {
+      "values": {
+        "window": "1 Mb, MAF 0, samples",
+        "n": 2504,
+        "v": 22513,
+        "hclust500": 59.89,
+        "hclustNew": 18.09,
+        "gpu": 5.89
+      }
+    },
+    {
+      "values": {
+        "window": "1 Mb, MAF 0, haplotypes",
+        "n": 5008,
+        "v": 22382,
+        "hclust500": 230.95,
+        "hclustNew": 69.18,
+        "gpu": 13.2
+      }
+    }
+  ]
+}

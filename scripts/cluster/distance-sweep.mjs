@@ -40,7 +40,7 @@
 import { readFileSync, writeFileSync } from 'node:fs'
 import { fork } from 'node:child_process'
 import { fileURLToPath } from 'node:url'
-import { loadavg, cpus } from 'node:os'
+import { loadavg, cpus, platform, release } from 'node:os'
 
 const args = process.argv.slice(2)
 const MATRIX_DIR = args.find(a => a.startsWith('--matrices='))?.slice(11) ??
@@ -141,7 +141,11 @@ if (child) {
 
   const busy = results.filter(r => r.load > BUSY)
   const out = {
-    machine: '2019 MacBook Pro, i9-9980HK, single threaded',
+    // Read off the box rather than typed in. The literal that used to sit
+    // here named a 2019 MacBook Pro, and a sweep run anywhere else recorded
+    // that name -- which is the one thing this file's own header says a reader
+    // must be able to check.
+    machine: `${cpus()[0].model.trim()}, ${platform()} ${release()}, single threaded`,
     measured: new Date().toISOString().slice(0, 10),
     note: 'distance build only, one process per (implementation, window), first call',
     busyThreshold: BUSY,

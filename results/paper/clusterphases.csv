@@ -1,9 +1,8 @@
 "matrix","n","v","config","phase","s"
-"2,504 × 3,105",2504,3105,"JS optimized","distance",14.6446
-"2,504 × 3,105",2504,3105,"JS optimized","merge",0.1642
-"2,504 × 3,105",2504,3105,"JS reference","distance",33.7468
-"2,504 × 3,105",2504,3105,"JS reference","merge",104.142
-"2,504 × 3,105",2504,3105,"wasm","distance",3.2757
-"2,504 × 3,105",2504,3105,"wasm","merge",0.0212
-"2,504 × 3,105",2504,3105,"WebGPU + wasm","distance",0.42
-"2,504 × 3,105",2504,3105,"WebGPU + wasm","merge",0.0212
+"2,504 × 3,105",2504,3105,"JS optimized","distance",9.9478
+"2,504 × 3,105",2504,3105,"JS optimized","merge",0.1178
+"2,504 × 3,105",2504,3105,"JS reference","distance",20.3565
+"2,504 × 3,105",2504,3105,"JS reference","merge",60.2712
+"2,504 × 3,105",2504,3105,"wasm","total (split unresolved)",2.1627
+"2,504 × 3,105",2504,3105,"WebGPU + wasm","distance",0.73
+"2,504 × 3,105",2504,3105,"WebGPU + wasm","merge (upper bound)",0.1
