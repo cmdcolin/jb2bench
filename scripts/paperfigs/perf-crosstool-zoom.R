@@ -12,6 +12,12 @@
 # cost. igv.js redraws in 34-1300 ms where the two older JBrowse builds take
 # 1.1-7.5 s, so the answer is the second one.
 #
+# A GenomeSpy column draws itself the run it is measured -- the arm landed in
+# panrunner.ts on 2026-09-02 and the legend is computed from the data rather
+# than listed. It is the second foreign tool the claim wants, and the more
+# telling one: it decodes BAM through the same @gmod/bam this build does, so it
+# is a renderer beside a renderer where igv confounds parser with renderer.
+#
 # TWO LINES PER TOOL, because on this motion the wait and the work are different
 # numbers. JBrowse's wait is flat at ~510 ms across a fifty-fold range of
 # coverage, which is not the shape of work: it is the 500 ms
@@ -87,9 +93,12 @@ fig <- ggplot(d, aes(x = coverage, y = s, colour = series, linetype = measure)) 
                 expand = expansion(mult = c(0.08, 0.3))) +
   time_scale_y(name = NULL, breaks = c(0.001, 0.01, 0.1, 1, 10)) +
   scale_linetype_manual(values = c("solid", "22")) +
+  # drop = FALSE keeps every series the colour it is on the cold-load figure;
+  # `breaks` then limits the legend to the arms this run measured, computed
+  # rather than listed so a GenomeSpy column appears the run it is measured and
+  # a legend key never stands for a curve that is not on the page.
   scale_colour_discrete(drop = FALSE,
-                        breaks = c("Release 2.4.0", "Release 4.3.0", "This work",
-                                   "igv.js 3.8.5")) +
+                        breaks = PERF_SERIES[PERF_SERIES %in% d$series]) +
   guides(colour = guide_legend(order = 1),
          linetype = guide_legend(order = 2,
                                  override.aes = list(linewidth = 0.6))) +
