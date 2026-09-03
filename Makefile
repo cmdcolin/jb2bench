@@ -245,6 +245,7 @@ figures:
 paper-figs:
 	Rscript scripts/paperfigs/perf-coldload.R
 	Rscript scripts/paperfigs/perf-interaction.R
+	Rscript scripts/paperfigs/perf-crosstool-zoom.R
 	Rscript scripts/paperfigs/parser.R
 	Rscript scripts/paperfigs/ldband.R
 	Rscript scripts/paperfigs/cluster-endtoend.R
