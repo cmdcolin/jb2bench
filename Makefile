@@ -27,7 +27,7 @@ LOGDIR := results/logs
         crosstool-zoom crosstool-pan crosstool-bundles \
         parsers parsers-count cram-samtools multibam backends clean-logs \
         formats toolcheck shots paper-tables paper-figs paper-data wait-quiet \
-        wasmgate
+        wasmgate bgzfpool bgzfpool-standalone bgzfpool-endtoend
 
 help:
 	@echo "preflight"
@@ -38,7 +38,7 @@ help:
 	@echo "  make crosstool-bundles  build the Gosling harness bundle"
 	@echo ""
 	@echo "corpus (generate once, then leave alone)"
-	@echo "  make corpus          alignments, variants, GFF3, modBAM, cohort BigWigs"
+	@echo "  make corpus          alignments, variants, GFF3, modBAM, cohort BigWigs, bgzf VCFs"
 	@echo "  make corpus-paper    the 2019 cram-js paper's own corpus (~16 GB, network)"
 	@echo ""
 	@echo "measure — no idle box needed"
@@ -57,6 +57,7 @@ help:
 	@echo "  make parsers         the parser libraries, 2023 vs current, + the sweep"
 	@echo "  make cram-samtools   @gmod/cram against samtools, the 2019 paper's benchmark"
 	@echo "  make wasmgate        is a routine worth compiling to wasm, or is the copy bigger?"
+	@echo "  make bgzfpool        the BGZF inflate pool on vs off, query alone and end to end"
 	@echo "  make multibam        multi-track pan"
 	@echo "  make backends        webgl vs webgpu vs canvas"
 	@echo ""
@@ -103,7 +104,9 @@ corpus:
 	shell/generate_variants.sh
 	shell/generate_gff3.sh
 	shell/generate_cohort_bw.sh
+	shell/generate_bgzf_vcf.sh
 	shell/load_alignments.sh
+	shell/load_bgzf_tracks.sh
 
 corpus-paper:
 	shell/fetch_paper2019.sh
@@ -200,6 +203,34 @@ multibam: gate | $(LOGDIR)
 backends: gate | $(LOGDIR)
 	$(NODE) scripts/render/backends.ts 2>&1 | tee $(LOGDIR)/backends-$(STAMP).log
 
+# What the BGZF inflate pool is worth, measured twice over the same files and
+# the same windows: once with nothing above the query and once through a real
+# jbrowse pan. The gap between them is the point — the first is a ceiling a user
+# never reaches, and quoting it alone is the mistake results/crampool.md records
+# this repo already making about the CRAM slice pool.
+#
+# The end-to-end half needs a build carrying the `useBgzfWorkerPool` config slot
+# and a `.nopool` twin of every bgzip-backed track (`shell/load_bgzf_tracks.sh`,
+# which `make corpus` runs). Against a build without the slot both arms run
+# pooled and the run reports ~1.00x; the blob-worker count it prints is what
+# says so rather than leaving it to be inferred from a flat number.
+#
+# Out of `timings` deliberately. It needs a build the other targets do not, and
+# it is long: twelve tracks x five reps x two arms x six page loads.
+bgzfpool: bgzfpool-standalone bgzfpool-endtoend
+
+# JB2 (below, by paper-data) names the jbrowse-components checkout. This arm
+# bundles @gmod/bam, @gmod/tabix and @gmod/bgzf-filehandle out of it rather than
+# out of this repo's node_modules, where they arrive as igv.js's transitive deps
+# four majors behind — so that both arms of the figure are the same code.
+bgzfpool-standalone: gate | $(LOGDIR)
+	JBROWSE=$(JB2) $(NODE) scripts/bgzfpool/standalone.ts 2>&1 \
+	  | tee $(LOGDIR)/bgzfpool-standalone-$(STAMP).log
+
+bgzfpool-endtoend: gate | $(LOGDIR)
+	$(NODE) scripts/bgzfpool/endtoend.ts 2>&1 \
+	  | tee $(LOGDIR)/bgzfpool-endtoend-$(STAMP).log
+
 parsers: gate | $(LOGDIR)
 	$(MAKE) -C ecosystem bench 2>&1 | tee $(LOGDIR)/parsers-$(STAMP).log
 	$(MAKE) -C ecosystem sweep 2>&1 | tee $(LOGDIR)/sweep-$(STAMP).log
@@ -252,6 +283,9 @@ paper-figs:
 	Rscript scripts/paperfigs/cluster-endtoend.R
 	Rscript scripts/paperfigs/cluster.R
 	Rscript scripts/paperfigs/wasmgate.R
+	@if [ -f results/paper/bgzfpool.csv ]; then \
+	   Rscript scripts/paperfigs/bgzfpool.R; \
+	 else echo "no results/paper/bgzfpool.csv; run make bgzfpool then make paper-data"; fi
 
 # The cluster pair reads jbrowse-components, not this repo, so it is skipped
 # rather than fatal when that checkout is not beside us: the other four are the
@@ -262,6 +296,9 @@ paper-data:
 	Rscript scripts/paperfigs/parser-data.R .
 	Rscript scripts/paperfigs/ldband-data.R .
 	Rscript scripts/paperfigs/wasmgate-data.R .
+	@if [ -f results/bgzfpool.json ] && [ -f results/bgzfpool-standalone.json ]; then \
+	   Rscript scripts/paperfigs/bgzfpool-data.R .; \
+	 else echo "no bgzfpool run on disk; bgzfpool.csv is left as committed"; fi
 	@if [ -d $(JB2) ]; then \
 	   Rscript scripts/paperfigs/cluster-data.R $(JB2); \
 	   Rscript scripts/paperfigs/clusterphases-data.R . $(JB2) \

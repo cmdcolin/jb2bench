@@ -71,22 +71,31 @@ slot on `BamAdapter`, `VcfTabixAdapter` and `Gff3TabixAdapter`. Without it the
 arms run pooled, and the blob-worker column is what says so.
 
 ```bash
-shell/generate_alignments.sh          # BAM corpus, if not already built
-shell/generate_bgzf_vcf.sh            # the VCF sweep, spanning every window
-# stage the build in builds/, then
-shell/load_alignments.sh
-shell/load_bgzf_tracks.sh             # VCF tracks + a .nopool twin of each
+make corpus                           # includes generate_bgzf_vcf.sh and,
+                                      # once builds/ is staged, the .nopool twins
 npx http-server builds/current -p 8010 -s --cors &
-
-node --experimental-strip-types scripts/bgzfpool/standalone.ts 9
-node --experimental-strip-types scripts/bgzfpool/endtoend.ts 5
-
-Rscript scripts/paperfigs/bgzfpool-data.R
-Rscript scripts/paperfigs/bgzfpool.R
+make bgzfpool                         # both arms, gated and logged
+make paper-data paper-figs            # csv, then the figure
 ```
+
+`make bgzfpool` runs `make gate` first, which is the point: neither arm means
+anything on a box that is not idle. To take one arm on its own, or a subset of
+the corpus:
+
+```bash
+make bgzfpool-standalone
+make bgzfpool-endtoend
+TRACKS=1000x.longread.bam,variants.pool.3000.wide.vcf.gz \
+  node --experimental-strip-types scripts/bgzfpool/endtoend.ts 5
+```
+
+If the corpus is being built by hand rather than through `make corpus`, the
+order is `generate_alignments.sh`, `generate_bgzf_vcf.sh`, then — with the build
+staged in `builds/` — `load_alignments.sh` and `load_bgzf_tracks.sh`.
 
 The standalone arm bundles `@gmod/bam`, `@gmod/tabix` and
 `@gmod/bgzf-filehandle` out of the jbrowse-components checkout rather than this
 repo's `node_modules`, so both arms are the same code; the versions it bundled
-are recorded in `results/bgzfpool-standalone.json`. Set `JBROWSE` if the
-checkout is not `../jbrowse-components`.
+are recorded in `results/bgzfpool-standalone.json`. Where that checkout is
+comes from `JB2` through the Makefile (`$HOME/src/jbrowse-components`) and from
+`JBROWSE` when the script is run directly (`../jbrowse-components`).

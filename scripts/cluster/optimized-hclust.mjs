@@ -109,27 +109,38 @@ const findNearest = (i, distances, numSamples, sizes, activeList, numActive, nn,
   nnSize[i] = bestSize
 }
 
-export const hierarchicalCluster = ({ data, onProgress }) => {
-  const t0 = performance.now()
-  const numSamples = data.length
-  if (numSamples < 2) {
-    throw new Error('hierarchicalCluster requires at least 2 samples')
+// The flattened matrix the distance build reads, with the wasm wrapper's
+// validation. `data` is the row-vector array everything here takes; a caller
+// that already holds the flat Float32Array passes it with `vectorSize` and
+// skips the copy, which is what the five-window distance sweep does -- an
+// array-of-arrays of the 5,008 x 22,383 matrix is 900MB of JS heap to build a
+// Float32Array that is 450MB.
+export const flatten = (data, vectorSize) => {
+  const flat = data instanceof Float32Array
+    ? data
+    : new Float32Array(data.length * vectorSize)
+  if (flat !== data) {
+    for (let i = 0; i < data.length; i++) {
+      flat.set(data[i], i * vectorSize)
+    }
   }
-  const vectorSize = data[0].length
-
-  // The wasm wrapper flattens into a Float32Array before it can hand the
-  // matrix to wasm, and wasmphases.mjs starts its clock before that, so the
-  // flatten sits inside the distance phase on both sides.
-  const flat = new Float32Array(numSamples * vectorSize)
-  for (let i = 0; i < numSamples; i++) {
-    flat.set(data[i], i * vectorSize)
-  }
+  // A single NaN would poison every distance silently: NaN compares false
+  // everywhere, so find-min skips it and the run produces a wrong tree rather
+  // than an error.
   for (let i = 0; i < flat.length; i++) {
     if (!Number.isFinite(flat[i])) {
       throw new Error('input contains non-finite values (NaN or Infinity)')
     }
   }
+  return flat
+}
 
+// Separated from the merge because it is a measurement in its own right: the
+// distance build is the phase the wasm SIMD and the compute shader both
+// replace, and the figure that sweeps it across window widths cannot call the
+// whole clustering to get it -- greenelab's merge at N = 5,008 does not
+// finish. hierarchicalCluster calls this, so there is one implementation.
+export const buildDistanceMatrix = (flat, numSamples, vectorSize, onProgress) => {
   const distances = new Float32Array(numSamples * numSamples)
   const progressIntervalMs = 100
   let lastProgressTime = performance.now()
@@ -170,6 +181,22 @@ export const hierarchicalCluster = ({ data, onProgress }) => {
       }
     }
   }
+  return distances
+}
+
+export const hierarchicalCluster = ({ data, onProgress }) => {
+  const t0 = performance.now()
+  const numSamples = data.length
+  if (numSamples < 2) {
+    throw new Error('hierarchicalCluster requires at least 2 samples')
+  }
+  const vectorSize = data[0].length
+
+  // The wasm wrapper flattens into a Float32Array before it can hand the
+  // matrix to wasm, and wasmphases.mjs starts its clock before that, so the
+  // flatten sits inside the distance phase on both sides.
+  const flat = flatten(data, vectorSize)
+  const distances = buildDistanceMatrix(flat, numSamples, vectorSize, onProgress)
 
   const t1 = performance.now()
 
@@ -199,7 +226,8 @@ export const hierarchicalCluster = ({ data, onProgress }) => {
   const mergeA = new Int32Array(numSamples - 1)
   const mergeB = new Int32Array(numSamples - 1)
   const totalIterations = numSamples - 1
-  lastProgressTime = performance.now()
+  const progressIntervalMs = 100
+  let lastProgressTime = performance.now()
 
   for (let iteration = 0; iteration < totalIterations; iteration++) {
     if (onProgress) {

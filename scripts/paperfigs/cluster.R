@@ -3,8 +3,19 @@
 #
 # The sample-by-sample distance build behind row clustering, on real 1000
 # Genomes windows, as the pure-JS implementation JBrowse shipped with
-# (greenelab/hclust), the wasm that replaced it, and a deliberately naive
-# WebGPU kernel that keeps the wasm merge behind it.
+# (greenelab/hclust), that same phase written the way a JS library would write
+# it today, the wasm that replaced it, and a deliberately naive WebGPU kernel
+# that keeps the wasm merge behind it.
+#
+# The optimized-JS curve is ~2x below the reference here, not the 9.3x the
+# end-to-end figure shows for the same pair. Both are right and the difference
+# is the point: this figure is the DISTANCE BUILD ALONE, and almost all of that
+# 9.3x was greenelab's merge, which rescans every cluster pair. What is left
+# once the merge is out of the comparison is a triangle instead of a full
+# square, plus a kernel that keeps four accumulators and reuses each streamed
+# row twice -- ordinary work, worth about 2x, and the honest size of what
+# optimizing JavaScript buys on this phase. The rest of the gap to wasm is the
+# runtime.
 #
 # results/paper/cluster.csv also carries the pre-rewrite wasm build (hclust
 # 5.0.0); the figure draws only the current one. Two wasm curves a fixed
@@ -36,9 +47,10 @@ d <- read.csv("results/paper/cluster.csv", stringsAsFactors = FALSE)
 
 # Slowest first, so the stock discrete scale walks its colours in the same
 # direction the measurements improve.
-SERIES <- c("greenelab/hclust (JS)", "hclust (wasm)", "hybrid WebGPU + wasm")
-d$series <- c("greenelab/hclust (JS)" = SERIES[1], "hclust 5.1.0 (wasm)" = SERIES[2],
-              "WebGPU kernel" = SERIES[3])[d$series]
+SERIES <- c("greenelab/hclust (JS)", "optimized JS", "hclust (wasm)",
+            "hybrid WebGPU + wasm")
+d$series <- c("greenelab/hclust (JS)" = SERIES[1], "optimized JS" = SERIES[2],
+              "hclust 5.1.0 (wasm)" = SERIES[3], "WebGPU kernel" = SERIES[4])[d$series]
 d <- d[!is.na(d$series), ]
 d$series <- factor(d$series, levels = SERIES)
 
@@ -52,13 +64,17 @@ d$rows <- factor(sprintf("%s %s", format(d$n, big.mark = ","), unit),
 # Two ratios per column, both against the GPU, because "how much faster" has
 # two honest answers here and neither subsumes the other: "vs wasm" is the
 # choice a reader actually faces, since nobody runs the JS baseline any more;
-# "vs JS" is where the whole system started. The wasm badge sits at the geometric mean of the pair it compares,
+# "vs JS ref" is where the whole system started. Two and not four: the
+# optimized-JS curve is on the figure to be read against the reference above it
+# and the wasm below it, and both of those gaps are visible as gaps. A badge
+# for every adjacent pair would be twelve numbers on a figure whose subject is
+# four curves. The wasm badge sits at the geometric mean of the pair it compares,
 # which on a log axis is the midpoint of the gap it measures; the JS badge
 # would sit far above it if placed the same way, so it goes below the GPU
 # point instead, in the margin the axis already carries for the point's own
 # time label above it.
 #
-# The "vs wasm"/"vs JS" tag names the comparator only on the widest column of
+# The "vs wasm"/"vs JS ref" tag names the comparator only on the widest column of
 # each panel: that column sits alone on the right with room to spell it out,
 # while the two narrow-window columns sit close enough in v that a second full
 # tag collides with the first. A bare number reads fine there once the wide
@@ -72,7 +88,8 @@ ratio_wasm <- data.frame(v = w$v, rows = w$rows,
                          lab = paste0(fmt_ratio(w$`s.hclust (wasm)` / w$`s.hybrid WebGPU + wasm`), tag("vs wasm")))
 ratio_js <- data.frame(v = w$v, rows = w$rows,
                        mid = w$`s.hybrid WebGPU + wasm` / 1.8,
-                       lab = paste0(fmt_ratio(w$`s.greenelab/hclust (JS)` / w$`s.hybrid WebGPU + wasm`), tag("vs JS")))
+                       lab = paste0(fmt_ratio(w$`s.greenelab/hclust (JS)` / w$`s.hybrid WebGPU + wasm`),
+                                    tag("vs JS ref")))
 
 # A line chart, not bars: geom_col draws from zero, which under log10 is minus
 # infinity, so ggplot starts the bars at 1 and the 310 ms GPU measurement
@@ -114,20 +131,41 @@ cat("wrote results/figures/paper/png/cluster-speedup.png\n")
 
 # ---- draft caption ----------------------------------------------------------
 #   The distance build behind row clustering, on five 1000 Genomes windows, for
-#   the pure-JS implementation JBrowse shipped with (greenelab/hclust 0.0.1),
-#   the wasm build that replaced it (hclust 5.1.0), and a deliberately naive
-#   WebGPU compute kernel, which replaces only the distance build and leaves
-#   the agglomerative merge in the same wasm library, hence "hybrid". The build is O(n^2 v), so the panels split on
-#   the row count n and each panel sweeps the variant columns v; the 5,008-row
-#   cases are the same 2,504 individuals phased into haplotypes. Both axes are
-#   logarithmic and the time ticks are round durations, so within a panel a
-#   slope of one is cost linear in the columns, and a fixed vertical distance
-#   anywhere is a fixed factor. The bold labels give the WebGPU kernel's
-#   margin over two comparators, one per column: the wasm build, which is the
-#   choice a reader actually faces; and the original JS implementation, where
-#   the whole system started. Both are named in full
-#   only on each panel's widest column, which has the room; the narrower
-#   columns carry the bare number. Comparing the panels at matched v gives the
-#   row cost: about 4x for a 2x row count, at both window widths. The
-#   JS-to-wasm step is a steady 7-9x across every window; the widening gap
-#   below it is what the compute shader adds.
+#   four implementations of that one phase: the pure-JS implementation JBrowse
+#   shipped with (greenelab/hclust 0.0.1); the same phase written the way a JS
+#   library would write it today, computing one triangle rather than a full
+#   square and keeping four accumulators in a kernel that reuses each streamed
+#   row twice; the wasm build that replaced it (hclust 5.1.0); and a
+#   deliberately naive WebGPU compute kernel, which replaces only this phase and
+#   leaves the agglomerative merge in the same wasm library, hence "hybrid".
+#   The build is O(n^2 v), so the panels split on the row count n and each panel
+#   sweeps the variant columns v; the 5,008-row cases are the same 2,504
+#   individuals phased into haplotypes. Both axes are logarithmic and the time
+#   ticks are round durations, so within a panel a slope of one is cost linear
+#   in the columns, and a fixed vertical distance anywhere is a fixed factor.
+#   The bold labels give the WebGPU kernel's margin over two comparators, one
+#   per column: the wasm build, which is the choice a reader actually faces; and
+#   the original JS implementation, where the whole system started. Both are
+#   named in full only on each panel's widest column, which has the room; the
+#   narrower columns carry the bare number. Comparing the panels at matched v
+#   gives the row cost: about 4x for a 2x row count, at both window widths.
+#
+#   The optimized JS curve sits about 2x below the reference at every window,
+#   and that is the whole of what optimizing JavaScript buys on THIS phase. It
+#   is much less than the 9.3x the end-to-end figure shows for the same pair,
+#   because almost all of that was greenelab's merge, which rescans every
+#   cluster pair and is absent here. The step from optimized JS to wasm is
+#   then the runtime alone, since the two run the same algorithm.
+#
+#   Provenance differs by row and the two JS rows are not the record's. The wasm
+#   and WebGPU columns are jbrowse-components' measurement record, an idle 2019
+#   MacBook Pro (i9-9980HK single threaded; Radeon Pro 5300M through headed
+#   Chrome, upload and readback included), warm calls. That record's own JS
+#   column was taken on a different machine against synthetic data and is
+#   labelled there as an order of magnitude rather than a fourth arm of the
+#   sitting, which is not good enough to divide an optimized-JS time by, so both
+#   JS columns here are re-measured on the same MacBook Pro on the real dosage
+#   matrices, one cold process per cell
+#   (scripts/cluster/distance-sweep.mjs). The JS-to-wasm gap is therefore
+#   cold-JS against warm-wasm and is, if anything, generous to wasm by the
+#   ~20% a first call costs.
