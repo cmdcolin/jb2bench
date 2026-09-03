@@ -93,9 +93,14 @@ ported$label <- sprintf("%s faster", fmt_ratio(ported$work / ported$ported))
 # six routines here have no wasm implementation and never needed one -- their
 # verdict is that the bound alone already loses. The legend has to say so, or the
 # reader is left asking, correctly, where the wasm numbers for those rows are.
-SERIES <- c("best case for a wasm port — its copying, with the compute free",
-            "JavaScript today",
-            "the one wasm port that exists, measured")
+# Plain words for the grey dot, because the abstract ones did not survive
+# contact with a reader: "the port with its compute taken to zero" is exact and
+# means nothing to anyone who has not already followed the argument. What it IS
+# is a measurement of copying bytes into wasm and back with nothing computed in
+# between, so that is what it says.
+SERIES <- c("just the copying, with nothing computed",
+            "the whole job today, in JavaScript",
+            "the one real wasm port, measured")
 dots <- rbind(
   data.frame(rows[c("panel", "candidate")], s = rows$copy, series = SERIES[1]),
   data.frame(rows[c("panel", "candidate")], s = rows$work, series = SERIES[2]),
@@ -128,10 +133,15 @@ fig <- ggplot(rows, aes(y = candidate)) +
        title = "Could a wasm port of this routine win?",
        # Hand-wrapped. The panel is 250 mm and this text is not wrapped for it by
        # ggplot, so a long line is silently cut off at the device edge.
+       # Hand-wrapped. The panel is 250 mm and ggplot does not wrap this text for
+       # it, so a long line is silently cut off at the device edge.
+       # Hand-wrapped at about 100 characters. ggplot does not wrap this text, and
+       # a longer line is silently cut off at the device edge rather than flowing.
        subtitle = paste(
-         "A wasm port must copy its input in and its result back out, so it can never beat the grey dot:",
-         "\nthat dot is the port with its compute taken to zero — grey right of blue means it cannot win.",
-         "\nOnly BGZF inflate is ported, and its triangle is the real measurement. The number is blue ÷ grey.")) +
+         "A wasm port has to copy its input into wasm memory and its result back out.",
+         "\nGrey is that copying alone, nothing computed. Every real port pays it on top of its own work,",
+         "\nso none can land left of grey. Where grey is right of blue, no port can beat today's JavaScript.",
+         "\nOnly BGZF inflate has a real port; the triangle is it. The number is blue ÷ grey.")) +
   paper_theme() +
   theme(plot.title = element_text(face = "bold", size = rel(1.1), hjust = 0),
         plot.subtitle = element_text(size = rel(0.85), hjust = 0, colour = "grey25",

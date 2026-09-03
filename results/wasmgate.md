@@ -20,17 +20,20 @@ Rust/libdeflate wasm inflate and a `pako-esm2` one, so it alone has a real wasm
 measurement. Nothing was written in Rust to produce the other five rows, and
 nothing needed to be.
 
-A wasm port's time is *copy in + compute + copy out*. Take the compute to zero
-and what is left — the two copies and the boundary crossing — is still a real,
-measurable quantity, and no implementation of that routine can come in under it.
-So the copy alone decides the question whenever it already exceeds what
-JavaScript costs today:
+A wasm port's time is *copy in + compute + copy out*. The two copies can be
+measured on their own, without writing the port: allocate a buffer inside the
+wasm module's memory, memcpy the input into it, call a wasm function that returns
+immediately and does nothing, memcpy the result-sized bytes back out, free. No
+inflating, no parsing — just the shuttling of bytes. Every real port does all of
+that *and* the actual work, so none of them can come in under it, and the copy
+alone decides the question whenever it already exceeds what JavaScript costs
+today:
 
 > If moving a routine's bytes across the boundary takes longer than doing the
 > whole job in JavaScript, no wasm port of it can win, however fast the wasm is.
 
-That is what the grey dot on the figure is: **the port with its compute free**,
-not a measurement of any port. It is why five rows can be settled without
+That is what the grey dot on the figure is: **the copying, measured with nothing
+computed** — not a measurement of any port. It is why five rows can be settled without
 writing them, and the ported row is the check that the model holds — its real
 measurement lands between the bound and the JavaScript, where it must.
 
