@@ -719,18 +719,18 @@ because half a second of constant loses to real work when the work is small. The
 current build wins the heavy long-read cases 2.2–2.7×, and beats both releases
 everywhere by 2–19×.
 
-The report prints two tables and the figure two rows — what the user waits for,
-and what the renderer did — because quoting either alone is how this benchmark
+The report prints two tables and the figure two lines per tool — what the user
+waits for, and what the renderer did — because quoting either alone is how this benchmark
 went wrong the first time. Read the redraw table with its dagger: the block
 renderer paints in a worker and the main thread blits the tiles, so `drawclock`
 times a composite for the two release arms and not a render. v2.4.0 reads 0.1 ms
 there, underneath a wait of seconds.
 
 Figure: `Rscript scripts/paperfigs/perf-crosstool-zoom.R` →
-`results/figures/paper/pdf/perf-crosstool-zoom.pdf`. Its redraw row carries only
-the current build and igv.js. A figure has no dagger to hang the worker caveat
-on, and left in, the release arms would sit at the bottom of that row as the
-fastest renderers on the page — so they are dropped from it and the caption says
+`results/figures/paper/pdf/perf-crosstool-zoom.pdf`. Solid is the wait, dashed
+the drawing inside it, and only the current build and igv.js have a dashed line.
+A figure has no dagger to hang the worker caveat on, and left in, the release
+arms would sit at the bottom of the panel as the fastest renderers on it — so they are dropped from it and the caption says
 why. What the figure is for is the comparison neither the JBrowse-only
 `perf-interaction.pdf` nor the cold-load matrix can make: igv.js does not pay a
 multi-second zoom either, so what the old block renderer cost on this motion was
