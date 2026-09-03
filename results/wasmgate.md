@@ -5,21 +5,29 @@ Measured 2026-09-02 by `make wasmgate` (`scripts/wasmgate.ts`), which writes
 [`figures/paper/png/wasmgate.png`](figures/paper/png/wasmgate.png), drawn by
 `scripts/paperfigs/wasmgate.R` from `paper/wasmgate.csv`, in two panels:
 
-- **(a)** time against the bytes a routine would have to marshal, with the floor
-  drawn and the region under it shaded. This panel establishes what the floor
-  *is* — its points come from a dozen different input and output sizes and still
-  fall on one line, which is what says it is a memcpy pair rather than an artifact
-  of the module measured through.
-- **(b)** the same divided by that floor, which is the number the decision turns
-  on: how many times faster a *perfect* port could be. The floor becomes the 1×
-  line, and everything under it is a routine that comes out slower in wasm however
-  fast the wasm is. The one ported routine is drawn in both panels twice — solid
-  for JavaScript, dashed for the shipped wasm — so in (b) its ceiling and what it
-  actually collected sit on the same axis.
+- **(a)** one bar per routine, from break-even out to the ceiling the floor
+  allows. A bar reaching left of 1× is a routine whose JavaScript already costs
+  less than moving its own bytes, so no port of it can win. The triangle on the
+  one ported routine is what that port actually collected out of the room it had.
+  Whiskers are the same ceiling over the rest of the payload sweep.
+- **(b)** where the ceiling's denominator comes from: every candidate's own floor
+  measurement, both corpora, against a single line at the measured 7 GB/s.
 
-The division is not cosmetic. In (a) every curve rises with payload size, so a
-verdict is a gap between two lines a decade apart and the eye has to measure it;
-in (b) the size dependence divides out and the verdict is a height.
+The figure was a pair of sweep panels until 2026-09-02 — time against payload
+size, and the same divided by the floor. The second of those turned out to be six
+nearly flat lines, and that flatness is the finding rather than a defect in the
+drawing: **the ceiling is a property of the routine and barely moves with how
+much data it is handed.** So the sweep collapses into (a)'s whiskers, which
+carry the same fact in a tenth of the space, and the panel that asked a reader
+to measure gaps between curves a decade apart on a log axis is gone.
+
+Two things to read carefully in (a). A whisker's far end is not evidence of a
+better ceiling: every sweep starts at a single block or a handful of records,
+where both sides of the ratio are one or two microseconds and neither is
+separable from the other — that is what puts the block scan's whisker up against
+1× while its bar sits at 0.05×. And the row order is the ceiling averaged over
+both read types, so a routine keeps its row across the two facets; within a
+single facet the bars are therefore not always in length order.
 
 wasm runs at close to native speed, which is what makes it look like a free win
 for a CPU-bound routine. It is not free, and the reason is the boundary rather
