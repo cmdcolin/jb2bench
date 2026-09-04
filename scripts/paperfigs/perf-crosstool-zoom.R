@@ -11,54 +11,33 @@
 # through the same @gmod/bam this build does, so it is a renderer beside a
 # renderer where igv confounds parser with renderer.
 #
-# TWO PANELS, because the run measures two different numbers per tool and only
-# some tools have both.
+# ONE PANEL, one claim: what a user waits after the zoom, one line per arm.
 #
-# The top panel is the result: what a user waits after the zoom, one line per
-# arm, one legend. The build under test and GenomeSpy sit at the bottom of it,
-# the two releases at the top, and the axis says so without a caption's help.
-#
-# The bottom panel is what the wait is made of. It earned its place answering a
-# sharper question than it answers now: the JBrowse wait used to be flat at
-# ~510 ms across a fifty-fold range of coverage, which is not the shape of work,
-# and the drawing inside it was sub-millisecond. That gap was the 500 ms
-# LGVCoarseDynamicBlocks throttle
+# It was two until 2026-09-04. The lower one showed what the wait was made of,
+# and it earned that space against a very different number -- the JBrowse wait
+# was then a flat ~510 ms across a fifty-fold range of coverage, which is not
+# the shape of work, wrapped around sub-millisecond drawing. That gap was the
+# 500 ms LGVCoarseDynamicBlocks throttle
 # (plugins/linear-genome-view/src/LinearGenomeView/afterAttach.ts), reached
 # because the benchmark drove the per-frame chokepoint rather than the discrete
-# path a UI control takes; scripts/crosstool/panprofile.ts fixed that on
-# 2026-09-04 and the wait fell to 7-30 ms.
+# path a UI control takes. scripts/crosstool/panprofile.ts fixed that and the
+# wait fell to 7-30 ms; the panel outlived the gap it was drawn to expose, and
+# neither of the two forms it was given afterwards was worth half a canvas.
+# The comment above WAIT below has that account.
 #
-# The panel stays because the two numbers are still different -- 8 ms of wait
-# around 2 ms of drawing at 20x short read -- and because publishing the drawing
-# alone as a render time is a mistake this repo made once and retracted. It
-# travels underneath the wait rather than instead of it, in its own panel, where
-# the gap between a tool's two lines is the whole subject and the label on each
-# line can be a sentence.
-#
-# Drawn as one figure the two measures needed two legends, a fourth decade of y
-# axis for a 500 us dashed line, and a reader who had to work out which arms the
-# dashed keys applied to. Split, each panel makes one claim and carries only the
-# keys it uses.
-#
-# ONLY TWO ARMS ARE IN THE BOTTOM PANEL, and the reason is not that the others
-# look bad there -- they look impossibly good. The block renderer paints in a
-# worker and the main thread only composites the finished tile, so the draw
-# clock times a drawImage and reads 0.0-0.1 ms underneath a wait of seconds.
-# drawclock patches the page's canvas prototypes and cannot reach a worker's own
-# global scope. results/crosstool-zoom.md prints those cells with a dagger and
-# tells the reader to compare only the un-daggered ones; a figure has no dagger,
-# so the panel carries the arms the clock can actually compare and says why in
-# the caption. The current renderer draws on the main thread through WebGL and
-# igv through the 2D API, and for those two this is the rasterization itself.
+# What the lower panel guarded against is still real: publishing a drawing time
+# as if it were the wait, or the wait as if it were a render cost, is a mistake
+# this repo made once and retracted. results/crosstool-zoom.md now carries that
+# guard, in two tables where each column can be labelled with a sentence and a
+# dagger can mark the arms whose rasterizer the clock cannot see. A figure has
+# no dagger.
 #
 #   Rscript scripts/paperfigs/perf-crosstool-zoom.R
 #
 # Endpoint labels are plain durations, no ratios. The claim here is a shape --
-# one arm flat, one rising with depth, two in seconds -- and the one ratio the
-# figure would carry is this work's rasterizer against igv's, which is a
-# different and louder claim than the one it is for. igv's drawing line is
-# unlabelled because it lands on its wait line, and two labels on one curve read
-# as two measurements.
+# two arms flat and fast, one rising with depth, two in seconds -- and the one
+# ratio the figure would carry is this work against igv, which is a louder claim
+# than the one it is for.
 
 suppressPackageStartupMessages({
   library(ggplot2)
@@ -126,9 +105,9 @@ endpoints <- function(df) {
   e
 }
 
-# Everything the two panels share: the curves, their endpoint labels, and the
-# axes. `breaks` limits the colour legend to the arms a panel draws, computed
-# rather than listed so a GenomeSpy column appears the run it is measured;
+# The curves, their endpoint labels and the axes. `breaks` limits the colour
+# legend to the arms actually drawn, computed rather than listed so a GenomeSpy
+# column appears the run it is measured;
 # drop = FALSE keeps every series the colour it has on the cold-load figure.
 zoom_panel <- function(df, ends, y_breaks) {
   ggplot(df, aes(x = coverage, y = s, colour = series)) +
@@ -171,12 +150,19 @@ top <- zoom_panel(wait, endpoints(wait), c(0.01, 0.1, 1, 10)) +
   # Two rows for the colour keys: six arms on one row run off both ends of a
   # 240 mm canvas, which clipped "Release 2.4.0" rather than shrinking to fit.
   guides(colour = guide_legend(nrow = 3)) +
-  labs(title = "What the user waits for",
-       # The premise, on the figure rather than only in the caption. Without it
-       # a reader assumes fetching is in these numbers and reads the spread as
-       # a comparison of network stacks; the run establishes the opposite, and
-       # it is the fact that makes this a redraw comparison at all.
-       subtitle = "No arm fetched a byte on any zoom step \u2014 every difference here is drawing")
+  # No subtitle. That no arm fetched a byte on any zoom step is the premise --
+  # it is what makes this a redraw comparison rather than a comparison of
+  # network stacks -- but it belongs to the caption, which is where the rest of
+  # the run's conditions already live. Stating it on the raster put one of the
+  # figure's several conditions above the others for no reason but that it was
+  # the one being argued about the week it was added.
+  # "Redraw" and not "render": every arm already holds the reads, no arm fetched
+  # a byte on any step, so what is timed is the second and later drawings of
+  # data already in hand. "Render" would let a reader fold in the cold load,
+  # which is a different figure. The clock stops at the last canvas draw call
+  # rather than at screen paint -- a draw precedes the compositor, so this reads
+  # slightly earlier than the eye, which the caption says.
+  labs(title = "Time to redraw after a 2\u00d7 zoom in")
 
 fig <- top + theme(text = element_text(size = PAPER_BASE))
 
@@ -193,8 +179,11 @@ cat("wrote results/figures/paper/png/perf-crosstool-zoom.png\n")
 # the figure itself carries no explanatory text beyond its subtitle.
 #
 #   A 2x zoom in, median of five steps, timed by one instrument belonging to no
-#   tool on the figure. No arm made a network request on any step, so every
-#   difference here is drawing and not fetching. Each key names the arm's
+#   tool on the figure. No arm made a network request on any step -- every arm
+#   already holds the reads -- so what is timed is redrawing data in hand, and
+#   every difference here is drawing and not fetching. The clock stops at the
+#   last canvas draw call rather than at screen paint, so it reads slightly
+#   earlier than the eye. Each key names the arm's
 #   renderer, because the subject is architecture and not brand: three
 #   architectures, three orders of magnitude, in that order down the panel. The
 #   two GPU arms sit together at 8-29 ms; igv.js rasterizes each read through
