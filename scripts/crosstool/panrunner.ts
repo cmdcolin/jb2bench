@@ -12,9 +12,9 @@
 // This is the cross-tool measurement `results/crosstool.md` is missing. Every
 // number there is a cold load, which folds application boot and assembly
 // resolution in with the drawing — and boot is the part that says nothing about
-// a renderer. The zoom comparison is worse rather than better: the README
-// retracts it, because what it timed was a 500 ms JBrowse debounce and not
-// JBrowse's pixels.
+// a renderer. The zoom comparison was worse rather than better until
+// 2026-09-04: what it timed was a 500 ms JBrowse throttle and not JBrowse's
+// pixels. See the drive note below.
 //
 // A pan at constant `bpPerPx` is the interaction where the comparison is
 // cleanest. The region is new to both tools so neither serves it from cache;
@@ -23,13 +23,15 @@
 // turning bytes into pixels, which is what the JBrowse-vs-JBrowse pan in
 // `results/interaction.md` measures and what nothing has measured across tools.
 //
-// A zoom asks the complementary question, and it is measurable here because the
-// instrument changed. The earlier `zoomrunner.ts` polled screenshots every
-// 100 ms and timed JBrowse's 500 ms navigation debounce rather than JBrowse's
-// drawing; the README retracted its table. The draws clock resolves both, and
-// reports them separately: on a zoom JBrowse waits a flat ~505 ms at every
-// coverage and then draws for well under a millisecond, so the wait and the work
-// are different numbers and the report prints both.
+// A zoom asks the complementary question, and it took two fixes to become
+// measurable. First the instrument: the earlier `zoomrunner.ts` polled
+// screenshots every 100 ms and could not resolve a step at all, so the README
+// retracted its table. Then the drive: even on the draws clock, a step written
+// through the bare `zoomTo` chokepoint left the coarse blocks on their 500 ms
+// throttle and read a flat ~507 ms at every coverage. Ending the step with
+// `settleCoarseBlocks`, the way every discrete placer in the LGV model does,
+// leaves 7-30 ms that rises with coverage. The report still prints the wait and
+// the drawing separately, because they are still different numbers.
 //
 // The three properties that make the cold-load matrix a comparison hold here
 // too, and one is added:
@@ -639,15 +641,24 @@ const lines: string[] = [
         'predicted that the older renderer would refetch and it does not; what the old',
         'renderer does is re-rasterize, which is a different cost and is priced below.',
         '',
-        '**Time-to-content on JBrowse here is mostly a timer, and this report will not',
-        'let it read as drawing.** A JBrowse zoom step comes back at a flat ~505 ms at',
-        'every coverage, every read type and every container, which is not what work',
-        'looks like: it is the 500 ms `LGVCoarseDynamicBlocks` debounce, and the',
-        'drawing inside it takes well under a millisecond. An earlier version of this',
-        'benchmark polled screenshots at 100 ms, could not see inside that, and',
-        'published the debounce as a render time; the README retracted it. Hence two',
-        'tables below — what the user waits, and what the renderer did — and never one',
-        'without the other.',
+        '**This column read a flat ~507 ms until 2026-09-04, and that number was the',
+        'benchmark and not the browser.** `zoomTo` is the per-frame chokepoint a',
+        'gesture writes through, and it leaves the coarse blocks on their 500 ms',
+        '`LGVCoarseDynamicBlocks` throttle deliberately — flushing sixty times a second',
+        'is the cost the throttle exists to avoid. Every discrete placer in the LGV',
+        'model ends with `settleCoarseBlocks` instead, and a benchmark step is a',
+        'discrete jump. Driven bare it timed the throttle coalescing a gesture that',
+        'never arrived, on a path no UI control takes; it also made JBrowse the only',
+        'arm entering a throttle at all, since igv is driven by `zoomIn` and GenomeSpy',
+        'by `zoomTo(interval)`, both discrete. Taking the discrete path leaves 7-30 ms',
+        'that rises with coverage — the shape of work, where the old column was flat',
+        'across a fifty-fold range because a constant dominated it.',
+        '',
+        'Two tables below all the same — what the user waits, and what the renderer',
+        'did — and never one without the other. The wait is no longer mostly a timer,',
+        'but it is still not all drawing, and an earlier version of this benchmark',
+        'polled screenshots at 100 ms, could not see inside the wait at all, and',
+        'published a debounce as a render time; the README retracted it.',
       ]
     : [
         'A pan holds scale fixed and moves to a region the view did not previously',
@@ -754,7 +765,7 @@ const drawTable = isZoom
       '## The redraw alone, with the waiting taken out',
       '',
       'The final draw burst of each step: its last draw minus its first. Everything',
-      'else in the column above is a tool waiting — a debounce for JBrowse, nothing at',
+      'else in the column above is a tool waiting — a residual few ms for JBrowse, nothing at',
       'all for igv, which starts drawing immediately.',
       '',
       '**`‡` is not a fast redraw, it is a blit.** The block renderer paints in a worker',

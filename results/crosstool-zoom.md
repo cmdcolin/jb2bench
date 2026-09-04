@@ -64,32 +64,41 @@ a single data request on any zoom step**. An earlier draft of this section
 predicted that the older renderer would refetch and it does not; what the old
 renderer does is re-rasterize, which is a different cost and is priced below.
 
-**Time-to-content on JBrowse here is mostly a timer, and this report will not
-let it read as drawing.** A JBrowse zoom step comes back at a flat ~505 ms at
-every coverage, every read type and every container, which is not what work
-looks like: it is the 500 ms `LGVCoarseDynamicBlocks` debounce, and the
-drawing inside it takes well under a millisecond. An earlier version of this
-benchmark polled screenshots at 100 ms, could not see inside that, and
-published the debounce as a render time; the README retracted it. Hence two
-tables below — what the user waits, and what the renderer did — and never one
-without the other.
+**This column read a flat ~507 ms until 2026-09-04, and that number was the
+benchmark and not the browser.** `zoomTo` is the per-frame chokepoint a
+gesture writes through, and it leaves the coarse blocks on their 500 ms
+`LGVCoarseDynamicBlocks` throttle deliberately — flushing sixty times a second
+is the cost the throttle exists to avoid. Every discrete placer in the LGV
+model ends with `settleCoarseBlocks` instead, and a benchmark step is a
+discrete jump. Driven bare it timed the throttle coalescing a gesture that
+never arrived, on a path no UI control takes; it also made JBrowse the only
+arm entering a throttle at all, since igv is driven by `zoomIn` and GenomeSpy
+by `zoomTo(interval)`, both discrete. Taking the discrete path leaves 7-30 ms
+that rises with coverage — the shape of work, where the old column was flat
+across a fifty-fold range because a constant dominated it.
+
+Two tables below all the same — what the user waits, and what the renderer
+did — and never one without the other. The wait is no longer mostly a timer,
+but it is still not all drawing, and an earlier version of this benchmark
+polled screenshots at 100 ms, could not see inside the wait at all, and
+published a debounce as a render time; the README retracted it.
 
 ## Time to content, over every step
 
 | case | JBrowse (current) | JBrowse (release-4.3.0) | JBrowse (release-2.4.0) | igv.js 3.8.5 | igv.js 3.8.5 (depth 10000) | GenomeSpy 0.85.0 | ratio | load | date |
 | --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | --- |
-| 20x-shortread-bam | 507 ms | 1108 ms | 1110 ms | 47 ms | 37 ms | 8 ms | 0.09x | 0.7 | 2026-09-03 |
-| 20x-shortread-cram | 507 ms | 1096 ms | 1114 ms | 50 ms | 57 ms | n/a | 0.10x | 0.5 | 2026-09-03 |
-| 200x-shortread-bam | 507 ms | 1170 ms | 1134 ms | 82 ms | 84 ms | 9 ms | 0.16x | 0.6 | 2026-09-03 |
-| 200x-shortread-cram | 507 ms | 1137 ms | 1145 ms | 87 ms | 86 ms | n/a | 0.17x | 0.9 | 2026-09-03 |
-| 1000x-shortread-bam | 508 ms | 1681 ms | 1982 ms | 82 ms | 86 ms | 9 ms | 0.16x | 0.9 | 2026-09-03 |
-| 1000x-shortread-cram | 507 ms | 1228 ms | 1877 ms | 87 ms | 86 ms | n/a | 0.17x | 1.1 | 2026-09-03 |
-| 20x-longread-bam | 512 ms | 1195 ms | 1229 ms | 236 ms | 232 ms | 9 ms | 0.46x | 1.1 | 2026-09-03 |
-| 20x-longread-cram | 511 ms | 1152 ms | 1147 ms | 219 ms | 217 ms | n/a | 0.43x | 1.5 | 2026-09-03 |
-| 200x-longread-bam | 517 ms | 3243 ms | 3592 ms | 1259 ms | 1325 ms | 9 ms | 2.44x | 1.5 | 2026-09-03 |
-| 200x-longread-cram | 516 ms | 1276 ms | 1913 ms | 1320 ms | 1269 ms | n/a | 2.56x | 0.9 | 2026-09-03 |
-| 1000x-longread-bam | 529 ms | 7574 ms | 7732 ms | 1119 ms | 1166 ms | — | 2.11x | 1.1 | 2026-09-03 |
-| 1000x-longread-cram | 530 ms | 3056 ms | 4596 ms | 1216 ms | 1293 ms | n/a | 2.29x | 1.1 | 2026-09-03 |
+| 20x-shortread-bam | 7 ms | 1109 ms | 1116 ms | 47 ms | 55 ms | 9 ms | 6.90x | 1.3 | 2026-09-04 |
+| 20x-shortread-cram | 7 ms | 1102 ms | 1122 ms | 50 ms | 56 ms | n/a | 7.17x | 0.7 | 2026-09-04 |
+| 200x-shortread-bam | 7 ms | 1181 ms | 1138 ms | 88 ms | 83 ms | 9 ms | 12.59x | 1.4 | 2026-09-04 |
+| 200x-shortread-cram | 7 ms | 1137 ms | 1149 ms | 88 ms | 85 ms | n/a | 12.78x | 1.4 | 2026-09-04 |
+| 1000x-shortread-bam | 8 ms | 1657 ms | 2002 ms | 86 ms | 89 ms | 9 ms | 11.29x | 0.9 | 2026-09-04 |
+| 1000x-shortread-cram | 8 ms | 1245 ms | 1817 ms | 84 ms | 86 ms | n/a | 11.11x | 1.1 | 2026-09-04 |
+| 20x-longread-bam | 8 ms | 1201 ms | 1232 ms | 231 ms | 239 ms | 9 ms | 29.20x | 1.1 | 2026-09-04 |
+| 20x-longread-cram | 9 ms | 1145 ms | 1150 ms | 219 ms | 218 ms | n/a | 23.84x | 1.2 | 2026-09-04 |
+| 200x-longread-bam | 19 ms | 3252 ms | 3592 ms | 1250 ms | 1324 ms | 9 ms | 64.74x | 1.2 | 2026-09-04 |
+| 200x-longread-cram | 20 ms | 1274 ms | 1906 ms | 1267 ms | 1282 ms | n/a | 63.99x | 1.1 | 2026-09-04 |
+| 1000x-longread-bam | 29 ms | 8998 ms | 5934 ms | 1178 ms | 1259 ms | — | 40.34x | 1.4 | 2026-09-04 |
+| 1000x-longread-cram | 30 ms | 3127 ms | 4530 ms | 1209 ms | 1240 ms | n/a | 40.02x | 1.4 | 2026-09-04 |
 
 `ratio` is igv ÷ JBrowse: above 1.0 means JBrowse got content back sooner.
 
@@ -99,7 +108,7 @@ ratio of two waits, one of which is a configured constant.
 ## The redraw alone, with the waiting taken out
 
 The final draw burst of each step: its last draw minus its first. Everything
-else in the column above is a tool waiting — a debounce for JBrowse, nothing at
+else in the column above is a tool waiting — a residual few ms for JBrowse, nothing at
 all for igv, which starts drawing immediately.
 
 **`‡` is not a fast redraw, it is a blit.** The block renderer paints in a worker
@@ -118,18 +127,18 @@ the count distinguishes them.
 
 | case | JBrowse (current) | JBrowse (release-4.3.0) | JBrowse (release-2.4.0) | igv.js 3.8.5 | igv.js 3.8.5 (depth 10000) | GenomeSpy 0.85.0 |
 | --- | ---: | ---: | ---: | ---: | ---: | ---: |
-| 20x-shortread-bam | 0.8 ms | 30 ms ‡ | 49 ms ‡ | 46 ms | 32 ms | 0.7 ms |
-| 20x-shortread-cram | 0.5 ms | 23 ms ‡ | 50 ms ‡ | 49 ms | 52 ms | — |
-| 200x-shortread-bam | 0.3 ms | 73 ms ‡ | 13 ms ‡ | 78 ms | 79 ms | 0.8 ms |
-| 200x-shortread-cram | 0.6 ms | 56 ms ‡ | 83 ms ‡ | 82 ms | 81 ms | — |
-| 1000x-shortread-bam | 0.7 ms | 0.0 ms ‡ | 0.0 ms ‡ | 78 ms | 83 ms | 0.8 ms |
-| 1000x-shortread-cram | 0.6 ms | 51 ms ‡ | 0.0 ms ‡ | 83 ms | 83 ms | — |
-| 20x-longread-bam | 0.4 ms | 91 ms ‡ | 59 ms ‡ | 232 ms | 228 ms | 0.7 ms |
-| 20x-longread-cram | 0.6 ms | 43 ms ‡ | 117 ms ‡ | 217 ms | 213 ms | — |
-| 200x-longread-bam | 0.6 ms | 0.1 ms ‡ | 0.0 ms ‡ | 1256 ms | 1321 ms | 0.8 ms |
-| 200x-longread-cram | 0.5 ms | 143 ms ‡ | 0.0 ms ‡ | 1318 ms | 1264 ms | — |
-| 1000x-longread-bam | 0.5 ms | 0.1 ms ‡ | 0.1 ms ‡ | 1115 ms | 1162 ms | — |
-| 1000x-longread-cram | 0.5 ms | 0.1 ms ‡ | 0.0 ms ‡ | 1212 ms | 1289 ms | — |
+| 20x-shortread-bam | 2.7 ms | 20 ms ‡ | 53 ms ‡ | 46 ms | 52 ms | 0.7 ms |
+| 20x-shortread-cram | 2.7 ms | 22 ms ‡ | 50 ms ‡ | 49 ms | 51 ms | — |
+| 200x-shortread-bam | 2.5 ms | 97 ms ‡ | 13 ms ‡ | 84 ms | 79 ms | 0.7 ms |
+| 200x-shortread-cram | 2.6 ms | 63 ms ‡ | 83 ms ‡ | 84 ms | 81 ms | — |
+| 1000x-shortread-bam | 2.1 ms | 0.1 ms ‡ | 0.0 ms ‡ | 81 ms | 84 ms | 0.6 ms |
+| 1000x-shortread-cram | 2.6 ms | 47 ms ‡ | 0.0 ms ‡ | 80 ms | 81 ms | — |
+| 20x-longread-bam | 2.8 ms | 94 ms ‡ | 56 ms ‡ | 226 ms | 235 ms | 0.8 ms |
+| 20x-longread-cram | 3.6 ms | 45 ms ‡ | 116 ms ‡ | 215 ms | 214 ms | — |
+| 200x-longread-bam | 1.2 ms | 0.1 ms ‡ | 0.0 ms ‡ | 1245 ms | 1319 ms | 0.7 ms |
+| 200x-longread-cram | 1.0 ms | 143 ms ‡ | 0.0 ms ‡ | 1263 ms | 1277 ms | — |
+| 1000x-longread-bam | 1.1 ms | 0.1 ms ‡ | 0.0 ms ‡ | 1174 ms | 1254 ms | — |
+| 1000x-longread-cram | 0.9 ms | 0.1 ms ‡ | 0.0 ms ‡ | 1204 ms | 1236 ms | — |
 
 Between the two arms this column can compare, it points opposite ways. The
 current renderer draws in a fraction of a millisecond, because the pileup is
@@ -196,14 +205,14 @@ been removed for exactly this reason.
 | 200x-shortread-cram | genomespy | — | 0 | 0 | — | — |
 | 1000x-shortread-bam | jbrowse | 5 | 5 | 0 | — | 20–20 |
 | 1000x-shortread-bam | jbrowse-release-4.3.0 | 5 | 5 | 0 | — | 12–14 |
-| 1000x-shortread-bam | jbrowse-release-2.4.0 | 5 | 5 | 0 | — | 6–9 |
-| 1000x-shortread-bam | igv | 5 | 5 | 0 | — | 9631–151763 |
+| 1000x-shortread-bam | jbrowse-release-2.4.0 | 5 | 5 | 0 | — | 6–12 |
+| 1000x-shortread-bam | igv | 5 | 5 | 0 | — | 9587–151899 |
 | 1000x-shortread-bam | igv-deep | 5 | 5 | 0 | — | 9718–153157 |
 | 1000x-shortread-bam | genomespy | 5 | 5 | 0 | — | 24–24 |
 | 1000x-shortread-cram | jbrowse | 5 | 5 | 0 | — | 20–20 |
 | 1000x-shortread-cram | jbrowse-release-4.3.0 | 5 | 5 | 0 | — | 12–18 |
-| 1000x-shortread-cram | jbrowse-release-2.4.0 | 5 | 5 | 0 | — | 6–12 |
-| 1000x-shortread-cram | igv | 5 | 5 | 0 | — | 9629–151798 |
+| 1000x-shortread-cram | jbrowse-release-2.4.0 | 5 | 5 | 0 | — | 6–9 |
+| 1000x-shortread-cram | igv | 5 | 5 | 0 | — | 9633–151816 |
 | 1000x-shortread-cram | igv-deep | 5 | 5 | 0 | — | 9696–153166 |
 | 1000x-shortread-cram | genomespy | — | 0 | 0 | — | — |
 | 20x-longread-bam | jbrowse | 5 | 5 | 0 | — | 20–23 |
@@ -225,21 +234,21 @@ been removed for exactly this reason.
 | 200x-longread-bam | igv-deep | 5 | 5 | 0 | — | 248025–955019 |
 | 200x-longread-bam | genomespy | 5 | 5 | 0 | — | 24–24 |
 | 200x-longread-cram | jbrowse | 5 | 5 | 0 | — | 18–25 |
-| 200x-longread-cram | jbrowse-release-4.3.0 | 5 | 5 | 0 | — | 12–18 |
+| 200x-longread-cram | jbrowse-release-4.3.0 | 5 | 5 | 0 | — | 12–16 |
 | 200x-longread-cram | jbrowse-release-2.4.0 | 5 | 5 | 0 | — | 6–12 |
 | 200x-longread-cram | igv | 5 | 5 | 0 | — | 248025–955019 |
 | 200x-longread-cram | igv-deep | 5 | 5 | 0 | — | 248025–955019 |
 | 200x-longread-cram | genomespy | — | 0 | 0 | — | — |
 | 1000x-longread-bam | jbrowse | 5 | 5 | 0 | — | 18–24 |
-| 1000x-longread-bam | jbrowse-release-4.3.0 | 5 | 5 | 0 | — | 2–4 |
-| 1000x-longread-bam | jbrowse-release-2.4.0 | 5 | 5 | 0 | — | 1–4 |
-| 1000x-longread-bam | igv | 5 | 5 | 0 | — | 235403–902212 |
+| 1000x-longread-bam | jbrowse-release-4.3.0 | 5 | 5 | 0 | — | 2–8 |
+| 1000x-longread-bam | jbrowse-release-2.4.0 | 5 | 5 | 0 | — | 1–3 |
+| 1000x-longread-bam | igv | 5 | 5 | 0 | — | 231894–882597 |
 | 1000x-longread-bam | igv-deep | 5 | 5 | 0 | — | 238070–903054 |
 | 1000x-longread-bam | genomespy | 0 | 0 | 0 | — | — |
 | 1000x-longread-cram | jbrowse | 5 | 5 | 0 | — | 18–24 |
 | 1000x-longread-cram | jbrowse-release-4.3.0 | 5 | 5 | 0 | — | 8–12 |
 | 1000x-longread-cram | jbrowse-release-2.4.0 | 5 | 5 | 0 | — | 6–9 |
-| 1000x-longread-cram | igv | 5 | 5 | 0 | — | 234175–890978 |
+| 1000x-longread-cram | igv | 5 | 5 | 0 | — | 233603–891783 |
 | 1000x-longread-cram | igv-deep | 5 | 5 | 0 | — | 239407–907018 |
 | 1000x-longread-cram | genomespy | — | 0 | 0 | — | — |
 

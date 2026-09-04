@@ -4,5 +4,5 @@
 "2,504 × 3,105",2504,3105,"JS reference","distance",20.3565
 "2,504 × 3,105",2504,3105,"JS reference","merge",60.2712
 "2,504 × 3,105",2504,3105,"wasm","total (split unresolved)",2.1627
-"2,504 × 3,105",2504,3105,"WebGPU + wasm","distance",0.73
+"2,504 × 3,105",2504,3105,"WebGPU + wasm","distance",0.42
 "2,504 × 3,105",2504,3105,"WebGPU + wasm","merge (upper bound)",0.1

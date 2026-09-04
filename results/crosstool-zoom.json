@@ -12,14 +12,21 @@
   "rows": {
     "20x-shortread-bam": {
       "jbrowse": {
-        "median": 507.10000002384186,
-        "drawMedian": 0.7999999523162842,
+        "median": 6.799999998882413,
+        "drawMedian": 2.700000001117587,
         "fetchedMedian": null,
         "runs": [
-          508.5,
-          507.10000002384186,
-          505.2999999523163
+          6.699999999254942,
+          6.799999998882413,
+          7.200000001117587
         ],
+        "fetchedRuns": [],
+        "drawRuns": [
+          2.700000001117587,
+          2.5,
+          2.900000000372529
+        ],
+        "settlesCoarseBlocks": true,
         "appliedSteps": [
           5,
           5,
@@ -43,20 +50,27 @@
           "chr22_mask:133,206..133,798"
         ],
         "load": {
-          "before": 0.72,
-          "after": 0.38
+          "before": 1.32,
+          "after": 0.55
         },
         "failures": []
       },
       "jbrowse-release-4.3.0": {
-        "median": 1107.800000011921,
-        "drawMedian": 29.599999964237213,
+        "median": 1108.800000000745,
+        "drawMedian": 20.09999999962747,
         "fetchedMedian": null,
         "runs": [
-          1107.699999988079,
-          1121,
-          1107.800000011921
+          1108.800000000745,
+          1110.4000000003725,
+          1100.8999999985099
         ],
+        "fetchedRuns": [],
+        "drawRuns": [
+          20.09999999962747,
+          18.5,
+          25.899999998509884
+        ],
+        "settlesCoarseBlocks": false,
         "appliedSteps": [
           5,
           5,
@@ -80,20 +94,27 @@
           "chr22_mask:133,206..133,798"
         ],
         "load": {
-          "before": 0.72,
-          "after": 0.38
+          "before": 1.32,
+          "after": 0.55
         },
         "failures": []
       },
       "jbrowse-release-2.4.0": {
-        "median": 1110.300000011921,
-        "drawMedian": 48.5,
+        "median": 1115.800000000745,
+        "drawMedian": 53.19999999925494,
         "fetchedMedian": null,
         "runs": [
-          1105.7999999523163,
-          1110.300000011921,
-          1113
+          1114,
+          1115.800000000745,
+          1118.7999999988824
         ],
+        "fetchedRuns": [],
+        "drawRuns": [
+          49.40000000037253,
+          65.19999999925494,
+          53.19999999925494
+        ],
+        "settlesCoarseBlocks": false,
         "appliedSteps": [
           5,
           5,
@@ -117,19 +138,25 @@
           "chr22_mask:133,206..133,798"
         ],
         "load": {
-          "before": 0.72,
-          "after": 0.38
+          "before": 1.32,
+          "after": 0.55
         },
         "failures": []
       },
       "igv": {
-        "median": 46.89999997615814,
-        "drawMedian": 45.80000001192093,
+        "median": 46.90000000037253,
+        "drawMedian": 45.69999999925494,
         "fetchedMedian": null,
         "runs": [
-          37.200000047683716,
-          51.200000047683716,
-          46.89999997615814
+          56.90000000037253,
+          46.90000000037253,
+          43.899999998509884
+        ],
+        "fetchedRuns": [],
+        "drawRuns": [
+          51.90000000037253,
+          45.69999999925494,
+          35.09999999962747
         ],
         "appliedSteps": [
           5,
@@ -154,19 +181,25 @@
           "chr22_mask:133203-133796"
         ],
         "load": {
-          "before": 0.72,
-          "after": 0.38
+          "before": 1.32,
+          "after": 0.55
         },
         "failures": []
       },
       "igv-deep": {
-        "median": 36.69999998807907,
-        "drawMedian": 32,
+        "median": 54.69999999925494,
+        "drawMedian": 51.69999999925494,
         "fetchedMedian": null,
         "runs": [
-          52,
-          32.30000001192093,
-          36.69999998807907
+          54.69999999925494,
+          53.09999999962747,
+          56.59999999962747
+        ],
+        "fetchedRuns": [],
+        "drawRuns": [
+          52.90000000037253,
+          48.40000000037253,
+          51.69999999925494
         ],
         "appliedSteps": [
           5,
@@ -191,19 +224,25 @@
           "chr22_mask:133203-133796"
         ],
         "load": {
-          "before": 0.72,
-          "after": 0.38
+          "before": 1.32,
+          "after": 0.55
         },
         "failures": []
       },
       "genomespy": {
-        "median": 8.300000011920929,
-        "drawMedian": 0.699999988079071,
+        "median": 8.700000001117587,
+        "drawMedian": 0.7000000011175871,
         "fetchedMedian": null,
         "runs": [
-          8.300000011920929,
-          5.399999976158142,
-          8.800000011920929
+          8.700000001117587,
+          5.900000000372529,
+          8.800000000745058
+        ],
+        "fetchedRuns": [],
+        "drawRuns": [
+          0.7000000011175871,
+          0.7000000011175871,
+          0.6999999992549419
         ],
         "appliedSteps": [
           5,
@@ -228,22 +267,29 @@
           "chr22_mask:133203-133798"
         ],
         "load": {
-          "before": 0.72,
-          "after": 0.38
+          "before": 1.32,
+          "after": 0.55
         },
         "failures": []
       }
     },
     "20x-shortread-cram": {
       "jbrowse": {
-        "median": 507.2000000476837,
-        "drawMedian": 0.5,
+        "median": 7,
+        "drawMedian": 2.699999999254942,
         "fetchedMedian": null,
         "runs": [
-          507.2000000476837,
-          506.30000001192093,
-          507.5999999642372
+          7,
+          7.600000001490116,
+          7
         ],
+        "fetchedRuns": [],
+        "drawRuns": [
+          2.699999999254942,
+          3,
+          2.5
+        ],
+        "settlesCoarseBlocks": true,
         "appliedSteps": [
           5,
           5,
@@ -267,20 +313,27 @@
           "chr22_mask:133,206..133,798"
         ],
         "load": {
-          "before": 0.38,
-          "after": 0.46
+          "before": 0.55,
+          "after": 0.74
         },
         "failures": []
       },
       "jbrowse-release-4.3.0": {
-        "median": 1095.6000000238419,
-        "drawMedian": 22.700000047683716,
+        "median": 1101.699999999255,
+        "drawMedian": 22.09999999962747,
         "fetchedMedian": null,
         "runs": [
-          1095.6000000238419,
-          1099.3999999761581,
-          1091.7999999523163
+          1101.699999999255,
+          1100.5999999996275,
+          1108.199999999255
         ],
+        "fetchedRuns": [],
+        "drawRuns": [
+          23.699999999254942,
+          22.09999999962747,
+          21.799999998882413
+        ],
+        "settlesCoarseBlocks": false,
         "appliedSteps": [
           5,
           5,
@@ -304,20 +357,27 @@
           "chr22_mask:133,206..133,798"
         ],
         "load": {
-          "before": 0.38,
-          "after": 0.46
+          "before": 0.55,
+          "after": 0.74
         },
         "failures": []
       },
       "jbrowse-release-2.4.0": {
-        "median": 1113.5,
+        "median": 1122.2999999988824,
         "drawMedian": 50,
         "fetchedMedian": null,
         "runs": [
-          1119.1000000238419,
-          1113.5,
-          1104.6000000238419
+          1120.5,
+          1122.2999999988824,
+          1131.2999999988824
         ],
+        "fetchedRuns": [],
+        "drawRuns": [
+          50.70000000111759,
+          50,
+          49.69999999925494
+        ],
+        "settlesCoarseBlocks": false,
         "appliedSteps": [
           5,
           5,
@@ -341,19 +401,25 @@
           "chr22_mask:133,206..133,798"
         ],
         "load": {
-          "before": 0.38,
-          "after": 0.46
+          "before": 0.55,
+          "after": 0.74
         },
         "failures": []
       },
       "igv": {
-        "median": 50,
-        "drawMedian": 48.80000001192093,
+        "median": 50.20000000111759,
+        "drawMedian": 48.70000000111759,
         "fetchedMedian": null,
         "runs": [
-          50,
-          41.5,
-          56
+          62.09999999962747,
+          38.5,
+          50.20000000111759
+        ],
+        "fetchedRuns": [],
+        "drawRuns": [
+          60.5,
+          33.90000000037253,
+          48.70000000111759
         ],
         "appliedSteps": [
           5,
@@ -378,19 +444,25 @@
           "chr22_mask:133203-133796"
         ],
         "load": {
-          "before": 0.38,
-          "after": 0.46
+          "before": 0.55,
+          "after": 0.74
         },
         "failures": []
       },
       "igv-deep": {
-        "median": 56.5,
-        "drawMedian": 51.80000001192093,
+        "median": 55.5,
+        "drawMedian": 50.5,
         "fetchedMedian": null,
         "runs": [
-          56.40000003576279,
-          57.39999997615814,
-          56.5
+          33.79999999888241,
+          89.79999999888241,
+          55.5
+        ],
+        "fetchedRuns": [],
+        "drawRuns": [
+          32.29999999888241,
+          84.79999999888241,
+          50.5
         ],
         "appliedSteps": [
           5,
@@ -415,8 +487,8 @@
           "chr22_mask:133203-133796"
         ],
         "load": {
-          "before": 0.38,
-          "after": 0.46
+          "before": 0.55,
+          "after": 0.74
         },
         "failures": []
       },
@@ -425,10 +497,12 @@
         "drawMedian": null,
         "fetchedMedian": null,
         "runs": [],
+        "fetchedRuns": [],
         "appliedSteps": [],
         "cachedSteps": 0,
         "requests": 0,
         "bytes": 0,
+        "drawRuns": [],
         "drawsPerStep": [],
         "loci": [],
         "load": {
@@ -441,14 +515,21 @@
     },
     "200x-shortread-bam": {
       "jbrowse": {
-        "median": 506.5,
-        "drawMedian": 0.30000001192092896,
+        "median": 7,
+        "drawMedian": 2.5,
         "fetchedMedian": null,
         "runs": [
-          506.5,
-          506.2999999523163,
-          506.69999998807907
+          7.5,
+          7,
+          7
         ],
+        "fetchedRuns": [],
+        "drawRuns": [
+          2.699999999254942,
+          2.5,
+          2.5
+        ],
+        "settlesCoarseBlocks": true,
         "appliedSteps": [
           5,
           5,
@@ -472,20 +553,27 @@
           "chr22_mask:133,206..133,798"
         ],
         "load": {
-          "before": 0.46,
-          "after": 0.61
+          "before": 0.74,
+          "after": 1.36
         },
         "failures": []
       },
       "jbrowse-release-4.3.0": {
-        "median": 1169.6000000238419,
-        "drawMedian": 73.19999998807907,
+        "median": 1181.0999999996275,
+        "drawMedian": 96.80000000074506,
         "fetchedMedian": null,
         "runs": [
-          1139.1000000238419,
-          1194.6000000238419,
-          1169.6000000238419
+          1181.0999999996275,
+          1201.0999999996275,
+          1125.5999999996275
         ],
+        "fetchedRuns": [],
+        "drawRuns": [
+          104.70000000111759,
+          96.80000000074506,
+          53.09999999962747
+        ],
+        "settlesCoarseBlocks": false,
         "appliedSteps": [
           5,
           5,
@@ -509,20 +597,27 @@
           "chr22_mask:133,206..133,798"
         ],
         "load": {
-          "before": 0.46,
-          "after": 0.61
+          "before": 0.74,
+          "after": 1.36
         },
         "failures": []
       },
       "jbrowse-release-2.4.0": {
-        "median": 1133.8999999761581,
-        "drawMedian": 13.199999988079071,
+        "median": 1138,
+        "drawMedian": 13.400000000372529,
         "fetchedMedian": null,
         "runs": [
-          1133.8999999761581,
-          1133.300000011921,
-          1162.300000011921
+          1122.5999999996275,
+          1138,
+          1164.199999999255
         ],
+        "fetchedRuns": [],
+        "drawRuns": [
+          13.400000000372529,
+          33.100000001490116,
+          12.699999999254942
+        ],
+        "settlesCoarseBlocks": false,
         "appliedSteps": [
           5,
           5,
@@ -546,19 +641,25 @@
           "chr22_mask:133,206..133,798"
         ],
         "load": {
-          "before": 0.46,
-          "after": 0.61
+          "before": 0.74,
+          "after": 1.36
         },
         "failures": []
       },
       "igv": {
-        "median": 81.89999997615814,
-        "drawMedian": 77.59999996423721,
+        "median": 88.09999999962747,
+        "drawMedian": 83.5,
         "fetchedMedian": null,
         "runs": [
-          81.89999997615814,
-          78.19999998807907,
-          82.19999998807907
+          119.90000000037253,
+          83.5,
+          88.09999999962747
+        ],
+        "fetchedRuns": [],
+        "drawRuns": [
+          115,
+          79.19999999925494,
+          83.5
         ],
         "appliedSteps": [
           5,
@@ -583,19 +684,25 @@
           "chr22_mask:133203-133796"
         ],
         "load": {
-          "before": 0.46,
-          "after": 0.61
+          "before": 0.74,
+          "after": 1.36
         },
         "failures": []
       },
       "igv-deep": {
-        "median": 83.60000002384186,
-        "drawMedian": 79.10000002384186,
+        "median": 83.29999999888241,
+        "drawMedian": 79.09999999962747,
         "fetchedMedian": null,
         "runs": [
-          84.69999998807907,
-          80.89999997615814,
-          83.60000002384186
+          83.40000000037253,
+          83.20000000111759,
+          83.29999999888241
+        ],
+        "fetchedRuns": [],
+        "drawRuns": [
+          79.09999999962747,
+          78.80000000074506,
+          79.09999999962747
         ],
         "appliedSteps": [
           5,
@@ -620,19 +727,25 @@
           "chr22_mask:133203-133796"
         ],
         "load": {
-          "before": 0.46,
-          "after": 0.61
+          "before": 0.74,
+          "after": 1.36
         },
         "failures": []
       },
       "genomespy": {
-        "median": 8.5,
-        "drawMedian": 0.7999999523162842,
+        "median": 8.799999998882413,
+        "drawMedian": 0.7000000011175871,
         "fetchedMedian": null,
         "runs": [
-          7.400000035762787,
-          8.600000023841858,
-          8.5
+          4.300000000745058,
+          9.400000000372529,
+          8.799999998882413
+        ],
+        "fetchedRuns": [],
+        "drawRuns": [
+          0.7000000011175871,
+          0.7000000011175871,
+          0.7999999988824129
         ],
         "appliedSteps": [
           5,
@@ -657,22 +770,29 @@
           "chr22_mask:133203-133798"
         ],
         "load": {
-          "before": 0.46,
-          "after": 0.61
+          "before": 0.74,
+          "after": 1.36
         },
         "failures": []
       }
     },
     "200x-shortread-cram": {
       "jbrowse": {
-        "median": 506.5,
-        "drawMedian": 0.6000000238418579,
+        "median": 6.899999998509884,
+        "drawMedian": 2.599999999627471,
         "fetchedMedian": null,
         "runs": [
-          506.19999998807907,
-          507.7000000476837,
-          506.5
+          6.899999998509884,
+          7.5,
+          5.300000000745058
         ],
+        "fetchedRuns": [],
+        "drawRuns": [
+          2.599999999627471,
+          2.900000000372529,
+          2.300000000745058
+        ],
+        "settlesCoarseBlocks": true,
         "appliedSteps": [
           5,
           5,
@@ -696,20 +816,27 @@
           "chr22_mask:133,206..133,798"
         ],
         "load": {
-          "before": 0.61,
-          "after": 0.89
+          "before": 1.36,
+          "after": 0.7
         },
         "failures": []
       },
       "jbrowse-release-4.3.0": {
-        "median": 1136.6000000238419,
-        "drawMedian": 55.89999997615814,
+        "median": 1137,
+        "drawMedian": 62.5,
         "fetchedMedian": null,
         "runs": [
-          1136.6000000238419,
-          1131,
-          1158.5
+          1137,
+          1156.800000000745,
+          1126.800000000745
         ],
+        "fetchedRuns": [],
+        "drawRuns": [
+          62.5,
+          86.30000000074506,
+          53.40000000037253
+        ],
+        "settlesCoarseBlocks": false,
         "appliedSteps": [
           5,
           5,
@@ -733,20 +860,27 @@
           "chr22_mask:133,206..133,798"
         ],
         "load": {
-          "before": 0.61,
-          "after": 0.89
+          "before": 1.36,
+          "after": 0.7
         },
         "failures": []
       },
       "jbrowse-release-2.4.0": {
-        "median": 1145.199999988079,
-        "drawMedian": 83.19999998807907,
+        "median": 1149.199999999255,
+        "drawMedian": 83.10000000149012,
         "fetchedMedian": null,
         "runs": [
-          1160.199999988079,
-          1145.199999988079,
-          1118.2000000476837
+          1150.300000000745,
+          1145.2999999988824,
+          1149.199999999255
         ],
+        "fetchedRuns": [],
+        "drawRuns": [
+          83.10000000149012,
+          99.5,
+          83
+        ],
+        "settlesCoarseBlocks": false,
         "appliedSteps": [
           5,
           5,
@@ -770,19 +904,25 @@
           "chr22_mask:133,206..133,798"
         ],
         "load": {
-          "before": 0.61,
-          "after": 0.89
+          "before": 1.36,
+          "after": 0.7
         },
         "failures": []
       },
       "igv": {
-        "median": 86.5,
-        "drawMedian": 82,
+        "median": 88.20000000111759,
+        "drawMedian": 84,
         "fetchedMedian": null,
         "runs": [
-          121.5,
-          82.40000003576279,
-          86.5
+          88.20000000111759,
+          84.09999999962747,
+          89.5
+        ],
+        "fetchedRuns": [],
+        "drawRuns": [
+          84,
+          79.79999999888241,
+          84.79999999888241
         ],
         "appliedSteps": [
           5,
@@ -807,19 +947,25 @@
           "chr22_mask:133203-133796"
         ],
         "load": {
-          "before": 0.61,
-          "after": 0.89
+          "before": 1.36,
+          "after": 0.7
         },
         "failures": []
       },
       "igv-deep": {
-        "median": 85.60000002384186,
-        "drawMedian": 81.19999998807907,
+        "median": 85.29999999888241,
+        "drawMedian": 80.69999999925494,
         "fetchedMedian": null,
         "runs": [
-          88.09999996423721,
-          85.60000002384186,
-          84.5
+          80.40000000037253,
+          85.29999999888241,
+          123.09999999962747
+        ],
+        "fetchedRuns": [],
+        "drawRuns": [
+          78.79999999888241,
+          80.69999999925494,
+          118.70000000111759
         ],
         "appliedSteps": [
           5,
@@ -844,8 +990,8 @@
           "chr22_mask:133203-133796"
         ],
         "load": {
-          "before": 0.61,
-          "after": 0.89
+          "before": 1.36,
+          "after": 0.7
         },
         "failures": []
       },
@@ -854,10 +1000,12 @@
         "drawMedian": null,
         "fetchedMedian": null,
         "runs": [],
+        "fetchedRuns": [],
         "appliedSteps": [],
         "cachedSteps": 0,
         "requests": 0,
         "bytes": 0,
+        "drawRuns": [],
         "drawsPerStep": [],
         "loci": [],
         "load": {
@@ -870,14 +1018,21 @@
     },
     "1000x-shortread-bam": {
       "jbrowse": {
-        "median": 507.5999999642372,
-        "drawMedian": 0.699999988079071,
+        "median": 7.599999999627471,
+        "drawMedian": 2.100000001490116,
         "fetchedMedian": null,
         "runs": [
-          508,
-          507.5999999642372,
-          504.89999997615814
+          7.599999999627471,
+          7.599999999627471,
+          7.800000000745058
         ],
+        "fetchedRuns": [],
+        "drawRuns": [
+          2.100000001490116,
+          2.099999999627471,
+          2.5
+        ],
+        "settlesCoarseBlocks": true,
         "appliedSteps": [
           5,
           5,
@@ -901,20 +1056,27 @@
           "chr22_mask:133,206..133,798"
         ],
         "load": {
-          "before": 0.89,
-          "after": 0.69
+          "before": 0.7,
+          "after": 0.86
         },
         "failures": []
       },
       "jbrowse-release-4.3.0": {
-        "median": 1681.3999999761581,
-        "drawMedian": 0,
+        "median": 1657.2000000011176,
+        "drawMedian": 0.09999999962747097,
         "fetchedMedian": null,
         "runs": [
-          1681.3999999761581,
-          1691.699999988079,
-          1627.1000000238419
+          1616.5,
+          1705.7000000011176,
+          1657.2000000011176
         ],
+        "fetchedRuns": [],
+        "drawRuns": [
+          0,
+          0.09999999962747097,
+          0.10000000149011612
+        ],
+        "settlesCoarseBlocks": false,
         "appliedSteps": [
           5,
           5,
@@ -938,20 +1100,27 @@
           "chr22_mask:133,206..133,798"
         ],
         "load": {
-          "before": 0.89,
-          "after": 0.69
+          "before": 0.7,
+          "after": 0.86
         },
         "failures": []
       },
       "jbrowse-release-2.4.0": {
-        "median": 1981.800000011921,
+        "median": 2002.0999999996275,
         "drawMedian": 0,
         "fetchedMedian": null,
         "runs": [
-          2006,
-          1981.800000011921,
-          1933.5
+          2002.0999999996275,
+          1951.7999999988824,
+          2014
         ],
+        "fetchedRuns": [],
+        "drawRuns": [
+          0,
+          0,
+          0
+        ],
+        "settlesCoarseBlocks": false,
         "appliedSteps": [
           5,
           5,
@@ -962,7 +1131,7 @@
         "bytes": 0,
         "drawsPerStep": [
           9,
-          9,
+          12,
           8,
           6,
           6
@@ -975,19 +1144,25 @@
           "chr22_mask:133,206..133,798"
         ],
         "load": {
-          "before": 0.89,
-          "after": 0.69
+          "before": 0.7,
+          "after": 0.86
         },
         "failures": []
       },
       "igv": {
-        "median": 82.19999998807907,
-        "drawMedian": 78.10000002384186,
+        "median": 85.79999999888241,
+        "drawMedian": 81.39999999850988,
         "fetchedMedian": null,
         "runs": [
-          82.40000003576279,
-          81.40000003576279,
-          82.19999998807907
+          117.89999999850988,
+          83.09999999962747,
+          85.79999999888241
+        ],
+        "fetchedRuns": [],
+        "drawRuns": [
+          113.5,
+          78.59999999962747,
+          81.39999999850988
         ],
         "appliedSteps": [
           5,
@@ -998,11 +1173,11 @@
         "requests": 0,
         "bytes": 0,
         "drawsPerStep": [
-          151763,
-          75963,
-          38486,
-          19240,
-          9631
+          151899,
+          75944,
+          38480,
+          19229,
+          9587
         ],
         "loci": [
           "chr22_mask:128749-138250",
@@ -1012,19 +1187,25 @@
           "chr22_mask:133203-133796"
         ],
         "load": {
-          "before": 0.89,
-          "after": 0.69
+          "before": 0.7,
+          "after": 0.86
         },
         "failures": []
       },
       "igv-deep": {
-        "median": 85.90000003576279,
-        "drawMedian": 83.30000001192093,
+        "median": 88.59999999962747,
+        "drawMedian": 84.29999999888241,
         "fetchedMedian": null,
         "runs": [
-          85.60000002384186,
-          87.69999998807907,
-          85.90000003576279
+          88.59999999962747,
+          88.89999999850988,
+          86.39999999850988
+        ],
+        "fetchedRuns": [],
+        "drawRuns": [
+          84.29999999888241,
+          84.5,
+          82
         ],
         "appliedSteps": [
           5,
@@ -1049,19 +1230,25 @@
           "chr22_mask:133203-133796"
         ],
         "load": {
-          "before": 0.89,
-          "after": 0.69
+          "before": 0.7,
+          "after": 0.86
         },
         "failures": []
       },
       "genomespy": {
-        "median": 9,
-        "drawMedian": 0.800000011920929,
+        "median": 9.099999999627471,
+        "drawMedian": 0.6000000014901161,
         "fetchedMedian": null,
         "runs": [
-          9,
-          9.100000023841858,
-          8.899999976158142
+          8,
+          9.199999999254942,
+          9.099999999627471
+        ],
+        "fetchedRuns": [],
+        "drawRuns": [
+          0.599999999627471,
+          0.6000000014901161,
+          0.6999999992549419
         ],
         "appliedSteps": [
           5,
@@ -1086,22 +1273,29 @@
           "chr22_mask:133203-133798"
         ],
         "load": {
-          "before": 0.89,
-          "after": 0.69
+          "before": 0.7,
+          "after": 0.86
         },
         "failures": []
       }
     },
     "1000x-shortread-cram": {
       "jbrowse": {
-        "median": 506.80000001192093,
-        "drawMedian": 0.5999999642372131,
+        "median": 7.599999999627471,
+        "drawMedian": 2.599999999627471,
         "fetchedMedian": null,
         "runs": [
-          505,
-          506.80000001192093,
-          508.5
+          7.399999998509884,
+          7.599999999627471,
+          7.700000001117587
         ],
+        "fetchedRuns": [],
+        "drawRuns": [
+          2.599999999627471,
+          2.599999999627471,
+          2.599999999627471
+        ],
+        "settlesCoarseBlocks": true,
         "appliedSteps": [
           5,
           5,
@@ -1125,20 +1319,27 @@
           "chr22_mask:133,206..133,798"
         ],
         "load": {
-          "before": 0.69,
+          "before": 0.86,
           "after": 1.06
         },
         "failures": []
       },
       "jbrowse-release-4.3.0": {
-        "median": 1227.800000011921,
-        "drawMedian": 51.10000002384186,
+        "median": 1244.8999999985099,
+        "drawMedian": 46.5,
         "fetchedMedian": null,
         "runs": [
-          1251,
-          1215.199999988079,
-          1227.800000011921
+          1244.8999999985099,
+          1244.4000000003725,
+          1245.199999999255
         ],
+        "fetchedRuns": [],
+        "drawRuns": [
+          46.5,
+          41.100000001490116,
+          46.80000000074506
+        ],
+        "settlesCoarseBlocks": false,
         "appliedSteps": [
           5,
           5,
@@ -1162,20 +1363,27 @@
           "chr22_mask:133,206..133,798"
         ],
         "load": {
-          "before": 0.69,
+          "before": 0.86,
           "after": 1.06
         },
         "failures": []
       },
       "jbrowse-release-2.4.0": {
-        "median": 1877.199999988079,
+        "median": 1817.3999999985099,
         "drawMedian": 0,
         "fetchedMedian": null,
         "runs": [
-          1788.4000000357628,
-          1877.199999988079,
-          1879.5
+          1787.7000000011176,
+          1948,
+          1817.3999999985099
         ],
+        "fetchedRuns": [],
+        "drawRuns": [
+          0,
+          0,
+          0
+        ],
+        "settlesCoarseBlocks": false,
         "appliedSteps": [
           5,
           5,
@@ -1186,7 +1394,7 @@
         "bytes": 0,
         "drawsPerStep": [
           9,
-          12,
+          9,
           8,
           6,
           6
@@ -1199,19 +1407,25 @@
           "chr22_mask:133,206..133,798"
         ],
         "load": {
-          "before": 0.69,
+          "before": 0.86,
           "after": 1.06
         },
         "failures": []
       },
       "igv": {
-        "median": 87.39999997615814,
-        "drawMedian": 83.09999996423721,
+        "median": 84.39999999850988,
+        "drawMedian": 80,
         "fetchedMedian": null,
         "runs": [
-          90.30000001192093,
-          82.69999998807907,
-          87.39999997615814
+          83.80000000074506,
+          84.39999999850988,
+          85.09999999962747
+        ],
+        "fetchedRuns": [],
+        "drawRuns": [
+          79.5,
+          80,
+          80.79999999888241
         ],
         "appliedSteps": [
           5,
@@ -1222,11 +1436,11 @@
         "requests": 0,
         "bytes": 0,
         "drawsPerStep": [
-          151798,
-          75892,
-          38502,
-          19251,
-          9629
+          151816,
+          75944,
+          38488,
+          19240,
+          9633
         ],
         "loci": [
           "chr22_mask:128749-138250",
@@ -1236,19 +1450,25 @@
           "chr22_mask:133203-133796"
         ],
         "load": {
-          "before": 0.69,
+          "before": 0.86,
           "after": 1.06
         },
         "failures": []
       },
       "igv-deep": {
-        "median": 85.80000001192093,
-        "drawMedian": 83.29999995231628,
+        "median": 85.5,
+        "drawMedian": 81,
         "fetchedMedian": null,
         "runs": [
-          85.80000001192093,
-          87.89999997615814,
-          84.89999997615814
+          83.90000000037253,
+          85.60000000149012,
+          85.5
+        ],
+        "fetchedRuns": [],
+        "drawRuns": [
+          79.5,
+          81.5,
+          81
         ],
         "appliedSteps": [
           5,
@@ -1273,7 +1493,7 @@
           "chr22_mask:133203-133796"
         ],
         "load": {
-          "before": 0.69,
+          "before": 0.86,
           "after": 1.06
         },
         "failures": []
@@ -1283,10 +1503,12 @@
         "drawMedian": null,
         "fetchedMedian": null,
         "runs": [],
+        "fetchedRuns": [],
         "appliedSteps": [],
         "cachedSteps": 0,
         "requests": 0,
         "bytes": 0,
+        "drawRuns": [],
         "drawsPerStep": [],
         "loci": [],
         "load": {
@@ -1299,14 +1521,21 @@
     },
     "20x-longread-bam": {
       "jbrowse": {
-        "median": 511.5,
-        "drawMedian": 0.3999999761581421,
+        "median": 7.900000000372529,
+        "drawMedian": 2.800000000745058,
         "fetchedMedian": null,
         "runs": [
-          511.60000002384186,
-          511.5,
-          511.19999998807907
+          7.900000000372529,
+          9.599999999627471,
+          4.400000000372529
         ],
+        "fetchedRuns": [],
+        "drawRuns": [
+          2.800000000745058,
+          3.300000000745058,
+          1.400000000372529
+        ],
+        "settlesCoarseBlocks": true,
         "appliedSteps": [
           5,
           5,
@@ -1331,19 +1560,26 @@
         ],
         "load": {
           "before": 1.06,
-          "after": 1.15
+          "after": 0.78
         },
         "failures": []
       },
       "jbrowse-release-4.3.0": {
-        "median": 1195,
-        "drawMedian": 90.69999998807907,
+        "median": 1201.1000000014901,
+        "drawMedian": 94.20000000111759,
         "fetchedMedian": null,
         "runs": [
-          1132,
-          1198.8999999761581,
-          1195
+          1201.1000000014901,
+          1200.4000000003725,
+          1205.2000000011176
         ],
+        "fetchedRuns": [],
+        "drawRuns": [
+          92.20000000111759,
+          96.89999999850988,
+          94.20000000111759
+        ],
+        "settlesCoarseBlocks": false,
         "appliedSteps": [
           5,
           5,
@@ -1368,19 +1604,26 @@
         ],
         "load": {
           "before": 1.06,
-          "after": 1.15
+          "after": 0.78
         },
         "failures": []
       },
       "jbrowse-release-2.4.0": {
-        "median": 1228.5,
-        "drawMedian": 58.59999996423721,
+        "median": 1232.0999999977648,
+        "drawMedian": 55.69999999925494,
         "fetchedMedian": null,
         "runs": [
-          1226.699999988079,
-          1228.5,
-          1234.199999988079
+          1227.1000000014901,
+          1244.2000000011176,
+          1232.0999999977648
         ],
+        "fetchedRuns": [],
+        "drawRuns": [
+          62,
+          55.600000001490116,
+          55.69999999925494
+        ],
+        "settlesCoarseBlocks": false,
         "appliedSteps": [
           5,
           5,
@@ -1405,18 +1648,24 @@
         ],
         "load": {
           "before": 1.06,
-          "after": 1.15
+          "after": 0.78
         },
         "failures": []
       },
       "igv": {
-        "median": 235.89999997615814,
-        "drawMedian": 231.5,
+        "median": 230.7000000011176,
+        "drawMedian": 226.30000000074506,
         "fetchedMedian": null,
         "runs": [
-          261.2999999523163,
-          235.89999997615814,
-          235.29999995231628
+          227.09999999962747,
+          230.7000000011176,
+          233.39999999850988
+        ],
+        "fetchedRuns": [],
+        "drawRuns": [
+          225.40000000037253,
+          226.30000000074506,
+          228.59999999776483
         ],
         "appliedSteps": [
           5,
@@ -1442,18 +1691,24 @@
         ],
         "load": {
           "before": 1.06,
-          "after": 1.15
+          "after": 0.78
         },
         "failures": []
       },
       "igv-deep": {
-        "median": 231.60000002384186,
-        "drawMedian": 227.80000001192093,
+        "median": 239.30000000074506,
+        "drawMedian": 235,
         "fetchedMedian": null,
         "runs": [
-          236,
-          231.60000002384186,
-          227.69999998807907
+          239.59999999962747,
+          235.80000000074506,
+          239.30000000074506
+        ],
+        "fetchedRuns": [],
+        "drawRuns": [
+          235,
+          234.40000000037253,
+          236
         ],
         "appliedSteps": [
           5,
@@ -1479,18 +1734,24 @@
         ],
         "load": {
           "before": 1.06,
-          "after": 1.15
+          "after": 0.78
         },
         "failures": []
       },
       "genomespy": {
-        "median": 8.800000011920929,
-        "drawMedian": 0.699999988079071,
+        "median": 8.900000002235174,
+        "drawMedian": 0.8000000007450581,
         "fetchedMedian": null,
         "runs": [
-          9.300000011920929,
-          8.800000011920929,
-          8.699999988079071
+          9,
+          5.299999998882413,
+          8.900000002235174
+        ],
+        "fetchedRuns": [],
+        "drawRuns": [
+          0.8000000007450581,
+          0.900000000372529,
+          0.8000000007450581
         ],
         "appliedSteps": [
           5,
@@ -1516,21 +1777,28 @@
         ],
         "load": {
           "before": 1.06,
-          "after": 1.15
+          "after": 0.78
         },
         "failures": []
       }
     },
     "20x-longread-cram": {
       "jbrowse": {
-        "median": 510.80000001192093,
-        "drawMedian": 0.5999999642372131,
+        "median": 9.199999999254942,
+        "drawMedian": 3.599999997764826,
         "fetchedMedian": null,
         "runs": [
-          505.69999998807907,
-          512,
-          510.80000001192093
+          8.099999997764826,
+          10.800000000745058,
+          9.199999999254942
         ],
+        "fetchedRuns": [],
+        "drawRuns": [
+          3.199999999254942,
+          4.600000001490116,
+          3.599999997764826
+        ],
+        "settlesCoarseBlocks": true,
         "appliedSteps": [
           5,
           5,
@@ -1554,20 +1822,27 @@
           "chr22_mask:133,206..133,798"
         ],
         "load": {
-          "before": 1.15,
-          "after": 1.48
+          "before": 0.78,
+          "after": 1.2
         },
         "failures": []
       },
       "jbrowse-release-4.3.0": {
-        "median": 1151.6000000238419,
-        "drawMedian": 43.200000047683716,
+        "median": 1144.6000000014901,
+        "drawMedian": 45.400000002235174,
         "fetchedMedian": null,
         "runs": [
-          1155.7999999523163,
-          1144.5999999642372,
-          1151.6000000238419
+          1119.1000000014901,
+          1144.6000000014901,
+          1151.5
         ],
+        "fetchedRuns": [],
+        "drawRuns": [
+          40.399999998509884,
+          51.69999999925494,
+          45.400000002235174
+        ],
+        "settlesCoarseBlocks": false,
         "appliedSteps": [
           5,
           5,
@@ -1591,20 +1866,27 @@
           "chr22_mask:133,206..133,798"
         ],
         "load": {
-          "before": 1.15,
-          "after": 1.48
+          "before": 0.78,
+          "after": 1.2
         },
         "failures": []
       },
       "jbrowse-release-2.4.0": {
-        "median": 1146.699999988079,
-        "drawMedian": 116.60000002384186,
+        "median": 1149.8999999985099,
+        "drawMedian": 116.20000000298023,
         "fetchedMedian": null,
         "runs": [
-          1142.0999999642372,
-          1150.699999988079,
-          1146.699999988079
+          1140.5,
+          1149.8999999985099,
+          1161.1000000014901
         ],
+        "fetchedRuns": [],
+        "drawRuns": [
+          116.20000000298023,
+          115.5,
+          116.30000000074506
+        ],
+        "settlesCoarseBlocks": false,
         "appliedSteps": [
           5,
           5,
@@ -1628,19 +1910,25 @@
           "chr22_mask:133,206..133,798"
         ],
         "load": {
-          "before": 1.15,
-          "after": 1.48
+          "before": 0.78,
+          "after": 1.2
         },
         "failures": []
       },
       "igv": {
-        "median": 218.60000002384186,
-        "drawMedian": 217.10000002384186,
+        "median": 219.30000000074506,
+        "drawMedian": 214.80000000074506,
         "fetchedMedian": null,
         "runs": [
-          218.60000002384186,
-          217.69999998807907,
-          251.39999997615814
+          219.30000000074506,
+          246.69999999925494,
+          218.89999999850988
+        ],
+        "fetchedRuns": [],
+        "drawRuns": [
+          214.80000000074506,
+          242.19999999925494,
+          214.09999999776483
         ],
         "appliedSteps": [
           5,
@@ -1665,19 +1953,25 @@
           "chr22_mask:133203-133796"
         ],
         "load": {
-          "before": 1.15,
-          "after": 1.48
+          "before": 0.78,
+          "after": 1.2
         },
         "failures": []
       },
       "igv-deep": {
-        "median": 217.39999997615814,
-        "drawMedian": 213.19999998807907,
+        "median": 218.10000000149012,
+        "drawMedian": 213.70000000298023,
         "fetchedMedian": null,
         "runs": [
-          217.39999997615814,
-          222.9000000357628,
-          217
+          212.19999999925494,
+          218.10000000149012,
+          220.39999999850988
+        ],
+        "fetchedRuns": [],
+        "drawRuns": [
+          207.69999999925494,
+          213.70000000298023,
+          215.59999999776483
         ],
         "appliedSteps": [
           5,
@@ -1702,8 +1996,8 @@
           "chr22_mask:133203-133796"
         ],
         "load": {
-          "before": 1.15,
-          "after": 1.48
+          "before": 0.78,
+          "after": 1.2
         },
         "failures": []
       },
@@ -1712,10 +2006,12 @@
         "drawMedian": null,
         "fetchedMedian": null,
         "runs": [],
+        "fetchedRuns": [],
         "appliedSteps": [],
         "cachedSteps": 0,
         "requests": 0,
         "bytes": 0,
+        "drawRuns": [],
         "drawsPerStep": [],
         "loci": [],
         "load": {
@@ -1728,14 +2024,21 @@
     },
     "200x-longread-bam": {
       "jbrowse": {
-        "median": 517.1999999880791,
-        "drawMedian": 0.6000000238418579,
+        "median": 19.300000000745058,
+        "drawMedian": 1.2000000029802322,
         "fetchedMedian": null,
         "runs": [
-          517.1999999880791,
-          515.1999999880791,
-          521.6999999880791
+          25.600000001490116,
+          19.300000000745058,
+          19.100000001490116
         ],
+        "fetchedRuns": [],
+        "drawRuns": [
+          2.199999999254942,
+          1.2000000029802322,
+          0.9000000022351742
+        ],
+        "settlesCoarseBlocks": true,
         "appliedSteps": [
           5,
           5,
@@ -1759,20 +2062,27 @@
           "chr22_mask:133,206..133,798"
         ],
         "load": {
-          "before": 1.48,
-          "after": 0.88
+          "before": 1.2,
+          "after": 1.1
         },
         "failures": []
       },
       "jbrowse-release-4.3.0": {
-        "median": 3242.5,
-        "drawMedian": 0.09999996423721313,
+        "median": 3251.599999997765,
+        "drawMedian": 0.09999999776482582,
         "fetchedMedian": null,
         "runs": [
-          3242.5,
-          3231.800000011921,
-          3324.900000035763
+          3196.7999999970198,
+          3288.5,
+          3251.599999997765
         ],
+        "fetchedRuns": [],
+        "drawRuns": [
+          0,
+          0.10000000149011612,
+          0.09999999776482582
+        ],
+        "settlesCoarseBlocks": false,
         "appliedSteps": [
           5,
           5,
@@ -1796,20 +2106,27 @@
           "chr22_mask:133,206..133,798"
         ],
         "load": {
-          "before": 1.48,
-          "after": 0.88
+          "before": 1.2,
+          "after": 1.1
         },
         "failures": []
       },
       "jbrowse-release-2.4.0": {
-        "median": 3592.099999964237,
+        "median": 3592,
         "drawMedian": 0,
         "fetchedMedian": null,
         "runs": [
-          3645.699999988079,
-          3592.099999964237,
-          3555.800000011921
+          3443.199999999255,
+          3592,
+          3669.300000000745
         ],
+        "fetchedRuns": [],
+        "drawRuns": [
+          0,
+          0,
+          0
+        ],
+        "settlesCoarseBlocks": false,
         "appliedSteps": [
           5,
           5,
@@ -1833,19 +2150,25 @@
           "chr22_mask:133,206..133,798"
         ],
         "load": {
-          "before": 1.48,
-          "after": 0.88
+          "before": 1.2,
+          "after": 1.1
         },
         "failures": []
       },
       "igv": {
-        "median": 1259.3999999761581,
-        "drawMedian": 1255.5,
+        "median": 1249.5,
+        "drawMedian": 1245.199999999255,
         "fetchedMedian": null,
         "runs": [
-          1259.3999999761581,
-          1232.699999988079,
-          1303.5
+          1244.800000000745,
+          1249.5,
+          1320.2999999970198
+        ],
+        "fetchedRuns": [],
+        "drawRuns": [
+          1240.7000000029802,
+          1245.199999999255,
+          1315.7999999970198
         ],
         "appliedSteps": [
           5,
@@ -1870,19 +2193,25 @@
           "chr22_mask:133203-133796"
         ],
         "load": {
-          "before": 1.48,
-          "after": 0.88
+          "before": 1.2,
+          "after": 1.1
         },
         "failures": []
       },
       "igv-deep": {
-        "median": 1325.3999999761581,
-        "drawMedian": 1321.300000011921,
+        "median": 1323.5,
+        "drawMedian": 1319.199999999255,
         "fetchedMedian": null,
         "runs": [
-          1299.6000000238419,
-          1325.3999999761581,
-          1343.5999999642372
+          1339.300000000745,
+          1284.699999999255,
+          1323.5
+        ],
+        "fetchedRuns": [],
+        "drawRuns": [
+          1335.0999999977648,
+          1280.5,
+          1319.199999999255
         ],
         "appliedSteps": [
           5,
@@ -1907,19 +2236,25 @@
           "chr22_mask:133203-133796"
         ],
         "load": {
-          "before": 1.48,
-          "after": 0.88
+          "before": 1.2,
+          "after": 1.1
         },
         "failures": []
       },
       "genomespy": {
-        "median": 8.699999988079071,
-        "drawMedian": 0.7999999523162842,
+        "median": 9.400000002235174,
+        "drawMedian": 0.7000000029802322,
         "fetchedMedian": null,
         "runs": [
-          7.800000011920929,
-          8.699999988079071,
-          9.100000023841858
+          8.699999999254942,
+          9.400000002235174,
+          9.400000002235174
+        ],
+        "fetchedRuns": [],
+        "drawRuns": [
+          0.5999999977648258,
+          0.7000000029802322,
+          0.9000000022351742
         ],
         "appliedSteps": [
           5,
@@ -1944,22 +2279,29 @@
           "chr22_mask:133203-133798"
         ],
         "load": {
-          "before": 1.48,
-          "after": 0.88
+          "before": 1.2,
+          "after": 1.1
         },
         "failures": []
       }
     },
     "200x-longread-cram": {
       "jbrowse": {
-        "median": 516.3999999761581,
-        "drawMedian": 0.5,
+        "median": 19.799999997019768,
+        "drawMedian": 1,
         "fetchedMedian": null,
         "runs": [
-          516.3999999761581,
-          516.6999999880791,
-          516.1000000238419
+          19.599999997764826,
+          19.899999998509884,
+          19.799999997019768
         ],
+        "fetchedRuns": [],
+        "drawRuns": [
+          0.7999999970197678,
+          1.2999999970197678,
+          1
+        ],
+        "settlesCoarseBlocks": true,
         "appliedSteps": [
           5,
           5,
@@ -1983,20 +2325,27 @@
           "chr22_mask:133,206..133,798"
         ],
         "load": {
-          "before": 0.88,
-          "after": 0.77
+          "before": 1.1,
+          "after": 0.78
         },
         "failures": []
       },
       "jbrowse-release-4.3.0": {
-        "median": 1276.1000000238419,
-        "drawMedian": 142.79999995231628,
+        "median": 1273.800000000745,
+        "drawMedian": 143.40000000223517,
         "fetchedMedian": null,
         "runs": [
-          1276.1000000238419,
-          1281.2999999523163,
-          1254.7000000476837
+          1273.800000000745,
+          1273.9000000022352,
+          1251.0999999977648
         ],
+        "fetchedRuns": [],
+        "drawRuns": [
+          138.5,
+          143.40000000223517,
+          154.09999999776483
+        ],
+        "settlesCoarseBlocks": false,
         "appliedSteps": [
           5,
           5,
@@ -2007,7 +2356,7 @@
         "bytes": 0,
         "drawsPerStep": [
           16,
-          18,
+          16,
           12,
           12,
           12
@@ -2020,20 +2369,27 @@
           "chr22_mask:133,206..133,798"
         ],
         "load": {
-          "before": 0.88,
-          "after": 0.77
+          "before": 1.1,
+          "after": 0.78
         },
         "failures": []
       },
       "jbrowse-release-2.4.0": {
-        "median": 1912.8999999761581,
+        "median": 1906.1000000014901,
         "drawMedian": 0,
         "fetchedMedian": null,
         "runs": [
-          1912.8999999761581,
-          1903.1000000238419,
-          1966.5
+          1900.0999999977648,
+          1906.1000000014901,
+          1968.8999999985099
         ],
+        "fetchedRuns": [],
+        "drawRuns": [
+          0,
+          0,
+          0
+        ],
+        "settlesCoarseBlocks": false,
         "appliedSteps": [
           5,
           5,
@@ -2057,19 +2413,25 @@
           "chr22_mask:133,206..133,798"
         ],
         "load": {
-          "before": 0.88,
-          "after": 0.77
+          "before": 1.1,
+          "after": 0.78
         },
         "failures": []
       },
       "igv": {
-        "median": 1319.699999988079,
-        "drawMedian": 1318,
+        "median": 1267.1000000014901,
+        "drawMedian": 1262.699999999255,
         "fetchedMedian": null,
         "runs": [
-          1339.800000011921,
-          1319.699999988079,
-          1267
+          1267.1000000014901,
+          1231,
+          1318.2999999970198
+        ],
+        "fetchedRuns": [],
+        "drawRuns": [
+          1262.699999999255,
+          1226.8999999985099,
+          1314.199999999255
         ],
         "appliedSteps": [
           5,
@@ -2094,19 +2456,25 @@
           "chr22_mask:133203-133796"
         ],
         "load": {
-          "before": 0.88,
-          "after": 0.77
+          "before": 1.1,
+          "after": 0.78
         },
         "failures": []
       },
       "igv-deep": {
-        "median": 1268.5,
-        "drawMedian": 1264.4000000357628,
+        "median": 1281.5,
+        "drawMedian": 1277.4000000022352,
         "fetchedMedian": null,
         "runs": [
-          1297.199999988079,
-          1268.5,
-          1229.800000011921
+          1274.9000000022352,
+          1281.5,
+          1326
+        ],
+        "fetchedRuns": [],
+        "drawRuns": [
+          1270.4000000022352,
+          1277.4000000022352,
+          1321.8999999985099
         ],
         "appliedSteps": [
           5,
@@ -2131,8 +2499,8 @@
           "chr22_mask:133203-133796"
         ],
         "load": {
-          "before": 0.88,
-          "after": 0.77
+          "before": 1.1,
+          "after": 0.78
         },
         "failures": []
       },
@@ -2141,10 +2509,12 @@
         "drawMedian": null,
         "fetchedMedian": null,
         "runs": [],
+        "fetchedRuns": [],
         "appliedSteps": [],
         "cachedSteps": 0,
         "requests": 0,
         "bytes": 0,
+        "drawRuns": [],
         "drawsPerStep": [],
         "loci": [],
         "load": {
@@ -2157,14 +2527,21 @@
     },
     "1000x-longread-bam": {
       "jbrowse": {
-        "median": 529.1999999880791,
-        "drawMedian": 0.5,
+        "median": 29.200000002980232,
+        "drawMedian": 1.1000000014901161,
         "fetchedMedian": null,
         "runs": [
-          525.8000000119209,
-          529.3000000119209,
-          529.1999999880791
+          27,
+          29.299999997019768,
+          29.200000002980232
         ],
+        "fetchedRuns": [],
+        "drawRuns": [
+          1.0999999977648258,
+          1.1000000014901161,
+          1.199999999254942
+        ],
+        "settlesCoarseBlocks": true,
         "appliedSteps": [
           5,
           5,
@@ -2188,20 +2565,27 @@
           "chr22_mask:133,206..133,798"
         ],
         "load": {
-          "before": 0.77,
-          "after": 1.13
+          "before": 0.78,
+          "after": 1.45
         },
         "failures": []
       },
       "jbrowse-release-4.3.0": {
-        "median": 7574.100000023842,
-        "drawMedian": 0.09999996423721313,
+        "median": 8998,
+        "drawMedian": 0.09999999776482582,
         "fetchedMedian": null,
         "runs": [
-          9727.199999988079,
-          7510.399999976158,
-          7574.100000023842
+          7730.099999997765,
+          9850.099999997765,
+          8998
         ],
+        "fetchedRuns": [],
+        "drawRuns": [
+          0.09999999776482582,
+          0.09999999776482582,
+          0.19999999925494194
+        ],
+        "settlesCoarseBlocks": false,
         "appliedSteps": [
           5,
           5,
@@ -2213,7 +2597,7 @@
         "drawsPerStep": [
           2,
           2,
-          4,
+          8,
           4,
           4
         ],
@@ -2225,20 +2609,27 @@
           "chr22_mask:133,206..133,798"
         ],
         "load": {
-          "before": 0.77,
-          "after": 1.13
+          "before": 0.78,
+          "after": 1.45
         },
         "failures": []
       },
       "jbrowse-release-2.4.0": {
-        "median": 7732,
-        "drawMedian": 0.09999996423721313,
+        "median": 5934.199999999255,
+        "drawMedian": 0,
         "fetchedMedian": null,
         "runs": [
-          7732,
-          5866.399999976158,
-          8118.199999988079
+          6552.300000000745,
+          5934.199999999255,
+          5872.300000000745
         ],
+        "fetchedRuns": [],
+        "drawRuns": [
+          0,
+          0,
+          0
+        ],
+        "settlesCoarseBlocks": false,
         "appliedSteps": [
           5,
           5,
@@ -2250,7 +2641,7 @@
         "drawsPerStep": [
           2,
           3,
-          4,
+          1,
           1,
           1
         ],
@@ -2262,19 +2653,25 @@
           "chr22_mask:133,206..133,798"
         ],
         "load": {
-          "before": 0.77,
-          "after": 1.13
+          "before": 0.78,
+          "after": 1.45
         },
         "failures": []
       },
       "igv": {
-        "median": 1118.6000000238419,
-        "drawMedian": 1114.699999988079,
+        "median": 1177.8999999985099,
+        "drawMedian": 1173.800000000745,
         "fetchedMedian": null,
         "runs": [
-          1107,
-          1154,
-          1118.6000000238419
+          1177.8999999985099,
+          1124.800000000745,
+          1185.300000000745
+        ],
+        "fetchedRuns": [],
+        "drawRuns": [
+          1173.800000000745,
+          1120.8999999985099,
+          1181
         ],
         "appliedSteps": [
           5,
@@ -2285,11 +2682,11 @@
         "requests": 0,
         "bytes": 0,
         "drawsPerStep": [
-          902212,
-          565063,
-          387053,
-          288609,
-          235403
+          882597,
+          554589,
+          380305,
+          284134,
+          231894
         ],
         "loci": [
           "chr22_mask:128749-138250",
@@ -2299,19 +2696,25 @@
           "chr22_mask:133203-133796"
         ],
         "load": {
-          "before": 0.77,
-          "after": 1.13
+          "before": 0.78,
+          "after": 1.45
         },
         "failures": []
       },
       "igv-deep": {
-        "median": 1166.199999988079,
-        "drawMedian": 1162.3999999761581,
+        "median": 1258.5,
+        "drawMedian": 1254.3999999985099,
         "fetchedMedian": null,
         "runs": [
-          1166.199999988079,
-          1135.0999999642372,
-          1177.800000011921
+          1180.1000000014901,
+          1275.2999999970198,
+          1258.5
+        ],
+        "fetchedRuns": [],
+        "drawRuns": [
+          1176.1000000014901,
+          1271.199999999255,
+          1254.3999999985099
         ],
         "appliedSteps": [
           5,
@@ -2336,8 +2739,8 @@
           "chr22_mask:133203-133796"
         ],
         "load": {
-          "before": 0.77,
-          "after": 1.13
+          "before": 0.78,
+          "after": 1.45
         },
         "failures": []
       },
@@ -2350,6 +2753,8 @@
           null,
           null
         ],
+        "fetchedRuns": [],
+        "drawRuns": [],
         "appliedSteps": [
           0,
           0,
@@ -2361,26 +2766,33 @@
         "drawsPerStep": [],
         "loci": [],
         "load": {
-          "before": 0.77,
-          "after": 1.13
+          "before": 0.78,
+          "after": 1.45
         },
         "failures": [
-          "Waiting failed: 180000ms exceeded",
-          "Waiting failed: 180000ms exceeded",
-          "Waiting failed: 180000ms exceeded"
+          "genomespy did not come up within the 120s interactive ceiling",
+          "genomespy did not come up within the 120s interactive ceiling",
+          "genomespy did not come up within the 120s interactive ceiling"
         ]
       }
     },
     "1000x-longread-cram": {
       "jbrowse": {
-        "median": 530.2999999523163,
-        "drawMedian": 0.5,
+        "median": 30.199999999254942,
+        "drawMedian": 0.9000000022351742,
         "fetchedMedian": null,
         "runs": [
-          530.2999999523163,
-          530.1999999880791,
-          530.7999999523163
+          33.100000001490116,
+          30.199999999254942,
+          29.5
         ],
+        "fetchedRuns": [],
+        "drawRuns": [
+          0.9000000022351742,
+          0.8999999985098839,
+          1
+        ],
+        "settlesCoarseBlocks": true,
         "appliedSteps": [
           5,
           5,
@@ -2404,20 +2816,27 @@
           "chr22_mask:133,206..133,798"
         ],
         "load": {
-          "before": 1.13,
-          "after": 1.13
+          "before": 1.45,
+          "after": 1.12
         },
         "failures": []
       },
       "jbrowse-release-4.3.0": {
-        "median": 3056.099999964237,
-        "drawMedian": 0.10000002384185791,
+        "median": 3127.10000000149,
+        "drawMedian": 0.09999999776482582,
         "fetchedMedian": null,
         "runs": [
-          3005.399999976158,
-          3056.099999964237,
-          3164.399999976158
+          3127.10000000149,
+          3018.39999999851,
+          3181.300000000745
         ],
+        "fetchedRuns": [],
+        "drawRuns": [
+          0,
+          0.09999999776482582,
+          0.09999999776482582
+        ],
+        "settlesCoarseBlocks": false,
         "appliedSteps": [
           5,
           5,
@@ -2441,20 +2860,27 @@
           "chr22_mask:133,206..133,798"
         ],
         "load": {
-          "before": 1.13,
-          "after": 1.13
+          "before": 1.45,
+          "after": 1.12
         },
         "failures": []
       },
       "jbrowse-release-2.4.0": {
-        "median": 4596.099999964237,
+        "median": 4530,
         "drawMedian": 0,
         "fetchedMedian": null,
         "runs": [
-          4596.099999964237,
-          4629.5,
-          4565.900000035763
+          4651.199999999255,
+          2937.099999997765,
+          4530
         ],
+        "fetchedRuns": [],
+        "drawRuns": [
+          0,
+          0,
+          0
+        ],
+        "settlesCoarseBlocks": false,
         "appliedSteps": [
           5,
           5,
@@ -2478,19 +2904,25 @@
           "chr22_mask:133,206..133,798"
         ],
         "load": {
-          "before": 1.13,
-          "after": 1.13
+          "before": 1.45,
+          "after": 1.12
         },
         "failures": []
       },
       "igv": {
-        "median": 1216.4000000357628,
-        "drawMedian": 1212.4000000357628,
+        "median": 1208.5,
+        "drawMedian": 1204.1000000014901,
         "fetchedMedian": null,
         "runs": [
-          1207.1000000238419,
-          1216.4000000357628,
-          1238
+          1208.5,
+          1128.3999999985099,
+          1248
+        ],
+        "fetchedRuns": [],
+        "drawRuns": [
+          1204.1000000014901,
+          1127,
+          1243.699999999255
         ],
         "appliedSteps": [
           5,
@@ -2501,11 +2933,11 @@
         "requests": 0,
         "bytes": 0,
         "drawsPerStep": [
-          890978,
-          560382,
-          383993,
-          286793,
-          234175
+          891783,
+          560326,
+          383845,
+          286357,
+          233603
         ],
         "loci": [
           "chr22_mask:128749-138250",
@@ -2515,19 +2947,25 @@
           "chr22_mask:133203-133796"
         ],
         "load": {
-          "before": 1.13,
-          "after": 1.13
+          "before": 1.45,
+          "after": 1.12
         },
         "failures": []
       },
       "igv-deep": {
-        "median": 1292.800000011921,
-        "drawMedian": 1288.9000000357628,
+        "median": 1240,
+        "drawMedian": 1235.6000000014901,
         "fetchedMedian": null,
         "runs": [
-          1307.800000011921,
-          1224.699999988079,
-          1292.800000011921
+          1219.6000000014901,
+          1253.4000000022352,
+          1240
+        ],
+        "fetchedRuns": [],
+        "drawRuns": [
+          1215.3999999985099,
+          1249,
+          1235.6000000014901
         ],
         "appliedSteps": [
           5,
@@ -2552,8 +2990,8 @@
           "chr22_mask:133203-133796"
         ],
         "load": {
-          "before": 1.13,
-          "after": 1.13
+          "before": 1.45,
+          "after": 1.12
         },
         "failures": []
       },
@@ -2562,10 +3000,12 @@
         "drawMedian": null,
         "fetchedMedian": null,
         "runs": [],
+        "fetchedRuns": [],
         "appliedSteps": [],
         "cachedSteps": 0,
         "requests": 0,
         "bytes": 0,
+        "drawRuns": [],
         "drawsPerStep": [],
         "loci": [],
         "load": {
@@ -2578,18 +3018,18 @@
     }
   },
   "dates": {
-    "20x-shortread-bam": "2026-09-03",
-    "20x-shortread-cram": "2026-09-03",
-    "200x-shortread-bam": "2026-09-03",
-    "200x-shortread-cram": "2026-09-03",
-    "1000x-shortread-bam": "2026-09-03",
-    "1000x-shortread-cram": "2026-09-03",
-    "20x-longread-bam": "2026-09-03",
-    "20x-longread-cram": "2026-09-03",
-    "200x-longread-bam": "2026-09-03",
-    "200x-longread-cram": "2026-09-03",
-    "1000x-longread-bam": "2026-09-03",
-    "1000x-longread-cram": "2026-09-03"
+    "20x-shortread-bam": "2026-09-04",
+    "20x-shortread-cram": "2026-09-04",
+    "200x-shortread-bam": "2026-09-04",
+    "200x-shortread-cram": "2026-09-04",
+    "1000x-shortread-bam": "2026-09-04",
+    "1000x-shortread-cram": "2026-09-04",
+    "20x-longread-bam": "2026-09-04",
+    "20x-longread-cram": "2026-09-04",
+    "200x-longread-bam": "2026-09-04",
+    "200x-longread-cram": "2026-09-04",
+    "1000x-longread-bam": "2026-09-04",
+    "1000x-longread-cram": "2026-09-04"
   },
   "locusMismatch": {},
   "gsVersion": "0.85.0"

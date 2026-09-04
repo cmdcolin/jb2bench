@@ -1,40 +1,40 @@
 "panel","case","series","ms","usable","session","format","window","censored","metric","lo","hi"
 "Zoom in, within loaded data","20x short read","This work",0,TRUE,"interaction","BAM",NA,FALSE,NA,NA,NA
-"Zoom in, within loaded data","20x short read","Release 4.3.0",1062,TRUE,"interaction","BAM",NA,FALSE,NA,NA,NA
-"Zoom in, within loaded data","20x short read","Release 2.4.0",565,TRUE,"interaction","BAM",NA,FALSE,NA,NA,NA
-"Pan, both refetch","20x short read","This work",214,TRUE,"interaction","BAM",NA,FALSE,NA,NA,NA
-"Pan, both refetch","20x short read","Release 4.3.0",1139,TRUE,"interaction","BAM",NA,FALSE,NA,NA,NA
-"Pan, both refetch","20x short read","Release 2.4.0",541,TRUE,"interaction","BAM",NA,FALSE,NA,NA,NA
+"Zoom in, within loaded data","20x short read","Release 4.3.0",1070,TRUE,"interaction","BAM",NA,FALSE,NA,NA,NA
+"Zoom in, within loaded data","20x short read","Release 2.4.0",596,TRUE,"interaction","BAM",NA,FALSE,NA,NA,NA
+"Pan, both refetch","20x short read","This work",174,TRUE,"interaction","BAM",NA,FALSE,NA,NA,NA
+"Pan, both refetch","20x short read","Release 4.3.0",1141,TRUE,"interaction","BAM",NA,FALSE,NA,NA,NA
+"Pan, both refetch","20x short read","Release 2.4.0",498,TRUE,"interaction","BAM",NA,FALSE,NA,NA,NA
 "Zoom in, within loaded data","200x short read","This work",0,TRUE,"interaction","BAM",NA,FALSE,NA,NA,NA
-"Zoom in, within loaded data","200x short read","Release 4.3.0",1114,TRUE,"interaction","BAM",NA,FALSE,NA,NA,NA
-"Zoom in, within loaded data","200x short read","Release 2.4.0",629,TRUE,"interaction","BAM",NA,FALSE,NA,NA,NA
-"Pan, both refetch","200x short read","This work",818,TRUE,"interaction","BAM",NA,FALSE,NA,NA,NA
-"Pan, both refetch","200x short read","Release 4.3.0",1266,TRUE,"interaction","BAM",NA,FALSE,NA,NA,NA
-"Pan, both refetch","200x short read","Release 2.4.0",2533,TRUE,"interaction","BAM",NA,FALSE,NA,NA,NA
+"Zoom in, within loaded data","200x short read","Release 4.3.0",1107,TRUE,"interaction","BAM",NA,FALSE,NA,NA,NA
+"Zoom in, within loaded data","200x short read","Release 2.4.0",622,TRUE,"interaction","BAM",NA,FALSE,NA,NA,NA
+"Pan, both refetch","200x short read","This work",815,TRUE,"interaction","BAM",NA,FALSE,NA,NA,NA
+"Pan, both refetch","200x short read","Release 4.3.0",1252,TRUE,"interaction","BAM",NA,FALSE,NA,NA,NA
+"Pan, both refetch","200x short read","Release 2.4.0",1917,TRUE,"interaction","BAM",NA,FALSE,NA,NA,NA
 "Zoom in, within loaded data","1000x short read","This work",0,TRUE,"interaction","BAM",NA,FALSE,NA,NA,NA
-"Zoom in, within loaded data","1000x short read","Release 4.3.0",1645,TRUE,"interaction","BAM",NA,FALSE,NA,NA,NA
-"Zoom in, within loaded data","1000x short read","Release 2.4.0",697,TRUE,"interaction","BAM",NA,FALSE,NA,NA,NA
-"Pan, both refetch","1000x short read","This work",1296,TRUE,"interaction","BAM",NA,FALSE,NA,NA,NA
-"Pan, both refetch","1000x short read","Release 4.3.0",3951,TRUE,"interaction","BAM",NA,FALSE,NA,NA,NA
-"Pan, both refetch","1000x short read","Release 2.4.0",10296,TRUE,"interaction","BAM",NA,FALSE,NA,NA,NA
+"Zoom in, within loaded data","1000x short read","Release 4.3.0",1510,TRUE,"interaction","BAM",NA,FALSE,NA,NA,NA
+"Zoom in, within loaded data","1000x short read","Release 2.4.0",669,TRUE,"interaction","BAM",NA,FALSE,NA,NA,NA
+"Pan, both refetch","1000x short read","This work",1181,TRUE,"interaction","BAM",NA,FALSE,NA,NA,NA
+"Pan, both refetch","1000x short read","Release 4.3.0",4049,TRUE,"interaction","BAM",NA,FALSE,NA,NA,NA
+"Pan, both refetch","1000x short read","Release 2.4.0",10500,TRUE,"interaction","BAM",NA,FALSE,NA,NA,NA
 "Zoom in, within loaded data","20x long read","This work",0,TRUE,"interaction","BAM",NA,FALSE,NA,NA,NA
-"Zoom in, within loaded data","20x long read","Release 4.3.0",1165,TRUE,"interaction","BAM",NA,FALSE,NA,NA,NA
-"Zoom in, within loaded data","20x long read","Release 2.4.0",670,TRUE,"interaction","BAM",NA,FALSE,NA,NA,NA
-"Pan, both refetch","20x long read","This work",171,TRUE,"interaction","BAM",NA,FALSE,NA,NA,NA
-"Pan, both refetch","20x long read","Release 4.3.0",1197,TRUE,"interaction","BAM",NA,FALSE,NA,NA,NA
-"Pan, both refetch","20x long read","Release 2.4.0",200,TRUE,"interaction","BAM",NA,FALSE,NA,NA,NA
+"Zoom in, within loaded data","20x long read","Release 4.3.0",1179,TRUE,"interaction","BAM",NA,FALSE,NA,NA,NA
+"Zoom in, within loaded data","20x long read","Release 2.4.0",668,TRUE,"interaction","BAM",NA,FALSE,NA,NA,NA
+"Pan, both refetch","20x long read","This work",199,TRUE,"interaction","BAM",NA,FALSE,NA,NA,NA
+"Pan, both refetch","20x long read","Release 4.3.0",1223,TRUE,"interaction","BAM",NA,FALSE,NA,NA,NA
+"Pan, both refetch","20x long read","Release 2.4.0",195,TRUE,"interaction","BAM",NA,FALSE,NA,NA,NA
 "Zoom in, within loaded data","200x long read","This work",0,TRUE,"interaction","BAM",NA,FALSE,NA,NA,NA
-"Zoom in, within loaded data","200x long read","Release 4.3.0",2881,TRUE,"interaction","BAM",NA,FALSE,NA,NA,NA
-"Zoom in, within loaded data","200x long read","Release 2.4.0",2047,TRUE,"interaction","BAM",NA,FALSE,NA,NA,NA
-"Pan, both refetch","200x long read","This work",894,TRUE,"interaction","BAM",NA,FALSE,NA,NA,NA
-"Pan, both refetch","200x long read","Release 4.3.0",2583,TRUE,"interaction","BAM",NA,FALSE,NA,NA,NA
-"Pan, both refetch","200x long read","Release 2.4.0",4329,TRUE,"interaction","BAM",NA,FALSE,NA,NA,NA
+"Zoom in, within loaded data","200x long read","Release 4.3.0",2843,TRUE,"interaction","BAM",NA,FALSE,NA,NA,NA
+"Zoom in, within loaded data","200x long read","Release 2.4.0",1915,TRUE,"interaction","BAM",NA,FALSE,NA,NA,NA
+"Pan, both refetch","200x long read","This work",871,TRUE,"interaction","BAM",NA,FALSE,NA,NA,NA
+"Pan, both refetch","200x long read","Release 4.3.0",2696,TRUE,"interaction","BAM",NA,FALSE,NA,NA,NA
+"Pan, both refetch","200x long read","Release 2.4.0",4062,TRUE,"interaction","BAM",NA,FALSE,NA,NA,NA
 "Zoom in, within loaded data","1000x long read","This work",0,TRUE,"interaction","BAM",NA,FALSE,NA,NA,NA
-"Zoom in, within loaded data","1000x long read","Release 4.3.0",12604,TRUE,"interaction","BAM",NA,FALSE,NA,NA,NA
-"Zoom in, within loaded data","1000x long read","Release 2.4.0",6505,TRUE,"interaction","BAM",NA,FALSE,NA,NA,NA
-"Pan, both refetch","1000x long read","This work",1544,TRUE,"interaction","BAM",NA,FALSE,NA,NA,NA
-"Pan, both refetch","1000x long read","Release 4.3.0",10911,TRUE,"interaction","BAM",NA,FALSE,NA,NA,NA
-"Pan, both refetch","1000x long read","Release 2.4.0",20249,TRUE,"interaction","BAM",NA,FALSE,NA,NA,NA
+"Zoom in, within loaded data","1000x long read","Release 4.3.0",12498,TRUE,"interaction","BAM",NA,FALSE,NA,NA,NA
+"Zoom in, within loaded data","1000x long read","Release 2.4.0",6819,TRUE,"interaction","BAM",NA,FALSE,NA,NA,NA
+"Pan, both refetch","1000x long read","This work",1578,TRUE,"interaction","BAM",NA,FALSE,NA,NA,NA
+"Pan, both refetch","1000x long read","Release 4.3.0",11101,TRUE,"interaction","BAM",NA,FALSE,NA,NA,NA
+"Pan, both refetch","1000x long read","Release 2.4.0",22079,TRUE,"interaction","BAM",NA,FALSE,NA,NA,NA
 "Cold load","20x short read","This work",1122,TRUE,"version sweep","BAM",NA,FALSE,NA,1094,1233
 "Cold load","20x short read","Release 4.3.0",2297,TRUE,"version sweep","BAM",NA,FALSE,NA,2260,2332
 "Cold load","20x short read","Release 2.4.0",2234,TRUE,"version sweep","BAM",NA,FALSE,NA,2218,2254
@@ -167,98 +167,61 @@
 "Cold load","1000x long read","Release 4.3.0",18466,TRUE,"cross-tool","CRAM","100kb",FALSE,NA,18397,18921
 "Cold load","1000x long read","Release 2.4.0",56463,TRUE,"cross-tool","CRAM","100kb",FALSE,NA,55856,68750
 "Cold load","1000x long read","igv.js 3.8.5",631579,TRUE,"cross-tool","CRAM","100kb",TRUE,NA,NA,NA
-"Zoom in, both hold the data","20x short read","This work",507.100000023842,TRUE,"cross-tool motion","BAM",NA,FALSE,"what the user waits",505.299999952316,508.5
-"Zoom in, both hold the data","20x short read","This work",0.799999952316284,TRUE,"cross-tool motion","BAM",NA,FALSE,"what the renderer did",NA,NA
-"Zoom in, both hold the data","20x short read","Release 4.3.0",1107.80000001192,TRUE,"cross-tool motion","BAM",NA,FALSE,"what the user waits",1107.69999998808,1121
-"Zoom in, both hold the data","20x short read","Release 4.3.0",29.5999999642372,TRUE,"cross-tool motion","BAM",NA,FALSE,"what the renderer did",NA,NA
-"Zoom in, both hold the data","20x short read","Release 2.4.0",1110.30000001192,TRUE,"cross-tool motion","BAM",NA,FALSE,"what the user waits",1105.79999995232,1113
-"Zoom in, both hold the data","20x short read","Release 2.4.0",48.5,TRUE,"cross-tool motion","BAM",NA,FALSE,"what the renderer did",NA,NA
-"Zoom in, both hold the data","20x short read","igv.js 3.8.5",46.8999999761581,TRUE,"cross-tool motion","BAM",NA,FALSE,"what the user waits",37.2000000476837,51.2000000476837
-"Zoom in, both hold the data","20x short read","igv.js 3.8.5",45.8000000119209,TRUE,"cross-tool motion","BAM",NA,FALSE,"what the renderer did",NA,NA
-"Zoom in, both hold the data","20x short read","GenomeSpy 0.85.0",8.30000001192093,TRUE,"cross-tool motion","BAM",NA,FALSE,"what the user waits",5.39999997615814,8.80000001192093
-"Zoom in, both hold the data","20x short read","GenomeSpy 0.85.0",0.699999988079071,TRUE,"cross-tool motion","BAM",NA,FALSE,"what the renderer did",NA,NA
-"Zoom in, both hold the data","200x short read","This work",506.5,TRUE,"cross-tool motion","BAM",NA,FALSE,"what the user waits",506.299999952316,506.699999988079
-"Zoom in, both hold the data","200x short read","This work",0.300000011920929,TRUE,"cross-tool motion","BAM",NA,FALSE,"what the renderer did",NA,NA
-"Zoom in, both hold the data","200x short read","Release 4.3.0",1169.60000002384,TRUE,"cross-tool motion","BAM",NA,FALSE,"what the user waits",1139.10000002384,1194.60000002384
-"Zoom in, both hold the data","200x short read","Release 4.3.0",73.1999999880791,TRUE,"cross-tool motion","BAM",NA,FALSE,"what the renderer did",NA,NA
-"Zoom in, both hold the data","200x short read","Release 2.4.0",1133.89999997616,TRUE,"cross-tool motion","BAM",NA,FALSE,"what the user waits",1133.30000001192,1162.30000001192
-"Zoom in, both hold the data","200x short read","Release 2.4.0",13.1999999880791,TRUE,"cross-tool motion","BAM",NA,FALSE,"what the renderer did",NA,NA
-"Zoom in, both hold the data","200x short read","igv.js 3.8.5",81.8999999761581,TRUE,"cross-tool motion","BAM",NA,FALSE,"what the user waits",78.1999999880791,82.1999999880791
-"Zoom in, both hold the data","200x short read","igv.js 3.8.5",77.5999999642372,TRUE,"cross-tool motion","BAM",NA,FALSE,"what the renderer did",NA,NA
-"Zoom in, both hold the data","200x short read","GenomeSpy 0.85.0",8.5,TRUE,"cross-tool motion","BAM",NA,FALSE,"what the user waits",7.40000003576279,8.60000002384186
-"Zoom in, both hold the data","200x short read","GenomeSpy 0.85.0",0.799999952316284,TRUE,"cross-tool motion","BAM",NA,FALSE,"what the renderer did",NA,NA
-"Zoom in, both hold the data","1000x short read","This work",507.599999964237,TRUE,"cross-tool motion","BAM",NA,FALSE,"what the user waits",504.899999976158,508
-"Zoom in, both hold the data","1000x short read","This work",0.699999988079071,TRUE,"cross-tool motion","BAM",NA,FALSE,"what the renderer did",NA,NA
-"Zoom in, both hold the data","1000x short read","Release 4.3.0",1681.39999997616,TRUE,"cross-tool motion","BAM",NA,FALSE,"what the user waits",1627.10000002384,1691.69999998808
-"Zoom in, both hold the data","1000x short read","Release 4.3.0",0,TRUE,"cross-tool motion","BAM",NA,FALSE,"what the renderer did",NA,NA
-"Zoom in, both hold the data","1000x short read","Release 2.4.0",1981.80000001192,TRUE,"cross-tool motion","BAM",NA,FALSE,"what the user waits",1933.5,2006
-"Zoom in, both hold the data","1000x short read","Release 2.4.0",0,TRUE,"cross-tool motion","BAM",NA,FALSE,"what the renderer did",NA,NA
-"Zoom in, both hold the data","1000x short read","igv.js 3.8.5",82.1999999880791,TRUE,"cross-tool motion","BAM",NA,FALSE,"what the user waits",81.4000000357628,82.4000000357628
-"Zoom in, both hold the data","1000x short read","igv.js 3.8.5",78.1000000238419,TRUE,"cross-tool motion","BAM",NA,FALSE,"what the renderer did",NA,NA
-"Zoom in, both hold the data","1000x short read","GenomeSpy 0.85.0",9,TRUE,"cross-tool motion","BAM",NA,FALSE,"what the user waits",8.89999997615814,9.10000002384186
-"Zoom in, both hold the data","1000x short read","GenomeSpy 0.85.0",0.800000011920929,TRUE,"cross-tool motion","BAM",NA,FALSE,"what the renderer did",NA,NA
-"Zoom in, both hold the data","20x long read","This work",511.5,TRUE,"cross-tool motion","BAM",NA,FALSE,"what the user waits",511.199999988079,511.600000023842
-"Zoom in, both hold the data","20x long read","This work",0.399999976158142,TRUE,"cross-tool motion","BAM",NA,FALSE,"what the renderer did",NA,NA
-"Zoom in, both hold the data","20x long read","Release 4.3.0",1195,TRUE,"cross-tool motion","BAM",NA,FALSE,"what the user waits",1132,1198.89999997616
-"Zoom in, both hold the data","20x long read","Release 4.3.0",90.6999999880791,TRUE,"cross-tool motion","BAM",NA,FALSE,"what the renderer did",NA,NA
-"Zoom in, both hold the data","20x long read","Release 2.4.0",1228.5,TRUE,"cross-tool motion","BAM",NA,FALSE,"what the user waits",1226.69999998808,1234.19999998808
-"Zoom in, both hold the data","20x long read","Release 2.4.0",58.5999999642372,TRUE,"cross-tool motion","BAM",NA,FALSE,"what the renderer did",NA,NA
-"Zoom in, both hold the data","20x long read","igv.js 3.8.5",235.899999976158,TRUE,"cross-tool motion","BAM",NA,FALSE,"what the user waits",235.299999952316,261.299999952316
-"Zoom in, both hold the data","20x long read","igv.js 3.8.5",231.5,TRUE,"cross-tool motion","BAM",NA,FALSE,"what the renderer did",NA,NA
-"Zoom in, both hold the data","20x long read","GenomeSpy 0.85.0",8.80000001192093,TRUE,"cross-tool motion","BAM",NA,FALSE,"what the user waits",8.69999998807907,9.30000001192093
-"Zoom in, both hold the data","20x long read","GenomeSpy 0.85.0",0.699999988079071,TRUE,"cross-tool motion","BAM",NA,FALSE,"what the renderer did",NA,NA
-"Zoom in, both hold the data","200x long read","This work",517.199999988079,TRUE,"cross-tool motion","BAM",NA,FALSE,"what the user waits",515.199999988079,521.699999988079
-"Zoom in, both hold the data","200x long read","This work",0.600000023841858,TRUE,"cross-tool motion","BAM",NA,FALSE,"what the renderer did",NA,NA
-"Zoom in, both hold the data","200x long read","Release 4.3.0",3242.5,TRUE,"cross-tool motion","BAM",NA,FALSE,"what the user waits",3231.80000001192,3324.90000003576
-"Zoom in, both hold the data","200x long read","Release 4.3.0",0.0999999642372131,TRUE,"cross-tool motion","BAM",NA,FALSE,"what the renderer did",NA,NA
-"Zoom in, both hold the data","200x long read","Release 2.4.0",3592.09999996424,TRUE,"cross-tool motion","BAM",NA,FALSE,"what the user waits",3555.80000001192,3645.69999998808
-"Zoom in, both hold the data","200x long read","Release 2.4.0",0,TRUE,"cross-tool motion","BAM",NA,FALSE,"what the renderer did",NA,NA
-"Zoom in, both hold the data","200x long read","igv.js 3.8.5",1259.39999997616,TRUE,"cross-tool motion","BAM",NA,FALSE,"what the user waits",1232.69999998808,1303.5
-"Zoom in, both hold the data","200x long read","igv.js 3.8.5",1255.5,TRUE,"cross-tool motion","BAM",NA,FALSE,"what the renderer did",NA,NA
-"Zoom in, both hold the data","200x long read","GenomeSpy 0.85.0",8.69999998807907,TRUE,"cross-tool motion","BAM",NA,FALSE,"what the user waits",7.80000001192093,9.10000002384186
-"Zoom in, both hold the data","200x long read","GenomeSpy 0.85.0",0.799999952316284,TRUE,"cross-tool motion","BAM",NA,FALSE,"what the renderer did",NA,NA
-"Zoom in, both hold the data","1000x long read","This work",529.199999988079,TRUE,"cross-tool motion","BAM",NA,FALSE,"what the user waits",525.800000011921,529.300000011921
-"Zoom in, both hold the data","1000x long read","This work",0.5,TRUE,"cross-tool motion","BAM",NA,FALSE,"what the renderer did",NA,NA
-"Zoom in, both hold the data","1000x long read","Release 4.3.0",7574.10000002384,TRUE,"cross-tool motion","BAM",NA,FALSE,"what the user waits",7510.39999997616,9727.19999998808
-"Zoom in, both hold the data","1000x long read","Release 4.3.0",0.0999999642372131,TRUE,"cross-tool motion","BAM",NA,FALSE,"what the renderer did",NA,NA
-"Zoom in, both hold the data","1000x long read","Release 2.4.0",7732,TRUE,"cross-tool motion","BAM",NA,FALSE,"what the user waits",5866.39999997616,8118.19999998808
-"Zoom in, both hold the data","1000x long read","Release 2.4.0",0.0999999642372131,TRUE,"cross-tool motion","BAM",NA,FALSE,"what the renderer did",NA,NA
-"Zoom in, both hold the data","1000x long read","igv.js 3.8.5",1118.60000002384,TRUE,"cross-tool motion","BAM",NA,FALSE,"what the user waits",1107,1154
-"Zoom in, both hold the data","1000x long read","igv.js 3.8.5",1114.69999998808,TRUE,"cross-tool motion","BAM",NA,FALSE,"what the renderer did",NA,NA
-"Pan, both refetch","20x short read","This work",506.04999999702,TRUE,"cross-tool motion","BAM",NA,FALSE,"what the user waits",NA,NA
-"Pan, both refetch","20x short read","This work",0.299999982118607,TRUE,"cross-tool motion","BAM",NA,FALSE,"what the renderer did",NA,NA
-"Pan, both refetch","20x short read","Release 4.3.0",1197.64999999106,TRUE,"cross-tool motion","BAM",NA,FALSE,"what the user waits",NA,NA
-"Pan, both refetch","20x short read","Release 4.3.0",51.9000000059605,TRUE,"cross-tool motion","BAM",NA,FALSE,"what the renderer did",NA,NA
-"Pan, both refetch","20x short read","Release 2.4.0",1459.59999999404,TRUE,"cross-tool motion","BAM",NA,FALSE,"what the user waits",NA,NA
-"Pan, both refetch","20x short read","Release 2.4.0",87.0999999940395,TRUE,"cross-tool motion","BAM",NA,FALSE,"what the renderer did",NA,NA
-"Pan, both refetch","20x short read","igv.js 3.8.5",508.5,TRUE,"cross-tool motion","BAM",NA,FALSE,"what the user waits",NA,NA
-"Pan, both refetch","20x short read","igv.js 3.8.5",139.5,TRUE,"cross-tool motion","BAM",NA,FALSE,"what the renderer did",NA,NA
-"Pan, both refetch","200x short read","This work",506.09999999404,TRUE,"cross-tool motion","BAM",NA,FALSE,"what the user waits",NA,NA
-"Pan, both refetch","200x short read","This work",0.400000005960464,TRUE,"cross-tool motion","BAM",NA,FALSE,"what the renderer did",NA,NA
-"Pan, both refetch","200x short read","Release 4.3.0",1332.35000000894,TRUE,"cross-tool motion","BAM",NA,FALSE,"what the user waits",NA,NA
-"Pan, both refetch","200x short read","Release 4.3.0",21,TRUE,"cross-tool motion","BAM",NA,FALSE,"what the renderer did",NA,NA
-"Pan, both refetch","200x short read","Release 2.4.0",3411.2499999851,TRUE,"cross-tool motion","BAM",NA,FALSE,"what the user waits",NA,NA
-"Pan, both refetch","200x short read","Release 2.4.0",0,TRUE,"cross-tool motion","BAM",NA,FALSE,"what the renderer did",NA,NA
-"Pan, both refetch","200x short read","igv.js 3.8.5",4120.09999999404,TRUE,"cross-tool motion","BAM",NA,FALSE,"what the user waits",NA,NA
-"Pan, both refetch","200x short read","igv.js 3.8.5",595.300000011921,TRUE,"cross-tool motion","BAM",NA,FALSE,"what the renderer did",NA,NA
-"Pan, both refetch","1000x short read","This work",885.300000011921,TRUE,"cross-tool motion","BAM",NA,FALSE,"what the user waits",NA,NA
-"Pan, both refetch","1000x short read","This work",40.8999999761581,TRUE,"cross-tool motion","BAM",NA,FALSE,"what the renderer did",NA,NA
-"Pan, both refetch","1000x short read","Release 4.3.0",4054.19999998808,TRUE,"cross-tool motion","BAM",NA,FALSE,"what the user waits",NA,NA
-"Pan, both refetch","1000x short read","Release 4.3.0",0,TRUE,"cross-tool motion","BAM",NA,FALSE,"what the renderer did",NA,NA
-"Pan, both refetch","1000x short read","Release 2.4.0",7900.29999998212,TRUE,"cross-tool motion","BAM",NA,FALSE,"what the user waits",NA,NA
-"Pan, both refetch","1000x short read","Release 2.4.0",0.0999999940395355,TRUE,"cross-tool motion","BAM",NA,FALSE,"what the renderer did",NA,NA
-"Pan, both refetch","1000x short read","igv.js 3.8.5",25692.450000003,TRUE,"cross-tool motion","BAM",NA,FALSE,"what the user waits",NA,NA
-"Pan, both refetch","1000x short read","igv.js 3.8.5",576.40000000596,TRUE,"cross-tool motion","BAM",NA,FALSE,"what the renderer did",NA,NA
-"Pan, both refetch","20x long read","This work",0.200000017881393,TRUE,"cross-tool motion","BAM",NA,FALSE,"what the renderer did",NA,NA
-"Pan, both refetch","20x long read","Release 4.3.0",70.2000000178814,TRUE,"cross-tool motion","BAM",NA,FALSE,"what the renderer did",NA,NA
-"Pan, both refetch","20x long read","Release 2.4.0",0,TRUE,"cross-tool motion","BAM",NA,FALSE,"what the renderer did",NA,NA
-"Pan, both refetch","20x long read","igv.js 3.8.5",2612.79999998212,TRUE,"cross-tool motion","BAM",NA,FALSE,"what the user waits",NA,NA
-"Pan, both refetch","20x long read","igv.js 3.8.5",1708.40000000596,TRUE,"cross-tool motion","BAM",NA,FALSE,"what the renderer did",NA,NA
-"Pan, both refetch","200x long read","This work",0.400000005960464,TRUE,"cross-tool motion","BAM",NA,FALSE,"what the renderer did",NA,NA
-"Pan, both refetch","200x long read","Release 4.3.0",0,TRUE,"cross-tool motion","BAM",NA,FALSE,"what the renderer did",NA,NA
-"Pan, both refetch","200x long read","Release 2.4.0",0,TRUE,"cross-tool motion","BAM",NA,FALSE,"what the renderer did",NA,NA
-"Pan, both refetch","200x long read","igv.js 3.8.5",16130.8000000119,TRUE,"cross-tool motion","BAM",NA,FALSE,"what the user waits",NA,NA
-"Pan, both refetch","200x long read","igv.js 3.8.5",7505.70000001788,TRUE,"cross-tool motion","BAM",NA,FALSE,"what the renderer did",NA,NA
-"Pan, both refetch","1000x long read","This work",0.699999988079071,TRUE,"cross-tool motion","BAM",NA,FALSE,"what the renderer did",NA,NA
-"Pan, both refetch","1000x long read","Release 4.3.0",0.0999999642372131,TRUE,"cross-tool motion","BAM",NA,FALSE,"what the renderer did",NA,NA
-"Pan, both refetch","1000x long read","Release 2.4.0",0.0999999642372131,TRUE,"cross-tool motion","BAM",NA,FALSE,"what the renderer did",NA,NA
+"Zoom in, both hold the data","20x short read","This work",6.79999999888241,TRUE,"cross-tool motion","BAM",NA,FALSE,"what the user waits",6.69999999925494,7.20000000111759
+"Zoom in, both hold the data","20x short read","This work",2.70000000111759,TRUE,"cross-tool motion","BAM",NA,FALSE,"what the renderer did",2.5,2.90000000037253
+"Zoom in, both hold the data","20x short read","Release 4.3.0",1108.80000000075,TRUE,"cross-tool motion","BAM",NA,FALSE,"what the user waits",1100.89999999851,1110.40000000037
+"Zoom in, both hold the data","20x short read","Release 4.3.0",20.0999999996275,TRUE,"cross-tool motion","BAM",NA,FALSE,"what the renderer did",18.5,25.8999999985099
+"Zoom in, both hold the data","20x short read","Release 2.4.0",1115.80000000075,TRUE,"cross-tool motion","BAM",NA,FALSE,"what the user waits",1114,1118.79999999888
+"Zoom in, both hold the data","20x short read","Release 2.4.0",53.1999999992549,TRUE,"cross-tool motion","BAM",NA,FALSE,"what the renderer did",49.4000000003725,65.1999999992549
+"Zoom in, both hold the data","20x short read","igv.js 3.8.5",46.9000000003725,TRUE,"cross-tool motion","BAM",NA,FALSE,"what the user waits",43.8999999985099,56.9000000003725
+"Zoom in, both hold the data","20x short read","igv.js 3.8.5",45.6999999992549,TRUE,"cross-tool motion","BAM",NA,FALSE,"what the renderer did",35.0999999996275,51.9000000003725
+"Zoom in, both hold the data","20x short read","GenomeSpy 0.85.0",8.70000000111759,TRUE,"cross-tool motion","BAM",NA,FALSE,"what the user waits",5.90000000037253,8.80000000074506
+"Zoom in, both hold the data","20x short read","GenomeSpy 0.85.0",0.700000001117587,TRUE,"cross-tool motion","BAM",NA,FALSE,"what the renderer did",0.699999999254942,0.700000001117587
+"Zoom in, both hold the data","200x short read","This work",7,TRUE,"cross-tool motion","BAM",NA,FALSE,"what the user waits",7,7.5
+"Zoom in, both hold the data","200x short read","This work",2.5,TRUE,"cross-tool motion","BAM",NA,FALSE,"what the renderer did",2.5,2.69999999925494
+"Zoom in, both hold the data","200x short read","Release 4.3.0",1181.09999999963,TRUE,"cross-tool motion","BAM",NA,FALSE,"what the user waits",1125.59999999963,1201.09999999963
+"Zoom in, both hold the data","200x short read","Release 4.3.0",96.8000000007451,TRUE,"cross-tool motion","BAM",NA,FALSE,"what the renderer did",53.0999999996275,104.700000001118
+"Zoom in, both hold the data","200x short read","Release 2.4.0",1138,TRUE,"cross-tool motion","BAM",NA,FALSE,"what the user waits",1122.59999999963,1164.19999999925
+"Zoom in, both hold the data","200x short read","Release 2.4.0",13.4000000003725,TRUE,"cross-tool motion","BAM",NA,FALSE,"what the renderer did",12.6999999992549,33.1000000014901
+"Zoom in, both hold the data","200x short read","igv.js 3.8.5",88.0999999996275,TRUE,"cross-tool motion","BAM",NA,FALSE,"what the user waits",83.5,119.900000000373
+"Zoom in, both hold the data","200x short read","igv.js 3.8.5",83.5,TRUE,"cross-tool motion","BAM",NA,FALSE,"what the renderer did",79.1999999992549,115
+"Zoom in, both hold the data","200x short read","GenomeSpy 0.85.0",8.79999999888241,TRUE,"cross-tool motion","BAM",NA,FALSE,"what the user waits",4.30000000074506,9.40000000037253
+"Zoom in, both hold the data","200x short read","GenomeSpy 0.85.0",0.700000001117587,TRUE,"cross-tool motion","BAM",NA,FALSE,"what the renderer did",0.700000001117587,0.799999998882413
+"Zoom in, both hold the data","1000x short read","This work",7.59999999962747,TRUE,"cross-tool motion","BAM",NA,FALSE,"what the user waits",7.59999999962747,7.80000000074506
+"Zoom in, both hold the data","1000x short read","This work",2.10000000149012,TRUE,"cross-tool motion","BAM",NA,FALSE,"what the renderer did",2.09999999962747,2.5
+"Zoom in, both hold the data","1000x short read","Release 4.3.0",1657.20000000112,TRUE,"cross-tool motion","BAM",NA,FALSE,"what the user waits",1616.5,1705.70000000112
+"Zoom in, both hold the data","1000x short read","Release 4.3.0",0.099999999627471,TRUE,"cross-tool motion","BAM",NA,FALSE,"what the renderer did",0,0.100000001490116
+"Zoom in, both hold the data","1000x short read","Release 2.4.0",2002.09999999963,TRUE,"cross-tool motion","BAM",NA,FALSE,"what the user waits",1951.79999999888,2014
+"Zoom in, both hold the data","1000x short read","Release 2.4.0",0,TRUE,"cross-tool motion","BAM",NA,FALSE,"what the renderer did",0,0
+"Zoom in, both hold the data","1000x short read","igv.js 3.8.5",85.7999999988824,TRUE,"cross-tool motion","BAM",NA,FALSE,"what the user waits",83.0999999996275,117.89999999851
+"Zoom in, both hold the data","1000x short read","igv.js 3.8.5",81.3999999985099,TRUE,"cross-tool motion","BAM",NA,FALSE,"what the renderer did",78.5999999996275,113.5
+"Zoom in, both hold the data","1000x short read","GenomeSpy 0.85.0",9.09999999962747,TRUE,"cross-tool motion","BAM",NA,FALSE,"what the user waits",8,9.19999999925494
+"Zoom in, both hold the data","1000x short read","GenomeSpy 0.85.0",0.600000001490116,TRUE,"cross-tool motion","BAM",NA,FALSE,"what the renderer did",0.599999999627471,0.699999999254942
+"Zoom in, both hold the data","20x long read","This work",7.90000000037253,TRUE,"cross-tool motion","BAM",NA,FALSE,"what the user waits",4.40000000037253,9.59999999962747
+"Zoom in, both hold the data","20x long read","This work",2.80000000074506,TRUE,"cross-tool motion","BAM",NA,FALSE,"what the renderer did",1.40000000037253,3.30000000074506
+"Zoom in, both hold the data","20x long read","Release 4.3.0",1201.10000000149,TRUE,"cross-tool motion","BAM",NA,FALSE,"what the user waits",1200.40000000037,1205.20000000112
+"Zoom in, both hold the data","20x long read","Release 4.3.0",94.2000000011176,TRUE,"cross-tool motion","BAM",NA,FALSE,"what the renderer did",92.2000000011176,96.8999999985099
+"Zoom in, both hold the data","20x long read","Release 2.4.0",1232.09999999776,TRUE,"cross-tool motion","BAM",NA,FALSE,"what the user waits",1227.10000000149,1244.20000000112
+"Zoom in, both hold the data","20x long read","Release 2.4.0",55.6999999992549,TRUE,"cross-tool motion","BAM",NA,FALSE,"what the renderer did",55.6000000014901,62
+"Zoom in, both hold the data","20x long read","igv.js 3.8.5",230.700000001118,TRUE,"cross-tool motion","BAM",NA,FALSE,"what the user waits",227.099999999627,233.39999999851
+"Zoom in, both hold the data","20x long read","igv.js 3.8.5",226.300000000745,TRUE,"cross-tool motion","BAM",NA,FALSE,"what the renderer did",225.400000000373,228.599999997765
+"Zoom in, both hold the data","20x long read","GenomeSpy 0.85.0",8.90000000223517,TRUE,"cross-tool motion","BAM",NA,FALSE,"what the user waits",5.29999999888241,9
+"Zoom in, both hold the data","20x long read","GenomeSpy 0.85.0",0.800000000745058,TRUE,"cross-tool motion","BAM",NA,FALSE,"what the renderer did",0.800000000745058,0.900000000372529
+"Zoom in, both hold the data","200x long read","This work",19.3000000007451,TRUE,"cross-tool motion","BAM",NA,FALSE,"what the user waits",19.1000000014901,25.6000000014901
+"Zoom in, both hold the data","200x long read","This work",1.20000000298023,TRUE,"cross-tool motion","BAM",NA,FALSE,"what the renderer did",0.900000002235174,2.19999999925494
+"Zoom in, both hold the data","200x long read","Release 4.3.0",3251.59999999776,TRUE,"cross-tool motion","BAM",NA,FALSE,"what the user waits",3196.79999999702,3288.5
+"Zoom in, both hold the data","200x long read","Release 4.3.0",0.0999999977648258,TRUE,"cross-tool motion","BAM",NA,FALSE,"what the renderer did",0,0.100000001490116
+"Zoom in, both hold the data","200x long read","Release 2.4.0",3592,TRUE,"cross-tool motion","BAM",NA,FALSE,"what the user waits",3443.19999999925,3669.30000000075
+"Zoom in, both hold the data","200x long read","Release 2.4.0",0,TRUE,"cross-tool motion","BAM",NA,FALSE,"what the renderer did",0,0
+"Zoom in, both hold the data","200x long read","igv.js 3.8.5",1249.5,TRUE,"cross-tool motion","BAM",NA,FALSE,"what the user waits",1244.80000000075,1320.29999999702
+"Zoom in, both hold the data","200x long read","igv.js 3.8.5",1245.19999999925,TRUE,"cross-tool motion","BAM",NA,FALSE,"what the renderer did",1240.70000000298,1315.79999999702
+"Zoom in, both hold the data","200x long read","GenomeSpy 0.85.0",9.40000000223517,TRUE,"cross-tool motion","BAM",NA,FALSE,"what the user waits",8.69999999925494,9.40000000223517
+"Zoom in, both hold the data","200x long read","GenomeSpy 0.85.0",0.700000002980232,TRUE,"cross-tool motion","BAM",NA,FALSE,"what the renderer did",0.599999997764826,0.900000002235174
+"Zoom in, both hold the data","1000x long read","This work",29.2000000029802,TRUE,"cross-tool motion","BAM",NA,FALSE,"what the user waits",27,29.2999999970198
+"Zoom in, both hold the data","1000x long read","This work",1.10000000149012,TRUE,"cross-tool motion","BAM",NA,FALSE,"what the renderer did",1.09999999776483,1.19999999925494
+"Zoom in, both hold the data","1000x long read","Release 4.3.0",8998,TRUE,"cross-tool motion","BAM",NA,FALSE,"what the user waits",7730.09999999776,9850.09999999776
+"Zoom in, both hold the data","1000x long read","Release 4.3.0",0.0999999977648258,TRUE,"cross-tool motion","BAM",NA,FALSE,"what the renderer did",0.0999999977648258,0.199999999254942
+"Zoom in, both hold the data","1000x long read","Release 2.4.0",5934.19999999925,TRUE,"cross-tool motion","BAM",NA,FALSE,"what the user waits",5872.30000000075,6552.30000000075
+"Zoom in, both hold the data","1000x long read","Release 2.4.0",0,TRUE,"cross-tool motion","BAM",NA,FALSE,"what the renderer did",0,0
+"Zoom in, both hold the data","1000x long read","igv.js 3.8.5",1177.89999999851,TRUE,"cross-tool motion","BAM",NA,FALSE,"what the user waits",1124.80000000075,1185.30000000075
+"Zoom in, both hold the data","1000x long read","igv.js 3.8.5",1173.80000000075,TRUE,"cross-tool motion","BAM",NA,FALSE,"what the renderer did",1120.89999999851,1181
