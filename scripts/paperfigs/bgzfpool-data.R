@@ -21,7 +21,18 @@ if (is.na(bench)) {
   bench <- Sys.getenv("JB2BENCH", ".")
 }
 
-e2e <- fromJSON(file.path(bench, "results/bgzfpool.json"), simplifyVector = FALSE)
+# The end-to-end arm needs a jbrowse-web built with the useBgzfWorkerPool config
+# slot staged under builds/. Without that build there is no such run, and the
+# standalone arm is still worth drawing on its own -- it is the ceiling the
+# end-to-end number would be read against, and a one-series figure says so
+# honestly where a missing figure says nothing.
+e2e_path <- file.path(bench, "results/bgzfpool.json")
+e2e <- if (file.exists(e2e_path)) {
+  fromJSON(e2e_path, simplifyVector = FALSE)
+} else {
+  cat("no results/bgzfpool.json; drawing the standalone arm only\n")
+  list(results = list())
+}
 alone <- fromJSON(file.path(bench, "results/bgzfpool-standalone.json"), simplifyVector = FALSE)
 
 # Above this many foreign cores a timing is not comparable to one taken on a
@@ -80,6 +91,14 @@ for (track in names(e2e$results)) {
 
 for (track in names(alone$results)) {
   r <- alone$results[[track]]
+  # A cell the renderer heap could not hold. It is recorded rather than absent,
+  # so it is reported rather than quietly leaving a shorter line.
+  if (!is.null(r$failed)) {
+    dropped <- c(dropped, paste0(track, " (did not fit in the renderer heap)"))
+    add(track, "query alone", NA_real_, NA_real_, NA_real_, 0, FALSE,
+        "did not fit in the renderer heap")
+    next
+  }
   ratios <- unlist(r$ratios)
   # No contention gate here: this arm interleaves within one page and takes a
   # min over rounds, so drift shows as a wider spread rather than as a biased

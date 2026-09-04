@@ -132,9 +132,18 @@ await new Promise<void>(resolve => {
   server.listen(PORT, resolve)
 })
 
+// A 19 kb window at 1000x long-read coverage resolves to a chunk that the
+// default renderer heap cannot hold, and the failure arrives as "Array buffer
+// allocation failed" from inside the page rather than as a slow cell. The
+// heap is raised here so the largest cell is measurable; when it still does
+// not fit, the per-track guard below records that and keeps the run.
 const browser = await puppeteer.launch({
   headless: true,
-  args: ['--no-sandbox'],
+  args: [
+    '--no-sandbox',
+    '--disable-dev-shm-usage',
+    '--js-flags=--max-old-space-size=8192',
+  ],
 })
 const page = await browser.newPage()
 page.on('pageerror', e => {
@@ -167,10 +176,27 @@ const med = (xs: number[]) => {
 }
 
 const results: Record<string, unknown> = {}
+
+// Written after every track rather than once at the end. A track that exhausts
+// the renderer heap takes the page down with it, and a whole run's worth of
+// measured tracks used to go with it.
+const save = () => {
+  fs.mkdirSync('results', { recursive: true })
+  fs.writeFileSync(
+    'results/bgzfpool-standalone.json',
+    JSON.stringify(
+      { rounds: ROUNDS, windows: TIMED, ref: REF, versions, results },
+      null,
+      2,
+    ),
+  )
+}
+
 for (const track of TRACKS) {
   process.stdout.write(`${track}: `)
   const rounds: { pooled: Timing[]; plain: Timing[] }[] = []
-  for (let r = 0; r < ROUNDS; r++) {
+  let failure = ''
+  for (let r = 0; r < ROUNDS && !failure; r++) {
     const out = await page.evaluate(
       (url: string, refName: string, windows: number[][]) =>
         (
@@ -187,9 +213,26 @@ for (const track of TRACKS) {
       `http://localhost:${PORT}/${track}`,
       REF,
       TIMED,
-    )
-    rounds.push(out)
-    process.stdout.write('.')
+    ).catch((e: unknown) => {
+      failure = String(e)
+      return undefined
+    })
+    if (out) {
+      rounds.push(out)
+      process.stdout.write('.')
+    }
+  }
+  // A cell whose chunk does not fit in the renderer heap is recorded as unusable
+  // and the run continues, on a fresh page because the old one died with it. It
+  // is not a ratio of 1.0 and it is not a missing key: the figure needs to be
+  // able to say the cell was attempted and did not fit.
+  if (failure) {
+    results[track] = { failed: failure }
+    save()
+    console.log(` => FAILED (${failure.split('\n')[0]})`)
+    await page.goto(`http://localhost:${PORT}/`, { waitUntil: 'load' })
+    await page.waitForFunction('window.bgzfBench !== undefined', { timeout: 60000 })
+    continue
   }
   // Both arms must have found the same records. An arm that silently returned
   // nothing is the fastest arm there is.
@@ -208,6 +251,7 @@ for (const track of TRACKS) {
         .size > 1,
   )
   results[track] = { rounds, perWindow, ratios, median: med(ratios), mismatched }
+  save()
   process.stdout.write(
     ` => ${med(ratios).toFixed(2)}x  (per window ${ratios.map(r => r.toFixed(2)).join(' ')})` +
       `  records ${[...counts].sort((a, b) => a - b).join('/')}\n`,
@@ -220,13 +264,5 @@ for (const track of TRACKS) {
 await browser.close()
 server.close()
 
-fs.mkdirSync('results', { recursive: true })
-fs.writeFileSync(
-  'results/bgzfpool-standalone.json',
-  JSON.stringify(
-    { rounds: ROUNDS, windows: TIMED, ref: REF, versions, results },
-    null,
-    2,
-  ),
-)
+save()
 console.log('\nWrote results/bgzfpool-standalone.json')
