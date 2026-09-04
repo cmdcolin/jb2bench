@@ -27,7 +27,10 @@ minimap2 -t 8 -a "$REF" 1000x_0001.fastq 2>/dev/null |
   samtools markdup -@8 --reference "$REF" - --write-index 1000x.longread.cram
 
 for k in shortread longread; do
-  for i in 02 20; do
+  # 01/03 are 10x and 30x, which is ordinary WGS depth and where the BGZF pool
+  # question is actually decided; 02/20 are the 20x/200x arms the render
+  # benchmarks use. See results/bgzfpool-levers.md.
+  for i in 01 03 02 20; do
     frac=0.$i
     a=$(echo "1000*$frac/1" | bc)
     echo "[$(date +%T)] subsample ${k} -> ${a}x"
