@@ -140,9 +140,7 @@ zoom_panel <- function(df, ends, y_breaks) {
     scale_colour_discrete(drop = FALSE, labels = function(x) unname(ARCH[x]),
                           breaks = PERF_SERIES[PERF_SERIES %in% df$series]) +
     labs(x = "coverage", colour = NULL) +
-    paper_theme() +
-    theme(plot.title = element_text(size = rel(1), face = "bold",
-                                    margin = margin(b = 6)))
+    paper_theme()
 }
 
 wait <- subset(d, measure == WAIT)

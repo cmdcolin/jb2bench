@@ -116,7 +116,12 @@ fig <- ggplot(plotted, aes(x = coverage, y = s, colour = series)) +
   # otherwise five keys wide and runs off the page.
   scale_colour_discrete(drop = FALSE,
                         breaks = c("Release 2.4.0", "Release 4.3.0", "This work")) +
-  labs(x = "coverage", y = "seconds", colour = NULL) +
+  # Titled by what is measured, like every figure in this set. The facet strips
+  # already name the two motions; the title names the quantity they share, so
+  # the figure still says what it is when it is pulled out of the paper and put
+  # on a slide.
+  labs(x = "coverage", y = "seconds", colour = NULL,
+       title = "Time to content after a zoom and after a pan") +
   paper_theme()
 
 ggsave("results/figures/paper/pdf/perf-interaction.pdf", fig,

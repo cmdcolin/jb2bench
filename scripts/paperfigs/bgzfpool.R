@@ -75,7 +75,8 @@ fig <- ggplot(plotted, aes(x = xf, y = speedup, colour = series, group = series)
   facet_wrap(~panel, nrow = 2, scales = "free_x") +
   scale_x_discrete(expand = expansion(add = c(0.35, 1.1))) +
   scale_y_continuous(expand = expansion(mult = c(0.08, 0.12))) +
-  labs(x = "coverage (BAM)  ·  samples (VCF)", y = "speedup, pool on ÷ pool off",
+  labs(title = "Does the BGZF inflate worker pool make a query faster?",
+       x = "coverage (BAM)  ·  samples (VCF)", y = "speedup, pool on ÷ pool off",
        colour = NULL) +
   paper_theme()
 

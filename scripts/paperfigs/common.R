@@ -122,6 +122,15 @@ paper_theme <- function(base = PAPER_BASE) {
           legend.text = element_text(size = rel(0.95)),
           legend.key.size = unit(5.5, "mm"),
           strip.text = element_text(size = rel(0.95)),
+          # One title treatment for the set. It lived in perf-crosstool-zoom.R
+          # alone, so that figure's title was bold at rel(1) while every other
+          # figure took ggplot's default -- larger, lighter, set at a different
+          # distance from the panel. Figures in one paper drawn by separate
+          # scripts drift exactly here, in the parts no single script owns.
+          plot.title = element_text(face = "bold", size = rel(1.05),
+                                    margin = margin(b = 6)),
+          plot.subtitle = element_text(size = rel(0.9),
+                                       margin = margin(b = 8)),
           panel.spacing = unit(1, "lines"))
 }
 
