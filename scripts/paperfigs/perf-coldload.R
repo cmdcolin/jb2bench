@@ -162,7 +162,8 @@ draw <- function(win, out, width_label) {
     # Below the panels, not above them, and in the same place as on every other
     # figure here: three lines of provenance between the reader and the legend
     # read as a title, and the eye has to cross them before reaching the data.
-    labs(x = "coverage", colour = NULL) +
+    labs(title = sprintf("Navigating to a %s genomic region", width_label),
+         x = "coverage", colour = NULL) +
     paper_theme()
 
   ggsave(sprintf("results/figures/paper/pdf/%s.pdf", out), fig,
