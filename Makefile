@@ -296,7 +296,9 @@ paper-data:
 	Rscript scripts/paperfigs/parser-data.R .
 	Rscript scripts/paperfigs/ldband-data.R .
 	Rscript scripts/paperfigs/wasmgate-data.R .
-	@if [ -f results/bgzfpool.json ] && [ -f results/bgzfpool-standalone.json ]; then \
+# Standalone alone is enough: that arm needs no staged build, and the figure
+# draws it as a single series until an end-to-end run exists beside it.
+	@if [ -f results/bgzfpool-standalone.json ]; then \
 	   Rscript scripts/paperfigs/bgzfpool-data.R .; \
 	 else echo "no bgzfpool run on disk; bgzfpool.csv is left as committed"; fi
 	@if [ -d $(JB2) ]; then \

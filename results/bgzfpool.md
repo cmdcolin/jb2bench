@@ -5,6 +5,10 @@ tabix VCF, and how much of the library-level speedup survives to the user?
 
 ## Runs of record
 
+The figure is [`figures/paper/png/bgzfpool.png`](figures/paper/png/bgzfpool.png),
+drawn by `scripts/paperfigs/bgzfpool.R` from `paper/bgzfpool.csv`. It carries
+one series until an end-to-end run exists to draw beside it.
+
 **The standalone arm, 2026-09-04.** Nine rounds, min per window, five
 non-overlapping 19 kb windows on `chr22_mask`, four workers, bundled from
 `@gmod/bam@9.0.1 @gmod/tabix@3.8.2 @gmod/bgzf-filehandle@6.6.0`. Written by
