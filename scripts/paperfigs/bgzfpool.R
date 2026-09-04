@@ -39,7 +39,9 @@ d$panel <- factor(d$panel, levels = PANELS)
 # an argument.
 levs <- unique(d[order(grepl("VCF", d$panel), d$x), c("xlab")])
 d$xf <- factor(d$xlab, levels = levs)
-d$series <- factor(d$series, levels = c("query alone", "in jbrowse, end to end"))
+d$series <- factor(d$series, levels = c(
+  "query alone, 19 kb window", "query alone, 100 kb window",
+  "in jbrowse, end to end"))
 
 # A dropped point truncates its series rather than interpolating across the gap:
 # a line drawn through a cell nobody measured is a claim nobody made.

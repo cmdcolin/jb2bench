@@ -26,7 +26,7 @@ import http from 'http'
 import os from 'os'
 import path from 'path'
 import puppeteer from 'puppeteer'
-import { DEFAULT_TRACKS, REF, TIMED } from './windows.ts'
+import { DEFAULT_TRACKS, REF, TIMED, WINDOW_KB } from './windows.ts'
 
 const ROUNDS = Number(process.argv[2] ?? process.env.ROUNDS ?? 9)
 const TRACKS = (process.env.TRACKS ?? DEFAULT_TRACKS.join(',')).split(',')
@@ -176,7 +176,12 @@ const med = (xs: number[]) => {
     : (s[s.length / 2 - 1]! + s[s.length / 2]!) / 2
 }
 
-const OUTFILE = 'results/bgzfpool-standalone.json'
+// Per window width, because the merge below is keyed by track: a 100 kb run
+// writing into the 19 kb file would overwrite each cell with a measurement of a
+// different query and leave nothing saying so.
+const OUTFILE = WINDOW_KB
+  ? `results/bgzfpool-standalone-${WINDOW_KB}kb.json`
+  : 'results/bgzfpool-standalone.json'
 
 // A TRACKS= run measures a subset and used to write a whole file, so re-taking
 // one cell silently deleted the other eleven. Subset runs merge instead, and

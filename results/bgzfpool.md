@@ -15,16 +15,16 @@ heap, bundled from `@gmod/bam@9.0.1 @gmod/tabix@3.8.2
 @gmod/bgzf-filehandle@6.6.0`. Raw in `results/bgzfpool-standalone.json`, which
 records the rounds and heap behind each cell.
 
-| track | records / window | pool on ÷ pool off |
+| track | 19 kb window | 100 kb window |
 | --- | --- | --- |
-| 20x shortread BAM | ~3,000 | 1.23x |
-| 200x shortread BAM | ~30,000 | 1.25x |
-| 1000x shortread BAM | ~153,000 | 1.31x |
-| 20x longread BAM | ~40 | 1.49x |
-| 200x longread BAM | ~350 | 1.55x |
-| 1000x longread BAM | ~1,700 | 1.65x |
-| VCF full genotypes, 100 / 1,000 / 3,000 samples | ~316 | 1.11x / 1.24x / 1.28x |
-| VCF genotypes only, 100 / 1,000 / 3,000 samples | ~316 | 0.93x / 1.05x / 1.11x |
+| 20x shortread BAM | 1.23x | 1.30x |
+| 200x shortread BAM | 1.25x | 1.44x |
+| 1000x shortread BAM | 1.31x | 1.31x |
+| 20x longread BAM | 1.49x | 1.48x |
+| 200x longread BAM | 1.55x | 1.59x |
+| 1000x longread BAM | 1.65x | 1.66x |
+| VCF full GT, 100 / 1,000 / 3,000 samples | 1.11x / 1.24x / 1.28x | 1.14x / 1.27x / **1.40x** |
+| VCF GT only, 100 / 1,000 / 3,000 samples | 0.93x / 1.05x / 1.11x | 1.01x / 1.06x / 1.07x |
 
 One axis explains the whole table, and it is not coverage or sample count as
 such: it is how many bytes the query resolves to. Every panel rises with it,
@@ -42,17 +42,22 @@ the number is stable even though the cell is not.
 jbrowse-components quotes the pool in two places, and this arm agrees with one
 of them and is in tension with the other.
 
-**Tabix: agrees.** `agent-docs/reference/BGZF_WORKER_POOL.md` reports
-1.34-1.46x over 50-400 kb windows on a 213 MB slice of 1000 Genomes. This arm
-gets 0.93-1.28x over **19 kb** windows on synthetic callsets. Same direction,
-smaller windows, smaller numbers — their windows are 2.6-21x wider than these,
-and the table above says what widening a window does.
+**Tabix: agrees, once the window is theirs.** Their 1.34-1.46x came from
+50-400 kb windows; at 19 kb this arm gets 1.28x on the 3,000-sample callset and
+at **100 kb it gets 1.40x**, inside their band. Window width was the whole
+difference. 200 kb and 400 kb are not reachable here: `chr22_mask` is 250 kb,
+so the corpus rather than the harness is what caps the sweep.
 
 **BAM: in tension, and worth resolving.** `BamAdapter.ts` and
 `website/docs/developer_guides/optimizations.md` both quote **1.95x end to end,
 over a 22-view pan and zoom across 1000x long-read data, both arms returning
 the same 38,246 records**. This arm measures **1.65x** for that same file with
 *nothing above the query*.
+
+Widening the window does **not** close it: at 100 kb the same cell measures
+1.66x, against 1.65x at 19 kb. Whatever the remaining 1.95x is, it is not
+window size — which is what makes the concurrency explanation below the one to
+test first.
 
 That is backwards. This figure's premise — stated in the section below and in
 `results/crampool.md` before it — is that the library alone is an upper bound

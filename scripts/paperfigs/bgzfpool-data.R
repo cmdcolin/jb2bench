@@ -33,7 +33,15 @@ e2e <- if (file.exists(e2e_path)) {
   cat("no results/bgzfpool.json; drawing the standalone arm only\n")
   list(results = list())
 }
-alone <- fromJSON(file.path(bench, "results/bgzfpool-standalone.json"), simplifyVector = FALSE)
+# The standalone arm at each window width it was taken over. Width is the axis
+# jbrowse-components' own tabix numbers differ from this repo's on -- 50-400 kb
+# there against 19 kb here -- so the widths are series rather than one merged
+# blob.
+STANDALONE <- list(
+  list(file = "results/bgzfpool-standalone.json", series = "query alone, 19 kb window"),
+  list(file = "results/bgzfpool-standalone-100kb.json", series = "query alone, 100 kb window")
+)
+alone <- NULL
 
 # Above this many foreign cores a timing is not comparable to one taken on a
 # quiet box; the same ceiling scripts/render/loadavg.ts applies.
@@ -89,30 +97,36 @@ for (track in names(e2e$results)) {
       length(r$ratios), usable, note)
 }
 
-for (track in names(alone$results)) {
-  r <- alone$results[[track]]
-  # A cell the renderer heap could not hold. It is recorded rather than absent,
-  # so it is reported rather than quietly leaving a shorter line.
-  if (!is.null(r$failed)) {
-    dropped <- c(dropped, paste0(track, " (did not fit in the renderer heap)"))
-    add(track, "query alone", NA_real_, NA_real_, NA_real_, 0, FALSE,
-        "did not fit in the renderer heap")
+for (arm in STANDALONE) {
+  path <- file.path(bench, arm$file)
+  if (!file.exists(path)) {
+    cat("no ", arm$file, "; skipping that width\n", sep = "")
     next
   }
-  ratios <- unlist(r$ratios)
-  # No contention gate here: this arm interleaves within one page and takes a
-  # min over rounds, so drift shows as a wider spread rather than as a biased
-  # ratio. The record-count check is the gate instead.
-  usable <- !isTRUE(r$mismatched)
-  if (!usable) {
-    dropped <- c(dropped, paste0(track, " (arms returned different record counts)"))
+  a <- fromJSON(path, simplifyVector = FALSE)
+  alone <- a
+  for (track in names(a$results)) {
+    r <- a$results[[track]]
+    # A cell the renderer heap could not hold. It is recorded rather than
+    # absent, so it is reported rather than quietly leaving a shorter line.
+    if (!is.null(r$failed)) {
+      dropped <- c(dropped, paste0(track, " (did not fit in the renderer heap)"))
+      add(track, arm$series, NA_real_, NA_real_, NA_real_, 0, FALSE,
+          "did not fit in the renderer heap")
+      next
+    }
+    ratios <- unlist(r$ratios)
+    # No contention gate here: this arm interleaves within one page and takes a
+    # min over rounds, so drift shows as a wider spread rather than as a biased
+    # ratio. The record-count check is the gate instead.
+    usable <- !isTRUE(r$mismatched)
+    if (!usable) {
+      dropped <- c(dropped, paste0(track, " (arms returned different record counts)"))
+    }
+    add(track, arm$series, median(ratios), min(ratios), max(ratios),
+        length(ratios), usable, if (usable) "" else "record count mismatch",
+        rounds = length(r$rounds))
   }
-  # Rounds is per track, not per run: the heaviest cell does not survive as many
-  # of them as the rest, so a cell taken over fewer has to say so rather than
-  # sit in the table looking equally well sampled.
-  add(track, "query alone", median(ratios), min(ratios), max(ratios),
-      length(ratios), usable, if (usable) "" else "record count mismatch",
-      rounds = length(r$rounds))
 }
 
 out <- do.call(rbind, rows)
