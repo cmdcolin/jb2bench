@@ -80,6 +80,54 @@ long read at ordinary coverage, ~1.5x and ~15 ms on short read. A claim of "~2x
 when viewing large regions" is true of long read and of high-coverage short
 read, and overstates 10-30x short read — which is most people's BAM.
 
+## What this predicts end to end, without running the end-to-end arm
+
+The pool can only speed up the part of a pan that is decompression, and this
+repo already measures both halves: `results/bgzfpool-standalone.json` has the
+query with the pool off, and `results/interaction.json` has what a pan costs on
+the `current` build over the same contig.
+
+| track | query, pool off | pan | query is | pool on the query | -> end to end |
+| --- | --- | --- | --- | --- | --- |
+| 20x shortread BAM | 8 ms | 214 ms | 4% | 1.23x | **1.01x** |
+| 200x shortread BAM | 58 ms | 818 ms | 7% | 1.25x | **1.01x** |
+| 1000x shortread BAM | 283 ms | 1296 ms | 22% | 1.31x | **1.05x** |
+| 20x longread BAM | 23 ms | 171 ms | 14% | 1.49x | **1.05x** |
+| 200x longread BAM | 146 ms | 894 ms | 16% | 1.55x | **1.06x** |
+| 1000x longread BAM | 563 ms | 1544 ms | 36% | 1.65x | **1.17x** |
+
+Amdahl on measured numbers, not a guess. Using the concurrent figures instead
+of the sequential ones moves the last row to 1.23x and the rest barely at all.
+
+**This is the number that matters, and it is small.** A pool that halves
+decompression is worth 1-6% on an ordinary pan, because decompression is
+4-16% of what a pan costs. Everything else — the RPC hop, feature conversion,
+layout, paint — is untouched and is the other 84-96%.
+
+### It also says the quoted 1.95x is not an end-to-end pan
+
+Set the pool speedup to infinity and the ceiling is `1 / (1 - f)`:
+
+| track | most any decompressor could ever give |
+| --- | --- |
+| 20x longread BAM | 1.16x |
+| 200x longread BAM | 1.19x |
+| 1000x shortread BAM | 1.28x |
+| 1000x longread BAM | 1.57x |
+
+No pool, of any size, can return 1.95x on a pan that spends 36% of itself
+decompressing. For 1.95x with a perfect four-worker pool the query would have to
+be **65% of the pan**. So `1.95x end to end` is measuring something narrower
+than a pan to paint — plausibly the adapter's own fetch-and-parse, which is
+exactly the thing the standalone arm here measures at 1.65-2.08x and agrees
+with. The disagreement was never about the pool; it was about what "end to end"
+names.
+
+The caveat that keeps this a prediction rather than a result: the pan times come
+from this repo's `current` build. A build whose rendering is much cheaper shifts
+`f` up and every number here with it. That is what the two-build end-to-end arm
+would settle, and it is now the only open question left.
+
 ## Cells that would not run
 
 `1000x.shortread.bam` and `variants.pool.3000.wide.vcf.gz` fail both modes with
