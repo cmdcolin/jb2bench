@@ -45,6 +45,7 @@ Every number lives in a file; nothing is summarized only here.
 | [`results/interaction.md`](results/interaction.md) | how long does a zoom make you wait? |
 | [`results/interaction-cpu.md`](results/interaction-cpu.md) | where does per-frame main-thread time go during a zoom? |
 | [`results/crampool.md`](results/crampool.md) | does @gmod/cram's slice worker pool make a pan faster? (no run of record yet) |
+| [`results/bgzfpool-levers.md`](results/bgzfpool-levers.md) | how much more is left in the pool — worker count against query concurrency? |
 | [`results/bgzfpool.md`](results/bgzfpool.md) | does the BGZF inflate pool make a pan faster, for BAM and for tabix VCF? (no run of record yet) |
 | [`results/ld-gpu-vs-cpu.md`](results/ld-gpu-vs-cpu.md) | is the LD compute shader worth it vs the CPU path? |
 | [`results/ld-dispatch-limit.md`](results/ld-dispatch-limit.md) | where does the LD dispatch break, and how loudly? |

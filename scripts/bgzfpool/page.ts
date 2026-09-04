@@ -35,10 +35,15 @@ async function openTabix(url: string, pool: BgzfWorkerPool | undefined) {
   }
 }
 
-// Four workers is what the default gives jbrowse on this box, so both panels
-// of the figure use the same pool size; idleTimeoutMs 0 so a reap cannot land
-// inside a timed region.
-const pool = await getSharedWorkerPool(4, 0)
+// Four workers is what the default gives jbrowse on this box, so both panels of
+// the figure use the same pool size; idleTimeoutMs 0 so a reap cannot land
+// inside a timed region. `?workers=` overrides it for the lever sweep —
+// getSharedWorkerPool memoizes per JS context, so a different size means a
+// different page load rather than a second pool.
+const WORKERS = Number(
+  new URLSearchParams(location.search).get('workers') ?? 4,
+)
+const pool = await getSharedWorkerPool(WORKERS, 0)
 
 const open = (url: string, withPool: boolean): Promise<Reader> =>
   url.endsWith('.bam')
@@ -69,5 +74,30 @@ Object.assign(window, {
       }
       return out
     },
+    /**
+     * The same windows issued all at once instead of one after another, which
+     * is what a pan does: a view is split into blocks and their queries are in
+     * flight together. One query can only ever hand the pool the blocks of one
+     * chunk; several can keep more of it busy, so if the pool is
+     * under-fed rather than saturated this is where it shows.
+     */
+    roundConcurrent: async (
+      url: string,
+      refName: string,
+      windows: number[][],
+    ) => {
+      const out: Record<string, number> = {}
+      for (const arm of ['pooled', 'plain']) {
+        const reader = await open(url, arm === 'pooled')
+        const t0 = performance.now()
+        const counts = await Promise.all(
+          windows.map(([start, end]) => reader.count(refName, start!, end!)),
+        )
+        out[arm] = performance.now() - t0
+        out[`${arm}Count`] = counts.reduce((a, b) => a + b, 0)
+      }
+      return out
+    },
+    workers: WORKERS,
   },
 })

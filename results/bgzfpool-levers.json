@@ -1,0 +1,106 @@
+{
+  "rounds": 5,
+  "windows": [
+    [
+      60000,
+      79000
+    ],
+    [
+      90000,
+      109000
+    ],
+    [
+      124000,
+      143000
+    ],
+    [
+      155000,
+      174000
+    ],
+    [
+      185000,
+      204000
+    ]
+  ],
+  "ref": "chr22_mask",
+  "versions": {
+    "@gmod/bam": "9.0.1",
+    "@gmod/tabix": "3.8.2",
+    "@gmod/bgzf-filehandle": "6.6.0"
+  },
+  "cores": 16,
+  "rows": [
+    {
+      "track": "variants.pool.1000.wide.vcf.gz",
+      "workers": 4,
+      "mode": "sequential",
+      "pooled": 170.69999999552965,
+      "plain": 206.80000000447035,
+      "speedup": 1.2114821324539313,
+      "counts": "1583"
+    },
+    {
+      "track": "variants.pool.1000.wide.vcf.gz",
+      "workers": 4,
+      "mode": "concurrent",
+      "pooled": 139.89999999850988,
+      "plain": 193.89999999850988,
+      "speedup": 1.3859899928561485,
+      "counts": "1583"
+    },
+    {
+      "track": "200x.shortread.bam",
+      "workers": 4,
+      "mode": "sequential",
+      "pooled": 234.30000000447035,
+      "plain": 288.3999999985099,
+      "speedup": 1.2309005548143719,
+      "counts": "153007"
+    },
+    {
+      "track": "200x.shortread.bam",
+      "workers": 4,
+      "mode": "concurrent",
+      "pooled": 200.09999999403954,
+      "plain": 284.19999999552965,
+      "speedup": 1.4202898550924299,
+      "counts": "153007"
+    },
+    {
+      "track": "variants.pool.1000.wide.vcf.gz",
+      "workers": 8,
+      "mode": "sequential",
+      "pooled": 160.69999999552965,
+      "plain": 199.19999999552965,
+      "speedup": 1.2395768512823335,
+      "counts": "1583"
+    },
+    {
+      "track": "variants.pool.1000.wide.vcf.gz",
+      "workers": 8,
+      "mode": "concurrent",
+      "pooled": 140.29999999701977,
+      "plain": 192.70000000298023,
+      "speedup": 1.3734853885037315,
+      "counts": "1583"
+    },
+    {
+      "track": "200x.shortread.bam",
+      "workers": 8,
+      "mode": "sequential",
+      "pooled": 211.69999999552965,
+      "plain": 278.1000000014901,
+      "speedup": 1.31365139351612,
+      "counts": "153007"
+    },
+    {
+      "track": "200x.shortread.bam",
+      "workers": 8,
+      "mode": "concurrent",
+      "pooled": 200,
+      "plain": 289.69999999552965,
+      "speedup": 1.4484999999776482,
+      "counts": "153007"
+    }
+  ]
+}

@@ -55,9 +55,12 @@ the same 38,246 records**. This arm measures **1.65x** for that same file with
 *nothing above the query*.
 
 Widening the window does **not** close it: at 100 kb the same cell measures
-1.66x, against 1.65x at 19 kb. Whatever the remaining 1.95x is, it is not
-window size — which is what makes the concurrency explanation below the one to
-test first.
+1.66x, against 1.65x at 19 kb. **Two other levers do close it**, and
+[`bgzfpool-levers.md`](bgzfpool-levers.md) measures both: the same cell reaches
+1.97x on eight workers, and 2.08x with queries in flight together on four. The
+1.65x here is the pool's worst configuration — one query at a time through four
+workers — which is the one a real pan never runs in. So the tension below is
+resolved: it was concurrency, and pool size.
 
 That is backwards. This figure's premise — stated in the section below and in
 `results/crampool.md` before it — is that the library alone is an upper bound
