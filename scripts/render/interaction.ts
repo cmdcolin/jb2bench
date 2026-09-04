@@ -127,6 +127,20 @@ console.error(
     `${settleIn.censored ? ' (CENSORED: still unfinished)' : ''}`,
 )
 
+// Recorded per run rather than assumed. The older releases predate the action,
+// so they sit out their throttle where the build under test flushes it — which
+// is a real difference between builds, and only readable as one if each cell
+// says which it was.
+const settlesCoarseBlocks = await page.evaluate(
+  () =>
+    typeof (
+      window as unknown as {
+        JBrowseSession: { views: { settleCoarseBlocks?: () => void }[] }
+      }
+    ).JBrowseSession.views[0]?.settleCoarseBlocks === 'function',
+)
+console.error(`settleCoarseBlocks: ${settlesCoarseBlocks}`)
+
 // install a frame recorder for redraw-cost (max rAF gap)
 await page.evaluate(() => {
   const w = window as unknown as { __frames: number[] }
@@ -253,7 +267,18 @@ async function interactStep(): Promise<StepMetric> {
         visibleLocStrings?: string
         zoomTo: (n: number) => void
         horizontalScroll: (px: number) => number
+        settleCoarseBlocks?: () => void
       }
+      // `zoomTo` and `horizontalScroll` are the per-frame chokepoints a gesture
+      // writes through, and they leave the coarse blocks on their 500 ms
+      // LGVCoarseDynamicBlocks throttle on purpose — flushing sixty times a
+      // second is the cost the throttle exists to avoid. Every discrete placer
+      // in the LGV model ends with `settleCoarseBlocks` instead, and a
+      // benchmark step is a discrete jump, so it takes the discrete path. The
+      // cross-tool runner learned this first: driven bare, a zoom step timed
+      // the throttle coalescing a gesture that never arrived — a flat ~507 ms
+      // at every coverage, on a path no UI control takes.
+      const settle = () => v.settleCoarseBlocks?.()
       const where = () =>
         v.visibleLocStrings ??
         // fallback for builds without the getter: this corpus is one contig
@@ -276,6 +301,7 @@ async function interactStep(): Promise<StepMetric> {
         const before = v.offsetPx
         const t = performance.now()
         v.horizontalScroll(sign * v.width)
+        settle()
         // read the offset back rather than trusting the return value, so this
         // does not depend on horizontalScroll's contract across builds
         return {
@@ -288,6 +314,7 @@ async function interactStep(): Promise<StepMetric> {
       const before = v.bpPerPx
       const t = performance.now()
       v.zoomTo(before * factor)
+      settle()
       // zoomTo clamps at the assembly's widest bpPerPx. An unchanged value means
       // the view was already as wide as the contig allows and nothing moved, so
       // there is nothing to time — distinguish that from "content came back
@@ -450,6 +477,7 @@ const summary = {
   zoomTimeToContentMs: median(drew.map(s => s.timeToContentMs)),
   zoomRedrawGapMs: median(drew.map(s => s.redrawGapMs)),
   loadingEverSeen: drew.some(s => s.loadingSeen),
+  settlesCoarseBlocks,
   steps,
 }
 console.log(JSON.stringify(summary))
