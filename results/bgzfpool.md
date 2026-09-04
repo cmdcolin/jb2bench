@@ -3,21 +3,41 @@
 Does the BGZF inflate pool make a **pan** faster in jbrowse, for BAM and for
 tabix VCF, and how much of the library-level speedup survives to the user?
 
-## Runs of record: none
+## Runs of record
 
-The harness and the corpus are in place and the instrument is verified
-sensitive, but nothing has been measured on a quiet box yet. Every number that
-appears here from now on is written by `scripts/bgzfpool/endtoend.ts`, which
-overwrites this file.
+**The standalone arm, 2026-09-04.** Nine rounds, min per window, five
+non-overlapping 19 kb windows on `chr22_mask`, four workers, bundled from
+`@gmod/bam@9.0.1 @gmod/tabix@3.8.2 @gmod/bgzf-filehandle@6.6.0`. Written by
+`scripts/bgzfpool/standalone.ts`; raw in `results/bgzfpool-standalone.json`.
 
-The one thing measured so far is that the standalone arm works and responds to
-the axis it is supposed to: on a **contended** 16-core laptop at load 8,
-`variants.pool.1000.wide` came out 1.19x and `variants.pool.3000.wide` 1.29x,
-each tight across its five windows, while `variants.pool.100.gtonly` sat at
-0.98x — which is the small-chunk regime `@gmod/bgzf-filehandle`'s worker-pool
-doc describes, where a query resolves to one or two blocks and the round trip
-costs more than the parallelism returns. Those are not results. They are the
-evidence that the instrument moves when the thing it measures moves.
+| track | pool on ÷ pool off |
+| --- | --- |
+| 20x shortread BAM | 1.24x |
+| 200x shortread BAM | 1.32x |
+| 1000x shortread BAM | 1.30x |
+| 20x longread BAM | 1.49x |
+| 200x longread BAM | 1.40x |
+| 1000x longread BAM | did not fit in the renderer heap |
+| VCF full genotypes, 100 / 1,000 / 3,000 samples | 1.13x / 1.26x / 1.24x |
+| VCF genotypes only, 100 / 1,000 / 3,000 samples | 0.95x / 1.08x / 1.07x |
+
+The shape is the one `@gmod/bgzf-filehandle`'s worker-pool doc describes: the
+ratio grows with the size of the chunk a query resolves to, and the smallest
+chunk here — 100 samples, genotypes only — sits below 1.0, where the round trip
+costs more than the parallelism returns.
+
+**This does not yet test the 1.95x in jbrowse-components.** That number, in the
+docstring of `packages/core/src/util/bgzfWorkerPool.ts`, was measured over a
+22-view pan / zoom out / pan back on 1000x long-read data. These windows are
+19 kb, which is a far smaller chunk, and the one cell that would speak to the
+claim is the one that did not fit. Nothing here contradicts 1.95x; nothing here
+confirms it either. See `agent-docs/bgzfpool-linux-runbook.md`.
+
+**The end-to-end arm: still none.** It compared a track against a `.nopool`
+twin driven by a `useBgzfWorkerPool` config slot, and that slot was removed
+from jbrowse-components deliberately — it was test-only and is not shipping.
+The arm needs rewiring to compare two builds instead; the runbook above says
+how.
 
 ## What is being compared
 
