@@ -59,12 +59,17 @@ drop_note <- if (nrow(dropped)) {
             inherit.aes = FALSE)
 }
 
-# Each release's last point carries its ratio to this work, stacked to the
-# right of the curve ends. The pan row can divide by a reference time; the zoom
-# row cannot, because a zoom in this work is a redraw with no refetch and reads
-# 0 s, and a ratio against zero is not a ratio. So the zoom row labels the same
-# endpoints with the duration alone, and names this work's zero for what it is
-# rather than leaving an unlabelled flat line on the axis.
+# Each release's last point carries its ratio to this work, stacked to the right
+# of the curve ends. The pan row divides by a reference time; the zoom row
+# labels durations alone.
+#
+# The zoom row used to be unable to divide at all: a zoom in this work is a
+# redraw with no refetch and the column read 0 s, and a ratio against zero is
+# not a ratio. That zero was withdrawn on 2026-09-04 -- it did not reproduce,
+# and five runs on an idle box put the cell at 146-171 ms (results/interaction.md
+# has what was ruled out). Durations stay, because the surviving reason holds:
+# these are ratios of 7x to 76x and a reader who wants one can take it off the
+# axis, while four ratio labels in a cell this tall collide.
 LABEL_COLS <- c("panel", "reads", "coverage", "s", "series", "label")
 
 pan_ends <- endpoint_labels(subset(plotted, panel == "Pan, both refetch"),
@@ -75,11 +80,12 @@ pan_ends$label <- sub("\n", " · ", pan_ends$label, fixed = TRUE)
 zoom <- subset(plotted, panel == "Zoom in, within loaded data")
 zoom <- zoom[order(-zoom$coverage), ]
 zoom_ends <- zoom[!duplicated(zoom[c("panel", "reads", "series")]), ]
-# Plain "0 s", not "0 s, no refetch": the caption says what the zero is, and
-# spelled out in the panel the phrase is wider than the gutter that holds every
-# other endpoint label, so it alone would set the figure's right margin.
-zoom_ends$label <- ifelse(zoom_ends$series == "This work", "0 s",
-                          fmt_time(zoom_ends$s))
+# Formatted from the value like every other label. It was hardcoded to "0 s"
+# for this work while the column really did read zero, and that hardcode
+# outlived the number: the data moved to 146-171 ms on 2026-09-04 and the figure
+# went on printing 0 s, because a literal cannot be wrong about data it never
+# reads. Nothing on a figure should be a constant that the data could contradict.
+zoom_ends$label <- fmt_time(zoom_ends$s)
 
 ends <- rbind(pan_ends[LABEL_COLS], zoom_ends[LABEL_COLS])
 
@@ -126,9 +132,13 @@ cat("wrote results/figures/paper/png/perf-interaction.png\n")
 # the figure itself carries no explanatory text.
 #
 #   Time-to-content after a 2x zoom in and after a one-viewport pan, median of
-#   five steps. Zero on the zoom row is a redraw with no refetch: this work
-#   serves the zoomed view from data it already holds, so nothing is fetched and
-#   nothing is waited for. Bold labels give that release's time at 1000x and how
-#   many times slower that is than this work at the same point; the zoom row
-#   labels the duration alone, since a ratio against zero is not a ratio. A
+#   five steps. The zoom row is a redraw with no refetch: this work serves the
+#   zoomed view from data it already holds, so nothing is fetched, and its
+#   146-171 ms is block bookkeeping rather than drawing or network -- flat
+#   across a fifty-fold coverage range, against releases that re-rasterize for
+#   0.6 to 12 s. This column read 0 s until 2026-09-04 and that reading was
+#   withdrawn: it did not reproduce, and results/interaction.md records what was
+#   ruled out. Bold labels give that release's time at 1000x and how many times
+#   slower that is than this work at the same point; the zoom row labels
+#   durations alone, because four ratio labels collide in a cell this tall. A
 #   series stops rather than bridging a cell measured under external load.
