@@ -112,6 +112,36 @@ add({
       : `missing ${missingCorpus.length}: ${missingCorpus.slice(0, 3).join(', ')}… — shell/generate_alignments.sh`,
 })
 
+// The ordinary-depth arms, on their own line rather than folded into the count
+// above, because they are needed by one benchmark and not by the others.
+//
+// `shell/generate_alignments.sh` started emitting 10x and 30x on 2026-09-04 for
+// the BGZF pool levers work -- 1000x is not a workload and 10-30x is, which is
+// where that question is actually decided (results/bgzfpool-levers.md). A box
+// whose corpus predates that commit can still take every render timing, so this
+// must not block one; what it must do is be visible, which the count above
+// cannot manage. That check passed at "24 files" on a machine with no 10x or
+// 30x file on it at all, because 24 is what it expects and the new arms were
+// never in its list.
+const ORDINARY_DEPTHS = ['10x', '30x']
+const ordinary = ORDINARY_DEPTHS.flatMap(c =>
+  READS.flatMap(r => [
+    `${c}.${r}.bam`,
+    `${c}.${r}.bam.bai`,
+    `${c}.${r}.cram`,
+    `${c}.${r}.cram.crai`,
+  ]),
+)
+const missingOrdinary = ordinary.filter(f => !fs.existsSync(`data/${f}`))
+add({
+  name: 'ordinary-depth arms',
+  ok: missingOrdinary.length === 0,
+  detail:
+    missingOrdinary.length === 0
+      ? `${ordinary.length} files (10x, 30x)`
+      : `missing ${missingOrdinary.length} of ${ordinary.length} — only scripts/bgzfpool/levers.ts reads these; make corpus`,
+})
+
 const extras: [string, string, string][] = [
   ['variant corpus', 'data/variants.1000.wide.vcf', 'shell/generate_variants.sh'],
   ['GFF3 corpus', 'data/features.1000.rich.gff3', 'shell/generate_gff3.sh'],
