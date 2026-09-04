@@ -91,19 +91,62 @@ hit rather than an inflate.
 
 ## Running it
 
+**`make bgzfpool-*` will refuse to start, and not for a reason that matters
+here.** Both targets depend on `gate`, and `scripts/gate.ts` exits 1 if *any*
+check fails — including the three render builds it expects served on ports
+8000, 8001 and 8004, and the parser sweep builds under `ecosystem/.libs/`. The
+BGZF pool benchmark uses none of those. So either stage all of that, or read
+the load with `--warn` and call the scripts directly:
+
 ```bash
-make gate                       # neither arm means anything on a busy box
-make bgzfpool-standalone        # the ceiling arm; works today, no build needed
+node --experimental-strip-types scripts/gate.ts --warn   # reports, exits 0
+JBROWSE=$HOME/src/jbrowse-components \
+  node --experimental-strip-types scripts/bgzfpool/standalone.ts 9
 # ... after doing (1) above:
 npx http-server builds/pool   -p 8010 -s --cors &
 npx http-server builds/nopool -p 8011 -s --cors &
-make bgzfpool-endtoend
+node --experimental-strip-types scripts/bgzfpool/endtoend.ts 5
 make paper-data paper-figs      # csv, then results/figures/paper/*/bgzfpool.*
 ```
 
-`bgzfpool-data.R` now runs with only the standalone JSON present and draws a
+Watch the foreign-cores line in the `--warn` output rather than the load
+average; `loadavg.ts` explains at length why the load average alone marks clean
+measurements dirty.
+
+`bgzfpool-data.R` runs with only the standalone JSON present and draws a
 one-series figure; it picks up the second series as soon as
 `results/bgzfpool.json` exists.
+
+`make paper-data` also regenerates the clustering CSVs out of the
+jbrowse-components checkout, and on 2026-09-04 that **overwrote the committed
+2026-09-03 cluster numbers with older 2026-08-24 ones**. Check `git diff
+results/paper/` after running it and restore anything you did not mean to
+touch.
+
+## Traps that are not in the ratio
+
+### patch_nopool.js is half dead, and the live half is load-bearing
+
+`shell/patch_nopool.js` does two things, and only the first is obsolete:
+
+- it adds the `.nopool` twins off the removed config slot — dead, and the
+  reason the end-to-end arm needs the two-build rework above;
+- **it raises `fetchSizeLimit` to 1e10 on every bgzip-backed track** — very much
+  alive. Over the 5 MB default a track renders "Requested too much data" and
+  never fetches: no error, no failing render, just an arm that is fast because
+  it did nothing. A 3,000-sample VCF over a 19 kb window is comfortably past it,
+  and a wide window puts the BAM tracks past it too.
+
+So do not delete the script as dead code. Keep the `fetchSizeLimit` pass and
+apply it to **both** builds.
+
+### make corpus fails at the end without builds/ staged
+
+`corpus` finishes with `load_alignments.sh` and `load_bgzf_tracks.sh`, which
+both `for l in builds/*` under `set -e`. With no `builds/` the glob stays
+literal, `jbrowse add-assembly --out 'builds/*'` fails, and the target aborts —
+*after* every generate step has succeeded. Stage the builds first, or run the
+`shell/generate_*.sh` scripts individually and the loaders afterwards.
 
 ## Two gates, and a third that already bit
 
