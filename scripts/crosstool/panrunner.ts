@@ -234,6 +234,7 @@ interface PanResult {
   cachedSteps: number
   totalRequests: number
   totalBytes: number
+  settlesCoarseBlocks?: boolean
   instrument: { kind: string }
   failure?: string
 }
@@ -285,6 +286,27 @@ interface Cell {
    */
   fetchedMedian: number
   runs: (number | null)[]
+  /**
+   * The per-run values behind `fetchedMedian`. Kept for the same reason as
+   * `drawRuns`: the pan's headline is the fetched-steps median, so without
+   * these the one number a pan figure draws is the one number with no spread
+   * behind it.
+   */
+  fetchedRuns: number[]
+  /**
+   * The per-run draw medians behind `drawMedian`, kept for the same reason
+   * `runs` keeps the ones behind `median`: a figure that draws a spread needs
+   * the values, not a summary of them.
+   */
+  drawRuns: number[]
+  /**
+   * Whether this arm's LGV exposes `settleCoarseBlocks`, i.e. whether it can
+   * take the discrete placement path the step driver asks for. Absent on the
+   * foreign tools. A build that answers false pays the 500ms coarse-block
+   * throttle on every step, and that is a real difference between builds rather
+   * than an artefact of how the benchmark drives them.
+   */
+  settlesCoarseBlocks?: boolean
   appliedSteps: number[]
   cachedSteps: number
   requests: number
@@ -347,6 +369,7 @@ for (const c of cases) {
   const bytes: Record<string, number> = {}
   const draws: Record<string, number[]> = {}
   const drawMs: Record<string, number[]> = {}
+  const settles: Record<string, boolean | undefined> = {}
   // Out of the rotation, not out of the row: an arm that cannot open this
   // container is recorded below with its reason.
   const measurable = tools.filter(t => {
@@ -383,6 +406,7 @@ for (const c of cases) {
       if (typeof got.medianDrawMs === 'number' && Number.isFinite(got.medianDrawMs)) {
         drawMs[t.id]!.push(got.medianDrawMs)
       }
+      settles[t.id] = got.settlesCoarseBlocks
       applied[t.id]!.push(got.appliedSteps)
       loci[t.id] = got.steps.filter(s => s.applied).map(s => s.locus)
       const fetched = got.steps.filter(s => s.applied && s.requests > 0)
@@ -409,10 +433,12 @@ for (const c of cases) {
         drawMedian: Number.NaN,
         fetchedMedian: Number.NaN,
         runs: [],
+        fetchedRuns: [],
         appliedSteps: [],
         cachedSteps: 0,
         requests: 0,
         bytes: 0,
+        drawRuns: [],
         drawsPerStep: [],
         loci: [],
         load: { before: 0, after: 0 },
@@ -429,6 +455,9 @@ for (const c of cases) {
         ? median(fetchedRuns[t.id]!)
         : Number.NaN,
       runs: runs[t.id]!,
+      fetchedRuns: fetchedRuns[t.id]!,
+      drawRuns: drawMs[t.id]!,
+      settlesCoarseBlocks: settles[t.id],
       appliedSteps: applied[t.id]!,
       cachedSteps: cached[t.id]!,
       requests: reqs[t.id]!,

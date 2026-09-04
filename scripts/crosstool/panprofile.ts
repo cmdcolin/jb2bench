@@ -328,6 +328,7 @@ interface Step {
 const steps: Step[] = []
 const shotCosts: number[] = []
 let failure: string | undefined
+let settlesCoarseBlocks: boolean | undefined
 
 try {
   const t0 = Date.now()
@@ -377,6 +378,17 @@ try {
   const initial = await settle(t0, blank)
   shotCosts.push(initial.shotMs)
   let reference = await shot()
+
+  // Recorded per run rather than assumed, because it is the difference between
+  // the two numbers this benchmark could report for a JBrowse motion and the
+  // arms do not all answer the same way. See the settle in the step driver.
+  if (tool === 'jbrowse') {
+    settlesCoarseBlocks = await page.evaluate(
+      () =>
+        typeof (window as any).JBrowseSession.views[0].settleCoarseBlocks ===
+        'function',
+    )
+  }
 
   for (let i = 1; i <= STEPS; i++) {
     // Where this step is supposed to land, computed the same way for both tools
@@ -439,14 +451,36 @@ try {
           return true
         }
         const v = (window as any).JBrowseSession.views[0]
+        // `zoomTo` and `horizontalScroll` are the per-frame chokepoints a
+        // gesture writes through, and they deliberately leave the coarse blocks
+        // on their 500ms throttle -- flushing them sixty times a second is the
+        // cost the throttle exists to avoid. Every DISCRETE placer in the LGV
+        // model (moveTo, setNewView, setWindow, navToLocString, centerAt, ...)
+        // ends with `settleCoarseBlocks` instead, and jbrowse-components'
+        // placersSettleCoarseBlocks.test.ts fails the next placer that forgets.
+        //
+        // A benchmark step is a discrete jump, so it takes the discrete path.
+        // Driven through the bare chokepoint it instead timed the throttle
+        // coalescing a gesture that never arrived: a flat ~507 ms at every
+        // coverage and both read types, against 0.3-0.8 ms of actual drawing,
+        // on a path no UI control takes. igv is driven by `zoomIn`/`search` and
+        // GenomeSpy by `zoomTo(interval)` -- both discrete -- so the bare
+        // chokepoint also made JBrowse the only arm entering a throttle at all.
+        //
+        // Optional because the older builds may not have the action; whether
+        // each did is recorded per run rather than assumed, so a build that
+        // cannot flush shows its throttle as the real difference it is.
+        const settle = () => v.settleCoarseBlocks?.()
         if (motion === 'zoom') {
           const before = v.bpPerPx
           // Second argument defaults to width/2, so this zooms about the centre.
           v.zoomTo(v.bpPerPx / 2)
+          settle()
           return v.bpPerPx !== before
         }
         const before = v.offsetPx
         v.horizontalScroll(sign * v.width)
+        settle()
         return v.offsetPx !== before
       },
       {
@@ -570,6 +604,9 @@ console.log(
     // from cache is not the "both tools must fetch" case this benchmark claims
     // to be, and the report refuses to call such a row a comparison.
     cachedSteps: done.filter(s => s.requests === 0).length,
+    // Whether this build could take the discrete path at all. Undefined for the
+    // foreign tools, which have no such concept.
+    settlesCoarseBlocks,
     totalRequests: done.reduce((n, s) => n + s.requests, 0),
     totalBytes: done.reduce((n, s) => n + s.bytes, 0),
     // What the instrument can and cannot resolve on this machine, this run.
