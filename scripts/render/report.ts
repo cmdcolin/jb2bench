@@ -553,8 +553,9 @@ const html = `<title>JBrowse 2 Since v2.4.0</title>
 
   <section>
     <h2>The figures</h2>
-    ${figure('perf-coldload-combined.png', 'Cold load to rendered reads, by coverage and read type, at both window widths, across four tools — JBrowse 2.4.0, JBrowse 5.0.0, igv.js and GenomeSpy. Laid out like Fig 8 of the 2023 paper so the two can be read side by side. A hollow point is a run abandoned at the paint ceiling, so its height is a bound and not a measurement.')}
-    ${figure('perf-interaction.png', 'Time-to-content after a zoom and after a pan, across three JBrowse releases. A zoom needs no network, and this work redraws without refetching at all, which is the zero on that row; a pan is new region to every arm, so all of them pay the fetch.')}
+    ${figure('perf-coldload.png', 'Cold load to rendered reads at the 19 kb window, by coverage and read type, across four tools — JBrowse 2.4.0, JBrowse 5.0.0, igv.js and GenomeSpy. Laid out like Fig 8 of the 2023 paper so the two can be read side by side. A hollow point is a run abandoned at the paint ceiling, so its height is a bound and not a measurement.')}
+    ${figure('perf-coldload-100kb.png', 'The same cold load at the 100 kb window, which quintuples the bytes per cell. Two figures rather than one eight-panel grid: reads and format already take both dimensions of the grid, and window as a third factor pushes format into a linetype the reader has to hold in mind while reading a duration off.')}
+    ${figure('perf-interaction.png', 'Time-to-content after a zoom and after a pan, across three JBrowse releases. A zoom needs no network and this work redraws without refetching, so its row is flat at ~165 ms while the releases re-rasterize for seconds; a pan is new region to every arm, so all of them pay the fetch.')}
     ${figure('parser-time.png', 'The alignment parser libraries, 2023 release against current, decode only — no browser, no GPU.')}
   </section>
 

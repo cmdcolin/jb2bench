@@ -101,7 +101,7 @@ all$hi_s <- all$hi / 1000
 # leader line to its own point, so displacement never costs attribution.
 #
 # The layer itself is built by common.R's coldload_labels() and drawn by its
-# endpoint_repel(), shared with perf-coldload-combined.R.
+# endpoint_repel().
 draw <- function(win, out, width_label) {
   d <- subset(all, window == win)
 
