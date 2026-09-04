@@ -75,12 +75,8 @@ fig <- ggplot(d, aes(x = coverage, y = s, colour = series)) +
                           ifelse(x == "This work", "JBrowse 5.0.0", x)
                         }) +
   guides(colour = guide_legend(nrow = 1)) +
-  labs(x = "coverage", colour = NULL,
-       caption = paste("* no CRAM support. Bold: that tool's time at its last coverage,",
-                       "and how many times slower that is than JBrowse 5.0.0 at the same point.",
-                       "Hollow: gave up at the paint ceiling.")) +
-  paper_theme() +
-  theme(plot.caption = element_text(size = rel(0.8), hjust = 0, colour = "grey30"))
+  labs(x = "coverage", colour = NULL) +
+  paper_theme()
 
 ggsave("results/figures/paper/pdf/perf-coldload-combined.pdf", fig,
        width = 360, height = 225, units = "mm", device = cairo_pdf)
@@ -90,3 +86,13 @@ ggsave("results/figures/paper/png/perf-coldload-combined.png", fig,
        width = 360, height = 225, units = "mm", dpi = 300,
        device = ragg::agg_png)
 cat("wrote results/figures/paper/png/perf-coldload-combined.png\n")
+
+# ---- draft caption ----------------------------------------------------------
+# Kept here so the figure and the words that make it readable travel together;
+# the figure itself carries no explanatory text.
+#
+#   Cold load across both windows and both container formats. A tool marked *
+#   has no CRAM support and so no curve in those panels. Bold labels give that
+#   tool's time at its last coverage and how many times slower that is than
+#   JBrowse 5.0.0 at the same point. A hollow marker is a run abandoned at the
+#   paint ceiling -- a lower bound rather than a measurement.

@@ -65,6 +65,8 @@ d <- subset(d, session == "cross-tool motion" & panel == "Zoom in, both hold the
 d$s <- d$ms / 1000
 
 d$coverage <- as.numeric(sub("x .*", "", d$case))
+d$lo_s <- d$lo / 1000
+d$hi_s <- d$hi / 1000
 d$reads <- factor(sub("^[0-9]+x ", "", d$case), levels = c("short read", "long read"))
 d$series <- factor(d$series, levels = PERF_SERIES)
 
@@ -91,6 +93,21 @@ endpoints <- function(df) {
 zoom_panel <- function(df, ends, y_breaks) {
   ggplot(df, aes(x = coverage, y = s, colour = series, linetype = measure)) +
     geom_line(linewidth = LINE_W) +
+    # The three runs behind each point, as their range.
+    #
+    # `geom_linerange` and not `geom_errorbar`, because an errorbar's cap width
+    # is measured in DATA space and this x axis is log10: a constant width draws
+    # a cap fifty times wider at 1000x than at 20x, and making it proportional
+    # (`width = coverage * k`) puts a width aesthetic into the scale's own
+    # training data and collapses the axis -- every point onto one x, every
+    # break label on top of the others. Capless is the honest trade: a cap is
+    # decoration, and the range on most of these cells is smaller than the
+    # marker anyway, which the caption says.
+    #
+    # `na.rm` because a cell whose plotted statistic has no per-run array
+    # recorded gets no bar -- see MOTION_RUNS in perf-data.R.
+    geom_linerange(aes(ymin = lo_s, ymax = hi_s),
+                   linewidth = 0.4, na.rm = TRUE, show.legend = FALSE) +
     geom_point(size = POINT_S, show.legend = FALSE) +
     geom_text_repel(data = ends, aes(label = label), direction = "y",
                     nudge_x = ENDPOINT_NUDGE, hjust = 0, size = ENDPOINT_LABEL,
@@ -128,19 +145,7 @@ bottom <- zoom_panel(inside, subset(endpoints(inside),
 
 fig <- top / bottom +
   plot_layout(heights = c(1, 1)) +
-  plot_annotation(
-    caption = paste(
-      "2× zoom in, median of five steps, timed by one instrument belonging to no tool on the figure. No arm",
-      "made a network request on any step, so every difference here is drawing and not fetching. Below,",
-      "igv.js's two lines coincide — its wait is its redraw — while this work spends half a second in a",
-      "navigation debounce around 0.6 ms of drawing. The two release arms rasterize in a worker, where a",
-      "page-side clock times the compositing blit and not the rendering, so the lower panel leaves them out.",
-      "GenomeSpy's long-read line stops at 200×: no 1000× step on that arm returned a usable measurement.",
-      sep = "\n"),
-    theme = theme(plot.caption = element_text(size = rel(0.8), hjust = 0,
-                                              face = "italic", lineheight = 1.25,
-                                              margin = margin(t = 8)),
-                  text = element_text(size = PAPER_BASE)))
+  plot_annotation(theme = theme(text = element_text(size = PAPER_BASE)))
 
 ggsave("results/figures/paper/pdf/perf-crosstool-zoom.pdf", fig,
        width = 240, height = 238, units = "mm", device = cairo_pdf)
@@ -149,3 +154,22 @@ cat("wrote results/figures/paper/pdf/perf-crosstool-zoom.pdf\n")
 ggsave("results/figures/paper/png/perf-crosstool-zoom.png", fig,
        width = 240, height = 238, units = "mm", dpi = 300, device = ragg::agg_png)
 cat("wrote results/figures/paper/png/perf-crosstool-zoom.png\n")
+
+# ---- draft caption ----------------------------------------------------------
+# Kept here so the figure and the words that make it readable travel together;
+# the figure itself carries no explanatory text.
+#
+#   A 2x zoom in, median of five steps, timed by one instrument belonging to no
+#   tool on the figure. No arm made a network request on any step, so every
+#   difference here is drawing and not fetching. The upper panel is what a user
+#   waits for after the zoom. The lower panel opens that wait for the two arms
+#   whose rasterizer a page-side clock can see: igv.js's two lines coincide --
+#   its wait is its redraw -- while this work spends half a second in a
+#   navigation debounce around 0.6 ms of drawing. The two release arms have no
+#   drawing line because they rasterize in a worker, where the clock times the
+#   compositing blit and not the rendering. GenomeSpy's long-read line stops at
+#   200x: no 1000x step on that arm returned a usable measurement. Vertical bars
+#   are the range of the three runs behind each point, and on most cells are
+#   shorter than the marker -- the widest of the six "This work" wait cells
+#   spans 6.5 ms about a 517 ms median. The lower panel has no bars: its per-run
+#   draw values were not recorded before 2026-09-03.

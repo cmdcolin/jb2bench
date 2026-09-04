@@ -110,19 +110,8 @@ fig <- ggplot(plotted, aes(x = coverage, y = s, colour = series)) +
   # otherwise five keys wide and runs off the page.
   scale_colour_discrete(drop = FALSE,
                         breaks = c("Release 2.4.0", "Release 4.3.0", "This work")) +
-  # Below the panels rather than above them: as a subtitle this note sat
-  # between the reader and the legend, and three lines of small italic there
-  # read as the figure's title. The manuscript caption says the same thing; this
-  # is what keeps the image quotable on its own.
-  labs(x = "coverage", y = "seconds", colour = NULL,
-       caption = paste("time-to-content after a 2× zoom in and after a one-viewport pan,",
-                       "median of five steps; zero is a redraw with no refetch.",
-                       "Bold: that release's time at 1000×, and how many times slower",
-                       "that is than this work at the same point",
-                       sep = "\n")) +
-  paper_theme() +
-  theme(plot.caption = element_text(size = rel(0.8), hjust = 0, face = "italic",
-                                    lineheight = 1.25, margin = margin(t = 8)))
+  labs(x = "coverage", y = "seconds", colour = NULL) +
+  paper_theme()
 
 ggsave("results/figures/paper/pdf/perf-interaction.pdf", fig,
        width = 220, height = 170, units = "mm", device = cairo_pdf)
@@ -131,3 +120,15 @@ cat("wrote results/figures/paper/pdf/perf-interaction.pdf\n")
 ggsave("results/figures/paper/png/perf-interaction.png", fig,
        width = 220, height = 170, units = "mm", dpi = 300, device = ragg::agg_png)
 cat("wrote results/figures/paper/png/perf-interaction.png\n")
+
+# ---- draft caption ----------------------------------------------------------
+# Kept here so the figure and the words that make it readable travel together;
+# the figure itself carries no explanatory text.
+#
+#   Time-to-content after a 2x zoom in and after a one-viewport pan, median of
+#   five steps. Zero on the zoom row is a redraw with no refetch: this work
+#   serves the zoomed view from data it already holds, so nothing is fetched and
+#   nothing is waited for. Bold labels give that release's time at 1000x and how
+#   many times slower that is than this work at the same point; the zoom row
+#   labels the duration alone, since a ratio against zero is not a ratio. A
+#   series stops rather than bridging a cell measured under external load.

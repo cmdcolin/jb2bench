@@ -80,6 +80,8 @@ all$reads <- factor(sub("^[0-9]+x ", "", all$case),
 all$series <- factor(all$series, levels = PERF_SERIES)
 all$format <- factor(all$format, levels = c("BAM", "CRAM"))
 all$s <- all$ms / 1000
+all$lo_s <- all$lo / 1000
+all$hi_s <- all$hi / 1000
 
 # Every point carries its own duration, because a log axis is the right shape for
 # this data and the wrong thing to read a number off: its gridlines are a decade
@@ -127,6 +129,13 @@ draw <- function(win, out, width_label) {
 
   fig <- ggplot(d, aes(x = coverage, y = s, colour = series)) +
     geom_line(data = meas, linewidth = LINE_W) +
+    # The three runs behind each point, as their range. Capless: an errorbar's
+    # cap width is in data space and this x axis is log10, so a fixed width
+    # draws fifty times wider at 1000x than at 20x and a proportional one
+    # collapses the scale. Censored points carry no bar -- they plot the
+    # ceiling a run was abandoned at, which is a bound and not a median.
+    geom_linerange(data = meas, aes(ymin = lo_s, ymax = hi_s),
+                   linewidth = 0.4, na.rm = TRUE, show.legend = FALSE) +
     geom_point(data = meas, size = POINT_S) +
     geom_point(data = subset(d, censored), size = POINT_S, shape = 1) +
     endpoint_repel(labels) +
@@ -153,17 +162,8 @@ draw <- function(win, out, width_label) {
     # Below the panels, not above them, and in the same place as on every other
     # figure here: three lines of provenance between the reader and the legend
     # read as a title, and the eye has to cross them before reaching the data.
-    labs(x = "coverage", colour = NULL,
-         caption = paste(
-           sprintf("%s window, navigation to render-complete,", width_label),
-           "median of three interleaved rounds in one session.",
-           "Bold: that tool's time at its last coverage, and how many times",
-           "slower that is than this work at the same point.",
-           "Hollow: gave up at the paint ceiling.",
-           ABSENT, sep = "\n")) +
-    paper_theme() +
-    theme(plot.caption = element_text(size = rel(0.8), hjust = 0, face = "italic",
-                                      lineheight = 1.25, margin = margin(t = 8)))
+    labs(x = "coverage", colour = NULL) +
+    paper_theme()
 
   ggsave(sprintf("results/figures/paper/pdf/%s.pdf", out), fig,
          width = 200, height = 200, units = "mm", device = cairo_pdf)
@@ -177,3 +177,17 @@ draw <- function(win, out, width_label) {
 
 draw("19kb", "perf-coldload", "19 kb")
 draw("100kb", "perf-coldload-100kb", "100 kb")
+
+# ---- draft caption ----------------------------------------------------------
+# Kept here so the figure and the words that make it readable travel together;
+# the figure itself carries no explanatory text. `draw()` renders one of these
+# per window, so the width the caption names is the window that figure was drawn
+# for -- 19 kb or 100 kb.
+#
+#   Cold load of a single alignment track: navigation to render-complete, median
+#   of three interleaved rounds in one session, over both container formats.
+#   Bold labels give that tool's time at its last coverage and how many times
+#   slower that is than this work at the same point. A hollow marker is a run
+#   abandoned at the paint ceiling -- a lower bound rather than a measurement,
+#   so it carries no range bar. Vertical bars are the range of the three rounds.
+#   GenomeSpy reads no CRAM, so it has no curve in the right-hand panels.

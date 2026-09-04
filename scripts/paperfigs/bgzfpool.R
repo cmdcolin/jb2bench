@@ -74,15 +74,8 @@ fig <- ggplot(plotted, aes(x = xf, y = speedup, colour = series, group = series)
   scale_x_discrete(expand = expansion(add = c(0.35, 1.1))) +
   scale_y_continuous(expand = expansion(mult = c(0.08, 0.12))) +
   labs(x = "coverage (BAM)  ·  samples (VCF)", y = "speedup, pool on ÷ pool off",
-       colour = NULL,
-       caption = paste(
-         "Same files, same 19 kb windows, same four workers, measured twice.",
-         "Bars: p25–p75 of the paired per-pan ratios end to end, and the range across windows for the query alone.",
-         "Dashed line is no effect. Bold: the ratio at the largest point of each series.",
-         sep = "\n")) +
-  paper_theme() +
-  theme(plot.caption = element_text(size = rel(0.8), hjust = 0, face = "italic",
-                                    lineheight = 1.25, margin = margin(t = 8)))
+       colour = NULL) +
+  paper_theme()
 
 ggsave("results/figures/paper/pdf/bgzfpool.pdf", fig,
        width = 220, height = 170, units = "mm", device = cairo_pdf)
@@ -91,3 +84,13 @@ cat("wrote results/figures/paper/pdf/bgzfpool.pdf\n")
 ggsave("results/figures/paper/png/bgzfpool.png", fig,
        width = 220, height = 170, units = "mm", dpi = 300, device = ragg::agg_png)
 cat("wrote results/figures/paper/png/bgzfpool.png\n")
+
+# ---- draft caption ----------------------------------------------------------
+# Kept here so the figure and the words that make it readable travel together;
+# the figure itself carries no explanatory text.
+#
+#   The BGZF worker pool, on the same files, the same 19 kb windows and the same
+#   four workers, measured twice. Bars are the p25-p75 of the paired per-pan
+#   ratios end to end, and the range across windows for the query alone. The
+#   dashed line is no effect. Bold labels give the ratio at the largest point of
+#   each series.

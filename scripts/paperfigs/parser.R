@@ -132,14 +132,7 @@ panel_plot <- function(pkg) {
 
 grid <- cowplot::plot_grid(plotlist = lapply(panels, panel_plot), nrow = 1)
 
-caption <- cowplot::ggdraw() +
-  cowplot::draw_label(
-    paste("parsing one 19 kb window, current release against the 2023 version;",
-          "each point carries its measured time; bold: times faster, over that panel's three coverages",
-          sep = "\n"),
-    size = 11, fontface = "italic", lineheight = 1.1)
-
-fig <- cowplot::plot_grid(grid, caption, ncol = 1, rel_heights = c(1, 0.13))
+fig <- grid
 
 ggsave("results/figures/paper/pdf/parser-time.pdf", fig,
        width = 220, height = 145, units = "mm", device = cairo_pdf, bg = "white")
@@ -149,3 +142,11 @@ ggsave("results/figures/paper/png/parser-time.png", fig,
        width = 220, height = 145, units = "mm", dpi = 300, device = ragg::agg_png,
        bg = "white")
 cat("wrote results/figures/paper/png/parser-time.png\n")
+
+# ---- draft caption ----------------------------------------------------------
+# Kept here so the figure and the words that make it readable travel together;
+# the figure itself carries no explanatory text.
+#
+#   Parsing one 19 kb window, the current release against the 2023 version, one
+#   panel per package. Each point carries its measured time; bold labels give
+#   the speedup over that panel's three coverages.

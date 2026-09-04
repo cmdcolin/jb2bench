@@ -58,6 +58,26 @@ labels <- c(
 )
 
 rows <- list()
+
+# The spread behind a plotted median, as the RANGE of the replicate runs.
+#
+# Range and not a standard deviation or an interval, because every one of these
+# cells is three runs. An SD over n=3 is a number with no useful precision and a
+# 95% interval over n=3 is worse -- both would dress three measurements as a
+# distribution. The range says exactly what was seen and claims nothing else,
+# and the figures label it as what it is.
+#
+# What is NOT a replicate here: the five steps inside one run. A zoom step
+# halves the width again each time, so those five are five different workloads
+# and their spread is the sweep, not the error. Only the run-to-run values are
+# repeats of the same thing, which is why these read `runs` and never `steps`.
+spread <- function(runs) {
+  v <- unlist(runs)
+  v <- v[!is.null(v) & !is.na(v)]
+  if (length(v) < 2) c(lo = NA_real_, hi = NA_real_)
+  else c(lo = min(v), hi = max(v))
+}
+
 # `session` records which benchmark run a number came from, and it is what the
 # cold-load figure selects on. Cold load is measured twice, in two harnesses on
 # two dates: the version sweep interleaves four JBrowse builds, and the
@@ -65,17 +85,24 @@ rows <- list()
 # between the two by up to 40%, so a number from one and a number from the other
 # are not a fair pair, and a figure drawing both has to say which is which. The
 # cold-load figure draws the cross-tool session alone instead.
+#
+# `runs` is the replicate values behind `ms`, and the caller passes whichever
+# array the median it is adding was taken over. Absent for a cell with no
+# repeats, which is the honest answer for the interaction session: it is one run
+# of five steps, so it has a sweep and no error.
 add <- function(panel, case, series, ms, usable = TRUE, session = NA, format = "BAM",
-                window = NA, censored = FALSE, metric = NA) {
+                window = NA, censored = FALSE, metric = NA, runs = NULL) {
   # Format-agnostic: `case` carries whichever suffix its own JSON key does
   # (alignments/interaction are always "-bam"; cold load's cross-tool loop
   # passes both), and only READ_CASES -- stripped of the format suffix and of
   # the `@window` the cross-tool keys carry since 2026-08-29 -- is the label key.
   base <- sub("-(bam|cram)$", "", sub("@.*$", "", case))
+  s <- spread(runs)
   rows[[length(rows) + 1]] <<- data.frame(
     panel = panel, case = labels[match(base, READ_CASES)],
     series = series, ms = ms, usable = usable, session = session, format = format,
     window = window, censored = censored, metric = metric,
+    lo = unname(s["lo"]), hi = unname(s["hi"]),
     stringsAsFactors = FALSE
   )
 }
@@ -180,7 +207,7 @@ for (c in cases) {
     if (!is.null(cell[[build]])) {
       add("Cold load", c, builds[[build]], cell[[build]]$median,
           usable = ok && contention_ok(cell[[build]]),
-          session = "version sweep")
+          session = "version sweep", runs = cell[[build]]$runs)
     }
   }
 }
@@ -244,7 +271,8 @@ for (base in READ_CASES) {
         if (is.null(ms)) next
         add("Cold load", key, xt_builds[[b]], ms,
             usable = contention_ok(arm), session = "cross-tool",
-            format = FORMATS[[fmt]], window = win, censored = censored)
+            format = FORMATS[[fmt]], window = win, censored = censored,
+            runs = if (censored) NULL else arm$runs)
       }
     }
   }
@@ -279,6 +307,12 @@ MOTIONS <- c("crosstool-zoom.json" = "Zoom in, both hold the data",
              "crosstool-pan.json" = "Pan, both refetch")
 MOTION_WAIT <- c("crosstool-zoom.json" = "median",
                  "crosstool-pan.json" = "fetchedMedian")
+# The per-run values behind each of those, so an error bar is the spread of the
+# statistic actually plotted. `fetchedRuns` and `drawRuns` were added to
+# panrunner.ts on 2026-09-03 and are absent from runs recorded before it; those
+# cells get no bar rather than a bar borrowed from a different statistic.
+MOTION_RUNS <- c("crosstool-zoom.json" = "runs",
+                 "crosstool-pan.json" = "fetchedRuns")
 for (f in names(MOTIONS)) {
   motion <- read_results(f)$rows
   for (base in READ_CASES) {
@@ -295,11 +329,13 @@ for (f in names(MOTIONS)) {
       wait <- arm[[MOTION_WAIT[[f]]]]
       if (!is.null(wait)) {
         add(MOTIONS[[f]], key, xt_builds[[b]], wait, usable = ok,
-            session = "cross-tool motion", metric = "what the user waits")
+            session = "cross-tool motion", metric = "what the user waits",
+            runs = arm[[MOTION_RUNS[[f]]]])
       }
       if (!is.null(arm$drawMedian)) {
         add(MOTIONS[[f]], key, xt_builds[[b]], arm$drawMedian, usable = ok,
-            session = "cross-tool motion", metric = "what the renderer did")
+            session = "cross-tool motion", metric = "what the renderer did",
+            runs = arm$drawRuns)
       }
     }
   }
