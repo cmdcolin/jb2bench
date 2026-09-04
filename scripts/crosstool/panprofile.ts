@@ -83,11 +83,21 @@ if (shotDir) {
   fs.mkdirSync(shotDir, { recursive: true })
 }
 
+/**
+ * The interactive ceiling. A pan or a zoom that has not come back inside two
+ * minutes has failed at the thing being measured, so waiting longer buys a
+ * number nobody would accept in use. Every wait below is this or derived from
+ * it, and a cell that hits it is recorded as having exceeded the ceiling rather
+ * than left blank — that a tool cannot finish a redraw in two minutes is the
+ * result, not the absence of one.
+ */
+const CEILING = Number(process.env.CEILING ?? 120000)
+
 const STEPS = Number(process.env.STEPS ?? 5)
-const MAX_WAIT = Number(process.env.MAX_WAIT ?? 120000)
+const MAX_WAIT = Number(process.env.MAX_WAIT ?? CEILING)
 const POLL_MS = Number(process.env.POLL_MS ?? 150)
 const STABLE_POLLS = Number(process.env.STABLE_POLLS ?? 5)
-const READY_TIMEOUT = Number(process.env.READY_TIMEOUT ?? 180000)
+const READY_TIMEOUT = Number(process.env.READY_TIMEOUT ?? CEILING)
 
 // INSTRUMENT=draws (default) times the canvas draw calls; INSTRUMENT=paint uses
 // screenshot quiescence. Draws is the default because paint cannot resolve a
@@ -129,15 +139,19 @@ const CONTIG_LENGTH = Number(process.env.CONTIG_LENGTH ?? 250001)
 
 const browser = await puppeteer.launch({
   headless: process.env.HEADLESS !== '0',
-  // Puppeteer's default protocolTimeout is 180 s, and it applies to a single
-  // `evaluate` round trip. igv.js parses alignments on the main thread, so at
-  // 1000x-longread it blocks JavaScript long enough to blow through that — the
-  // first run of this matrix recorded three "Runtime.evaluate timed out"
-  // failures on that cell and nothing else. A harness timeout reported as a tool
-  // result is the same error as an unrecognized loading indicator scoring a
-  // perfect zero, pointed the other way: it censors the case where the
-  // difference is largest.
-  protocolTimeout: Number(process.env.PROTOCOL_TIMEOUT ?? 600000),
+  // Puppeteer's protocolTimeout applies to a single `evaluate` round trip, and
+  // igv.js parses alignments on the main thread — at 1000x-longread it blocks
+  // JavaScript for minutes, so the default 180 s fired first and the matrix
+  // recorded three "Runtime.evaluate timed out" failures on that cell and
+  // nothing else. A transport timeout reported as a tool result is the same
+  // error as an unrecognized loading indicator scoring a perfect zero, pointed
+  // the other way: it censors the case where the difference is largest.
+  //
+  // So this sits deliberately ABOVE the interactive ceiling rather than at it.
+  // The ceiling is the policy and must be what reports — "did not come back
+  // within two minutes", attributed to the tool. The transport only has to stay
+  // out of its way long enough for that sentence to be the one written down.
+  protocolTimeout: Number(process.env.PROTOCOL_TIMEOUT ?? CEILING * 1.5),
   args: [
     '--no-sandbox',
     '--ignore-gpu-blocklist',
@@ -219,7 +233,9 @@ page.on('response', res => {
 async function drawsSettled(t0: number) {
   for (;;) {
     if (Date.now() - t0 > MAX_WAIT) {
-      throw new Error(`no content draw within ${MAX_WAIT} ms`)
+      throw new Error(
+        `${tool} drew no content within the ${MAX_WAIT / 1000}s interactive ceiling`,
+      )
     }
     const got = (await page.evaluate(DRAW_CLOCK_READ)) as {
       count: number
@@ -343,10 +359,26 @@ try {
 
   // A positive gate before any timing. Every signal below is negative — pixels
   // not changing — so all of them pass on a page whose JavaScript never ran.
+  //
+  // Puppeteer's own message for a blown gate is "Waiting failed: 120000ms
+  // exceeded", which says nothing about which tool or which condition — a run
+  // of record carried three of those as the entire account of a dead cell. Name
+  // both, and say it as the ceiling it is.
+  const readyOr = async (condition: string) => {
+    try {
+      await page.waitForFunction(condition, {
+        timeout: READY_TIMEOUT,
+        polling: 200,
+      })
+    } catch {
+      throw new Error(
+        `${tool} did not come up within the ${READY_TIMEOUT / 1000}s interactive ceiling`,
+      )
+    }
+  }
   if (tool === 'igv') {
-    await page.waitForFunction(
+    await readyOr(
       'window.__igvState && (window.__igvState.ready || window.__igvState.error)',
-      { timeout: READY_TIMEOUT, polling: 200 },
     )
     const err = await page.evaluate(() => (window as any).__igvState.error)
     if (err) throw new Error(`igv failed to start: ${err}`)
@@ -357,9 +389,8 @@ try {
     // for that reason, and `ready` is only set after both. Waiting on anything
     // weaker would let a dead page reach the step loop, where it would draw
     // nothing and settle instantly.
-    await page.waitForFunction(
+    await readyOr(
       'window.__gsState && (window.__gsState.ready || window.__gsState.error)',
-      { timeout: READY_TIMEOUT, polling: 200 },
     )
     const state = await page.evaluate(() => (window as any).__gsState)
     if (state.error) throw new Error(`genomespy failed to start: ${state.error}`)
@@ -367,9 +398,8 @@ try {
       throw new Error(`genomespy lazy data: ${state.lazyLoaded}`)
     }
   } else {
-    await page.waitForFunction(
+    await readyOr(
       'window.JBrowseSession && window.JBrowseSession.views && window.JBrowseSession.views.length > 0',
-      { timeout: READY_TIMEOUT, polling: 200 },
     )
   }
 
@@ -571,7 +601,17 @@ try {
     }
   }
 } catch (e) {
-  failure = e instanceof Error ? e.message : String(e)
+  const raw = e instanceof Error ? e.message : String(e)
+  // A tool that blocks the main thread past the ceiling cannot be caught by the
+  // ceiling: every poll this script makes is itself an `evaluate`, so the only
+  // thing left running is the CDP transport, and its timeout is what fires.
+  // igv.js parses alignments on the main thread and does exactly this at
+  // 1000x-longread. Reporting that as "Runtime.evaluate timed out" attributes a
+  // tool's blocking to the harness — so say what actually happened, which is
+  // that the page stopped answering for longer than any interaction tolerates.
+  failure = /timed out|Timed out|protocolTimeout/.test(raw)
+    ? `${tool} blocked past the ${CEILING / 1000}s interactive ceiling (${raw})`
+    : raw
   if (shotDir) {
     await page
       .screenshot({ path: path.join(shotDir, `${tool}-error.png`) })
