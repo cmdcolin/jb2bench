@@ -430,6 +430,7 @@ md += `Measured — ${when}. Comparisons *within* a section are same-run; compar
 
 md += `## Zoom IN — only the old renderer refetches\n\n`
 md += `The new view is a strict subset of already-loaded reads, so the GPU branch re-projects without going to the network. This is its best case.\n\n`
+md += `**This column read 0 ms in every case on 2026-09-04 and does not reproduce.** Re-measured five times on an idle box it reads 146-187 ms, flat across a fifty-fold coverage range, which is the shape of fixed block bookkeeping rather than of drawing (the redraw frame is one vsync either way). The two release columns are unchanged between those runs (4.3.0 at 20x-shortread-bam: 1070 against 1066 ms), so it is not the box: it moved only on the build that can flush the coarse-block throttle, the one where the discrete drive does anything at all. Why the earlier run recorded zeros, with no loading state seen on any step, is not established. Zero was the stronger claim and it is withdrawn.\n\n`
 md += `| case | ${NEW} | ${BASE} |${pubHead} ${NEW} redraw frame |\n`
 md += `|---|---:|---:|${hasPublished ? '---:|' : ''}---:|\n`
 for (const c of allCases) {

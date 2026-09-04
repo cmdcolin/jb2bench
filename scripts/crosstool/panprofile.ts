@@ -636,9 +636,11 @@ console.log(
     steps,
     appliedSteps: done.length,
     medianMs: done.length ? median(done.map(s => s.ms)) : null,
-    // The drawing alone, with the wait taken out. On a JBrowse zoom this is the
-    // few milliseconds inside a flat ~504 ms, and quoting the 504 as a render
-    // cost would be quoting a debounce.
+    // The drawing alone, with the wait taken out. Quoting a wait as a render
+    // cost is the error this pair exists to prevent -- flagrantly so before
+    // 2026-09-04, when a JBrowse zoom wait was a flat ~504 ms throttle around
+    // these few milliseconds, and still worth keeping apart now that the
+    // discrete drive has brought the wait down to 7-30 ms.
     medianDrawMs: done.length ? median(done.map(s => s.drawMs)) : null,
     // Steps that issued no data request at all. Not a footnote: a step served
     // from cache is not the "both tools must fetch" case this benchmark claims

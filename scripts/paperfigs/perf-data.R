@@ -289,13 +289,14 @@ for (base in READ_CASES) {
 # both would be comparing neither -- the same reason the cold-load figure draws
 # one session and not two.
 #
-# TWO METRICS PER CELL, because one of them is not a render time.
-# results/crosstool-zoom.md is explicit about it: a JBrowse zoom step comes back
-# at a flat ~505 ms at every coverage and every read type, which is the debounce
-# and not work, while the drawing inside it takes well under a millisecond.
-# Publishing that number alone as a render time is a mistake this repo made once
-# and retracted, so what the user waits and what the renderer did both travel
-# and the figures draw them side by side.
+# TWO METRICS PER CELL, because a wait is not a render time even when it is
+# short. Until 2026-09-04 a JBrowse zoom step came back at a flat ~505 ms at
+# every coverage -- the LGVCoarseDynamicBlocks throttle and not work -- around
+# well under a millisecond of drawing; taking the discrete navigation path left
+# 7-30 ms of wait around 1-2 ms of drawing. The ratio collapsed but the two are
+# still different numbers, and publishing either alone as a render time is a
+# mistake this repo made once and retracted. So both travel, and the figures
+# draw them side by side.
 #
 # Pan's waiting figure is `fetchedMedian` -- the steps on which the tool went to
 # the network -- rather than the median over all five steps. This work serves

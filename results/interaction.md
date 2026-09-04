@@ -2,8 +2,6 @@
 
 Region `chr22_mask:124000-143000`. **time-to-content** = ms a loading indicator ("Downloading alignments...") is shown after a zoom before correct content returns; median over the measured steps. redraw = longest frame (ms) of the GPU redraw. A `≥` prefix marks a censored value: the step was still loading at MAX_WAIT (120000 ms), so the true figure is larger.
 
-Contamination, over the cells measured this run: worst **1.16 foreign cores** (`20x-shortread-cram / release-2.4.0 / zoom-in` — firefox 0.32, Isolated Web Co 0.29, RDD Process 0.14), median 0.07. That is CPU burned by processes outside this benchmark — its own tree and the corpus servers excluded. This box floors near 0.28 with nobody using it, so read the ceiling as a budget over that floor. Cells not measured this run keep their recorded figure and are absent from these two numbers.
-
 Measured — in: 2026-09-04 (structural), out: 2026-09-04 (structural), pan: 2026-09-04 (structural). Comparisons *within* a section are same-run; comparisons across sections may not be.
 
 Every step is a discrete jump, so it ends with `settleCoarseBlocks` rather than leaving the 500 ms `LGVCoarseDynamicBlocks` throttle to expire — the path a UI control takes, and not the per-frame chokepoint a gesture writes through. Flushes: current. Predates the action and waits the throttle out on every step: release-4.3.0, release-2.4.0 — half a second of each of those cells is a timer, and it is a difference between the builds rather than one between the columns' instruments.
@@ -12,20 +10,22 @@ Every step is a discrete jump, so it ends with `settleCoarseBlocks` rather than 
 
 The new view is a strict subset of already-loaded reads, so the GPU branch re-projects without going to the network. This is its best case.
 
+**This column read 0 ms in every case on 2026-09-04 and does not reproduce.** Re-measured five times on an idle box it reads 146-187 ms, flat across a fifty-fold coverage range, which is the shape of fixed block bookkeeping rather than of drawing (the redraw frame is one vsync either way). The two release columns are unchanged between those runs (4.3.0 at 20x-shortread-bam: 1070 against 1066 ms), so it is not the box: it moved only on the build that can flush the coarse-block throttle, the one where the discrete drive does anything at all. Why the earlier run recorded zeros, with no loading state seen on any step, is not established. Zero was the stronger claim and it is withdrawn.
+
 | case | current | release-4.3.0 | release-2.4.0 | current redraw frame |
 |---|---:|---:|---:|---:|
-| 20x-shortread-bam | 0ms | 1070ms | 596ms | 17ms |
-| 20x-shortread-cram | 0ms | 1086ms | 554ms | 17ms |
-| 200x-shortread-bam | 0ms | 1107ms | 622ms | 17ms |
-| 200x-shortread-cram | 0ms | 1085ms | 630ms | 17ms |
-| 1000x-shortread-bam | 0ms | 1510ms | 669ms | 17ms |
-| 1000x-shortread-cram | 0ms | 1116ms | 682ms | 17ms |
-| 20x-longread-bam | 0ms | 1179ms | 668ms | 17ms |
-| 20x-longread-cram | 0ms | 1082ms | 622ms | 17ms |
-| 200x-longread-bam | 0ms | 2843ms | 1915ms | 17ms |
-| 200x-longread-cram | 0ms | 1210ms | 906ms | 17ms |
-| 1000x-longread-bam | 0ms | 12498ms | 6819ms | 33ms |
-| 1000x-longread-cram | 0ms | 2889ms | 1927ms | 33ms |
+| 20x-shortread-bam | 163ms | 1066ms | 567ms | 17ms |
+| 20x-shortread-cram | 187ms | 1058ms | 584ms | 17ms |
+| 200x-shortread-bam | 146ms | 1110ms | 640ms | 17ms |
+| 200x-shortread-cram | 174ms | 1078ms | 602ms | 17ms |
+| 1000x-shortread-bam | 167ms | 1555ms | 707ms | 17ms |
+| 1000x-shortread-cram | 170ms | 1112ms | 733ms | 17ms |
+| 20x-longread-bam | 171ms | 1171ms | 694ms | 17ms |
+| 20x-longread-cram | 169ms | 1093ms | 639ms | 17ms |
+| 200x-longread-bam | 166ms | 2874ms | 2235ms | 17ms |
+| 200x-longread-cram | 159ms | 1192ms | 896ms | 17ms |
+| 1000x-longread-bam | 168ms | 11697ms | 6818ms | 17ms |
+| 1000x-longread-cram | 163ms | 3020ms | 2499ms | 17ms |
 
 ## Zoom OUT — mostly refused, not measured
 
@@ -37,8 +37,8 @@ The honest reading: for anything heavier than 20x shortread, this comparison has
 
 | case | current | release-4.3.0 | release-2.4.0 | current redraw frame | drew/attempted |
 |---|---:|---:|---:|---:|---:|
-| 20x-shortread-bam | 359ms | 1873ms | 3314ms | 17ms | 4/4 |
-| 20x-shortread-cram | 366ms | 1810ms | 2805ms | 17ms | 4/4 |
+| 20x-shortread-bam | 171ms | 1755ms | 3313ms | 17ms | 4/4 |
+| 20x-shortread-cram | 178ms | 1852ms | 2262ms | 17ms | 4/4 |
 | 200x-shortread-bam | 659ms | 5120ms | 16147ms | 75ms | 4/4 |
 | 200x-shortread-cram | 697ms | 5193ms | 10377ms | 58ms | 4/4 |
 | 1000x-shortread-bam | 1963ms | 20380ms | 47705ms | 308ms | 4/4 |
@@ -62,8 +62,8 @@ The pan runs **leftward** from the benchmark locus. pbsim's long reads run off t
 
 | case | current | release-4.3.0 | ratio | release-2.4.0 | current redraw frame | steps |
 |---|---:|---:|---:|---:|---:|---:|
-| 20x-shortread-bam | 174ms | 1141ms | 6.56× | 498ms | 17ms | 5/5 |
-| 20x-shortread-cram | 152ms | 1136ms | 7.47× | 48ms | 17ms | 5/5 |
+| 20x-shortread-bam | 175ms | 1133ms | 6.47× | 445ms | 17ms | 5/5 |
+| 20x-shortread-cram | 168ms | 1121ms | 6.67× | 64ms | 17ms | 5/5 |
 | 200x-shortread-bam | 815ms | 1252ms | 1.54× | 1917ms | 17ms | 5/5 |
 | 200x-shortread-cram | 795ms | 1160ms | 1.46× | 2292ms | 17ms | 5/5 |
 | 1000x-shortread-bam | 1181ms | 4049ms | 3.43× | 10500ms | 67ms | 5/5 |

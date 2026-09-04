@@ -174,13 +174,15 @@ export const DEFAULT_QUIET_MS = 1500
  * caller never has to reconcile two clocks.
  *
  * `burstMs` is the last draw minus the first draw of the burst it belongs to,
- * and it exists because time-to-content on a JBrowse zoom is almost all waiting.
- * A zoom step there reads a flat ~504 ms at every coverage and read type, which
- * is the 500 ms LGVCoarseDynamicBlocks debounce plus a few milliseconds of
- * drawing. Reporting only the 504 would invite the reader to compare a timer
- * against igv's actual redraw; reporting both says which is which. On a pan,
- * where the wait is a fetch rather than a timer, the two differ for a different
- * reason and the same split is still the honest one.
+ * and it exists because a tool's wait and its drawing are different numbers. It
+ * was written when they differed enormously: a JBrowse zoom step read a flat
+ * ~504 ms at every coverage and read type, the 500 ms LGVCoarseDynamicBlocks
+ * throttle plus a few milliseconds of drawing, and reporting only the 504 would
+ * have invited a comparison of a timer against igv's actual redraw. Driving the
+ * discrete path closed most of that gap on 2026-09-04 -- 7-30 ms around 1-2 ms
+ * -- without closing it entirely. On a pan, where the wait is a fetch rather
+ * than a timer, the two differ for a different reason and the same split is
+ * still the honest one.
  */
 export const DRAW_CLOCK_READ = `(() => {
   const c = window.__drawClock;

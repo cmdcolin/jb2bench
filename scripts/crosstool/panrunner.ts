@@ -270,10 +270,12 @@ interface Cell {
   median: number
   /**
    * The final draw burst alone, with the waiting taken out. Time-to-content is
-   * what a user waits, so it stays the headline — but on a JBrowse zoom that is
-   * a flat ~505 ms debounce wrapped around half a millisecond of drawing, and a
-   * reader comparing it against igv's redraw would be comparing a timer to a
-   * renderer.
+   * what a user waits, so it stays the headline — but the two are not the same
+   * number. Until the runner took the discrete navigation path on 2026-09-04, a
+   * JBrowse zoom step was a flat ~505 ms throttle wrapped around half a
+   * millisecond of drawing, and a reader comparing that against igv's redraw
+   * was comparing a timer to a renderer. It is 7-30 ms around 1-2 ms now, which
+   * is a far smaller gap and still a real one.
    */
   drawMedian: number
   /**

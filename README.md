@@ -711,22 +711,42 @@ on any zoom step. Both tools hold the surrounding window client-side, so every
 difference below is a difference in drawing and not in network. An earlier
 version of this section predicted the old renderer would refetch; it does not.
 
-**The current build's zoom time-to-content is almost entirely a timer.** It comes
-back flat at 504–532 ms across every coverage, read type and container, which is
-not the shape of work. It is the 500 ms `LGVCoarseDynamicBlocks` debounce, and
-the drawing inside it takes **0.2–0.6 ms**, since the pileup is already on the
-GPU and a zoom is a change of projection.
+**This column read a flat 504–532 ms until 2026-09-04, and that number was the
+benchmark rather than the browser.** `zoomTo` is the per-frame chokepoint a
+gesture writes through, and it leaves the coarse blocks on their 500 ms
+`LGVCoarseDynamicBlocks` throttle deliberately — flushing sixty times a second is
+the cost the throttle exists to avoid. Every discrete placer in the LGV model
+ends with `settleCoarseBlocks`, and a benchmark step is a discrete jump, so the
+runners take that path now. Driven bare, the benchmark timed the throttle
+coalescing a gesture that never arrived, on a path no UI control takes; it also
+made JBrowse the only arm entering a throttle at all, since igv is driven by
+`zoomIn` and GenomeSpy by `zoomTo(interval)`, both discrete.
+
+**The current build now reads 7–30 ms, and it rises with coverage** — 7 ms at
+20x short read, 19 ms at 200x long read, 29 ms at 1000x long read. That is the
+shape of work, where the old column was flat across a fifty-fold range because a
+constant dominated everything the GPU was doing.
 
 The releases have no such constant and pay real cost instead: v4.3.0 and v2.4.0
-run 1.1 s at 20x short read and **9.7 s and 8.0 s at 1000x long read**. igv waits
-for nothing and spends its whole number drawing, from 39 ms at 20x short read to
-1.4 s on the long-read cases.
+run about 1.1 s at 20x short read and **9.0 s and 5.9 s at 1000x long read**. igv
+waits for nothing and spends its whole number drawing, from 47 ms at 20x short
+read to 1.2 s on the long-read cases.
 
-So the comparison splits, and it is worth stating in the direction that does not
-flatter this work: **igv is faster on every short-read case and at 20x long read**,
-because half a second of constant loses to real work when the work is small. The
-current build wins the heavy long-read cases 2.2–2.7×, and beats both releases
-everywhere by 2–19×.
+So the comparison no longer splits. **The current build is fastest in every cell
+of the matrix, by 6.9× over igv at 20x short read and 64.7× at 200x long read.**
+Until this was fixed the honest statement was the opposite one — that igv won
+every short-read case, because half a second of constant loses to real work when
+the work is small — and that half second was ours, not the browser's.
+
+**Read the GenomeSpy column before quoting the igv one.** GenomeSpy returns a
+flat 9 ms and is *faster* than the current build at 200x and 1000x long read
+(9 ms against 19 and 29 ms). It is the arm that isolates the renderer, because
+`@genome-spy/core` decodes BAM through the same `@gmod/bam` this build reads
+through, where the igv columns confound parser with renderer. It is also the
+narrower comparison: 0.85.0 has no CRAM lazy source, so half the matrix reads
+`n/a`, and it fails to come up at all on `1000x-longread-bam` — 0/3 runs on
+2026-09-04 at a 120 s ceiling, after 0/3 on 2026-09-03 at 180 s, which is a tool
+limit rather than a harness timeout.
 
 The report prints two tables and the figure two lines per tool — what the user
 waits for, and what the renderer did — because quoting either alone is how this benchmark

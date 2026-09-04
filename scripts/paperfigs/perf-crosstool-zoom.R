@@ -15,17 +15,25 @@
 # some tools have both.
 #
 # The top panel is the result: what a user waits after the zoom, one line per
-# arm, one legend. Every JBrowse arm sits above igv.js and GenomeSpy on this
-# motion and the axis says so without a caption's help.
+# arm, one legend. The build under test and GenomeSpy sit at the bottom of it,
+# the two releases at the top, and the axis says so without a caption's help.
 #
-# The bottom panel is the caveat that keeps the top one honest. JBrowse's wait
-# is flat at ~510 ms across a fifty-fold range of coverage, which is not the
-# shape of work: it is the 500 ms LGVCoarseDynamicBlocks debounce
-# (plugins/linear-genome-view/src/LinearGenomeView/afterAttach.ts) around a
-# sub-millisecond redraw. Publishing that 0.6 ms as a render time is a mistake
-# this repo made once and retracted, so it travels underneath the wait rather
-# than instead of it -- and in its own panel, where the gap between a tool's two
-# lines is the whole subject and the label on each line can be a sentence.
+# The bottom panel is what the wait is made of. It earned its place answering a
+# sharper question than it answers now: the JBrowse wait used to be flat at
+# ~510 ms across a fifty-fold range of coverage, which is not the shape of work,
+# and the drawing inside it was sub-millisecond. That gap was the 500 ms
+# LGVCoarseDynamicBlocks throttle
+# (plugins/linear-genome-view/src/LinearGenomeView/afterAttach.ts), reached
+# because the benchmark drove the per-frame chokepoint rather than the discrete
+# path a UI control takes; scripts/crosstool/panprofile.ts fixed that on
+# 2026-09-04 and the wait fell to 7-30 ms.
+#
+# The panel stays because the two numbers are still different -- 8 ms of wait
+# around 2 ms of drawing at 20x short read -- and because publishing the drawing
+# alone as a render time is a mistake this repo made once and retracted. It
+# travels underneath the wait rather than instead of it, in its own panel, where
+# the gap between a tool's two lines is the whole subject and the label on each
+# line can be a sentence.
 #
 # Drawn as one figure the two measures needed two legends, a fourth decade of y
 # axis for a 500 us dashed line, and a reader who had to work out which arms the

@@ -1,37 +1,37 @@
 "panel","case","series","ms","usable","session","format","window","censored","metric","lo","hi"
-"Zoom in, within loaded data","20x short read","This work",0,TRUE,"interaction","BAM",NA,FALSE,NA,NA,NA
-"Zoom in, within loaded data","20x short read","Release 4.3.0",1070,TRUE,"interaction","BAM",NA,FALSE,NA,NA,NA
-"Zoom in, within loaded data","20x short read","Release 2.4.0",596,TRUE,"interaction","BAM",NA,FALSE,NA,NA,NA
-"Pan, both refetch","20x short read","This work",174,TRUE,"interaction","BAM",NA,FALSE,NA,NA,NA
-"Pan, both refetch","20x short read","Release 4.3.0",1141,TRUE,"interaction","BAM",NA,FALSE,NA,NA,NA
-"Pan, both refetch","20x short read","Release 2.4.0",498,TRUE,"interaction","BAM",NA,FALSE,NA,NA,NA
-"Zoom in, within loaded data","200x short read","This work",0,TRUE,"interaction","BAM",NA,FALSE,NA,NA,NA
-"Zoom in, within loaded data","200x short read","Release 4.3.0",1107,TRUE,"interaction","BAM",NA,FALSE,NA,NA,NA
-"Zoom in, within loaded data","200x short read","Release 2.4.0",622,TRUE,"interaction","BAM",NA,FALSE,NA,NA,NA
+"Zoom in, within loaded data","20x short read","This work",163,TRUE,"interaction","BAM",NA,FALSE,NA,NA,NA
+"Zoom in, within loaded data","20x short read","Release 4.3.0",1066,TRUE,"interaction","BAM",NA,FALSE,NA,NA,NA
+"Zoom in, within loaded data","20x short read","Release 2.4.0",567,TRUE,"interaction","BAM",NA,FALSE,NA,NA,NA
+"Pan, both refetch","20x short read","This work",175,TRUE,"interaction","BAM",NA,FALSE,NA,NA,NA
+"Pan, both refetch","20x short read","Release 4.3.0",1133,TRUE,"interaction","BAM",NA,FALSE,NA,NA,NA
+"Pan, both refetch","20x short read","Release 2.4.0",445,TRUE,"interaction","BAM",NA,FALSE,NA,NA,NA
+"Zoom in, within loaded data","200x short read","This work",146,TRUE,"interaction","BAM",NA,FALSE,NA,NA,NA
+"Zoom in, within loaded data","200x short read","Release 4.3.0",1110,TRUE,"interaction","BAM",NA,FALSE,NA,NA,NA
+"Zoom in, within loaded data","200x short read","Release 2.4.0",640,TRUE,"interaction","BAM",NA,FALSE,NA,NA,NA
 "Pan, both refetch","200x short read","This work",815,TRUE,"interaction","BAM",NA,FALSE,NA,NA,NA
 "Pan, both refetch","200x short read","Release 4.3.0",1252,TRUE,"interaction","BAM",NA,FALSE,NA,NA,NA
 "Pan, both refetch","200x short read","Release 2.4.0",1917,TRUE,"interaction","BAM",NA,FALSE,NA,NA,NA
-"Zoom in, within loaded data","1000x short read","This work",0,TRUE,"interaction","BAM",NA,FALSE,NA,NA,NA
-"Zoom in, within loaded data","1000x short read","Release 4.3.0",1510,TRUE,"interaction","BAM",NA,FALSE,NA,NA,NA
-"Zoom in, within loaded data","1000x short read","Release 2.4.0",669,TRUE,"interaction","BAM",NA,FALSE,NA,NA,NA
+"Zoom in, within loaded data","1000x short read","This work",167,TRUE,"interaction","BAM",NA,FALSE,NA,NA,NA
+"Zoom in, within loaded data","1000x short read","Release 4.3.0",1555,TRUE,"interaction","BAM",NA,FALSE,NA,NA,NA
+"Zoom in, within loaded data","1000x short read","Release 2.4.0",707,TRUE,"interaction","BAM",NA,FALSE,NA,NA,NA
 "Pan, both refetch","1000x short read","This work",1181,TRUE,"interaction","BAM",NA,FALSE,NA,NA,NA
 "Pan, both refetch","1000x short read","Release 4.3.0",4049,TRUE,"interaction","BAM",NA,FALSE,NA,NA,NA
 "Pan, both refetch","1000x short read","Release 2.4.0",10500,TRUE,"interaction","BAM",NA,FALSE,NA,NA,NA
-"Zoom in, within loaded data","20x long read","This work",0,TRUE,"interaction","BAM",NA,FALSE,NA,NA,NA
-"Zoom in, within loaded data","20x long read","Release 4.3.0",1179,TRUE,"interaction","BAM",NA,FALSE,NA,NA,NA
-"Zoom in, within loaded data","20x long read","Release 2.4.0",668,TRUE,"interaction","BAM",NA,FALSE,NA,NA,NA
+"Zoom in, within loaded data","20x long read","This work",171,TRUE,"interaction","BAM",NA,FALSE,NA,NA,NA
+"Zoom in, within loaded data","20x long read","Release 4.3.0",1171,TRUE,"interaction","BAM",NA,FALSE,NA,NA,NA
+"Zoom in, within loaded data","20x long read","Release 2.4.0",694,TRUE,"interaction","BAM",NA,FALSE,NA,NA,NA
 "Pan, both refetch","20x long read","This work",199,TRUE,"interaction","BAM",NA,FALSE,NA,NA,NA
 "Pan, both refetch","20x long read","Release 4.3.0",1223,TRUE,"interaction","BAM",NA,FALSE,NA,NA,NA
 "Pan, both refetch","20x long read","Release 2.4.0",195,TRUE,"interaction","BAM",NA,FALSE,NA,NA,NA
-"Zoom in, within loaded data","200x long read","This work",0,TRUE,"interaction","BAM",NA,FALSE,NA,NA,NA
-"Zoom in, within loaded data","200x long read","Release 4.3.0",2843,TRUE,"interaction","BAM",NA,FALSE,NA,NA,NA
-"Zoom in, within loaded data","200x long read","Release 2.4.0",1915,TRUE,"interaction","BAM",NA,FALSE,NA,NA,NA
+"Zoom in, within loaded data","200x long read","This work",166,TRUE,"interaction","BAM",NA,FALSE,NA,NA,NA
+"Zoom in, within loaded data","200x long read","Release 4.3.0",2874,TRUE,"interaction","BAM",NA,FALSE,NA,NA,NA
+"Zoom in, within loaded data","200x long read","Release 2.4.0",2235,TRUE,"interaction","BAM",NA,FALSE,NA,NA,NA
 "Pan, both refetch","200x long read","This work",871,TRUE,"interaction","BAM",NA,FALSE,NA,NA,NA
 "Pan, both refetch","200x long read","Release 4.3.0",2696,TRUE,"interaction","BAM",NA,FALSE,NA,NA,NA
 "Pan, both refetch","200x long read","Release 2.4.0",4062,TRUE,"interaction","BAM",NA,FALSE,NA,NA,NA
-"Zoom in, within loaded data","1000x long read","This work",0,TRUE,"interaction","BAM",NA,FALSE,NA,NA,NA
-"Zoom in, within loaded data","1000x long read","Release 4.3.0",12498,TRUE,"interaction","BAM",NA,FALSE,NA,NA,NA
-"Zoom in, within loaded data","1000x long read","Release 2.4.0",6819,TRUE,"interaction","BAM",NA,FALSE,NA,NA,NA
+"Zoom in, within loaded data","1000x long read","This work",168,TRUE,"interaction","BAM",NA,FALSE,NA,NA,NA
+"Zoom in, within loaded data","1000x long read","Release 4.3.0",11697,TRUE,"interaction","BAM",NA,FALSE,NA,NA,NA
+"Zoom in, within loaded data","1000x long read","Release 2.4.0",6818,TRUE,"interaction","BAM",NA,FALSE,NA,NA,NA
 "Pan, both refetch","1000x long read","This work",1578,TRUE,"interaction","BAM",NA,FALSE,NA,NA,NA
 "Pan, both refetch","1000x long read","Release 4.3.0",11101,TRUE,"interaction","BAM",NA,FALSE,NA,NA,NA
 "Pan, both refetch","1000x long read","Release 2.4.0",22079,TRUE,"interaction","BAM",NA,FALSE,NA,NA,NA
