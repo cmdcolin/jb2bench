@@ -1,5 +1,7 @@
 #!/bin/bash
-# Load hg19mod assembly + alignment tracks into every build in builds/.
+# Load hg19mod assembly + alignment tracks into every build in builds/, or into
+# just the builds named as arguments — a restaged build wants wiring up without
+# fifteen others being rewritten around it.
 # Track ids match the <cov>.<readtype>.<fmt> naming the profiler URLs use.
 # The assembly is copied into each build; the alignments are symlinked, so
 # builds/ stays small and every build serves the same bytes out of data/.
@@ -7,7 +9,10 @@ set -e
 cd "$(dirname "$0")/.."
 REF=data/hg19mod.fa
 
-for l in builds/*; do
+targets=("$@")
+if [ ${#targets[@]} -eq 0 ]; then targets=(builds/*); fi
+
+for l in "${targets[@]}"; do
   echo "=== $l ==="
   jbrowse add-assembly --load copy "$REF" --out "$l" --force --name hg19mod
   for k in shortread longread; do
