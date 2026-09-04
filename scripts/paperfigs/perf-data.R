@@ -313,8 +313,33 @@ MOTION_WAIT <- c("crosstool-zoom.json" = "median",
 # cells get no bar rather than a bar borrowed from a different statistic.
 MOTION_RUNS <- c("crosstool-zoom.json" = "runs",
                  "crosstool-pan.json" = "fetchedRuns")
+# A motion recorded before the benchmark took the discrete navigation path is
+# not comparable with one recorded after it. Driven through the bare per-frame
+# chokepoint, a JBrowse step timed the 500ms LGVCoarseDynamicBlocks throttle
+# coalescing a gesture that never arrived -- a flat ~507ms at every coverage,
+# against 7-8ms once the step ends with settleCoarseBlocks the way a UI control
+# does. Mixing the two in one CSV puts a timer and a redraw in the same column.
+#
+# Detected from the data rather than from a date: panrunner.ts began recording
+# `settlesCoarseBlocks` in the same commit that fixed the drive, so a motion
+# whose arms all lack the field predates the fix.
+predates_discrete_drive <- function(rows) {
+  for (cell in rows) {
+    for (arm in cell) {
+      if (is.list(arm) && !is.null(arm$settlesCoarseBlocks)) return(FALSE)
+    }
+  }
+  TRUE
+}
+
 for (f in names(MOTIONS)) {
   motion <- read_results(f)$rows
+  if (predates_discrete_drive(motion)) {
+    cat("skipping ", f, ": recorded before the discrete-drive fix, so its ",
+        "JBrowse arms time a throttle rather than a redraw. Re-run it to ",
+        "put it back in the figures.\n", sep = "")
+    next
+  }
   for (base in READ_CASES) {
     key <- paste0(base, "-", FORMAT)
     cell <- cell_for(motion, key, f)

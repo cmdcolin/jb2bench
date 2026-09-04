@@ -227,3 +227,26 @@ in workers, and JBrowse boots an application shell where igv mounts a widget.
 Those are real architectural differences and they are inside the number — but
 less of it than in the cold-load table, which is the reason this measurement
 exists.
+
+---
+
+## This table predates the discrete-drive fix — 2026-09-04
+
+Every JBrowse cell above was measured through the bare `zoomTo` /
+`horizontalScroll` chokepoint, which leaves the coarse blocks on their 500 ms
+`LGVCoarseDynamicBlocks` throttle. `c8f07db` changed the runner to end each
+discrete step with `settleCoarseBlocks`, the path a UI control actually takes.
+On the zoom that was worth roughly 500 ms a step; on a pan the throttle overlaps
+the fetch, so the same change moved `results/interaction.md`'s pan column by tens
+of milliseconds and no more. Expect these numbers to survive a re-run, but they
+have not had one.
+
+Two other things date this file. It carries no GenomeSpy column — that arm
+reached the motion runs on 2026-09-02, after this run. And it was taken against
+`builds/current` as staged 2026-09-02 (v5.0.0-beta.2 @ `062c20ec7d`), where
+`results/crosstool-zoom.md` and `results/interaction.md` are against
+`7d22e68f96` staged 2026-09-04.
+
+`scripts/paperfigs/perf-data.R` drops this file from `perf.csv` rather than
+plotting it beside the corrected zoom, and says so when it runs. Re-run
+`make crosstool-pan` to put it back.
