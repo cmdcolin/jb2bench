@@ -75,9 +75,23 @@ DRAW <- "the drawing inside it"
 d$measure <- factor(ifelse(d$metric == "what the user waits", WAIT, DRAW),
                     levels = c(WAIT, DRAW))
 
-# The arms whose rasterizer runs on the main thread, where a page-side clock can
-# see it. Everything else draws in a worker and reads a compositing blit.
-CLOCKED <- c("This work", "igv.js 3.8.5")
+# The arms whose rasterizer runs in a WORKER, where a page-side clock times the
+# compositing blit and not the rendering -- they read 0.0-0.1 ms underneath a
+# wait of seconds. Everything else draws on the main thread and is measured for
+# real.
+#
+# An EXCLUDE list, and that is the point rather than a style choice. This was an
+# include list (`CLOCKED <- c("This work", "igv.js 3.8.5")`) for one day, and in
+# that day it silently dropped GenomeSpy: its motion arm landed on 2026-09-02,
+# the panel split rewrote the filter on 2026-09-03, and nobody added the new arm
+# to the new list. Excluding by the stated reason puts every future arm in the
+# panel by default and leaves one out only where the instrument cannot see it.
+#
+# GenomeSpy is the arm this panel most wants, which is what made losing it
+# costly: it decodes BAM through the same @gmod/bam this build does, so against
+# it the comparison is a renderer beside a renderer, where igv confounds parser
+# with renderer.
+WORKER_RENDERERS <- c("Release 2.4.0", "Release 4.3.0")
 
 endpoints <- function(df) {
   e <- df[order(-df$coverage), ]
@@ -134,13 +148,25 @@ top <- zoom_panel(wait, endpoints(wait), c(0.01, 0.1, 1, 10)) +
   guides(colour = guide_legend(nrow = 2), linetype = "none") +
   labs(title = "What the user waits for", x = NULL)
 
-inside <- subset(d, series %in% CLOCKED)
-bottom <- zoom_panel(inside, subset(endpoints(inside),
-                                    measure == WAIT | series == "This work"),
-                     c(0.001, 0.01, 0.1, 1)) +
+inside <- subset(d, !(series %in% WORKER_RENDERERS))
+# Label every wait endpoint, and a drawing endpoint only where it is separated
+# from its own arm's wait: igv's two lines coincide -- its wait IS its redraw --
+# and two labels on one curve read as two measurements. Computed from the values
+# rather than named per arm, because a list of arms is what dropped GenomeSpy
+# from this panel in the first place.
+LABEL_SEPARATION <- 2
+inside_ends <- endpoints(inside)
+inside_waits <- subset(inside_ends, measure == WAIT)
+inside_ends$wait_s <- inside_waits$s[match(
+  paste(inside_ends$reads, inside_ends$series),
+  paste(inside_waits$reads, inside_waits$series))]
+inside_ends <- subset(inside_ends,
+                      measure == WAIT | s * LABEL_SEPARATION < wait_s)
+
+bottom <- zoom_panel(inside, inside_ends, c(0.001, 0.01, 0.1, 1)) +
   guides(colour = "none",
          linetype = guide_legend(override.aes = list(linewidth = 0.6))) +
-  labs(title = "Inside that wait, for the two arms drawing on the main thread") +
+  labs(title = "Inside that wait, for the arms drawing on the main thread") +
   theme(strip.text = element_blank())
 
 fig <- top / bottom +
@@ -162,10 +188,12 @@ cat("wrote results/figures/paper/png/perf-crosstool-zoom.png\n")
 #   A 2x zoom in, median of five steps, timed by one instrument belonging to no
 #   tool on the figure. No arm made a network request on any step, so every
 #   difference here is drawing and not fetching. The upper panel is what a user
-#   waits for after the zoom. The lower panel opens that wait for the two arms
+#   waits for after the zoom. The lower panel opens that wait for the three arms
 #   whose rasterizer a page-side clock can see: igv.js's two lines coincide --
 #   its wait is its redraw -- while this work spends half a second in a
-#   navigation debounce around 0.6 ms of drawing. The two release arms have no
+#   navigation debounce around 0.6 ms of drawing, and GenomeSpy about 8 ms
+#   around 0.8 ms. This work and GenomeSpy rasterize in the same order of time;
+#   what separates their waits is not the drawing. The two release arms have no
 #   drawing line because they rasterize in a worker, where the clock times the
 #   compositing blit and not the rendering. GenomeSpy's long-read line stops at
 #   200x: no 1000x step on that arm returned a usable measurement. Vertical bars
