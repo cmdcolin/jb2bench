@@ -26,6 +26,13 @@
 # reads at 20x really are two decades cheaper than long reads at 1000x, and a
 # free axis would flatten every cell to the same visual span.
 #
+# Every point then carries its own duration, as on the cold-load and interaction
+# figures: four decades of log axis are the right shape for this data and the
+# wrong thing to read a value off, since a reader who wants to know what the
+# 2023 reader actually cost at 200x has to interpolate logarithmically by eye.
+# The axis keeps the shape, the labels carry the numbers, and the speedup stops
+# being a claim the reader has to take on trust from the gap between two lines.
+#
 #   Rscript scripts/paperfigs/parser.R
 #
 # Stock discrete colour scale; type sizes come from common.R's paper_theme.
@@ -34,6 +41,7 @@
 
 suppressPackageStartupMessages({
   library(ggplot2)
+  library(ggrepel)
   library(ragg)
   library(cowplot)
 })
@@ -70,7 +78,20 @@ span <- do.call(rbind, lapply(split(d, list(d$package, d$reads)), function(g) {
 # that reader's versions; the package name that used to sit in the column strip
 # becomes that sub-plot's title. The y axis is still fixed across both, so a
 # cell's height means the same thing in either sub-plot.
-y_range <- range(d$s)
+
+# The two curves in a cell are a decade apart at worst and a third of one at
+# best, so each release's labels ride on its own side of its curve -- baseline
+# above, current below -- and the pair never competes for the same strip. Repel
+# then only has to settle labels against their neighbours along a curve, with
+# common.R's sampled curve obstacles keeping them off the lines themselves.
+# In log10 seconds.
+LABEL_LIFT <- 0.16
+
+# The shared limits carry that lift as headroom, because a scale limit CLIPS
+# rather than pads: set to the bare data range, it drops the label on the
+# cheapest and the dearest point in the whole figure -- the two a reader most
+# wants the number for.
+y_range <- range(d$s) * 10^(c(-1, 1) * (LABEL_LIFT + 0.14))
 
 panel_plot <- function(pkg) {
   dp <- droplevels(subset(d, package == pkg))
@@ -78,18 +99,32 @@ panel_plot <- function(pkg) {
   arm_labels <- sprintf("%s (%s)", levels(dp$arm),
                          vers$version[match(levels(dp$arm), vers$arm)])
   dp$arm <- factor(dp$arm, levels = levels(dp$arm), labels = arm_labels)
+  dp$series <- dp$arm
+
+  labels <- rbind(label_rows(dp, "reads", fmt_time(dp$s), "plain"),
+                  curve_obstacles(dp, "reads"))
+  labels$nudge_y <- ifelse(labels$label == "", 0,
+                           ifelse(labels$series == arm_labels[1],
+                                  LABEL_LIFT, -LABEL_LIFT))
 
   ggplot(dp, aes(x = coverage, y = s, colour = arm)) +
     geom_line(linewidth = LINE_W) +
     geom_point(size = POINT_S) +
+    ggrepel::geom_text_repel(
+      data = labels, aes(label = label, colour = series),
+      size = POINT_LABEL, nudge_y = labels$nudge_y, seed = REPEL_SEED,
+      show.legend = FALSE, box.padding = 0.3, point.padding = 0.2,
+      force = 3, force_pull = 0.5, min.segment.length = 0.3,
+      segment.size = 0.25, segment.alpha = 0.5, max.overlaps = Inf,
+      max.time = 5, max.iter = 60000) +
     geom_text(data = subset(span, package == pkg), aes(label = paste(lab, "faster")),
               x = -Inf, y = Inf, hjust = -0.15, vjust = 1.5, size = ENDPOINT_LABEL,
               fontface = "bold", inherit.aes = FALSE) +
     facet_grid(reads ~ .) +
     scale_x_log10(breaks = c(20, 200, 1000), labels = c("20×", "200×", "1000×"),
-                  expand = expansion(mult = 0.13)) +
+                  expand = expansion(mult = 0.2)) +
     time_scale_y("time (log scale)", breaks = c(0.01, 0.1, 1, 10),
-                 limits = y_range, expand = expansion(mult = 0.12)) +
+                 limits = y_range, expand = expansion(mult = 0.02)) +
     labs(x = "coverage", colour = NULL, title = pkg) +
     paper_theme() +
     theme(plot.title = element_text(hjust = 0.5, face = "bold", size = rel(1.05)))
@@ -100,7 +135,8 @@ grid <- cowplot::plot_grid(plotlist = lapply(panels, panel_plot), nrow = 1)
 caption <- cowplot::ggdraw() +
   cowplot::draw_label(
     paste("parsing one 19 kb window, current release against the 2023 version;",
-          "bold: times faster, over that panel's three coverages", sep = "\n"),
+          "each point carries its measured time; bold: times faster, over that panel's three coverages",
+          sep = "\n"),
     size = 11, fontface = "italic", lineheight = 1.1)
 
 fig <- cowplot::plot_grid(grid, caption, ncol = 1, rel_heights = c(1, 0.13))
