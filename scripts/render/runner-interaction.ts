@@ -116,6 +116,14 @@ interface Result {
   allBailed: boolean
   /** the renderer process died partway through this cell */
   crashed?: boolean
+  /**
+   * Whether this build exposes `settleCoarseBlocks`, so a discrete step flushes
+   * the 500 ms LGVCoarseDynamicBlocks throttle instead of waiting it out. The
+   * older releases predate the action and sit out the throttle on every step,
+   * which is a real difference between builds rather than an artefact of how
+   * the benchmark drives them — and only readable as one if each cell says so.
+   */
+  settlesCoarseBlocks?: boolean
   maxWaitMs: number
   steps: { locus: string; loadingSeen: boolean }[]
   /** load average either side of this cell — filled in here, not by the child */
@@ -388,6 +396,37 @@ const when = ALL_MODES.map(
     ` (${detector[m] ?? 'text, pre-2026-08-25'})`,
 ).join(', ')
 md += `Measured — ${when}. Comparisons *within* a section are same-run; comparisons across sections may not be.\n\n`
+
+// Which builds flush the coarse-block throttle on a discrete step, taken from
+// the cells rather than from the build names. A build without the action waits
+// out 500 ms that no UI control pays, and a reader comparing two columns has to
+// know which of them did.
+{
+  const flush = new Map<Role, boolean>()
+  for (const r of Object.values(results)) {
+    for (const mode of ALL_MODES) {
+      for (const [role, cell] of Object.entries(r[mode]) as [Role, Result][]) {
+        if (typeof cell.settlesCoarseBlocks === 'boolean') {
+          flush.set(role, cell.settlesCoarseBlocks)
+        }
+      }
+    }
+  }
+  if (flush.size) {
+    const named = (want: boolean) =>
+      [...flush]
+        .filter(([, v]) => v === want)
+        .map(([role]) => builds.find(b => b.role === role)?.name ?? role)
+    const yes = named(true)
+    const no = named(false)
+    md += `Every step is a discrete jump, so it ends with \`settleCoarseBlocks\` rather than leaving the 500 ms \`LGVCoarseDynamicBlocks\` throttle to expire — the path a UI control takes, and not the per-frame chokepoint a gesture writes through. `
+    md += yes.length ? `Flushes: ${yes.join(', ')}. ` : ''
+    md += no.length
+      ? `Predates the action and waits the throttle out on every step: ${no.join(', ')} — half a second of each of those cells is a timer, and it is a difference between the builds rather than one between the columns' instruments.`
+      : ''
+    md += `\n\n`
+  }
+}
 
 md += `## Zoom IN — only the old renderer refetches\n\n`
 md += `The new view is a strict subset of already-loaded reads, so the GPU branch re-projects without going to the network. This is its best case.\n\n`
