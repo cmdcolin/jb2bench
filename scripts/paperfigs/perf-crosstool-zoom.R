@@ -101,6 +101,25 @@ d$measure <- factor(ifelse(d$metric == "what the user waits", WAIT, DRAW),
 # with renderer.
 WORKER_RENDERERS <- c("Release 2.4.0", "Release 4.3.0")
 
+# What each arm's renderer IS, shown in the legend instead of the bare tool name.
+# The figure's subject is architecture: three of them, three orders of magnitude,
+# in that order down the panel. Named here, a reader who has never opened either
+# codebase can see why the lines sit where they do; named as tools only, the
+# vertical order is a fact about brands and the reader has to already know which
+# renderer each one ships to read it as anything else.
+#
+# A relabel and not a rename: PERF_SERIES levels and their colours are shared
+# with the cold-load and interaction figures so a tool keeps its colour across
+# the set, and renaming here would fork that.
+ARCH <- c(
+  "Release 2.4.0"    = "Release 2.4.0 \u2014 worker tiles, re-rasterized",
+  "Release 4.1.15"   = "Release 4.1.15",
+  "Release 4.3.0"    = "Release 4.3.0 \u2014 worker tiles, re-rasterized",
+  "This work"        = "This work \u2014 GPU, batched",
+  "igv.js 3.8.5"     = "igv.js 3.8.5 \u2014 2D canvas, per read",
+  "GenomeSpy 0.85.0" = "GenomeSpy 0.85.0 \u2014 GPU"
+)
+
 endpoints <- function(df) {
   e <- df[order(-df$coverage), ]
   e <- e[!duplicated(e[c("measure", "reads", "series")]), ]
@@ -141,7 +160,7 @@ zoom_panel <- function(df, ends, y_breaks) {
                   expand = expansion(mult = c(0.08, 0.3))) +
     time_scale_y(name = NULL, breaks = y_breaks) +
     scale_linetype_manual(values = c("solid", "22"), drop = FALSE) +
-    scale_colour_discrete(drop = FALSE,
+    scale_colour_discrete(drop = FALSE, labels = function(x) unname(ARCH[x]),
                           breaks = PERF_SERIES[PERF_SERIES %in% df$series]) +
     labs(x = "coverage", colour = NULL, linetype = NULL) +
     paper_theme() +
@@ -153,29 +172,75 @@ wait <- subset(d, measure == WAIT)
 top <- zoom_panel(wait, endpoints(wait), c(0.01, 0.1, 1, 10)) +
   # Two rows for the colour keys: six arms on one row run off both ends of a
   # 240 mm canvas, which clipped "Release 2.4.0" rather than shrinking to fit.
-  guides(colour = guide_legend(nrow = 2), linetype = "none") +
-  labs(title = "What the user waits for", x = NULL)
+  guides(colour = guide_legend(nrow = 3), linetype = "none") +
+  labs(title = "What the user waits for",
+       # The premise, on the figure rather than only in the caption. Without it
+       # a reader assumes fetching is in these numbers and reads the spread as
+       # a comparison of network stacks; the run establishes the opposite, and
+       # it is the fact that makes this a redraw comparison at all.
+       subtitle = "No arm fetched a byte on any zoom step \u2014 every difference here is drawing",
+       x = NULL)
 
 inside <- subset(d, !(series %in% WORKER_RENDERERS))
-# Label every wait endpoint, and a drawing endpoint only where it is separated
-# from its own arm's wait: igv's two lines coincide -- its wait IS its redraw --
-# and two labels on one curve read as two measurements. Computed from the values
-# rather than named per arm, because a list of arms is what dropped GenomeSpy
-# from this panel in the first place.
-LABEL_SEPARATION <- 2
-inside_ends <- endpoints(inside)
-inside_waits <- subset(inside_ends, measure == WAIT)
-inside_ends$wait_s <- inside_waits$s[match(
-  paste(inside_ends$reads, inside_ends$series),
-  paste(inside_waits$reads, inside_waits$series))]
-inside_ends <- subset(inside_ends,
-                      measure == WAIT | s * LABEL_SEPARATION < wait_s)
 
-bottom <- zoom_panel(inside, inside_ends, c(0.001, 0.01, 0.1, 1)) +
-  guides(colour = "none",
-         linetype = guide_legend(override.aes = list(linewidth = 0.6))) +
-  labs(title = "Inside that wait, for the arms drawing on the main thread") +
-  theme(strip.text = element_blank())
+# THE BOTTOM PANEL IS A RATIO, not a second copy of the top one.
+#
+# It used to plot the wait and the drawing as two lines per arm, and it existed
+# to expose a 500 ms navigation throttle sitting on top of 0.6 ms of drawing --
+# a gap so large that drawing it twice was the clearest way to say it. The
+# discrete-drive fix of 2026-09-04 removed the throttle, and with it the reason:
+# the solid lines became duplicates of the panel above, and the message shrank to
+# a gap the reader had to eyeball between two nearly-coincident curves.
+#
+# What survives is worth one number rather than two lines. Of the time a user
+# waits, how much was the tool actually drawing? igv.js sits at ~1: its wait IS
+# its redraw, it is busy the whole time. The GPU arms sit far below it, because
+# what they wait on is not rasterization. That is the same claim the two-line
+# version made, stated once, on an axis a reader can read directly.
+#
+# The releases are absent for the reason they were absent before: their
+# rasterizer runs in a worker and a page-side clock times the compositing blit,
+# so a ratio for them would divide a real wait by a number that is not drawing.
+ratio <- reshape(inside[c("series", "reads", "coverage", "measure", "s")],
+                 idvar = c("series", "reads", "coverage"),
+                 timevar = "measure", direction = "wide")
+names(ratio) <- sub("^s\\.", "", names(ratio))
+ratio$frac <- ratio[[WAIT]] / ratio[[WAIT]]  # placeholder, replaced below
+ratio$frac <- ratio[[DRAW]] / ratio[[WAIT]]
+ratio <- subset(ratio, is.finite(frac))
+
+ratio_ends <- ratio[order(-ratio$coverage), ]
+ratio_ends <- ratio_ends[!duplicated(ratio_ends[c("reads", "series")]), ]
+ratio_ends$label <- paste0(round(ratio_ends$frac * 100), "%")
+
+bottom <- ggplot(ratio, aes(x = coverage, y = frac, colour = series)) +
+  geom_line(linewidth = LINE_W) +
+  geom_point(size = POINT_S, show.legend = FALSE) +
+  geom_text_repel(data = ratio_ends, aes(label = label), direction = "y",
+                  nudge_x = ENDPOINT_NUDGE, hjust = 0, size = ENDPOINT_LABEL,
+                  fontface = "bold", seed = REPEL_SEED, show.legend = FALSE,
+                  min.segment.length = 0.3, segment.size = 0.25,
+                  segment.alpha = 0.5, box.padding = 0.25) +
+  facet_wrap(~reads) +
+  scale_x_log10(breaks = c(20, 200, 1000), labels = c("20\u00d7", "200\u00d7", "1000\u00d7"),
+                expand = expansion(mult = c(0.08, 0.3))) +
+  # Verified against the data rather than assumed: the largest ratio in this
+  # run is 0.997, so nothing is clipped. A drawing time above its own wait would
+  # be a bug in one of the two clocks, not a cell to plot.
+  scale_y_continuous(name = NULL, limits = c(0, 1.02),
+                     breaks = c(0, 0.25, 0.5, 0.75, 1),
+                     labels = c("0", "25%", "50%", "75%", "all of it")) +
+  scale_colour_discrete(drop = FALSE, labels = function(x) unname(ARCH[x]),
+                        breaks = PERF_SERIES[PERF_SERIES %in% ratio$series]) +
+  labs(x = "coverage", colour = NULL,
+       title = "How much of that wait was the tool drawing?",
+       subtitle = "Main-thread rasterizers only \u2014 a page-side clock cannot see a worker draw") +
+  guides(colour = "none") +
+  paper_theme() +
+  theme(plot.title = element_text(size = rel(1), face = "bold",
+                                  margin = margin(b = 2)),
+        plot.subtitle = element_text(size = rel(0.8), margin = margin(b = 6)),
+        strip.text = element_blank())
 
 fig <- top / bottom +
   plot_layout(heights = c(1, 1)) +
@@ -191,21 +256,29 @@ cat("wrote results/figures/paper/png/perf-crosstool-zoom.png\n")
 
 # ---- draft caption ----------------------------------------------------------
 # Kept here so the figure and the words that make it readable travel together;
-# the figure itself carries no explanatory text.
+# the figure itself carries no explanatory text beyond its two subtitles.
 #
 #   A 2x zoom in, median of five steps, timed by one instrument belonging to no
 #   tool on the figure. No arm made a network request on any step, so every
 #   difference here is drawing and not fetching. The upper panel is what a user
-#   waits for after the zoom. The lower panel opens that wait for the three arms
-#   whose rasterizer a page-side clock can see: igv.js's two lines coincide --
-#   its wait is its redraw -- while this work spends half a second in a
-#   navigation debounce around 0.6 ms of drawing, and GenomeSpy about 8 ms
-#   around 0.8 ms. This work and GenomeSpy rasterize in the same order of time;
-#   what separates their waits is not the drawing. The two release arms have no
-#   drawing line because they rasterize in a worker, where the clock times the
-#   compositing blit and not the rendering. GenomeSpy's long-read line stops at
-#   200x: no 1000x step on that arm returned a usable measurement. Vertical bars
-#   are the range of the three runs behind each point, and on most cells are
-#   shorter than the marker -- the widest of the six "This work" wait cells
-#   spans 6.5 ms about a 517 ms median. The lower panel has no bars: its per-run
-#   draw values were not recorded before 2026-09-03.
+#   waits for; each key names the arm's renderer, because the subject is
+#   architecture and not brand -- three architectures, three orders of
+#   magnitude, in that order down the panel. The lower panel asks how much of
+#   that wait the tool spent drawing: igv.js is at 95-100%, its wait IS its
+#   redraw, while this work and GenomeSpy are at 4-28%, so what they wait on is
+#   not rasterization. The two release arms have no ratio because they
+#   rasterize in a worker, where a page-side clock times the compositing blit
+#   and not the rendering. GenomeSpy's long-read line stops at 200x: no 1000x
+#   step on that arm returned a usable measurement, and it reads no CRAM at all.
+#   Vertical bars are the range of the three runs behind each point and on most
+#   cells are shorter than the marker.
+#
+# This figure was wrong until 2026-09-04 and the shape of the error is worth
+# keeping. The upper panel read a flat ~507 ms for this work at every coverage,
+# and the lower panel existed to expose that as a 500 ms navigation throttle
+# wrapped around 0.6 ms of drawing. The throttle was the benchmark's, not the
+# browser's: the runner drove `zoomTo`, the per-frame chokepoint a gesture
+# writes through, where every discrete placer in the LGV model ends with
+# `settleCoarseBlocks`. Fixed, the wait is 7-30 ms and rises with coverage. The
+# lower panel became a ratio at that point, because two lines per arm was a way
+# of drawing a gap that no longer needed a whole panel to be visible.
