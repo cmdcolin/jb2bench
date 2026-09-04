@@ -6,35 +6,50 @@ a mac left the claim unconfirmed at the window size this harness uses.
 
 ## Where the ~2x actually comes from
 
-Not from this repo. It is in jbrowse-components, in the docstring of
-`packages/core/src/util/bgzfWorkerPool.ts`:
+Not from this repo. jbrowse-components quotes it in three places —
+`packages/core/src/util/bgzfWorkerPool.ts`, `BamAdapter.ts`, and
+`website/docs/developer_guides/optimizations.md`:
 
-> Measured 1.95x end to end on the BAM side: a 22-view pan / zoom out / pan
-> back over 1000x long-read data, real HTTP, headless Chrome, 4 workers, with
-> both arms returning the same 38,246 records.
+> **1.95x** end to end, over a 22-view pan and zoom across 1000x long-read
+> data, with both arms returning the same 38,246 records.
 
-Read what that measured: **22 views including a zoom out**, over **1000x long
-read**. Large regions, large chunks. That is the regime the pool has the most
-to divide.
+Its own reference doc, `agent-docs/reference/BGZF_WORKER_POOL.md`, is careful
+that **1.95x is BAM's**, and puts tabix at 1.34-1.46x over 50-400 kb windows on
+a 213 MB slice of 1000 Genomes — "quoting the BAM figure for a VCF track
+overstates it by a third".
 
-`scripts/bgzfpool/windows.ts` measures something else — five **19 kb** windows.
-That is a small region, and the first standalone run says so:
+## What jb2bench measures against that
 
-| track | pool on ÷ pool off |
-| --- | --- |
-| 20x / 200x / 1000x shortread BAM | 1.24x / 1.32x / 1.30x |
-| 20x / 200x longread BAM | 1.49x / 1.40x |
-| 1000x longread BAM | did not fit in the renderer heap |
-| VCF full genotypes, 100 / 1,000 / 3,000 samples | 1.13x / 1.26x / 1.24x |
-| VCF genotypes only, 100 / 1,000 / 3,000 samples | 0.95x / 1.08x / 1.07x |
+The standalone arm now has a run of record (`results/bgzfpool.md`). Over five
+19 kb windows, min of nine rounds, four workers:
 
-Raw: `results/bgzfpool-standalone.json`. Figure:
-`results/figures/paper/png/bgzfpool.png`.
+| | jb2bench, query alone | jbrowse-components |
+| --- | --- | --- |
+| BAM, 1000x long read | **1.65x** | 1.95x end to end |
+| BAM, 1000x short read | 1.31x | — |
+| Tabix VCF, 3,000 samples | 1.28x (full GT) / 1.11x (GT only) | 1.34-1.46x |
 
-So at 19 kb nothing reaches 2x, and the trend is the one the pool doc predicts:
-the ratio grows with the size of the chunk a query resolves to. **The claim is
-not contradicted — it is untested at its own window size.** The two cells that
-would test it are the ones missing above: 1000x long read, at a wide view.
+**Tabix agrees** — their windows are 50-400 kb against these 19 kb, and the
+speedup rises with the size of the chunk a query resolves to, which is the one
+axis that explains every panel of the figure.
+
+**BAM is in tension and is the thing worth resolving.** 1.95x end to end sits
+*above* the 1.65x this arm measures with nothing above the query, and that is
+backwards: the standalone arm is supposed to be the ceiling, because jbrowse
+still pays the RPC hop, feature conversion, layout and paint. Three candidates,
+and the end-to-end arm is what tells them apart:
+
+- **Concurrency.** This arm issues one window at a time, so four workers serve
+  a single query. A real pan has several block queries in flight sharing one
+  pool — more parallel work than this arm ever offers. If that is the answer,
+  the standalone arm understates BAM rather than bounding it.
+- **The zoom-out view.** 38,246 records over 22 views averages 1,738, almost
+  exactly this corpus's ~1,700 per window at 1000x long read. But an average
+  hides a zoom-out, and one much larger view could be carrying the total.
+- **A different fixture.** No quote names the file, so "1000x long-read data"
+  may not be this corpus's `1000x.longread.bam`.
+
+So: don't set out to "confirm 2x". Set out to find which of those three it is.
 
 ## Do the two things that are actually blocking
 
@@ -63,13 +78,23 @@ twin. Keep the blob-worker gate exactly as it is — it is what proves the two
 arms differ: **4 on the pool build, 0 on the nopool build.** Any other pair
 means the arms were not different and the run is worthless.
 
-### 2. Measure at the window size the claim is about
+### 2. Widen the windows, at least for tabix
 
-Add a wide-window set to `scripts/bgzfpool/windows.ts` alongside the 19 kb one,
-sized to the zoom-out in the 1.95x measurement, and run the 1000x long-read
-cell there. Keep the windows non-overlapping — jbrowse caches decoded records
-per region and raw bytes per 256 KiB chunk, so a repeat window times a cache
-hit rather than an inflate.
+`scripts/bgzfpool/windows.ts` uses five 19 kb windows. For **tabix** that is
+demonstrably too narrow to meet jbrowse-components on its own ground: its
+1.34-1.46x came from 50-400 kb windows, and this arm's VCF cells top out at
+1.28x. Add a wide-window set alongside the 19 kb one and the two should meet.
+
+For **BAM** the case is weaker than it first looks — 38,246 records over 22
+views averages 1,738, and this corpus already returns ~1,700 per 19 kb window
+at 1000x long read, so the per-view volume may already match. Widen it anyway
+to see whether the ratio keeps climbing, but the BAM gap is more likely
+concurrency than window size, and that is an end-to-end question rather than a
+windows.ts one.
+
+Keep any new windows non-overlapping — jbrowse caches decoded records per
+region and raw bytes per 256 KiB chunk, so a repeat window times a cache hit
+rather than an inflate.
 
 ## Prerequisites
 
@@ -152,11 +177,21 @@ literal, `jbrowse add-assembly --out 'builds/*'` fails, and the target aborts �
 
 - **Foreign CPU.** Above 0.5 cores of other people's work, drop the row.
 - **The pool never engaged.** Blob workers must be 4/0 across the arms.
-- **The renderer heap.** `1000x.longread.bam` failed the standalone arm on the
-  mac with `RangeError: Array buffer allocation failed` — `getRecordsForRange`
-  materializes every record, and at 1000x long read over even a 19 kb window
-  that is more than the renderer will allocate. `standalone.ts` now launches
-  Chrome with `--max-old-space-size=8192`, records a cell that still does not
-  fit as `{failed}` rather than dying, and saves after every track. If the cell
-  still fails on Linux, raise the heap further rather than dropping the cell —
-  it is the one the 1.95x claim rests on.
+- **The renderer heap.** `1000x.longread.bam` is the heaviest query in the
+  corpus and the one the BAM claim rests on. `getRecordsForRange` materializes
+  every record, and at the 8 GB default it failed with
+  `Array buffer allocation failed`. `standalone.ts` takes `HEAP_MB` now
+  (default 8192); at `HEAP_MB=24576` the cell measures, but still only over
+  **three** rounds — at nine it failed again, the second time as
+  `Failed to fetch`. Three rounds gave 1.69x and 1.65x on separate runs, so
+  re-take it on its own with fewer rounds rather than dropping it:
+
+  ```bash
+  TRACKS=1000x.longread.bam HEAP_MB=24576 \
+    node --experimental-strip-types scripts/bgzfpool/standalone.ts 3
+  ```
+
+  A `TRACKS=` run merges into `results/bgzfpool-standalone.json` rather than
+  replacing it, and each cell records the rounds and heap it was taken at, so a
+  table assembled from two sittings says so. It refuses to merge across
+  differing library versions.

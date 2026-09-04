@@ -32,6 +32,7 @@ const ROUNDS = Number(process.argv[2] ?? process.env.ROUNDS ?? 9)
 const TRACKS = (process.env.TRACKS ?? DEFAULT_TRACKS.join(',')).split(',')
 const JBROWSE = process.env.JBROWSE ?? path.resolve('../jbrowse-components')
 const PORT = Number(process.env.PORT ?? 8021)
+const HEAP_MB = Number(process.env.HEAP_MB ?? 8192)
 
 const libs = {
   '@gmod/bam': 'plugins/alignments/node_modules/@gmod/bam',
@@ -142,7 +143,7 @@ const browser = await puppeteer.launch({
   args: [
     '--no-sandbox',
     '--disable-dev-shm-usage',
-    '--js-flags=--max-old-space-size=8192',
+    `--js-flags=--max-old-space-size=${HEAP_MB}`,
   ],
 })
 const page = await browser.newPage()
@@ -175,7 +176,26 @@ const med = (xs: number[]) => {
     : (s[s.length / 2 - 1]! + s[s.length / 2]!) / 2
 }
 
-const results: Record<string, unknown> = {}
+const OUTFILE = 'results/bgzfpool-standalone.json'
+
+// A TRACKS= run measures a subset and used to write a whole file, so re-taking
+// one cell silently deleted the other eleven. Subset runs merge instead, and
+// every cell carries the run that produced it — a table assembled from two
+// sittings has to be able to say so.
+//
+// Not across library versions though: those cells are not the same benchmark,
+// so a version change starts a new file rather than interleaving with the old.
+const prior = fs.existsSync(OUTFILE)
+  ? JSON.parse(fs.readFileSync(OUTFILE, 'utf8'))
+  : undefined
+const sameLibraries =
+  prior && JSON.stringify(prior.versions) === JSON.stringify(versions)
+if (prior && !sameLibraries) {
+  console.log('library versions differ from the file on disk — starting fresh')
+}
+const results: Record<string, unknown> = sameLibraries ? prior.results : {}
+
+const measuredAt = new Date().toISOString().slice(0, 10)
 
 // Written after every track rather than once at the end. A track that exhausts
 // the renderer heap takes the page down with it, and a whole run's worth of
@@ -183,9 +203,9 @@ const results: Record<string, unknown> = {}
 const save = () => {
   fs.mkdirSync('results', { recursive: true })
   fs.writeFileSync(
-    'results/bgzfpool-standalone.json',
+    OUTFILE,
     JSON.stringify(
-      { rounds: ROUNDS, windows: TIMED, ref: REF, versions, results },
+      { windows: TIMED, ref: REF, versions, results },
       null,
       2,
     ),
@@ -227,7 +247,7 @@ for (const track of TRACKS) {
   // is not a ratio of 1.0 and it is not a missing key: the figure needs to be
   // able to say the cell was attempted and did not fit.
   if (failure) {
-    results[track] = { failed: failure }
+    results[track] = { failed: failure, measuredAt, heapMb: HEAP_MB, rounds: ROUNDS }
     save()
     console.log(` => FAILED (${failure.split('\n')[0]})`)
     await page.goto(`http://localhost:${PORT}/`, { waitUntil: 'load' })
@@ -250,7 +270,15 @@ for (const track of TRACKS) {
       new Set(rounds.flatMap(r => [r.pooled[i]!.count, r.plain[i]!.count]))
         .size > 1,
   )
-  results[track] = { rounds, perWindow, ratios, median: med(ratios), mismatched }
+  results[track] = {
+    rounds,
+    perWindow,
+    ratios,
+    median: med(ratios),
+    mismatched,
+    measuredAt,
+    heapMb: HEAP_MB,
+  }
   save()
   process.stdout.write(
     ` => ${med(ratios).toFixed(2)}x  (per window ${ratios.map(r => r.toFixed(2)).join(' ')})` +

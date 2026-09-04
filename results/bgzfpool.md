@@ -9,39 +9,78 @@ The figure is [`figures/paper/png/bgzfpool.png`](figures/paper/png/bgzfpool.png)
 drawn by `scripts/paperfigs/bgzfpool.R` from `paper/bgzfpool.csv`. It carries
 one series until an end-to-end run exists to draw beside it.
 
-**The standalone arm, 2026-09-04.** Nine rounds, min per window, five
-non-overlapping 19 kb windows on `chr22_mask`, four workers, bundled from
-`@gmod/bam@9.0.1 @gmod/tabix@3.8.2 @gmod/bgzf-filehandle@6.6.0`. Written by
-`scripts/bgzfpool/standalone.ts`; raw in `results/bgzfpool-standalone.json`.
+**The standalone arm, 2026-09-04.** Min per window over nine rounds, five
+non-overlapping 19 kb windows on `chr22_mask`, four workers, 24 GB renderer
+heap, bundled from `@gmod/bam@9.0.1 @gmod/tabix@3.8.2
+@gmod/bgzf-filehandle@6.6.0`. Raw in `results/bgzfpool-standalone.json`, which
+records the rounds and heap behind each cell.
 
-| track | pool on ÷ pool off |
-| --- | --- |
-| 20x shortread BAM | 1.24x |
-| 200x shortread BAM | 1.32x |
-| 1000x shortread BAM | 1.30x |
-| 20x longread BAM | 1.49x |
-| 200x longread BAM | 1.40x |
-| 1000x longread BAM | did not fit in the renderer heap |
-| VCF full genotypes, 100 / 1,000 / 3,000 samples | 1.13x / 1.26x / 1.24x |
-| VCF genotypes only, 100 / 1,000 / 3,000 samples | 0.95x / 1.08x / 1.07x |
+| track | records / window | pool on ÷ pool off |
+| --- | --- | --- |
+| 20x shortread BAM | ~3,000 | 1.23x |
+| 200x shortread BAM | ~30,000 | 1.25x |
+| 1000x shortread BAM | ~153,000 | 1.31x |
+| 20x longread BAM | ~40 | 1.49x |
+| 200x longread BAM | ~350 | 1.55x |
+| 1000x longread BAM | ~1,700 | 1.65x |
+| VCF full genotypes, 100 / 1,000 / 3,000 samples | ~316 | 1.11x / 1.24x / 1.28x |
+| VCF genotypes only, 100 / 1,000 / 3,000 samples | ~316 | 0.93x / 1.05x / 1.11x |
 
-The shape is the one `@gmod/bgzf-filehandle`'s worker-pool doc describes: the
-ratio grows with the size of the chunk a query resolves to, and the smallest
-chunk here — 100 samples, genotypes only — sits below 1.0, where the round trip
-costs more than the parallelism returns.
+One axis explains the whole table, and it is not coverage or sample count as
+such: it is how many bytes the query resolves to. Every panel rises with it,
+and the smallest chunk here — 100 samples, genotypes only — is the one that
+falls below 1.0, where the round trip costs more than the parallelism returns.
 
-**This does not yet test the 1.95x in jbrowse-components.** That number, in the
-docstring of `packages/core/src/util/bgzfWorkerPool.ts`, was measured over a
-22-view pan / zoom out / pan back on 1000x long-read data. These windows are
-19 kb, which is a far smaller chunk, and the one cell that would speak to the
-claim is the one that did not fit. Nothing here contradicts 1.95x; nothing here
-confirms it either. See `agent-docs/bgzfpool-linux-runbook.md`.
+The 1000x long-read cell is min of **three** rounds, not nine. It is the
+heaviest query in the corpus and does not survive nine: at nine it failed twice
+on this box, once as `Array buffer allocation failed` and once as
+`Failed to fetch`. Three rounds gave 1.69x and 1.65x on two separate runs, so
+the number is stable even though the cell is not.
+
+## How this reads against jbrowse-components' own numbers
+
+jbrowse-components quotes the pool in two places, and this arm agrees with one
+of them and is in tension with the other.
+
+**Tabix: agrees.** `agent-docs/reference/BGZF_WORKER_POOL.md` reports
+1.34-1.46x over 50-400 kb windows on a 213 MB slice of 1000 Genomes. This arm
+gets 0.93-1.28x over **19 kb** windows on synthetic callsets. Same direction,
+smaller windows, smaller numbers — their windows are 2.6-21x wider than these,
+and the table above says what widening a window does.
+
+**BAM: in tension, and worth resolving.** `BamAdapter.ts` and
+`website/docs/developer_guides/optimizations.md` both quote **1.95x end to end,
+over a 22-view pan and zoom across 1000x long-read data, both arms returning
+the same 38,246 records**. This arm measures **1.65x** for that same file with
+*nothing above the query*.
+
+That is backwards. This figure's premise — stated in the section below and in
+`results/crampool.md` before it — is that the library alone is an upper bound
+the user never experiences, because jbrowse still pays the RPC hop, feature
+conversion, layout and paint around every query. An end-to-end figure above the
+library-alone ceiling means one of the following, and the end-to-end arm is
+what would tell them apart:
+
+- **Concurrency.** This arm issues one window at a time, so four workers are
+  fed by one query. A jbrowse pan has several block queries in flight at once
+  sharing the one pool, which is *more* parallel work than this arm ever
+  offers. If so the ceiling framing is wrong for BAM and the standalone arm
+  understates rather than overstates.
+- **The zoom-out view.** 38,246 records over 22 views averages 1,738, which is
+  almost exactly this corpus's ~1,700 per window at 1000x long read. But an
+  average hides a zoom-out, and if one view in that sequence covered far more
+  than the rest it could carry the total.
+- **A different fixture or box.** Neither quote names the file, so "1000x
+  long-read data" may not be this corpus's `1000x.longread.bam`.
+
+Until that is settled, **1.65x is what this repo can show for BAM**, and the
+1.95x is someone else's measurement of something not yet reproduced here.
 
 **The end-to-end arm: still none.** It compared a track against a `.nopool`
 twin driven by a `useBgzfWorkerPool` config slot, and that slot was removed
 from jbrowse-components deliberately — it was test-only and is not shipping.
-The arm needs rewiring to compare two builds instead; the runbook above says
-how.
+The arm needs rewiring to compare two builds instead; see
+`agent-docs/bgzfpool-linux-runbook.md`.
 
 ## What is being compared
 

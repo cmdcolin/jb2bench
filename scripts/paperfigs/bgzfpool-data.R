@@ -60,15 +60,15 @@ describe <- function(track) {
 }
 
 rows <- list()
-add <- function(track, series, speedup, lo, hi, n, usable, note) {
+add <- function(track, series, speedup, lo, hi, n, usable, note, rounds = NA_integer_) {
   d <- describe(track)
   if (is.null(d)) {
     cat("skipping unrecognised track ", track, "\n", sep = "")
   } else {
     rows[[length(rows) + 1]] <<- data.frame(
       panel = d$panel, x = d$x, xlab = d$xlab, track = track, series = series,
-      speedup = speedup, lo = lo, hi = hi, n = n, usable = usable, note = note,
-      stringsAsFactors = FALSE)
+      speedup = speedup, lo = lo, hi = hi, n = n, rounds = rounds,
+      usable = usable, note = note, stringsAsFactors = FALSE)
   }
 }
 
@@ -107,8 +107,12 @@ for (track in names(alone$results)) {
   if (!usable) {
     dropped <- c(dropped, paste0(track, " (arms returned different record counts)"))
   }
+  # Rounds is per track, not per run: the heaviest cell does not survive as many
+  # of them as the rest, so a cell taken over fewer has to say so rather than
+  # sit in the table looking equally well sampled.
   add(track, "query alone", median(ratios), min(ratios), max(ratios),
-      length(ratios), usable, if (usable) "" else "record count mismatch")
+      length(ratios), usable, if (usable) "" else "record count mismatch",
+      rounds = length(r$rounds))
 }
 
 out <- do.call(rbind, rows)
