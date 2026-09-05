@@ -42,6 +42,7 @@ Every number lives in a file; nothing is summarized only here.
 | document | question it answers |
 | --- | --- |
 | [`results/alignments.md`](results/alignments.md) | how long does a cold initial render take? |
+| [`results/alignments-1mb.md`](results/alignments-1mb.md) | and at a 1 Mb window, where layout and paint dominate rather than fetch? |
 | [`results/interaction.md`](results/interaction.md) | how long does a zoom make you wait? |
 | [`results/interaction-cpu.md`](results/interaction-cpu.md) | where does per-frame main-thread time go during a zoom? |
 | [`results/crampool.md`](results/crampool.md) | does @gmod/cram's slice worker pool make a pan faster? (no run of record yet) |
@@ -90,6 +91,13 @@ except the reference is untracked and regenerable — roughly 750 MB.
   This bullet claimed the opposite until 2026-08-23 — "signal is the only
   workload a tool with no alignment track can share" — which was true of an
   earlier harness design and never true of the file.
+- `chr22_2mb.fa` (+ `.fai`) — a 2 Mb slice of GRCh38 chr22 (20,000,001–22,000,000,
+  no Ns), contig `chr22_2mb`. Tracked, and the input the wide arm is derived
+  from. A different genome build from `hg19mod.fa`, which does not matter to a
+  simulation but is worth knowing before the two corpora are read as one.
+- `2mb.*.bam` / `2mb.*.cram` (+ indexes) — the wide arm: 20x and 100x over that
+  contig, short and long reads, built by `shell/generate_1mb.sh`. Roughly 550 MB
+  and regenerable in about a minute.
 - `R103.model` — the pbsim error model for the long-read simulation. Tracked.
 - `hg19_17.chrom.sizes` — chr17's size, left over from the variant-matrix work.
   Nothing in this repo currently reads it.
@@ -100,8 +108,26 @@ except the reference is untracked and regenerable — roughly 750 MB.
   published numbers as published; that benchmark also runs on the simulated
   corpus above, which is where its result sits beside everything else here.
 
-The benchmark window throughout is `chr22_mask:124000-143000` (19 kb), which
-matches the historical jb2profile region.
+The benchmark window is `chr22_mask:124000-143000` (19 kb), which matches the
+historical jb2profile region, and it is what every table here reports unless it
+says otherwise.
+
+The exception is the **wide arm**, added 2026-09-05: `chr22_2mb:500001-1500000`
+(1 Mb) on its own assembly. Everything above sits on a 250 kb contig, so the
+only variable the corpus could move was depth — 20x to 1000x through a fixed
+19 kb window. The wide arm holds depth at what people actually have (20x and
+100x) and moves the window instead. 100x over 2 Mb is 200 Mb of aligned bases
+against the deep arm's 250 Mb over 250 kb: about the same bytes, spread over 50x
+the screen, which is what separates fetch and decode cost from per-feature
+layout and paint. The contig is 2 Mb and the window the middle 1 Mb of it
+because JBrowse clamps bpPerPx at the contig width — a window that *is* the
+assembly cannot be panned or zoomed out of, and is a different thing from a 1 Mb
+view of a chromosome.
+
+`SCALE=1mb` selects it, in `scripts/render/cases.ts`. Its results are their own
+files (`results/alignments-1mb.md`) rather than more rows in the deep arm's
+table: the two share no assembly, no window and no coverage ladder, so one table
+would carry a column for every axis and a value for none of them.
 
 ## The benchmarks
 
@@ -135,6 +161,10 @@ against a fresh profile.
 
 Rows are dated and carry the peak load they were measured under, because this
 box is shared and contamination lands per-cell rather than across a whole run.
+
+**`SCALE=1mb` runs the same matrix at a 1 Mb window** (`make render-1mb`) and
+writes `results/alignments-1mb.md`. Eight cases rather than twelve: 20x and 100x
+only, since the question there is width and not depth.
 
 ### Zoom interaction
 

@@ -147,6 +147,7 @@ const extras: [string, string, string][] = [
   ['GFF3 corpus', 'data/features.1000.rich.gff3', 'shell/generate_gff3.sh'],
   ['cohort BigWigs', 'data/cohort', 'shell/generate_cohort_bw.sh'],
   ['modBAM corpus', 'data/200x.longread.mod.bam', 'shell/generate_modbam.sh'],
+  ['wide-window corpus', 'data/2mb.100x.longread.bam', 'shell/generate_1mb.sh'],
   // The manifest rather than a CRAM: fetch_paper2019.sh writes it last, so its
   // presence means the downloads finished. A half-fetched 4.6 GB CRAM exists as
   // a file and fails as a corpus.

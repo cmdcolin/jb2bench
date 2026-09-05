@@ -4,7 +4,14 @@
 // and writes a markdown comparison table + raw JSON to results/.
 import { execFileSync } from 'child_process'
 import fs from 'fs'
-import { enumerateCases, migrateCaseKeys, selectCases } from './cases.ts'
+import {
+  type Case,
+  enumerateCases,
+  migrateCaseKeys,
+  resultSuffix,
+  selectCases,
+  selectScale,
+} from './cases.ts'
 import { resolveBuild } from './servedbuild.ts'
 import {
   FOREIGN_CORE_CEILING,
@@ -27,7 +34,12 @@ const WARMUP = Number(process.env.WARMUP ?? 1)
 if (!Number.isInteger(RUNS) || RUNS < 1) {
   throw new Error(`RUNS must be a positive integer, got ${process.env.RUNS}`)
 }
-const LOC = 'chr22_mask:124000-143000' // 19kb, matches historical jb2profile
+// Window, assembly and coverage ladder all come from the scale. The default is
+// the 19 kb window that matches the historical jb2profile region; `SCALE=1mb`
+// is the wide arm, which writes results/alignments-1mb.* rather than adding
+// rows to a table that shares no axis with it.
+const scale = selectScale()
+const OUT = `results/alignments${resultSuffix(scale)}`
 
 // renderer pinned to webgl2 for the new branch: WebGPU works but emits Dawn
 // validation errors on this Intel/Vulkan stack, so webgl2 is the credible path
@@ -109,8 +121,8 @@ const stddev = (a: number[]) => {
   return Math.sqrt(mean(a.map(x => (x - m) ** 2)))
 }
 
-function runOnceRaw(build: (typeof builds)[number], track: string): number {
-  const url = `http://localhost:${build.port}/?loc=${LOC}&assembly=hg19mod&tracks=${track}${build.extra}`
+function runOnceRaw(build: (typeof builds)[number], c: Case): number {
+  const url = `http://localhost:${build.port}/?loc=${c.loc}&assembly=${c.assembly}&tracks=${c.track}${build.extra}`
   // profile.ts prints the timing on stdout and exits non-zero on render
   // failure; execFileSync throws on non-zero, but still hands back the captured
   // stdout on the thrown error, so read from either path.
@@ -130,9 +142,9 @@ function runOnceRaw(build: (typeof builds)[number], track: string): number {
 
 // one retry to absorb transient headful-chrome flakiness (occasional render
 // timeout under GPU/window contention)
-function runOnce(build: (typeof builds)[number], track: string): number {
-  const v = runOnceRaw(build, track)
-  return Number.isFinite(v) ? v : runOnceRaw(build, track)
+function runOnce(build: (typeof builds)[number], c: Case): number {
+  const v = runOnceRaw(build, c)
+  return Number.isFinite(v) ? v : runOnceRaw(build, c)
 }
 
 interface Cell {
@@ -152,8 +164,8 @@ interface Saved {
   results?: Record<string, Record<string, Cell>>
   measuredAt?: Record<string, string>
 }
-const priorRaw: Saved = fs.existsSync('results/alignments.json')
-  ? (JSON.parse(fs.readFileSync('results/alignments.json', 'utf8')) as Saved)
+const priorRaw: Saved = fs.existsSync(`${OUT}.json`)
+  ? (JSON.parse(fs.readFileSync(`${OUT}.json`, 'utf8')) as Saved)
   : {}
 
 const prior: Saved = {
@@ -180,7 +192,7 @@ for (const c of cases) {
     }
     const before = loadavg()
     for (let i = 0; i < WARMUP; i++) {
-      runOnce(b, c.track)
+      runOnce(b, c)
     }
     // Started after the warmup: the warmup's own cost is not part of what the
     // measured runs competed with, and including it would charge this cell for
@@ -188,7 +200,7 @@ for (const c of cases) {
     const cpu = watchForeignCpu()
     const runs: number[] = []
     for (let i = 0; i < RUNS; i++) {
-      const v = runOnce(b, c.track)
+      const v = runOnce(b, c)
       runs.push(v)
       process.stdout.write(Number.isFinite(v) ? `${v.toFixed(0)} ` : 'FAIL ')
     }
@@ -227,8 +239,12 @@ if (suspect.length) {
 
 fs.mkdirSync('results', { recursive: true })
 fs.writeFileSync(
-  'results/alignments.json',
-  JSON.stringify({ loc: LOC, runs: RUNS, builds, measuredAt, results }, null, 2),
+  `${OUT}.json`,
+  JSON.stringify(
+    { loc: scale.loc, scale: scale.id, runs: RUNS, builds, measuredAt, results },
+    null,
+    2,
+  ),
 )
 
 // second port is the comparison baseline, named by what it actually serves —
@@ -236,7 +252,7 @@ fs.writeFileSync(
 // were ever restaged, which is the failure this whole resolution step exists for
 const baseline = builds[1]!.name
 let md = `# Alignments render benchmark\n\n`
-md += `Region \`${LOC}\` (19kb). In-page navigation→render-complete time, median of ${RUNS} runs (ms). `
+md += `Region \`${scale.loc}\` (${scale.label}). In-page navigation→render-complete time, median of ${RUNS} runs (ms). `
 md += `Speedup = ${baseline} median ÷ ${UNDER_TEST} median.\n\n`
 
 // Rows can be re-measured independently (CASES=), so the table can hold numbers
@@ -300,6 +316,6 @@ for (const c of allCases) {
 if (unusable.length) {
   md += `\n> **${unusable.join(', ')}** ${unusable.length === 1 ? 'was' : 'were'} measured while something else was using the machine, and the timings are not usable. The medians are left in the table because they are what was measured, not because they mean anything; re-run with \`CASES=${unusable.join(',')}\` on an idle box, and read the \`by\` column first — if it names the operator's own tooling, the fix is to leave the box alone for the length of the run rather than to find another machine. Judge that the box is idle from \`uptime\` before starting, not from the load at the moment the run begins — on 2026-08-05 a run that started at load 3.15 was at 35 by the time it finished.\n`
 }
-fs.writeFileSync('results/alignments.md', md)
+fs.writeFileSync(`${OUT}.md`, md)
 console.log('\n' + md)
-console.log('Wrote results/alignments.json and results/alignments.md')
+console.log(`Wrote ${OUT}.json and ${OUT}.md`)

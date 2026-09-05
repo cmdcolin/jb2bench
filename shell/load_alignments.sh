@@ -8,6 +8,7 @@
 set -e
 cd "$(dirname "$0")/.."
 REF=data/hg19mod.fa
+WIDEREF=data/chr22_2mb.fa
 
 targets=("$@")
 if [ ${#targets[@]} -eq 0 ]; then targets=(builds/*); fi
@@ -68,6 +69,22 @@ for l in "${targets[@]}"; do
   if [ -f "data/20x.shortread.nomd.bam" ]; then
     jbrowse add-track data/20x.shortread.nomd.bam --load symlink --out "$l" \
       --trackId 20x.shortread.nomd.bam --force -a hg19mod >/dev/null
+  fi
+  # The wide arm: its own assembly, because a 1 Mb window does not fit on the
+  # 250 kb contig everything above sits on. Same track naming, prefixed `2mb.`
+  # (the contig is 2 Mb; the window measured on it is the middle 1 Mb).
+  if [ -f "$WIDEREF" ]; then
+    jbrowse add-assembly --load copy "$WIDEREF" --out "$l" --force --name chr22_2mb
+    for k in shortread longread; do
+      for cov in 20x 100x; do
+        for fmt in bam cram; do
+          track="2mb.$cov.$k.$fmt"
+          if [ -f "data/$track" ]; then
+            jbrowse add-track "data/$track" --load symlink --out "$l" --trackId "$track" --force -a chr22_2mb >/dev/null
+          fi
+        done
+      done
+    done
   fi
   # Two adapter settings `add-track` cannot express: fetchSizeLimit, which
   # otherwise refuses the heavy windows outright, and the sequenceAdapter a 2.x

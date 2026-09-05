@@ -23,7 +23,7 @@ STAMP := $(shell date +%Y-%m-%d)
 LOGDIR := results/logs
 
 .PHONY: help gate counts timings all figures report serve serve-stop \
-        corpus corpus-paper render interaction crosstool crosstool-cold \
+        corpus corpus-paper render render-1mb interaction crosstool crosstool-cold \
         crosstool-zoom crosstool-pan crosstool-bundles \
         parsers parsers-count cram-samtools multibam backends clean-logs \
         formats toolcheck shots paper-tables paper-figs paper-data wait-quiet \
@@ -49,6 +49,7 @@ help:
 	@echo "measure — needs an idle box (make gate first)"
 	@echo "  make timings         render, interaction, cross-tool, parsers"
 	@echo "  make render          cold load, both formats x both read types"
+	@echo "  make render-1mb      the same, at a 1 Mb window: 20x and 100x over 2 Mb"
 	@echo "  make interaction     zoom and pan time-to-content"
 	@echo "  make crosstool       against igv.js: cold load, zoom and pan, all four arms"
 	@echo "  make crosstool-cold  just the cold-load matrix"
@@ -100,6 +101,7 @@ serve-stop:
 
 corpus:
 	shell/generate_alignments.sh
+	shell/generate_1mb.sh
 	shell/generate_modbam.sh
 	shell/generate_variants.sh
 	shell/generate_gff3.sh
@@ -146,6 +148,13 @@ shots: crosstool-bundles
 
 render: gate | $(LOGDIR)
 	$(NODE) scripts/render/runner.ts 2>&1 | tee $(LOGDIR)/render-$(STAMP).log
+
+# The width axis. Everything else here is measured at 19 kb on a 250 kb contig,
+# so depth is the only variable it can move; this arm holds depth at what people
+# actually have (20x, 100x) and moves the window to 1 Mb instead. Its own
+# assembly and its own results file — see scripts/render/cases.ts.
+render-1mb: gate | $(LOGDIR)
+	SCALE=1mb $(NODE) scripts/render/runner.ts 2>&1 | tee $(LOGDIR)/render-1mb-$(STAMP).log
 
 interaction: gate | $(LOGDIR)
 	$(NODE) scripts/render/runner-interaction.ts 2>&1 | tee $(LOGDIR)/interaction-$(STAMP).log

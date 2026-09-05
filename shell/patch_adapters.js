@@ -78,9 +78,10 @@ for (const track of tracks) {
   track.adapter.fetchSizeLimit = FETCH_SIZE_LIMIT
 }
 
-// One assembly per build here, and the CRAM tracks all name it. Reading the
-// sequence adapter off the assembly rather than rebuilding it keeps the two
-// pointing at the same FASTA even if load_alignments.sh changes REF.
+// Each CRAM track names its own assembly — two of them since the wide arm
+// landed. Reading the sequence adapter off the assembly the track names rather
+// than rebuilding it keeps the pair pointing at the same FASTA, whichever
+// reference load_alignments.sh handed that track.
 const cramTracks = version.startsWith('2.')
   ? tracks.filter(t => t.adapter.type === 'CramAdapter')
   : []
