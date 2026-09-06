@@ -49,6 +49,7 @@ import puppeteer from 'puppeteer'
 import {
   POLL_MS,
   STABLE_POLLS,
+  WAIT_TIMEOUT,
   waitForRenderComplete,
 } from './rendercomplete.ts'
 import fs from 'fs'
@@ -65,6 +66,14 @@ if (screenshotPath) {
 
 const browser = await puppeteer.launch({
   headless: process.env.HEADLESS !== '0',
+  // Every readiness poll is a CDP round trip now that the detector asks the
+  // shared probe rather than a predicate serialized into the page, and puppeteer
+  // applies `protocolTimeout` to each one. release-2.4.0 holds the main thread
+  // for minutes at the wide window, which blocks the poll — and a blocked poll
+  // only delays settling, never hastens it, so the timeout must be the
+  // measurement ceiling and not a shorter default that turns a slow build into
+  // an error. Same remedy, and the same reasoning, as paintprofile.ts.
+  protocolTimeout: WAIT_TIMEOUT + 60000,
   args: [
     '--no-sandbox',
     '--ignore-gpu-blocklist',

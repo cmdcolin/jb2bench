@@ -46,7 +46,7 @@
 // Usage: interaction.ts <url> [screenshotPath]     (MODE=in|out|pan, MAX_WAIT=ms)
 // Prints JSON with per-step time-to-content and redraw cost.
 import puppeteer from 'puppeteer'
-import { waitForRenderComplete } from './rendercomplete.ts'
+import { WAIT_TIMEOUT, waitForRenderComplete } from './rendercomplete.ts'
 import {
   contentReadyProbe,
   waitForContentReady,
@@ -94,6 +94,9 @@ const browser = await puppeteer.launch({
   // not always the version this puppeteer pins. CHROME= names one explicitly.
   executablePath: process.env.CHROME,
   headless: process.env.HEADLESS !== '0',
+  // See profile.ts: the readiness poll is a CDP round trip, and a build that
+  // holds the main thread for minutes must delay it rather than fail it.
+  protocolTimeout: WAIT_TIMEOUT + 60000,
   args: [
     '--no-sandbox',
     '--ignore-gpu-blocklist',
