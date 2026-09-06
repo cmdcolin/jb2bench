@@ -6,6 +6,7 @@ import { execFileSync } from 'child_process'
 import fs from 'fs'
 import {
   type Case,
+  DEFAULT_SCALE,
   enumerateCases,
   migrateCaseKeys,
   resultSuffix,
@@ -58,15 +59,36 @@ const OUT = `results/alignments${resultSuffix(scale)}`
 // profile.ts already caps a run at WAIT_TIMEOUT (120 s), so a 2023 build that
 // cannot finish 1000x longread fails that cell instead of hanging the matrix.
 //
-// Three arms, matching every figure in results/figures: the build under test,
-// the last release, and the version the 2023 paper benchmarked. v4.1.15 was a
-// fourth until 2026-08-24; it sat between two releases, moved no conclusion, and
-// cost a quarter of the wall clock of the longest matrix here.
-const ports = [
+// Three arms at 19 kb, matching every figure in results/figures: the build under
+// test, the last release, and the version the 2023 paper benchmarked. v4.1.15
+// was a fourth until 2026-08-24; it sat between two releases, moved no
+// conclusion, and cost a quarter of the wall clock of the longest matrix here.
+//
+// Two arms at 1 Mb. release-4.3.0 sits between the other two and answers the
+// narrow "what did this release change"; the wide arm asks how a 1 Mb view
+// scales, which the build under test and the 2023 version bracket on their own.
+// Its cells are the most expensive in this repo, so a column that moves no
+// conclusion is a third of the matrix spent on nothing. `PORTS=8000,8001,8004`
+// puts it back.
+const ALL_PORTS = [
   { port: 8000, extra: '&renderer=webgl' },
   { port: 8001, extra: '' },
   { port: 8004, extra: '' },
 ]
+const DEFAULT_PORTS =
+  scale.id === DEFAULT_SCALE.id ? [8000, 8001, 8004] : [8000, 8004]
+const wanted = process.env.PORTS?.split(',').map(Number) ?? DEFAULT_PORTS
+for (const w of wanted) {
+  if (!ALL_PORTS.some(p => p.port === w)) {
+    throw new Error(
+      `PORTS entry ${w} is not one of ${ALL_PORTS.map(p => p.port).join(',')}`,
+    )
+  }
+}
+const ports = ALL_PORTS.filter(p => wanted.includes(p.port))
+if (ports.length < 2) {
+  throw new Error('a matrix of one build is not a comparison; name two ports')
+}
 const builds = await Promise.all(
   ports.map(async p => ({ ...p, name: await resolveBuild(p.port) })),
 )
@@ -265,7 +287,9 @@ md += `\`load\` is the highest 1-minute load average across the row's cells, kep
 // by name so a restaged ports table cannot silently point this column at a
 // different build. Its speedup is the one a reader of that paper is asking for;
 // the baseline column answers the narrower "what did this release change".
-const published = builds.find(b => b.port === 8004)?.name
+// Skipped when 8004 IS the baseline, as it is whenever the middle arm is out:
+// one column cannot be printed twice under two different questions.
+const published = builds.find(b => b.port === 8004 && b.name !== baseline)?.name
 md += `| case | ${builds.map(b => b.name).join(' | ')} | speedup vs ${baseline} |${published ? ` speedup vs ${published} |` : ''} measured | foreign | by | load |\n`
 md += `|---|${builds.map(() => '---:').join('|')}|---:|${published ? '---:|' : ''}---|---:|---|---:|\n`
 const unusable: string[] = []

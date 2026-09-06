@@ -29,6 +29,10 @@ import puppeteer from 'puppeteer'
 
 const PORT = Number(process.env.PORT ?? 8000)
 const LOC = process.env.LOC ?? 'chr22_mask:124000-143000'
+// The wide arm brings its own assembly, and a refusal is per (build, track,
+// window): the estimate a limit is checked against scales with the window, so
+// the arm most likely to be refused is the one that was never asked.
+const ASSEMBLY = process.env.ASSEMBLY ?? 'hg19mod'
 const SETTLE_MS = Number(process.env.SETTLE_MS ?? 12000)
 const tracks =
   process.argv.slice(2).length > 0
@@ -59,7 +63,7 @@ for (const track of tracks) {
   })
   try {
     await page.goto(
-      `http://localhost:${PORT}/?loc=${LOC}&assembly=hg19mod&tracks=${track}&renderer=webgl`,
+      `http://localhost:${PORT}/?loc=${LOC}&assembly=${ASSEMBLY}&tracks=${track}&renderer=webgl`,
       { waitUntil: 'domcontentloaded' },
     )
     // The positive gate first: every signal below is negative, and all of them

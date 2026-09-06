@@ -13,7 +13,18 @@ for read in shortread longread; do
     done
   done
 done
+WIDE=""
+for read in shortread longread; do
+  for cov in 20x 100x; do
+    for fmt in bam cram; do
+      WIDE="$WIDE 2mb.$cov.$read.$fmt"
+    done
+  done
+done
 for port in 8000 8001 8002 8004; do
   echo "=== port $port ==="
   PORT=$port node --experimental-strip-types scripts/render/bailcheck.ts $TRACKS
+  echo "--- port $port, 1 Mb window ---"
+  PORT=$port ASSEMBLY=chr22_2mb LOC=chr22_2mb:500001-1500000 \
+    node --experimental-strip-types scripts/render/bailcheck.ts $WIDE
 done
