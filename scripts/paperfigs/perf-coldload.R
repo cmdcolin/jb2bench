@@ -110,10 +110,14 @@ all$hi_s <- all$hi / 1000
 #
 # The layer itself is built by common.R's coldload_labels() and drawn by its
 # endpoint_repel().
+# `save = FALSE` returns the panel without writing it, which is how
+# perf-coldload-ab.R gets the 19 kb and 1 Mb panels for its combined figure
+# without a second copy of this spec to drift from.
 draw <- function(win, out, width_label,
                  cov_breaks = c(20, 200, 1000),
                  cov_labels = c("20×", "200×", "1000×"),
-                 time_breaks = c(1, 2, 5, 10, 20, 60, 120, 600)) {
+                 time_breaks = c(1, 2, 5, 10, 20, 60, 120, 600),
+                 save = TRUE) {
   d <- subset(all, window == win)
 
   # A dropped point truncates its series rather than interpolating across the
@@ -177,14 +181,17 @@ draw <- function(win, out, width_label,
          x = "coverage", colour = NULL) +
     paper_theme()
 
-  ggsave(sprintf("results/figures/paper/pdf/%s.pdf", out), fig,
-         width = 200, height = 200, units = "mm", device = cairo_pdf)
-  cat(sprintf("wrote results/figures/paper/pdf/%s.pdf\n", out))
+  if (save) {
+    ggsave(sprintf("results/figures/paper/pdf/%s.pdf", out), fig,
+           width = 200, height = 200, units = "mm", device = cairo_pdf)
+    cat(sprintf("wrote results/figures/paper/pdf/%s.pdf\n", out))
 
-  ggsave(sprintf("results/figures/paper/png/%s.png", out), fig,
-         width = 200, height = 200, units = "mm", dpi = 300,
-         device = ragg::agg_png)
-  cat(sprintf("wrote results/figures/paper/png/%s.png\n", out))
+    ggsave(sprintf("results/figures/paper/png/%s.png", out), fig,
+           width = 200, height = 200, units = "mm", dpi = 300,
+           device = ragg::agg_png)
+    cat(sprintf("wrote results/figures/paper/png/%s.png\n", out))
+  }
+  invisible(fig)
 }
 
 draw("19kb", "perf-coldload", "19 kb")

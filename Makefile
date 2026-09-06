@@ -293,6 +293,9 @@ paper-figs:
 	Rscript scripts/paperfigs/perf-coldload.R
 	Rscript scripts/paperfigs/perf-coldload-windows.R
 	Rscript scripts/paperfigs/perf-downsampling.R
+# Sources perf-coldload.R for its panels, so it redraws that script's three
+# figures on the way through. Idempotent, and about fifteen seconds.
+	Rscript scripts/paperfigs/perf-coldload-ab.R
 	Rscript scripts/paperfigs/width.R
 	Rscript scripts/paperfigs/perf-interaction.R
 	Rscript scripts/paperfigs/perf-crosstool-zoom.R
