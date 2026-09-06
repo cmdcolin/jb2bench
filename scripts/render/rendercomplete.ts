@@ -35,9 +35,9 @@
 // region on screen". That is what runs here now, for both generations, and it
 // is the same probe zoom and pan have used since 2026-08-25 — one definition of
 // finished for every measurement in this repo.
-import fs from 'node:fs'
 import type { Page } from 'puppeteer'
 import { contentReadyProbe, type Contract } from './contentready.ts'
+import { treeStats } from './proctree.ts'
 
 export const WAIT_TIMEOUT = Number(process.env.WAIT_TIMEOUT ?? 120000)
 export const POLL_MS = 100
@@ -74,81 +74,6 @@ const WATCH_MS = 5000
  */
 const BUSY_CPU_S = 0.1
 
-/**
- * CPU seconds used by a process and everything under it, from /proc.
- *
- * Read here rather than asked of the page, because the case this exists for is
- * a page that has stopped answering: an `evaluate` against a wedged or dead
- * renderer does not fail, it waits, so anything that goes through CDP inherits
- * the hang it is trying to detect. /proc always answers.
- */
-function treeCpuSeconds(root: number): number {
-  const ticks = Number(process.env.CLK_TCK ?? 100)
-  const children = new Map<number, number[]>()
-  const self = new Map<number, number>()
-  for (const entry of fs.readdirSync('/proc')) {
-    const pid = Number(entry)
-    if (!pid) {
-      continue
-    }
-    let stat: string
-    try {
-      stat = fs.readFileSync(`/proc/${pid}/stat`, 'utf8')
-    } catch {
-      continue // exited between readdir and read
-    }
-    // The comm field is parenthesised and may contain spaces, so fields are
-    // counted from after the last ')'.
-    const f = stat.slice(stat.lastIndexOf(')') + 2).split(' ')
-    const ppid = Number(f[1])
-    self.set(pid, (Number(f[11]) + Number(f[12])) / ticks)
-    children.set(ppid, [...(children.get(ppid) ?? []), pid])
-  }
-  let total = 0
-  const stack = [root]
-  while (stack.length) {
-    const pid = stack.pop()!
-    total += self.get(pid) ?? 0
-    stack.push(...(children.get(pid) ?? []))
-  }
-  return total
-}
-
-/**
- * The session gate: views exist and none reports itself uninitialized.
- *
- * This mirrors `waitForSession` from `@jbrowse/capture`, which is the maintained
- * implementation of the whole problem and has more stages than this. It is NOT
- * imported, because that package's `exports` resolves to `./src/index.ts` while
- * its `files` ships only `esm/` — so the bare specifier lands on TypeScript
- * inside node_modules, which node refuses to strip
- * (ERR_UNSUPPORTED_NODE_MODULES_TYPE_STRIPPING), and the built output is
- * unreachable through the exports map (ERR_PACKAGE_PATH_NOT_EXPORTED). If that
- * is fixed — @jbrowse/img is the sibling that has it right — replace this with
- * `waitForSession(page, { timeout: WAIT_TIMEOUT })` and take its other stages.
- */
-function sessionReady() {
-  const session = (
-    globalThis as { JBrowseSession?: { views?: { initialized?: boolean }[] } }
-  ).JBrowseSession
-  const views = session?.views
-  if (!views?.length) {
-    return false
-  }
-  // `initialized` is an LGV getter; a view type without one is mounted content
-  // the moment it exists, so absent counts as initialized and only an explicit
-  // false is pending.
-  return !views.some(v => v.initialized === false)
-}
-
-/**
- * Waits for the session, then for every block of the view to be drawn.
- *
- * Polled from here rather than through `page.waitForFunction`, because the probe
- * is shared with the motion runners and a serialized predicate cannot call it.
- * Returns which contract fired, so a row measured under a different one from its
- * neighbours is visible rather than silently incomparable.
- */
 export async function waitForRenderComplete(
   page: Page,
   { timeout = WAIT_TIMEOUT, stableNeeded = STABLE_POLLS } = {},
@@ -190,11 +115,11 @@ function watchdog(page: Page, responses: () => number) {
     if (!pid) {
       return // a browser we did not spawn is one we cannot watch
     }
-    let lastCpu = treeCpuSeconds(pid)
+    let lastCpu = treeStats(pid).cpuSeconds
     let lastResponses = responses()
     let idleSince = Date.now()
     const timer = setInterval(() => {
-      const cpu = treeCpuSeconds(pid)
+      const cpu = treeStats(pid).cpuSeconds
       const busy = cpu - lastCpu > BUSY_CPU_S || responses() !== lastResponses
       lastCpu = cpu
       lastResponses = responses()
@@ -221,6 +146,33 @@ function watchdog(page: Page, responses: () => number) {
   // losing side of a race is still an unhandled rejection.
   stalled.catch(() => {})
   return { stalled, stop: () => stop() }
+}
+
+/**
+ * The session gate: views exist and none reports itself uninitialized.
+ *
+ * This mirrors `waitForSession` from `@jbrowse/capture`, which is the maintained
+ * implementation of the whole problem and has more stages than this. It is NOT
+ * imported, because that package's `exports` resolves to `./src/index.ts` while
+ * its `files` ships only `esm/` — so the bare specifier lands on TypeScript
+ * inside node_modules, which node refuses to strip
+ * (ERR_UNSUPPORTED_NODE_MODULES_TYPE_STRIPPING), and the built output is
+ * unreachable through the exports map (ERR_PACKAGE_PATH_NOT_EXPORTED). If that
+ * is fixed — @jbrowse/img is the sibling that has it right — replace this with
+ * `waitForSession(page, { timeout: WAIT_TIMEOUT })` and take its other stages.
+ */
+function sessionReady() {
+  const session = (
+    globalThis as { JBrowseSession?: { views?: { initialized?: boolean }[] } }
+  ).JBrowseSession
+  const views = session?.views
+  if (!views?.length) {
+    return false
+  }
+  // `initialized` is an LGV getter; a view type without one is mounted content
+  // the moment it exists, so absent counts as initialized and only an explicit
+  // false is pending.
+  return !views.some(v => v.initialized === false)
 }
 
 async function poll(

@@ -143,7 +143,13 @@ const stddev = (a: number[]) => {
   return Math.sqrt(mean(a.map(x => (x - m) ** 2)))
 }
 
-function runOnceRaw(build: (typeof builds)[number], c: Case): number {
+interface Attempt {
+  ms: number
+  /** peak resident MB across the browser tree; NaN when the run produced none */
+  peakRssMb: number
+}
+
+function runOnceRaw(build: (typeof builds)[number], c: Case): Attempt {
   const url = `http://localhost:${build.port}/?loc=${c.loc}&assembly=${c.assembly}&tracks=${c.track}${build.extra}`
   // profile.ts prints the timing on stdout and exits non-zero on render
   // failure; execFileSync throws on non-zero, but still hands back the captured
@@ -171,15 +177,24 @@ function runOnceRaw(build: (typeof builds)[number], c: Case): number {
       process.stdout.write(`\n    ${why}\n    `)
     }
   }
-  const val = Number.parseFloat(out.trim().split('\n').pop() || 'NaN')
-  return Number.isFinite(val) ? val : Number.NaN
+  const lines = out.trim().split('\n')
+  const val = Number.parseFloat(lines.pop() || 'NaN')
+  // profile.ts prints `peak-rss-mb=N` before the timing. Absent on a run that
+  // failed, and absent from every run recorded before 2026-09-06.
+  const rss = Number(
+    lines.find(l => l.startsWith('peak-rss-mb='))?.slice('peak-rss-mb='.length),
+  )
+  return {
+    ms: Number.isFinite(val) ? val : Number.NaN,
+    peakRssMb: Number.isFinite(rss) ? rss : Number.NaN,
+  }
 }
 
 // one retry to absorb transient headful-chrome flakiness (occasional render
 // timeout under GPU/window contention)
-function runOnce(build: (typeof builds)[number], c: Case): number {
+function runOnce(build: (typeof builds)[number], c: Case): Attempt {
   const v = runOnceRaw(build, c)
-  return Number.isFinite(v) ? v : runOnceRaw(build, c)
+  return Number.isFinite(v.ms) ? v : runOnceRaw(build, c)
 }
 
 interface Cell {
@@ -187,6 +202,22 @@ interface Cell {
   mean: number
   stddev: number
   runs: number[]
+  /**
+   * Peak resident memory of the whole browser process tree, per run, in MB.
+   *
+   * The tab and not the JS heap: a Chrome page's cost is spread across browser,
+   * GPU, renderer and utility processes, and at this window that is the
+   * difference between 400 MB and the 5.5 GB release 2.4.0 actually takes to
+   * draw a megabase at 100x. Absent from rows measured before 2026-09-06.
+   */
+  peakRssMb?: number[]
+  /**
+   * Runs that produced no number at all — a stall, a crash, a ceiling. Kept
+   * because "it manages this sometimes" is a result: 2.4.0 stalls on
+   * 1mb-100x-shortread-bam about as often as it completes it, and a median over
+   * the runs that survived says nothing about the ones that did not.
+   */
+  failed?: number
   /**
    * Load average either side of this cell, so contamination stays attributable.
    * Optional because results recorded before this instrumentation existed —
@@ -251,10 +282,18 @@ for (const c of cases) {
     // work it did itself.
     const cpu = watchForeignCpu()
     const runs: number[] = []
+    const peaks: number[] = []
     for (let i = 0; i < RUNS; i++) {
       const v = runOnce(b, c)
-      runs.push(v)
-      process.stdout.write(Number.isFinite(v) ? `${v.toFixed(0)} ` : 'FAIL ')
+      runs.push(v.ms)
+      if (Number.isFinite(v.peakRssMb)) {
+        peaks.push(v.peakRssMb)
+      }
+      process.stdout.write(
+        Number.isFinite(v.ms)
+          ? `${v.ms.toFixed(0)}${Number.isFinite(v.peakRssMb) ? `/${(v.peakRssMb / 1000).toFixed(1)}G` : ''} `
+          : 'FAIL ',
+      )
     }
     const ok = runs.filter(Number.isFinite)
     const { cores, top } = await cpu.done()
@@ -264,6 +303,8 @@ for (const c of cases) {
       mean: ok.length ? mean(ok) : Number.NaN,
       stddev: ok.length ? stddev(ok) : Number.NaN,
       runs,
+      peakRssMb: peaks,
+      failed: runs.length - ok.length,
       load,
     }
     results[c.id]![b.name] = cell
@@ -363,6 +404,33 @@ for (const c of allCases) {
 if (unusable.length) {
   md += `\n> **${unusable.join(', ')}** ${unusable.length === 1 ? 'was' : 'were'} measured while something else was using the machine, and the timings are not usable. The medians are left in the table because they are what was measured, not because they mean anything; re-run with \`CASES=${unusable.join(',')}\` on an idle box, and read the \`by\` column first — if it names the operator's own tooling, the fix is to leave the box alone for the length of the run rather than to find another machine. Judge that the box is idle from \`uptime\` before starting, not from the load at the moment the run begins — on 2026-08-05 a run that started at load 3.15 was at 35 by the time it finished.\n`
 }
+// Memory gets its own table rather than a second number in each timing cell.
+// It is a different question with a different verdict — a build that draws a
+// megabase in 14 s and needs 5.5 GB to do it has not won — and a cell carrying
+// both invites reading one as the other.
+const withRss = allCases.filter(c =>
+  builds.some(b => (results[c.id]?.[b.name]?.peakRssMb ?? []).length),
+)
+if (withRss.length) {
+  md += `\n## Peak memory\n\n`
+  md += `Highest resident memory across the **whole browser process tree** — browser, GPU, renderer, workers — sampled once a second, in GB. Not the JS heap: a page's cost is spread over several processes and the heap of one of them is not what a machine has to find. The figure is the worst of the row's runs, because a render that peaks at 5.5 GB and settles at 2 fails on a machine with 4 GB free and the settled number would not say so.\n\n`
+  md += `\`stalled\` counts runs that produced no timing at all — the browser stopped making progress and the run was abandoned. At this window that is a property of the build and the cell, not of the box: release 2.4.0 stalls on the heaviest short-read cell about as often as it finishes it, at 5.5 GB.\n\n`
+  md += `| case | ${builds.map(b => b.name).join(' | ')} |\n`
+  md += `|---|${builds.map(() => '---:').join('|')}|\n`
+  for (const c of withRss) {
+    const cells = builds.map(b => {
+      const cell = results[c.id]?.[b.name]
+      const peaks = cell?.peakRssMb ?? []
+      if (!peaks.length) {
+        return '—'
+      }
+      const gb = (Math.max(...peaks) / 1000).toFixed(1)
+      return cell?.failed ? `${gb} GB, ${cell.failed} stalled` : `${gb} GB`
+    })
+    md += `| ${c.id} | ${cells.join(' | ')} |\n`
+  }
+}
+
 fs.writeFileSync(`${OUT}.md`, md)
 console.log('\n' + md)
 console.log(`Wrote ${OUT}.json and ${OUT}.md`)

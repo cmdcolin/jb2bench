@@ -46,6 +46,7 @@ import puppeteer from 'puppeteer'
 // POLL_MS and STABLE_POLLS come from the detector that uses them: the elapsed
 // correction below subtracts the settle window, and a local copy that drifted
 // from the real one would quietly bias every timing in the table.
+import { watchPeakRss } from './proctree.ts'
 import {
   POLL_MS,
   STABLE_POLLS,
@@ -83,6 +84,11 @@ const browser = await puppeteer.launch({
     '--window-size=1280,900',
   ],
 })
+// What the render costs in memory, across every process of the tab. Sampled
+// rather than read at the end: a render that peaks at 5.5 GB and settles at 2
+// will fail on a machine with 4 GB free, and the settled figure would not say
+// so. See scripts/render/proctree.ts.
+const rss = watchPeakRss(browser.process()?.pid ?? process.pid)
 const page = await browser.newPage()
 await page.setViewport({ width: 1280, height: 800 })
 
@@ -135,6 +141,9 @@ try {
   if (screenshotPath) {
     await page.screenshot({ path: screenshotPath })
   }
+  // Two lines, and the timing LAST: runner.ts reads the last line of stdout as
+  // the number, so anything else this prints has to come before it.
+  console.log(`peak-rss-mb=${(rss.stop() / 1e6).toFixed(0)}`)
   console.log(elapsed.toFixed(1))
 } catch (e) {
   // A timeout with no display mounted at all is almost always a trackId the
