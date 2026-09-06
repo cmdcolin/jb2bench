@@ -32,7 +32,7 @@
 //   RUNS=3 WARMUP=1
 import { execFileSync } from 'child_process'
 import fs from 'fs'
-import { enumerateCases, selectCases, type Case } from '../render/cases.ts'
+import { enumerateCases, SCALES, selectCases, type Case } from '../render/cases.ts'
 import {
   FOREIGN_CORE_CEILING,
   foreign,
@@ -45,6 +45,7 @@ import {
 } from '../render/loadavg.ts'
 import { resolveBuild } from '../render/servedbuild.ts'
 import {
+  contigSize,
   migrateRowKeys,
   rowKey,
   selectWindows,
@@ -107,7 +108,14 @@ console.log(`igv.js ${igvVersion}, GenomeSpy ${gsVersion}, Gosling ${goslingVers
 interface Tool {
   id: string
   label: string
-  url: (track: string, loc: string) => string
+  /**
+   * The page this arm opens for a cell, at a window.
+   *
+   * Takes the WINDOW and not just its locus, because a window carries the
+   * assembly it is a window on: the 1 Mb arm is a second reference beside the
+   * 250 kb one, and every tool has to be pointed at the same one.
+   */
+  url: (track: string, w: Window) => string
   /**
    * Container formats this arm can open, where it cannot open all of them.
    *
@@ -129,19 +137,21 @@ const allTools: Tool[] = [
   ...jbrowseArms.map(({ port, build, id }, i) => ({
     id,
     label: `JBrowse (${build})`,
-    url: (t: string, loc: string) =>
-      `http://localhost:${port}/?loc=${loc}&assembly=hg19mod&tracks=${t}` +
+    url: (t: string, w: Window) =>
+      `http://localhost:${port}/?loc=${w.loc}&assembly=${w.scale.assembly}&tracks=${t}` +
       (i === 0 ? '&renderer=webgl' : ''),
   })),
   {
     id: 'igv',
     label: `igv.js ${igvVersion}`,
-    url: (t, loc) => `http://localhost:${IGV_PORT}/?loc=${loc}&track=${t}`,
+    url: (t, w) =>
+      `http://localhost:${IGV_PORT}/?loc=${w.loc}&track=${t}&ref=${w.scale.assembly}`,
   },
   {
     id: 'igv-deep',
     label: `igv.js ${igvVersion}, no downsampling`,
-    url: (t, loc) => `http://localhost:${IGV_PORT}/?loc=${loc}&track=${t}&depth=${DEEP}`,
+    url: (t, w) =>
+      `http://localhost:${IGV_PORT}/?loc=${w.loc}&track=${t}&ref=${w.scale.assembly}&depth=${DEEP}`,
   },
   {
     // Height control. The harness gives igv a 600 px track; igv's own default
@@ -157,12 +167,14 @@ const allTools: Tool[] = [
     // `igv-h600ctl` is the same URL as `igv` under a name the table ignores.
     id: 'igv-h300',
     label: `igv.js ${igvVersion}, 300 px track`,
-    url: (t, loc) => `http://localhost:${IGV_PORT}/?loc=${loc}&track=${t}&height=300`,
+    url: (t, w) =>
+      `http://localhost:${IGV_PORT}/?loc=${w.loc}&track=${t}&ref=${w.scale.assembly}&height=300`,
   },
   {
     id: 'igv-h600ctl',
     label: `igv.js ${igvVersion}, 600 px track (control arm)`,
-    url: (t, loc) => `http://localhost:${IGV_PORT}/?loc=${loc}&track=${t}`,
+    url: (t, w) =>
+      `http://localhost:${IGV_PORT}/?loc=${w.loc}&track=${t}&ref=${w.scale.assembly}`,
   },
   {
     // GenomeSpy, on the same BAM through its own lazy BAM source and `pileup`
@@ -183,8 +195,9 @@ const allTools: Tool[] = [
     id: 'genomespy',
     label: `GenomeSpy ${gsVersion}`,
     formats: ['bam'],
-    url: (t, loc) =>
-      `http://localhost:${CROSSTOOL_PORT}/genomespy.html?loc=${loc}&track=${t}`,
+    url: (t, w) =>
+      `http://localhost:${CROSSTOOL_PORT}/genomespy.html?loc=${w.loc}&track=${t}` +
+      `&ref=${w.scale.assembly}&size=${contigSize(w)}`,
   },
   {
     // Gosling, on the same BAM through its own `bam` fetcher and its
@@ -210,8 +223,8 @@ const allTools: Tool[] = [
       bp: 20000,
       why: "Gosling's BAM fetcher declines a tile wider than 20 kb",
     },
-    url: (t, loc) =>
-      `http://localhost:${CROSSTOOL_PORT}/gosling.html?loc=${loc}&track=${t}`,
+    url: (t, w) =>
+      `http://localhost:${CROSSTOOL_PORT}/gosling.html?loc=${w.loc}&track=${t}`,
   },
   {
     // Gosling with its tile-width caps raised, which is the only way it reaches
@@ -232,8 +245,8 @@ const allTools: Tool[] = [
     id: 'gosling-patched',
     label: `Gosling ${goslingVersion}, tile cap raised`,
     formats: ['bam'],
-    url: (t, loc) =>
-      `http://localhost:${CROSSTOOL_PORT}/gosling.html?loc=${loc}&track=${t}` +
+    url: (t, w) =>
+      `http://localhost:${CROSSTOOL_PORT}/gosling.html?loc=${w.loc}&track=${t}` +
       `&bundle=gosling-patched.bundle.js`,
   },
 ]
@@ -270,8 +283,23 @@ function unsupported(tool: Tool, c: Case, w: Window): string | null {
 // Both containers by default, the way the interaction matrix does it. It used
 // to default to BAM alone, which left the cold-load figure with a CRAM row the
 // pan figure had and it did not.
-const allCases = enumerateCases()
-const cases = selectCases(allCases)
+// Cases are enumerated PER WINDOW, because a window carries its corpus: the
+// two narrow ones sweep 20x/200x/1000x over the 250 kb contig and the 1 Mb one
+// sweeps 20x/100x over its own. One shared list would name files half the
+// windows do not have.
+function casesFor(w: Window): Case[] {
+  const env = { ...process.env, SCALE: w.scale.id }
+  const all = enumerateCases(env)
+  const wanted = process.env.CASES?.split(',')
+  // `selectCases` throws when nothing matches, which is right for a single-axis
+  // run and wrong here: a `CASES=` list naming the deep arm's ids matches
+  // nothing in the wide window, and that is a window to skip rather than a run
+  // to abort.
+  if (wanted && !wanted.includes('none') && !all.some(c => wanted.includes(c.id))) {
+    return []
+  }
+  return selectCases(all, env)
+}
 const windows = selectWindows()
 console.log(
   `windows: ${windows.map(w => `${w.id} (${w.loc}, ${(span(w) / 1000).toFixed(0)} kb)`).join(', ')}`,
@@ -287,8 +315,8 @@ const GOSLING_BUNDLES: Record<string, string> = {
   'gosling-patched': 'crosstool/gosling-patched.bundle.js',
 }
 for (const [id, bundle] of Object.entries(GOSLING_BUNDLES)) {
-  const measures = cases.some(c =>
-    windows.some(w => tools.some(t => t.id === id && !unsupported(t, c, w))),
+  const measures = windows.some(w =>
+    casesFor(w).some(c => tools.some(t => t.id === id && !unsupported(t, c, w))),
   )
   if (measures && !fs.existsSync(bundle)) {
     throw new Error(`${bundle} is missing — run \`make crosstool-bundles\``)
@@ -320,8 +348,22 @@ const stddev = (a: number[]) => {
  * two seconds. Only a cell that cannot settle pays it, which is why `FAIL_LIMIT`
  * exists.
  */
+// Proportional to the window, and capped. The proportion is right between 19 kb
+// and 100 kb; carried to 1 Mb it asks for 105 minutes per attempt, which is not
+// a ceiling but an absence of one — an arm that will never settle would burn
+// three and a half hours per cell proving it. 15 minutes is well clear of the
+// slowest thing measured at this width (release 2.4.0 at 100x long read, 103 s)
+// and still ends a run this decade. The cap does not touch the two narrow
+// windows, whose ceilings are 120 s and 632 s.
+const CEILING_CAP_MS = 900000
 const ceilingFor = (w: Window) =>
-  Number(process.env.MAX_WAIT ?? Math.round(120000 * (span(w) / span(WINDOWS[0]!))))
+  Number(
+    process.env.MAX_WAIT ??
+      Math.min(
+        CEILING_CAP_MS,
+        Math.round(120000 * (span(w) / span(WINDOWS[0]!))),
+      ),
+  )
 
 /**
  * How many times an arm may fail a cell before the runner stops asking.
@@ -428,7 +470,7 @@ async function measureRow(c: Case, w: Window): Promise<Row> {
     if (abandoned.has(t.id)) {
       return Number.NaN
     }
-    const ms = runOnce(t.url(c.track, w.loc), ceiling)
+    const ms = runOnce(t.url(c.track, w), ceiling)
     if (Number.isFinite(ms)) {
       return ms
     }
@@ -563,7 +605,7 @@ const RETRY_PASSES = Number(process.env.RETRY_PASSES ?? 2)
 const contended: { c: Case; w: Window; foreign: number }[] = []
 
 for (const w of windows) {
-  for (const c of cases) {
+  for (const c of casesFor(w)) {
     const key = rowKey(c.id, w.id)
     const row = await measureRow(c, w)
     record(key, row)
@@ -683,7 +725,7 @@ lines.push(
 )
 lines.push('')
 lines.push(
-  `Two windows, both on the same contig, the wider one containing the narrower: ${WINDOWS.map(
+  `${WINDOWS.length} windows. The two narrow ones sit on the same contig, the wider containing the narrower; the 1 Mb one is a second corpus beside them — its own assembly, its own files, 20x and 100x rather than the 20x-to-1000x ladder — because a 250 kb contig cannot hold a megabase view: ${WINDOWS.map(
     w => `**${w.id}** \`${w.loc}\``,
   ).join(', ')}. Same reads, more of them, so a row pair says how each tool scales with what is on screen rather than with what is in the file.`,
 )
@@ -741,10 +783,13 @@ const header = [
 ]
 lines.push(`| ${header.join(' | ')} |`)
 lines.push(`|${header.map((_, i) => (i === 0 ? '---' : '---:')).join('|')}|`)
-// Row order is window-major within each case, so a case's two windows sit next
-// to each other and the pair reads as one comparison.
-for (const c of allCases) {
-  for (const w of WINDOWS) {
+// Row order is window-major within each case, so a case's windows sit next to
+// each other and the set reads as one comparison. Grouped by scale first, since
+// a case belongs to one corpus and only the windows on that corpus can hold it.
+for (const sc of SCALES) {
+  const scaleWindows = WINDOWS.filter(w => w.scale.id === sc.id)
+  for (const c of enumerateCases({ ...process.env, SCALE: sc.id })) {
+  for (const w of scaleWindows) {
   const key = rowKey(c.id, w.id)
   const row = prior.rows[key]
   if (!row) {
@@ -776,6 +821,7 @@ for (const c of allCases) {
   lines.push(
     `| ${c.id} | ${w.id} | ${shownTools.map(t => (row[t.id] ? fmt(row[t.id]) : '')).join(' | ')} | ${ratio('igv')} | ${prior.dates[key] ?? '?'} | ${Number.isFinite(rowForeign) ? rowForeign.toFixed(2) : '?'} | ${by ?? '—'} | ${load ? load.toFixed(1) : '?'} |`,
   )
+  }
   }
 }
 lines.push('')

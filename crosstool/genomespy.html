@@ -167,7 +167,13 @@
       // has to become a chrom.sizes URL instead.
       const [chrom, range] = locus.split(':')
       const [start, end] = range.split('-').map(Number)
-      const CONTIG_SIZE = 250001
+      // Passed in rather than written down: the runner reads it from the
+      // assembly's own .fai (see scripts/crosstool/windows.ts), because the
+      // 1 Mb window sits on a second, larger contig and a wrong size here is
+      // silent — the axis is drawn to the declared length and the pileup lands
+      // wherever that puts it.
+      const CONTIG_SIZE = Number(params.get('size') ?? 250001)
+      const genome = params.get('ref') ?? 'hg19mod'
 
       const windowSize = Number(params.get('window') ?? Math.max(30000, end - start + 1000))
 
@@ -213,8 +219,8 @@
       }
 
       const spec = {
-        genomes: { hg19mod: { contigs: [{ name: chrom, size: CONTIG_SIZE }] } },
-        assembly: 'hg19mod',
+        genomes: { [genome]: { contigs: [{ name: chrom, size: CONTIG_SIZE }] } },
+        assembly: genome,
         // A CONTAINER root, not a bare unit view, mirroring GenomeSpy's
         // published BAM example: the assembly preflight collects requirements
         // from x/y scale *resolutions*, and a shared resolution is what a

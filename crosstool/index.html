@@ -60,6 +60,8 @@
 
       const track = params.get('track') ?? '20x.shortread.bam'
       const locus = params.get('loc') ?? 'chr22_mask:124000-143000'
+      // Span of the requested window, for the visibility cap below.
+      const [start, end] = (locus.split(':')[1] ?? '0-0').split('-').map(Number)
       const depth = params.get('depth')
       const height = Number(params.get('height') ?? 600)
       // The format axis, for the capability matrix rather than for the timing
@@ -94,12 +96,16 @@
         alignmentTrack.samplingDepth = Number(depth)
       }
 
+      // The reference is a parameter because the 1 Mb window is not a wider view
+      // of the 250 kb contig — it is a second assembly beside it. Default keeps
+      // every recorded row's URL exactly as it was.
+      const ref = params.get('ref') ?? 'hg19mod'
       const options = {
         reference: {
-          id: 'hg19mod',
-          name: 'hg19mod',
-          fastaURL: './data/hg19mod.fa',
-          indexURL: './data/hg19mod.fa.fai',
+          id: ref,
+          name: ref,
+          fastaURL: `./data/${ref}.fa`,
+          indexURL: `./data/${ref}.fa.fai`,
         },
         locus,
         showChromosomeWidget: false,
@@ -112,9 +118,12 @@
             ...(fmt.index ? { indexURL: `./data/${track}${fmt.index}` } : {}),
             name: track,
             height,
-            // the whole window must be inside the visibility window or igv
-            // declines to draw, the same way JBrowse's byte gate does
-            visibilityWindow: 1_000_000,
+            // The whole window must be inside the visibility window or igv
+            // declines to draw, the same way JBrowse's byte gate does. Derived
+            // from the locus rather than fixed at 1 Mb: at a 1 Mb window a fixed
+            // 1 Mb is the boundary itself, and an arm that declines to draw
+            // scores as the fastest thing in the table.
+            visibilityWindow: Math.max(1_000_000, (end - start) * 2),
             ...(depth ? { samplingDepth: Number(depth) } : {}),
           },
         ],
