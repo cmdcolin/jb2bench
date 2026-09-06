@@ -1,6 +1,8 @@
 #!/usr/bin/env Rscript
-# results/figures/paper/pdf/perf-coldload.pdf and results/figures/paper/pdf/perf-coldload-100kb.pdf, from
-# results/paper/perf.csv.
+# results/figures/paper/pdf/perf-coldload.pdf, perf-coldload-100kb.pdf and
+# perf-coldload-1mb.pdf, from results/paper/perf.csv. The three are meant to sit
+# side by side; results/figures/paper/pdf/perf-coldload-windows.pdf is the same
+# numbers as one faceted figure instead, drawn by perf-coldload-windows.R.
 #
 # Navigation to render-complete on a cold load: this release, the published
 # release 2.4.0, igv.js 3.8.5 and GenomeSpy 0.85.0, over the same files, window,
@@ -33,13 +35,19 @@
 # formats sit close together in cost (CRAM decode adds a few percent, not a
 # multiple), so they share the fixed y scale the two read lengths already did.
 #
-# ONE WINDOW PER FIGURE, and two figures, because the run of 2026-08-29 added a
-# second window. Window is not a facet here: reads and format already take both
-# dimensions of the grid, and a third factor would either make eight panels of a
-# figure whose every point is labelled, or push format into a linetype the
-# reader has to hold in mind while reading a duration off. Two figures with the
-# same axes, the same colours and the same label placement compare by overlay
-# instead.
+# ONE WINDOW PER FIGURE, and three figures, because the run of 2026-08-29 added
+# a second window and the run of 2026-09-06 a third. Window is not a facet
+# here: reads and format already take both dimensions of the grid, and a third
+# factor would either make eight-to-twelve panels of a figure whose every point
+# is labelled, or push format into a linetype the reader has to hold in mind
+# while reading a duration off. Figures with the same colours and the same
+# label placement compare by overlay instead -- the 1 Mb one carries its own
+# coverage breaks (20x/100x rather than 20x/200x/1000x), so its axes are not
+# identical to the other two, only styled the same way.
+#
+# perf-coldload-windows.R draws the window facet this figure argues against, on
+# purpose: it is the one place a reader can see the three side by side without
+# walking between files, at the cost of the BAM-only scope that facet needs.
 #
 #   Rscript scripts/paperfigs/perf-coldload.R
 #
@@ -102,7 +110,10 @@ all$hi_s <- all$hi / 1000
 #
 # The layer itself is built by common.R's coldload_labels() and drawn by its
 # endpoint_repel().
-draw <- function(win, out, width_label) {
+draw <- function(win, out, width_label,
+                 cov_breaks = c(20, 200, 1000),
+                 cov_labels = c("20×", "200×", "1000×"),
+                 time_breaks = c(1, 2, 5, 10, 20, 60, 120, 600)) {
   d <- subset(all, window == win)
 
   # A dropped point truncates its series rather than interpolating across the
@@ -141,12 +152,12 @@ draw <- function(win, out, width_label) {
     endpoint_repel(labels) +
     note +
     facet_grid(reads ~ format) +
-    scale_x_log10(breaks = c(20, 200, 1000), labels = c("20×", "200×", "1000×"),
+    scale_x_log10(breaks = cov_breaks, labels = cov_labels,
                   expand = expansion(mult = c(0.16, 0.2))) +
     # More labelled breaks than the shared default, for the same reason the
     # points are labelled: three decades carrying one gridline each is not a
     # scale a reader can place a value on.
-    time_scale_y("time (log scale)", breaks = c(1, 2, 5, 10, 20, 60, 120, 600),
+    time_scale_y("time (log scale)", breaks = time_breaks,
                  expand = expansion(mult = c(0.17, 0.28))) +
     # drop = FALSE keeps every series the colour it has in the other figure and
     # in the other window, which is the whole point of a shared PERF_SERIES:
@@ -178,12 +189,24 @@ draw <- function(win, out, width_label) {
 
 draw("19kb", "perf-coldload", "19 kb")
 draw("100kb", "perf-coldload-100kb", "100 kb")
+# The cross-tool run picked up a 1 Mb window on 2026-09-06, at 20x/100x rather
+# than the deep sweep's 20x/200x/1000x, so the coverage axis needs its own
+# breaks rather than the two narrower windows' shared ones. Both formats, like
+# the other two figures: the first 1 Mb run was BAM-only and the re-run of the
+# same day measured CRAM beside it.
+#
+# 120 is a labelled break because the paint ceiling is 120 s and the arms that
+# hit it -- igv at 100x long read, GenomeSpy above 20x short read -- are drawn
+# as hollow points sitting on exactly that line.
+draw("1mb", "perf-coldload-1mb", "1 Mb",
+     cov_breaks = c(20, 100), cov_labels = c("20×", "100×"),
+     time_breaks = c(1, 2, 5, 10, 20, 60, 120))
 
 # ---- draft caption ----------------------------------------------------------
 # Kept here so the figure and the words that make it readable travel together;
 # the figure itself carries no explanatory text. `draw()` renders one of these
 # per window, so the width the caption names is the window that figure was drawn
-# for -- 19 kb or 100 kb.
+# for -- 19 kb, 100 kb or 1 Mb.
 #
 #   Cold load of a single alignment track: navigation to render-complete, median
 #   of three interleaved rounds in one session, over both container formats.

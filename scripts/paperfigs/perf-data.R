@@ -237,6 +237,12 @@ xt_builds <- c("jbrowse" = "This work",
                "igv" = "igv.js 3.8.5",
                "genomespy" = "GenomeSpy 0.85.0",
                "gosling" = "Gosling 1.0.7")
+# The downsampling control, added to the cold-load extraction only. It is not a
+# comparator -- it exists to check whether igv's default samplingDepth is what
+# makes it fast -- and the zoom/pan motion loop below shares `xt_builds` with no
+# DRAWN filter of its own, so folding it into the shared vector put a seventh,
+# uncaptioned line on perf-crosstool-zoom.pdf the first time this was tried.
+xt_builds_cold <- c(xt_builds, "igv-deep" = "igv.js 3.8.5, no downsampling")
 # Both formats: the version sweep above is BAM-only because that reader has
 # always meant BAM, but cross-tool's own JSON keys every case by format
 # already, so the only change here is not throwing CRAM's half away.
@@ -253,7 +259,7 @@ for (base in READ_CASES) {
       ct <- cell_for(crosstool, key, "crosstool.json")
       # This harness records one load reading per row, shared by every arm, so a
       # row's gate and its cells' gates are the same test.
-      for (b in names(xt_builds)) {
+      for (b in names(xt_builds_cold)) {
         arm <- ct[[b]]
         if (is.null(arm)) next
         # A capability limit is not a timing. Neither GenomeSpy nor Gosling
@@ -269,11 +275,52 @@ for (base in READ_CASES) {
         censored <- is.null(arm$median)
         ms <- if (censored) arm$unsettled else arm$median
         if (is.null(ms)) next
-        add("Cold load", key, xt_builds[[b]], ms,
+        add("Cold load", key, xt_builds_cold[[b]], ms,
             usable = contention_ok(arm), session = "cross-tool",
             format = FORMATS[[fmt]], window = win, censored = censored,
             runs = if (censored) NULL else arm$runs)
       }
+    }
+  }
+}
+
+# The cross-tool run also measured a 1 Mb window, added 2026-09-06. It shares
+# no coverage ladder with READ_CASES above (20x/100x, not the deep sweep's
+# 20x/200x/1000x) and carries BAM only, so it is pulled out by hand instead of
+# through add()'s READ_CASES lookup -- the same reason width-data.R reads
+# alignments-1mb.json apart from this file's own sweep, and for the same
+# result: fed through READ_CASES a wide case's label comes back NA.
+WIDE_CASES <- c("1mb-20x-shortread" = "20x short read",
+               "1mb-100x-shortread" = "100x short read",
+               "1mb-20x-longread" = "20x long read",
+               "1mb-100x-longread" = "100x long read")
+# Two of those four strings are new -- the deep sweep never measures 100x -- so
+# the shared level order below has to carry them or the factor conversion at
+# the bottom of this file silently turns them to NA.
+labels <- c(labels, "100x short read", "100x long read")
+# Both formats, since the re-run of 2026-09-06 measured CRAM at this window too.
+# The first 1 Mb run was BAM-only, so anything written against it -- including
+# two figure scripts' "CRAM was never measured at 1 Mb" -- is out of date.
+for (base in names(WIDE_CASES)) {
+  for (fmt in names(FORMATS)) {
+    key <- paste0(base, "-", fmt, "@1mb")
+    ct <- cell_for(crosstool, key, "crosstool.json")
+    for (b in names(xt_builds_cold)) {
+      arm <- ct[[b]]
+      if (is.null(arm)) next
+      # A capability limit is not a timing, the same as the sweep above:
+      # GenomeSpy has no CRAM reader and its cells say so rather than going in
+      # as a missing measurement.
+      if (!is.null(arm$unsupported)) next
+      censored <- is.null(arm$median)
+      ms <- if (censored) arm$unsettled else arm$median
+      if (is.null(ms)) next
+      s <- spread(if (censored) NULL else arm$runs)
+      rows[[length(rows) + 1]] <- data.frame(
+        panel = "Cold load", case = WIDE_CASES[[base]], series = xt_builds_cold[[b]],
+        ms = ms, usable = contention_ok(arm), session = "cross-tool",
+        format = FORMATS[[fmt]], window = "1mb", censored = censored, metric = NA,
+        lo = unname(s["lo"]), hi = unname(s["hi"]), stringsAsFactors = FALSE)
     }
   }
 }
