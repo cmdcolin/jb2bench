@@ -1,0 +1,17 @@
+"case","series","format","window","ms","usable","censored","lo","hi"
+"20x short read","This work","BAM","1mb",2096.5,TRUE,FALSE,2006,2137
+"20x short read","Release 2.4.0","BAM","1mb",4136,TRUE,FALSE,4073,4476
+"20x short read","This work","CRAM","1mb",2213,TRUE,FALSE,2168,2234
+"20x short read","Release 2.4.0","CRAM","1mb",11171.5,TRUE,FALSE,11053,12512
+"100x short read","This work","BAM","1mb",5709.5,TRUE,FALSE,5632,5820
+"100x short read","Release 2.4.0","BAM","1mb",14037,TRUE,FALSE,13700,14554
+"100x short read","This work","CRAM","1mb",6017,TRUE,FALSE,5822,6284
+"100x short read","Release 2.4.0","CRAM","1mb",36847.5,TRUE,FALSE,36094,45705
+"20x long read","This work","BAM","1mb",3307.5,TRUE,FALSE,3220,3319
+"20x long read","Release 2.4.0","BAM","1mb",4578,TRUE,FALSE,4568,4653
+"20x long read","This work","CRAM","1mb",3619,TRUE,FALSE,3501,3829
+"20x long read","Release 2.4.0","CRAM","1mb",9040,TRUE,FALSE,8366,9504
+"100x long read","This work","BAM","1mb",9416.5,TRUE,FALSE,9095,9733
+"100x long read","Release 2.4.0","BAM","1mb",14103,TRUE,FALSE,13970,14664
+"100x long read","This work","CRAM","1mb",10022.5,TRUE,FALSE,9724,10121
+"100x long read","Release 2.4.0","CRAM","1mb",32157.5,TRUE,FALSE,30475,34182

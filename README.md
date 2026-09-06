@@ -42,7 +42,7 @@ Every number lives in a file; nothing is summarized only here.
 | document | question it answers |
 | --- | --- |
 | [`results/alignments.md`](results/alignments.md) | how long does a cold initial render take? |
-| [`results/alignments-1mb.md`](results/alignments-1mb.md) | and at a 1 Mb window, where layout and paint dominate rather than fetch? |
+| [`results/alignments-1mb.md`](results/alignments-1mb.md) | and at a 1 Mb window — is a megabase reachable at all? |
 | [`results/interaction.md`](results/interaction.md) | how long does a zoom make you wait? |
 | [`results/interaction-cpu.md`](results/interaction-cpu.md) | where does per-frame main-thread time go during a zoom? |
 | [`results/crampool.md`](results/crampool.md) | does @gmod/cram's slice worker pool make a pan faster? (no run of record yet) |
@@ -164,7 +164,27 @@ box is shared and contamination lands per-cell rather than across a whole run.
 
 **`SCALE=1mb` runs the same matrix at a 1 Mb window** (`make render-1mb`) and
 writes `results/alignments-1mb.md`. Eight cases rather than twelve: 20x and 100x
-only, since the question there is width and not depth.
+only, since the question there is width and not depth. Two arms rather than
+three — release 4.3.0 answers "what did that release change", and these cells are
+the most expensive in the repo. `scripts/paperfigs/width.R` draws it.
+
+**A megabase is reachable.** Measured 2026-09-06, median of 6 runs, every row
+inside the foreign-CPU gate: on the build under test, 1 Mb costs 2.1 s at 20x
+short read and 5.7 s at 100x — 666k reads on screen at once — and 3.3 s / 9.4 s
+on long read. Release 2.4.0 takes 4.1 s and 14 s for the same short-read cells.
+
+**CRAM is free at this width on the build under test, and it is not on 2.4.0.**
+2.2 s against BAM's 2.1 s at 20x short read, 10.0 s against 9.4 s at 100x long
+read. On 2.4.0 the same pairs are 11.2 s against 4.1 s and 32 s against 14 s, so
+the format penalty that release carries grows rather than shrinks with the
+window — the 100x short-read CRAM cell is its worst at 37 s, 6.1x this work.
+
+**The cost tracks the data, not the width.** 100x short read over 1 Mb is 80 MB
+and 666k reads, and it draws in 5.7 s; 1000x short read through the 19 kb window
+is roughly 8 MB and 127k reads, and it draws in 2.2 s. Ten times the bytes for
+2.6 times the time. Read that as a shape and not as a measurement: the two
+numbers come from different corpora measured three days apart, and the same
+build has moved 40% between sessions here before.
 
 ### Zoom interaction
 

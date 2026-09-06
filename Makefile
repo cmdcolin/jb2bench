@@ -285,6 +285,7 @@ figures:
 # measurement with it.
 paper-figs:
 	Rscript scripts/paperfigs/perf-coldload.R
+	Rscript scripts/paperfigs/width.R
 	Rscript scripts/paperfigs/perf-interaction.R
 	Rscript scripts/paperfigs/perf-crosstool-zoom.R
 	Rscript scripts/paperfigs/parser.R
@@ -302,6 +303,10 @@ paper-figs:
 JB2 ?= $(HOME)/src/jbrowse-components
 paper-data:
 	Rscript scripts/paperfigs/perf-data.R .
+# The wide arm, whose own results file the reader above does not touch.
+	@if [ -f results/alignments-1mb.json ]; then \
+	   Rscript scripts/paperfigs/width-data.R .; \
+	 else echo "no 1 Mb run on disk; width.csv is left as committed"; fi
 	Rscript scripts/paperfigs/parser-data.R .
 	Rscript scripts/paperfigs/ldband-data.R .
 	Rscript scripts/paperfigs/wasmgate-data.R .
