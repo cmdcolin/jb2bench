@@ -22,12 +22,12 @@
 //   LOC=chr22_mask:1-1000 overrides the window sweep with one window
 import puppeteer from 'puppeteer'
 import { drew, drewCheck } from './drewcheck.ts'
-import { selectWindows } from './windows.ts'
+import { contigSize, selectWindows, WINDOWS, type Window } from './windows.ts'
 
 const PORT = Number(process.env.PORT ?? 8003)
 const SETTLE_MS = Number(process.env.SETTLE_MS ?? 15000)
-const windows = process.env.LOC
-  ? [{ id: 'LOC', loc: process.env.LOC }]
+const windows: Window[] = process.env.LOC
+  ? [{ id: 'LOC', loc: process.env.LOC, scale: WINDOWS[0]!.scale }]
   : selectWindows()
 // A page entry may carry its own query string — `gosling.html?bundle=...` is a
 // different arm of the same page, and the patched Gosling bundle can rot the same
@@ -36,9 +36,14 @@ const pages = (
   process.env.PAGES ??
   'index.html,genomespy.html,gosling.html,gosling.html?bundle=gosling-patched.bundle.js'
 ).split(',')
-const tracks = (process.env.TRACKS ?? '20x.shortread.bam,200x.shortread.bam').split(
-  ',',
-)
+// Default tracks come from the WINDOW's corpus, since a window carries the
+// files it can be a window on: the two narrow ones get 20x and 200x of the
+// 250 kb contig, the 1 Mb one 20x and 100x of its own. `TRACKS=` still names
+// them by hand, and then it applies to every window in the sweep.
+const trackList = process.env.TRACKS?.split(',')
+const tracksFor = (w: Window) =>
+  trackList ??
+  w.scale.coverages.slice(0, 2).map(c => `${w.scale.prefix}${c}.shortread.bam`)
 
 const browser = await puppeteer.launch({
   headless: process.env.HEADLESS !== '0',
@@ -56,15 +61,24 @@ const EXPECTED_EMPTY: { page: string; window: string; why: string }[] = [
     window: '100kb',
     why: "Gosling's BAM fetcher declines a tile wider than 20 kb",
   },
+  {
+    page: 'gosling.html',
+    window: '1mb',
+    why: "Gosling's BAM fetcher declines a tile wider than 20 kb",
+  },
 ]
 
 let bad = 0
 for (const harness of pages) {
   for (const w of windows) {
-    for (const track of tracks) {
+    for (const track of tracksFor(w)) {
+      // Same reference parameters the runner passes. Without them this preflight
+      // would open the wide tracks against the 250 kb assembly and report the
+      // harness broken when what is wrong is the check.
       const url =
         `http://localhost:${PORT}/${harness}` +
-        `${harness.includes('?') ? '&' : '?'}loc=${w.loc}&track=${track}`
+        `${harness.includes('?') ? '&' : '?'}loc=${w.loc}&track=${track}` +
+        `&ref=${w.scale.assembly}&size=${contigSize(w)}`
       const d = await drewCheck(browser, url, SETTLE_MS)
       const ok = drew(d)
       const expected = EXPECTED_EMPTY.find(
