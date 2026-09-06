@@ -162,6 +162,16 @@ against a fresh profile.
 Rows are dated and carry the peak load they were measured under, because this
 box is shared and contamination lands per-cell rather than across a whole run.
 
+> **Every legacy-build column here predates the 2026-09-06 detector fix and is
+> understated.** `rendercomplete.ts` used to call the old block renderer finished
+> when its count of finished blocks held still for half a second, which any gap
+> between two blocks satisfies. Spot-checked after the fix: `20x-shortread-bam`
+> on 2.4.0 goes 2234 → 3360 ms, and the other three cells checked moved within
+> their own spread. Small here, because a 19 kb view is one or two blocks — see
+> the wide arm below for what the same bug did at 1 Mb. The 4.3.0 and 2.4.0
+> columns want re-measuring; `current` is unaffected, since it publishes a
+> per-display phase rather than per-block markers.
+
 **`SCALE=1mb` runs the same matrix at a 1 Mb window** (`make render-1mb`) and
 writes `results/alignments-1mb.md`. Eight cases rather than twelve: 20x and 100x
 only, since the question there is width and not depth. Two arms rather than
