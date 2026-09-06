@@ -161,6 +161,31 @@ for (const [name, path, how] of extras) {
   })
 }
 
+// ----------------------------------------------------------------- power ---
+
+// A laptop off mains changes governor and clock, and a timing taken across that
+// simply comes out larger — indistinguishable from a slower build afterwards.
+// This box came off AC mid-matrix on 2026-09-06 and the only record of it was
+// upower's charge history. Checked at the door rather than per cell: cheap,
+// and it catches the case that matters, which is starting an hour-long run on
+// battery.
+const ac = (() => {
+  for (const p of ['/sys/class/power_supply/AC/online', '/sys/class/power_supply/ACAD/online']) {
+    try {
+      return fs.readFileSync(p, 'utf8').trim() === '1'
+    } catch {
+      continue
+    }
+  }
+  return true // a desktop with no adapter to report is always on mains
+})()
+add({
+  name: 'mains power',
+  ok: ac,
+  detail: ac ? 'on AC' : 'ON BATTERY — the governor will throttle mid-run',
+  timingOnly: true,
+})
+
 // ---------------------------------------------------------------- builds ---
 
 for (const port of PORTS) {

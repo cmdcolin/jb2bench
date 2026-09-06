@@ -27,87 +27,117 @@
   "results": {
     "1mb-20x-shortread-bam": {
       "current": {
-        "median": 2141,
-        "mean": 2125.6666666666665,
-        "stddev": 28.288199345702836,
+        "median": 2120,
+        "mean": 2121.3333333333335,
+        "stddev": 9.030811456096044,
         "runs": [
-          2086,
-          2150,
-          2141
+          2120,
+          2133,
+          2111
         ],
+        "peakRssMb": [
+          1726,
+          1716,
+          1709
+        ],
+        "failed": 0,
         "load": {
-          "before": 1.46,
-          "after": 2.14,
-          "foreignCores": 0.12035472972972276,
-          "foreignTop": "htop 0.04, fwupd 0.01"
+          "before": 0.33,
+          "after": 0.84,
+          "foreignCores": 0.0822351080653454,
+          "foreignTop": "claude 0.01, fwupd 0.01"
         }
       },
       "release-2.4.0": {
-        "median": 29626,
-        "mean": 29516,
-        "stddev": 308.0043289739069,
+        "median": 29756,
+        "mean": 29699.666666666668,
+        "stddev": 81.79785381590942,
         "runs": [
-          29826,
-          29096,
-          29626
+          29759,
+          29756,
+          29584
         ],
+        "peakRssMb": [
+          4445,
+          4648,
+          5022
+        ],
+        "failed": 0,
         "load": {
-          "before": 2.14,
-          "after": 1.64,
-          "foreignCores": 0.12214147883565034,
-          "foreignTop": "htop 0.04, claude 0.01, firefox-bin 0.01"
+          "before": 0.84,
+          "after": 1.81,
+          "foreignCores": 0.08318042813455125,
+          "foreignTop": "claude 0.02, firefox-bin 0.01"
         }
       }
     },
     "1mb-20x-shortread-cram": {
       "current": {
-        "median": 2255,
-        "mean": 2294.6666666666665,
-        "stddev": 65.50487683286558,
+        "median": 2276,
+        "mean": 2289.6666666666665,
+        "stddev": 45.536310297997964,
         "runs": [
-          2255,
-          2242,
-          2387
+          2351,
+          2276,
+          2242
         ],
+        "peakRssMb": [
+          1706,
+          1714,
+          1708
+        ],
+        "failed": 0,
         "load": {
-          "before": 1.59,
-          "after": 1.58,
-          "foreignCores": 0.13709596717699263,
-          "foreignTop": "htop 0.05, claude 0.03"
+          "before": 1.81,
+          "after": 1.64,
+          "foreignCores": 0.0863020572002193,
+          "foreignTop": "fwupd 0.01, claude 0.01"
         }
       },
       "release-2.4.0": {
-        "median": 12159,
-        "mean": 12218,
-        "stddev": 333.7074567142105,
+        "median": 12446,
+        "mean": 12457.666666666666,
+        "stddev": 27.78888666755511,
         "runs": [
-          12653,
-          11842,
-          12159
+          12431,
+          12446,
+          12496
         ],
+        "peakRssMb": [
+          2438,
+          2434,
+          2385
+        ],
+        "failed": 0,
         "load": {
-          "before": 1.45,
-          "after": 1.2,
-          "foreignCores": 0.13628283626308488,
-          "foreignTop": "htop 0.04, gnome-shell 0.01, firefox-bin 0.01"
+          "before": 1.64,
+          "after": 1.88,
+          "foreignCores": 0.09452489371344432,
+          "foreignTop": "firefox-bin 0.01, gnome-shell 0.01, claude 0.01"
         }
       }
     },
     "1mb-100x-shortread-bam": {
       "current": {
-        "median": 5811,
-        "mean": 5832,
-        "stddev": 34.02939905434711,
+        "median": 5768,
+        "mean": 5750,
+        "stddev": 35.81433604950212,
         "runs": [
-          5811,
-          5880,
-          5805
+          5782,
+          5768,
+          5700
         ],
+        "peakRssMb": [
+          3404,
+          3416,
+          3349
+        ],
+        "failed": 0,
         "load": {
-          "before": 1.2,
-          "after": 2.4,
-          "foreignCores": 0.14128664495116533,
-          "foreignTop": "htop 0.04, firefox-bin 0.02, gnome-shell 0.01"
+          "before": 1.88,
+          "after": 1.77,
+          "foreignCores": 0.12999773259768993,
+          "foreignTop": "firefox-bin 0.02, gnome-shell 0.02, claude 0.01"
         }
       }
     },
