@@ -45,6 +45,11 @@ import {
 } from '../render/loadavg.ts'
 import { resolveBuild } from '../render/servedbuild.ts'
 import {
+  checkHarnessPages,
+  corpusPaths,
+  unreachable,
+} from './servedharness.ts'
+import {
   contigSize,
   migrateRowKeys,
   rowKey,
@@ -321,6 +326,55 @@ for (const [id, bundle] of Object.entries(GOSLING_BUNDLES)) {
   if (measures && !fs.existsSync(bundle)) {
     throw new Error(`${bundle} is missing — run \`make crosstool-bundles\``)
   }
+}
+
+// Can every arm actually reach the files this run is about to open?
+//
+// On 2026-09-06 none of them could at the 1 Mb window, and the run recorded the
+// answer anyway: the harness port had been serving another checkout's
+// `crosstool/` for three days, so igv, igv-deep and GenomeSpy each opened a page
+// whose corpus 404'd. Paint quiescence times a page that throws as the fastest
+// thing in the table, so the row came out with igv.js beating JBrowse and not
+// scaling with coverage. `toolcheck.ts` had said NOTHING DRAWN half an hour
+// earlier and nothing was standing between it and the matrix.
+//
+// So: before the first timing, ask each origin for the first byte of every file
+// the run will open through it. A 404 here costs a second; a 404 discovered
+// afterwards costs the run and, if nobody looks at the screenshot, the table.
+const jbrowseSelected = tools.some(t => t.id.startsWith('jbrowse'))
+const harnessSelected = tools.some(t => !t.id.startsWith('jbrowse'))
+// `CASES=none` regenerates the report from what is already recorded and opens
+// nothing, so it needs no server to be up at all.
+const toMeasure = windows
+  .map(w => ({ w, tracks: casesFor(w).map(c => c.track) }))
+  .filter(({ tracks }) => tracks.length)
+if (toMeasure.length && harnessSelected) {
+  console.log(await checkHarnessPages(CROSSTOOL_PORT))
+}
+for (const { w, tracks } of toMeasure) {
+  const paths = corpusPaths(w.scale.assembly, tracks)
+  const origins: [number, string[]][] = []
+  if (harnessSelected) {
+    origins.push([CROSSTOOL_PORT, paths])
+  }
+  if (jbrowseSelected) {
+    // A build serves the corpus at its root, not under `data/`; the files are
+    // symlinked in by shell/load_alignments.sh.
+    const atRoot = paths.map(p => p.replace(/^data\//, ''))
+    origins.push(...jbrowseArms.map(a => [a.port, atRoot] as [number, string[]]))
+  }
+  for (const [port, want] of origins) {
+    const missing = await unreachable(port, want)
+    if (missing.length) {
+      throw new Error(
+        `port ${port} will not serve ${missing.length} of ${want.length} files ` +
+          `the ${w.id} window needs: ${missing.slice(0, 3).join(', ')}` +
+          (missing.length > 3 ? '…' : '') +
+          ` — every arm on it would be timed on a page that draws nothing`,
+      )
+    }
+  }
+  console.log(`${w.id}: ${paths.length} corpus files reachable on every arm`)
 }
 
 const median = (a: number[]) => {

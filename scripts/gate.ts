@@ -12,6 +12,10 @@
 //               to become load 30 while /proc/loadavg still reads 2.
 //   builds      a port serving a build nobody staged produces a results table
 //               whose column headers are a guess — see servedbuild.ts.
+//   harness     2026-09-06: the cross-tool port had been serving a worktree's
+//               `crosstool/` for three days, so every non-JBrowse arm at the
+//               1 Mb window opened a page whose corpus 404'd and was timed at
+//               2.1 s for drawing nothing — see servedharness.ts.
 //   corpus      a missing CRAM makes one cell fail an hour into a matrix.
 //   disk        the parser sweep writes 30-odd library builds; the paper corpus
 //               is 16 GB.
@@ -22,6 +26,12 @@
 import { execFileSync } from 'node:child_process'
 import fs from 'node:fs'
 
+import {
+  checkHarnessPages,
+  corpusPaths,
+  unreachable,
+} from './crosstool/servedharness.ts'
+import { SCALES } from './render/cases.ts'
 import { loadavg } from './render/loadavg.ts'
 import { resolveBuild } from './render/servedbuild.ts'
 
@@ -32,6 +42,12 @@ const WARN_ONLY = process.argv.includes('--warn')
 // rather than by name, so a restaged port fails here instead of mislabelling a
 // column.
 const PORTS = [8000, 8001, 8004]
+// The cross-tool harness pages. Checked separately from the builds because it
+// fails differently: a build serves its corpus through absolute symlinks and so
+// works from any working directory, while `crosstool/data` is a relative one and
+// resolves against whatever directory the server was started in. See
+// scripts/crosstool/servedharness.ts for the run that cost.
+const HARNESS_PORT = Number(process.env.CROSSTOOL_PORT ?? 8003)
 
 interface Check {
   name: string
@@ -199,6 +215,29 @@ for (const port of PORTS) {
       timingOnly: true,
     })
   }
+}
+
+// One shortread BAM per scale, which is enough to say whether the relative
+// symlink behind these pages resolves to a directory holding this scale's
+// corpus. The wide arm is the one that has already been measured against 404s.
+try {
+  const detail = [await checkHarnessPages(HARNESS_PORT)]
+  for (const sc of SCALES) {
+    const paths = corpusPaths(sc.assembly, [`${sc.prefix}${sc.coverages[0]}.shortread.bam`])
+    const missing = await unreachable(HARNESS_PORT, paths)
+    if (missing.length) {
+      throw new Error(`${sc.id} corpus unreachable: ${missing.join(', ')}`)
+    }
+    detail.push(`${sc.id} corpus reachable`)
+  }
+  add({ name: `port ${HARNESS_PORT}`, ok: true, detail: detail.join('; '), timingOnly: true })
+} catch (e) {
+  add({
+    name: `port ${HARNESS_PORT}`,
+    ok: false,
+    detail: String((e as Error).message).split('\n')[0]!,
+    timingOnly: true,
+  })
 }
 
 // -------------------------------------------------------------- libraries ---

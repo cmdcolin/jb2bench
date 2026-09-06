@@ -194,15 +194,21 @@ crosstool/gosling.bundle.js crosstool/gosling-patched.bundle.js &: \
 
 crosstool: crosstool-cold crosstool-zoom crosstool-pan
 
-crosstool-cold: gate crosstool-bundles | $(LOGDIR)
+# `toolcheck` and not just `gate`: the gate says the corpus is reachable through
+# the harness port, and toolcheck says the pages then draw it. On 2026-09-06
+# toolcheck reported NOTHING DRAWN for all six non-JBrowse arms at the 1 Mb
+# window and the matrix ran regardless, because nothing depended on it. It reads
+# the same WINDOWS/TRACKS as the run it now guards, so it preflights the windows
+# about to be measured and no others.
+crosstool-cold: gate toolcheck crosstool-bundles | $(LOGDIR)
 	$(ARMS) $(TOOLARMS) $(NODE) scripts/crosstool/runner.ts 2>&1 \
 	  | tee $(LOGDIR)/crosstool-cold-$(STAMP).log
 
-crosstool-zoom: gate | $(LOGDIR)
+crosstool-zoom: gate toolcheck | $(LOGDIR)
 	MOTION=zoom $(ARMS) $(MOTIONARMS) $(NODE) scripts/crosstool/panrunner.ts 2>&1 \
 	  | tee $(LOGDIR)/crosstool-zoom-$(STAMP).log
 
-crosstool-pan: gate | $(LOGDIR)
+crosstool-pan: gate toolcheck | $(LOGDIR)
 	MOTION=pan $(ARMS) $(MOTIONARMS) $(NODE) scripts/crosstool/panrunner.ts 2>&1 \
 	  | tee $(LOGDIR)/crosstool-pan-$(STAMP).log
 
