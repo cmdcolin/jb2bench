@@ -157,6 +157,19 @@ function runOnceRaw(build: (typeof builds)[number], c: Case): number {
     })
   } catch (e) {
     out = (e as { stdout?: string }).stdout ?? ''
+    // Why it failed, not just that it did. profile.ts puts its diagnosis on
+    // stderr — a stall, a trackId the config does not define, a ceiling that
+    // ran out — and execFileSync hands it back only on the throw, so this is
+    // the one place it can be read. Without it a matrix prints FAIL and the
+    // reason dies with the child.
+    const why = ((e as { stderr?: string }).stderr ?? '')
+      .split('\n')
+      .map(l => l.trim())
+      .filter(l => l && !l.startsWith('at '))
+      .pop()
+    if (why) {
+      process.stdout.write(`\n    ${why}\n    `)
+    }
   }
   const val = Number.parseFloat(out.trim().split('\n').pop() || 'NaN')
   return Number.isFinite(val) ? val : Number.NaN
@@ -201,6 +214,23 @@ const measuredAt = { ...prior.measuredAt }
 const results: Record<string, Record<string, Cell>> = { ...prior.results }
 const measured: { key: string; load: LoadWindow; value: Cell }[] = []
 
+// Written after every cell, not once at the end. A matrix is hours long and
+// this box is shared, so a run that is interrupted -- by contention, by an
+// operator who sees a cell stall, by anything -- should cost the cell it was on
+// and not the five before it. Three runs were killed and re-measured from
+// nothing on 2026-09-06 before this existed.
+function save() {
+  fs.mkdirSync('results', { recursive: true })
+  fs.writeFileSync(
+    `${OUT}.json`,
+    JSON.stringify(
+      { loc: scale.loc, scale: scale.id, runs: RUNS, builds, measuredAt, results },
+      null,
+      2,
+    ),
+  )
+}
+
 for (const c of cases) {
   results[c.id] = {}
   measuredAt[c.id] = stamp
@@ -243,6 +273,7 @@ for (const c of cases) {
         `(load ${load.before.toFixed(1)}→${load.after.toFixed(1)}, ` +
         `foreign ${cores.toFixed(2)} cores${top ? `: ${top}` : ''})\n`,
     )
+    save()
   }
 }
 
@@ -259,15 +290,7 @@ if (suspect.length) {
   }
 }
 
-fs.mkdirSync('results', { recursive: true })
-fs.writeFileSync(
-  `${OUT}.json`,
-  JSON.stringify(
-    { loc: scale.loc, scale: scale.id, runs: RUNS, builds, measuredAt, results },
-    null,
-    2,
-  ),
-)
+save()
 
 // second port is the comparison baseline, named by what it actually serves —
 // hardcoding 'release-4.3.0' here would index an undefined cell if the ports
