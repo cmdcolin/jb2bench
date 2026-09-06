@@ -229,7 +229,8 @@ const allTools: Tool[] = [
       why: "Gosling's BAM fetcher declines a tile wider than 20 kb",
     },
     url: (t, w) =>
-      `http://localhost:${CROSSTOOL_PORT}/gosling.html?loc=${w.loc}&track=${t}`,
+      `http://localhost:${CROSSTOOL_PORT}/gosling.html?loc=${w.loc}&track=${t}` +
+      `&size=${contigSize(w)}`,
   },
   {
     // Gosling with its tile-width caps raised, which is the only way it reaches
@@ -252,7 +253,7 @@ const allTools: Tool[] = [
     formats: ['bam'],
     url: (t, w) =>
       `http://localhost:${CROSSTOOL_PORT}/gosling.html?loc=${w.loc}&track=${t}` +
-      `&bundle=gosling-patched.bundle.js`,
+      `&size=${contigSize(w)}&bundle=gosling-patched.bundle.js`,
   },
 ]
 const toolFilter = process.env.TOOLS?.split(',')

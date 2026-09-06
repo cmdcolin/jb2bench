@@ -181,9 +181,13 @@
       }
 
       // The size a made-up contig is declared to be, read from the same .fai the
-      // other harnesses use. One contig, so a constant is honest; a second one
-      // would make this a chrom.sizes fetch.
-      const CONTIG_SIZE = 250001
+      // other harnesses use and passed in like the locus, because the 1 Mb
+      // window sits on a second, larger contig. A wrong size here is silent:
+      // Gosling draws the axis to the declared length, and an interval past the
+      // end of it yields no features at all rather than an error. Hardcoded at
+      // 250001 until 2026-09-06, which is why the patched arm fetched tiles and
+      // laid out nothing at the wide window.
+      const CONTIG_SIZE = Number(params.get('size') ?? 250001)
 
       // Split out of the track height rather than added to it, so the arm
       // still draws into the same 600 px the other arms get.

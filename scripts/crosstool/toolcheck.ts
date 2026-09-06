@@ -30,11 +30,13 @@ const windows: Window[] = process.env.LOC
   ? [{ id: 'LOC', loc: process.env.LOC, scale: WINDOWS[0]!.scale }]
   : selectWindows()
 // A page entry may carry its own query string — `gosling.html?bundle=...` is a
-// different arm of the same page, and the patched Gosling bundle can rot the same
-// way any other harness can.
+// different arm of the same page. The patched Gosling bundle stays out of the
+// default sweep: no arm in the runner's TOOLS list measures it, so it cannot rot
+// a recorded number, and a preflight that blocks every cross-tool run over an
+// arm nobody times is a preflight that gets deleted. Reach it with
+// `PAGES='gosling.html?bundle=gosling-patched.bundle.js'`.
 const pages = (
-  process.env.PAGES ??
-  'index.html,genomespy.html,gosling.html,gosling.html?bundle=gosling-patched.bundle.js'
+  process.env.PAGES ?? 'index.html,genomespy.html,gosling.html'
 ).split(',')
 // Default tracks come from the WINDOW's corpus, since a window carries the
 // files it can be a window on: the two narrow ones get 20x and 200x of the
