@@ -291,6 +291,8 @@ figures:
 # measurement with it.
 paper-figs:
 	Rscript scripts/paperfigs/perf-coldload.R
+	Rscript scripts/paperfigs/perf-coldload-windows.R
+	Rscript scripts/paperfigs/perf-downsampling.R
 	Rscript scripts/paperfigs/width.R
 	Rscript scripts/paperfigs/perf-interaction.R
 	Rscript scripts/paperfigs/perf-crosstool-zoom.R
