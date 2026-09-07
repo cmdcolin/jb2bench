@@ -10,8 +10,11 @@
 // would be the two machines. cluster-data.R takes CLUSTER_RECORD so this file
 // can stand in without editing that repo's measurement store.
 //
-// THE WASM COLUMNS ARE THE WHOLE clusterData CALL, NOT ITS DISTANCE PHASE, and
-// that is forced rather than chosen. hclust reports the distance/merge boundary
+// EVERY COLUMN IS THE WHOLE CALL. The GPU column is the shipped kernel's
+// distance build plus hclust's merge on the matrix it returned, each the
+// first call in a fresh process (gpusweep.mjs). The wasm columns are the
+// whole clusterData call, not its distance phase, and that is forced rather
+// than chosen. hclust reports the distance/merge boundary
 // through its progress callback, and the C side throttles those reports to one
 // per 100 ms with the timer reset as the merge begins (src/wasm/distance.c). So
 // a merge under 100 ms emits no 'clustering' report at all -- three of the ten
@@ -84,7 +87,8 @@ const rows = WINDOWS.map(w => {
       v: gpu.v,
       hclust500: +(v500.totalMs / 1000).toFixed(2),
       hclustNew: +(v510.totalMs / 1000).toFixed(2),
-      gpu: +(gpu.readbackMs / 1000).toFixed(2),
+      gpu: +((gpu.distanceMs + gpu.mergeMs) / 1000).toFixed(2),
+      gpuMerge: +(gpu.mergeMs / 1000).toFixed(3),
     },
   }
 })
@@ -110,12 +114,13 @@ const out = {
       'Every arm on one machine, which is the point: the jbrowse-components record ' +
       'this stands in for mixes a 2019 MacBook Pro (wasm, WebGPU) with a different ' +
       'Linux box (JS). Every arm is also the first call in a fresh process, where that ' +
-      'record timed wasm warm. The JS and WebGPU arms are the distance build alone and ' +
-      'the wasm arms carry their merge with them, which overstates wasm by under 5%. ' +
+      'record timed wasm warm. The JS arms are the distance build alone; the wasm arms ' +
+      'and the WebGPU arm carry their merge, so the WebGPU column is the path end to ' +
+      'end (the shipped kernel, then hclust on its matrix). ' +
       'Matrices are ' +
       '1000 Genomes phase 3 chr22:20-21 Mb dumped by `pnpm bench:real --dump` in ' +
       `@gmod/hclust (${rev(`${process.env.HOME}/src/gmod/hclust`)}), byte-identical across all four arms. ` +
-      'The kernel is naive -- one thread per pair, no tiling -- so the GPU column is a floor.',
+      'The kernel is the one clusterMatrix ships: one thread per pair, no tiling.',
   },
   rows,
 }

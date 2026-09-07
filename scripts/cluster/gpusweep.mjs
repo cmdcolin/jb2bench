@@ -1,11 +1,14 @@
-// The WebGPU distance kernel across the same five windows distance-sweep.mjs
+// The WebGPU distance build across the same five windows distance-sweep.mjs
 // sweeps, so the figure's GPU curve comes off this box rather than off the
 // jbrowse-components measurement record's 2019 MacBook Pro.
 //
-// Drives jbrowse-web's probe-gpu-distance-matrix.ts, which owns the kernel and
-// the correctness check against an f64 reference. --matrix hands it the same
-// .bin every other arm reads, and --skip-cpu drops its wasm side: wasmphases.mjs
-// measures that here, at the same phase boundary the JS arms are measured at.
+// Drives jbrowse-web's probe-gpu-distance-matrix.ts, which runs the kernel
+// clusterMatrix ships (bundled into the page as is, spot check included),
+// checks it against an f64 reference, and then runs @gmod/hclust's merge loop
+// on the matrix that came back -- so the row carries the whole GPU path a user
+// waits on, not the distance build alone. --matrix hands it the same .bin every
+// other arm reads, and --skip-cpu drops its wasm side: wasmphases.mjs measures
+// that here, at the same phase boundary the JS arms are measured at.
 //
 // HEADED CHROME, so this needs a display. Headless has no WebGPU adapter, and
 // on Linux the adapter only appears with --enable-features=Vulkan, which the
@@ -53,8 +56,9 @@ for (const w of selected) {
   // which reads on the figure as a shorter curve rather than as a broken run.
   const shape = /N=(\d+) V=(\d+)/.exec(out)
   const timing =
-    /gpu (.+?): compute\+upload ([\d.]+) ms, with readback ([\d.]+) ms, max rel err (\S+) over (\d+) pairs/.exec(out)
-  if (!shape || !timing) {
+    /gpu (.+?): distance matrix ([\d.]+) ms \(upload, dispatch, readback, spot check\), max rel err (\S+) over (\d+) pairs/.exec(out)
+  const merge = /merge on the gpu matrix \(hclust wasm\): ([\d.]+) ms/.exec(out)
+  if (!shape || !timing || !merge) {
     throw new Error(`could not parse the probe's output for ${w.file}:\n${out}`)
   }
 
@@ -64,19 +68,20 @@ for (const w of selected) {
     n: Number(shape[1]),
     v: Number(shape[2]),
     adapter: timing[1],
-    // Upload and readback included: the record this replaces defines its GPU
-    // column that way, and a kernel time without the transfers is not a time
-    // anything waits on.
-    computeMs: Number(timing[2]),
-    readbackMs: Number(timing[3]),
-    maxRelErr: Number(timing[4]),
-    checkedPairs: Number(timing[5]),
-    note: 'naive kernel, one thread per pair, no tiling — a floor, not a claim',
+    // Upload, readback and the spot check included: a kernel time without the
+    // transfers is not a time anything waits on.
+    distanceMs: Number(timing[2]),
+    // hclust's merge loop on the matrix the GPU returned, first call in a
+    // fresh process, so distanceMs + mergeMs is the path end to end.
+    mergeMs: Number(merge[1]),
+    maxRelErr: Number(timing[3]),
+    checkedPairs: Number(timing[4]),
+    note: 'the shipped kernel: one thread per pair, no tiling, blocked Kahan sum',
   }
   const slug = w.file.replace(/\.bin$/, '')
   writeFileSync(`results/cluster-gpu-${slug}.json`, JSON.stringify(row, null, 2))
   console.log(
     `${w.window.padEnd(28)} ${String(row.n).padStart(5)} x ${String(row.v).padStart(6)}   ` +
-      `${(row.readbackMs / 1000).toFixed(2).padStart(7)} s   ${row.adapter}   max rel err ${row.maxRelErr}`,
+      `distance ${(row.distanceMs / 1000).toFixed(2).padStart(6)} s + merge ${(row.mergeMs / 1000).toFixed(2)} s   ${row.adapter}   max rel err ${row.maxRelErr}`,
   )
 }

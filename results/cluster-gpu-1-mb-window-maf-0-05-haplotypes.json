@@ -4,9 +4,9 @@
   "n": 5008,
   "v": 2311,
   "adapter": "amd gcn-4",
-  "computeMs": 1238,
-  "readbackMs": 1358,
-  "maxRelErr": 0,
+  "distanceMs": 1369,
+  "mergeMs": 460,
+  "maxRelErr": 7.2e-8,
   "checkedPairs": 824,
-  "note": "naive kernel, one thread per pair, no tiling — a floor, not a claim"
+  "note": "the shipped kernel: one thread per pair, no tiling, blocked Kahan sum"
 }

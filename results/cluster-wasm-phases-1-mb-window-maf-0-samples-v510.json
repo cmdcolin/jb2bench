@@ -2,10 +2,10 @@
   "matrix": "1-mb-window-maf-0-samples.bin",
   "n": 2504,
   "v": 22513,
-  "distanceMs": 18088,
-  "clusterMs": 7,
-  "totalMs": 18095,
-  "clusterShare": 0.0004,
+  "distanceMs": 18066.2,
+  "clusterMs": 12.7,
+  "totalMs": 18078.9,
+  "clusterShare": 0.0007,
   "note": "first call in a fresh process, the one a user waits on",
-  "hclust": "/home/cdiesh/src/gmod/hclust/src/index.ts"
+  "hclust": "/home/cdiesh/src/jbrowse-components/.claude/worktrees/gpu-cluster-distances/node_modules/.pnpm/@gmod+hclust@5.1.0/node_modules/@gmod/hclust/esm/index.js"
 }

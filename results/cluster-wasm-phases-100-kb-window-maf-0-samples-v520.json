@@ -4,8 +4,8 @@
   "v": 3105,
   "distanceMs": null,
   "clusterMs": null,
-  "totalMs": 2275.2,
+  "totalMs": 2250.7,
   "clusterShare": null,
   "note": "first call in a fresh process, the one a user waits on",
-  "hclust": "/home/cdiesh/src/jbrowse-components/.claude/worktrees/gpu-cluster-distances/node_modules/.pnpm/@gmod+hclust@5.1.0/node_modules/@gmod/hclust/esm/index.js"
+  "hclust": "/home/cdiesh/src/gmod/hclust/esm/index.js"
 }

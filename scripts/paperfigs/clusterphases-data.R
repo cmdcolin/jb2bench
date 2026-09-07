@@ -53,6 +53,9 @@ for (f in files) {
   g <- Filter(function(r) r$values$n == cmp$n && abs(r$values$v - cmp$v) <= 2, gpu$rows)
   if (!length(g)) { message("skip ", basename(f), ": no GPU row at N=", cmp$n, " V~", cmp$v); next }
   gpuS <- g[[1]]$values$gpu
+  # A local record (localrecord.mjs) carries the merge hclust ran on the GPU's
+  # matrix; the jbrowse-components store's record predates that and does not.
+  gpuMergeS <- g[[1]]$values$gpuMerge
 
   # Matrix shape is the label, not the window's MAF threshold: a filter setting
   # is not what the time scales with, and "MAF" reads as an allele frequency
@@ -83,19 +86,27 @@ for (f in files) {
   for (impl in names(config)) {
     measured <- c(measured, phasesFor(config[[impl]], byImpl[[impl]]))
   }
-  # The compute shader replaces only the distance build, so its merge is the
-  # wasm merge, carried across rather than re-measured. When that merge was
-  # never resolved, carry the interval that hid it: the true value is somewhere
-  # under it, so the WebGPU point comes out slow rather than flattering, which
-  # is the direction an unmeasured quantity should err in a figure whose last
-  # step is the one it buys.
+  # The compute shader replaces only the distance build; the merge is hclust's
+  # wasm on the matrix it returned. A local record measured that merge
+  # directly. The store's record did not, so there the wasm arm's merge is
+  # carried across -- and when that was never resolved, the interval that hid
+  # it: the true value is somewhere under it, so the WebGPU point comes out
+  # slow rather than flattering, which is the direction an unmeasured quantity
+  # should err in a figure whose last step is the one it buys.
   wasmMerge <- byImpl$wasm$clusterMs
-  measured[[length(measured) + 1]] <-
-    list(config = "WebGPU + wasm", phase = "distance", s = gpuS)
-  measured[[length(measured) + 1]] <-
-    list(config = "WebGPU + wasm",
-         phase = if (is.null(wasmMerge)) "merge (upper bound)" else "merge",
-         s = if (is.null(wasmMerge)) SPLIT_FLOOR else wasmMerge / 1000)
+  if (!is.null(gpuMergeS)) {
+    measured[[length(measured) + 1]] <-
+      list(config = "WebGPU + wasm", phase = "distance", s = gpuS - gpuMergeS)
+    measured[[length(measured) + 1]] <-
+      list(config = "WebGPU + wasm", phase = "merge", s = gpuMergeS)
+  } else {
+    measured[[length(measured) + 1]] <-
+      list(config = "WebGPU + wasm", phase = "distance", s = gpuS)
+    measured[[length(measured) + 1]] <-
+      list(config = "WebGPU + wasm",
+           phase = if (is.null(wasmMerge)) "merge (upper bound)" else "merge",
+           s = if (is.null(wasmMerge)) SPLIT_FLOOR else wasmMerge / 1000)
+  }
 
   for (r in measured) {
     rows[[length(rows) + 1]] <- data.frame(
