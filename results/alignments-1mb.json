@@ -1,7 +1,7 @@
 {
   "loc": "chr22_2mb:500001-1500000",
   "scale": "1mb",
-  "runs": 3,
+  "runs": 10,
   "builds": [
     {
       "port": 8000,
@@ -27,317 +27,566 @@
   "results": {
     "1mb-20x-shortread-bam": {
       "current": {
-        "median": 2120,
-        "mean": 2121.3333333333335,
-        "stddev": 9.030811456096044,
+        "median": 2107.5,
+        "mean": 2102,
+        "stddev": 22.57432169523594,
         "runs": [
-          2120,
-          2133,
-          2111
+          2100,
+          2106,
+          2060,
+          2095,
+          2128,
+          2116,
+          2127,
+          2063,
+          2116,
+          2109
         ],
         "peakRssMb": [
-          1726,
+          1721,
+          1723,
+          1719,
+          1736,
+          1693,
+          1712,
           1716,
-          1709
+          1709,
+          1723,
+          1715
         ],
         "failed": 0,
         "load": {
-          "before": 0.33,
-          "after": 0.84,
-          "foreignCores": 0.0822351080653454,
-          "foreignTop": "claude 0.01, fwupd 0.01"
+          "before": 0.03,
+          "after": 0.6,
+          "foreignCores": 0.07058898684043394,
+          "foreignTop": "claude 0.02"
         }
       },
       "release-2.4.0": {
-        "median": 29756,
-        "mean": 29699.666666666668,
-        "stddev": 81.79785381590942,
+        "median": 29715,
+        "mean": 29725.7,
+        "stddev": 698.9416356177388,
         "runs": [
-          29759,
-          29756,
-          29584
+          28612,
+          29627,
+          29805,
+          29773,
+          28767,
+          29491,
+          29695,
+          29735,
+          30826,
+          30926
         ],
         "peakRssMb": [
-          4445,
-          4648,
-          5022
+          4442,
+          4679,
+          4673,
+          4676,
+          4822,
+          4460,
+          4505,
+          4821,
+          4487,
+          4689
         ],
         "failed": 0,
         "load": {
-          "before": 0.84,
-          "after": 1.81,
-          "foreignCores": 0.08318042813455125,
-          "foreignTop": "claude 0.02, firefox-bin 0.01"
+          "before": 0.6,
+          "after": 1.85,
+          "foreignCores": 0.05635206741456445,
+          "foreignTop": ""
         }
       }
     },
     "1mb-20x-shortread-cram": {
       "current": {
-        "median": 2276,
-        "mean": 2289.6666666666665,
-        "stddev": 45.536310297997964,
+        "median": 2259.5,
+        "mean": 2262.7,
+        "stddev": 28.411441357312373,
         "runs": [
-          2351,
-          2276,
-          2242
+          2224,
+          2310,
+          2261,
+          2267,
+          2258,
+          2237,
+          2235,
+          2258,
+          2261,
+          2316
         ],
         "peakRssMb": [
+          1721,
+          1715,
+          1705,
+          1719,
+          1710,
+          1716,
+          1721,
           1706,
-          1714,
-          1708
+          1726,
+          1707
         ],
         "failed": 0,
         "load": {
-          "before": 1.81,
-          "after": 1.64,
-          "foreignCores": 0.0863020572002193,
-          "foreignTop": "fwupd 0.01, claude 0.01"
+          "before": 1.85,
+          "after": 2.76,
+          "foreignCores": 0.06840569135352517,
+          "foreignTop": "firefox-bin 0.01, claude 0.01"
         }
       },
       "release-2.4.0": {
-        "median": 12446,
-        "mean": 12457.666666666666,
-        "stddev": 27.78888666755511,
+        "median": 12484,
+        "mean": 12405.6,
+        "stddev": 238.83726677384328,
         "runs": [
-          12431,
-          12446,
-          12496
+          12518,
+          12484,
+          12055,
+          12645,
+          12484,
+          12564,
+          12746,
+          12060,
+          12418,
+          12082
         ],
         "peakRssMb": [
-          2438,
-          2434,
-          2385
+          2222,
+          2226,
+          2194,
+          2390,
+          2200,
+          2448,
+          2355,
+          2200,
+          2267,
+          2289
         ],
         "failed": 0,
         "load": {
-          "before": 1.64,
-          "after": 1.88,
-          "foreignCores": 0.09452489371344432,
-          "foreignTop": "firefox-bin 0.01, gnome-shell 0.01, claude 0.01"
+          "before": 2.54,
+          "after": 1.94,
+          "foreignCores": 0.082452774978055,
+          "foreignTop": "gnome-shell 0.01, firefox-bin 0.01"
         }
       }
     },
     "1mb-100x-shortread-bam": {
       "current": {
-        "median": 5768,
-        "mean": 5750,
-        "stddev": 35.81433604950212,
+        "median": 5810.5,
+        "mean": 5840.2,
+        "stddev": 115.5974048151601,
         "runs": [
+          5820,
+          5968,
+          6026,
+          5944,
+          5947,
+          5712,
           5782,
-          5768,
-          5700
+          5801,
+          5707,
+          5695
         ],
         "peakRssMb": [
-          3404,
-          3416,
-          3349
+          3418,
+          3385,
+          3376,
+          3391,
+          3337,
+          3461,
+          3342,
+          3420,
+          3366,
+          3412
         ],
         "failed": 0,
         "load": {
-          "before": 1.88,
-          "after": 1.77,
-          "foreignCores": 0.12999773259768993,
-          "foreignTop": "firefox-bin 0.02, gnome-shell 0.02, claude 0.01"
+          "before": 1.78,
+          "after": 1.85,
+          "foreignCores": 0.11417611552997835,
+          "foreignTop": "gnome-shell 0.02, firefox-bin 0.01, fwupd 0.01"
+        }
+      },
+      "release-2.4.0": {
+        "median": 38591,
+        "mean": 51313.4,
+        "stddev": 25314.478707648712,
+        "runs": [
+          null,
+          38082,
+          null,
+          null,
+          38591,
+          null,
+          101934,
+          null,
+          38473,
+          39487
+        ],
+        "peakRssMb": [
+          5764,
+          5714,
+          7112,
+          5716,
+          5770
+        ],
+        "failed": 5,
+        "load": {
+          "before": 1.85,
+          "after": 1.08,
+          "foreignCores": 0.05433149821064023,
+          "foreignTop": "claude 0.01"
         }
       }
     },
     "1mb-100x-shortread-cram": {
       "current": {
-        "median": 6017,
-        "mean": 6014.833333333333,
-        "stddev": 147.1307997063233,
+        "median": 5907,
+        "mean": 5950.6,
+        "stddev": 115.62197023057513,
         "runs": [
-          6006,
-          5822,
-          6284,
-          6066,
-          5883,
-          6028
+          5770,
+          5951,
+          5906,
+          5901,
+          5904,
+          6047,
+          6044,
+          6210,
+          5865,
+          5908
         ],
+        "peakRssMb": [
+          3255,
+          3313,
+          3362,
+          3306,
+          3418,
+          3315,
+          3296,
+          3343,
+          3349,
+          3300
+        ],
+        "failed": 0,
         "load": {
-          "before": 0.4,
-          "after": 1.43,
-          "foreignCores": 0.4446192815474434,
-          "foreignTop": "claude 0.10, ptyxis 0.09, claude 0.05"
+          "before": 1.08,
+          "after": 2.31,
+          "foreignCores": 0.10065584119524688,
+          "foreignTop": "gnome-shell 0.02, firefox-bin 0.01"
         }
       },
       "release-2.4.0": {
-        "median": 36847.5,
-        "mean": 38209,
-        "stddev": 3366.5664506536427,
+        "median": 53821.5,
+        "mean": 53604.1,
+        "stddev": 796.8696819430389,
         "runs": [
-          37095,
-          36788,
-          45705,
-          36094,
-          36907,
-          36665
+          53292,
+          53779,
+          52417,
+          52058,
+          54760,
+          54457,
+          54014,
+          53864,
+          53471,
+          53929
         ],
+        "peakRssMb": [
+          5311,
+          5102,
+          5194,
+          5027,
+          5046,
+          5056,
+          5189,
+          5163,
+          5281,
+          5042
+        ],
+        "failed": 0,
         "load": {
-          "before": 1.43,
-          "after": 2.39,
-          "foreignCores": 0.16915559726244442,
-          "foreignTop": "claude 0.05, claude 0.04, ptyxis 0.03"
+          "before": 2.12,
+          "after": 1.65,
+          "foreignCores": 0.049002716089961526,
+          "foreignTop": "firefox-bin 0.01"
         }
       }
     },
     "1mb-20x-longread-bam": {
       "current": {
-        "median": 3307.5,
-        "mean": 3283.1666666666665,
-        "stddev": 41.115352634049266,
+        "median": 3406,
+        "mean": 3369.1,
+        "stddev": 89.0925922846563,
         "runs": [
-          3319,
-          3310,
-          3231,
-          3305,
-          3314,
-          3220
+          3395,
+          3398,
+          3418,
+          3197,
+          3444,
+          3414,
+          3278,
+          3243,
+          3440,
+          3464
         ],
+        "peakRssMb": [
+          2162,
+          2201,
+          2173,
+          2178,
+          2175,
+          2177,
+          2173,
+          2173,
+          2172,
+          2157
+        ],
+        "failed": 0,
         "load": {
-          "before": 2.39,
-          "after": 1.95,
-          "foreignCores": 0.11126134827123672,
-          "foreignTop": "claude 0.04, ptyxis 0.02"
+          "before": 1.65,
+          "after": 1.61,
+          "foreignCores": 0.058270037410719004,
+          "foreignTop": ""
         }
       },
       "release-2.4.0": {
-        "median": 4578,
-        "mean": 4594.833333333333,
-        "stddev": 32.01258433109635,
+        "median": 37697,
+        "mean": 37806.8,
+        "stddev": 553.5331607049392,
         "runs": [
-          4653,
-          4581,
-          4575,
-          4569,
-          4623,
-          4568
+          37958,
+          36868,
+          37680,
+          38923,
+          37362,
+          38556,
+          37472,
+          37855,
+          37705,
+          37689
         ],
+        "peakRssMb": [
+          4168,
+          4324,
+          4824,
+          4831,
+          4844,
+          4327,
+          4425,
+          4823,
+          4469,
+          3804
+        ],
+        "failed": 0,
         "load": {
-          "before": 1.95,
-          "after": 1.85,
-          "foreignCores": 0.3507367547214329,
-          "foreignTop": "firefox-bin 0.09, ptyxis 0.04, gnome-shell 0.04"
+          "before": 1.61,
+          "after": 2.74,
+          "foreignCores": 0.05116079632465574,
+          "foreignTop": "firefox-bin 0.01"
         }
       }
     },
     "1mb-20x-longread-cram": {
       "current": {
-        "median": 3619,
-        "mean": 3635.5,
-        "stddev": 120.64375933576783,
+        "median": 3553,
+        "mean": 3562.1,
+        "stddev": 45.03654071973113,
         "runs": [
-          3511,
-          3734,
-          3829,
-          3501,
-          3564,
-          3674
+          3605,
+          3495,
+          3517,
+          3631,
+          3538,
+          3563,
+          3516,
+          3598,
+          3615,
+          3543
         ],
+        "peakRssMb": [
+          2146,
+          2160,
+          2166,
+          2175,
+          2166,
+          2154,
+          2163,
+          2172,
+          2162,
+          2175
+        ],
+        "failed": 0,
         "load": {
-          "before": 4.53,
-          "after": 3.17,
-          "foreignCores": 0.24389374220005483,
-          "foreignTop": "claude 0.08, ptyxis 0.04, firefox-bin 0.03"
+          "before": 2.74,
+          "after": 1.72,
+          "foreignCores": 0.059277848690047166,
+          "foreignTop": "firefox-bin 0.01"
         }
       },
       "release-2.4.0": {
-        "median": 9040,
-        "mean": 8975.833333333334,
-        "stddev": 493.11980176108204,
+        "median": null,
+        "mean": null,
+        "stddev": null,
         "runs": [
-          9474,
-          8683,
-          9504,
-          8431,
-          9397,
-          8366
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null
         ],
+        "peakRssMb": [],
+        "failed": 10,
         "load": {
-          "before": 3.17,
-          "after": 2.33,
-          "foreignCores": 0.11021051603633261,
-          "foreignTop": "claude 0.03, ptyxis 0.02"
+          "before": 1.72,
+          "after": 0.15,
+          "foreignCores": 0.0616191339360146,
+          "foreignTop": "claude 0.01, firefox-bin 0.01"
         }
       }
     },
     "1mb-100x-longread-bam": {
       "current": {
-        "median": 9416.5,
-        "mean": 9447.166666666666,
-        "stddev": 228.936975800959,
+        "median": 9410,
+        "mean": 9430.3,
+        "stddev": 175.633168849167,
         "runs": [
-          9324,
-          9713,
-          9309,
-          9095,
-          9509,
-          9733
+          9440,
+          9104,
+          9292,
+          9544,
+          9744,
+          9635,
+          9504,
+          9303,
+          9380,
+          9357
         ],
+        "peakRssMb": [
+          4849,
+          4793,
+          4821,
+          4804,
+          4854,
+          4759,
+          4817,
+          4875,
+          4822,
+          4853
+        ],
+        "failed": 0,
         "load": {
-          "before": 2.33,
-          "after": 3.13,
-          "foreignCores": 0.09245168163139703,
-          "foreignTop": "claude 0.02, ptyxis 0.02"
+          "before": 0.14,
+          "after": 1.27,
+          "foreignCores": 0.09774917652800014,
+          "foreignTop": "firefox-bin 0.02, gnome-shell 0.02"
         }
       },
       "release-2.4.0": {
-        "median": 14103,
-        "mean": 14202,
-        "stddev": 226.0117991020233,
+        "median": 106567,
+        "mean": 106140,
+        "stddev": 1512.533768218085,
         "runs": [
-          14283,
-          13970,
-          14115,
-          14664,
-          14089,
-          14091
+          106356,
+          103803,
+          104642,
+          103907,
+          106778,
+          105581,
+          108179,
+          106810,
+          107428,
+          107916
         ],
+        "peakRssMb": [
+          6271,
+          6252,
+          6436,
+          5527,
+          6459,
+          6279,
+          5694,
+          5208,
+          5568,
+          5239
+        ],
+        "failed": 0,
         "load": {
-          "before": 3.13,
-          "after": 1.7,
-          "foreignCores": 0.14703598742187127,
-          "foreignTop": "ptyxis 0.03, claude 0.02, claude 0.02"
+          "before": 1.17,
+          "after": 1.2,
+          "foreignCores": 0.04199821342678483,
+          "foreignTop": ""
         }
       }
     },
     "1mb-100x-longread-cram": {
       "current": {
-        "median": 10022.5,
-        "mean": 9961.5,
-        "stddev": 149.6515396958325,
+        "median": 10337.5,
+        "mean": 10310.7,
+        "stddev": 172.26029722486837,
         "runs": [
-          10020,
-          9791,
-          9724,
-          10088,
-          10121,
-          10025
+          10295,
+          10097,
+          10423,
+          10390,
+          10182,
+          10650,
+          10387,
+          10380,
+          10291,
+          10012
         ],
+        "peakRssMb": [
+          4873,
+          4725,
+          4719,
+          4667,
+          4733,
+          4662,
+          4714,
+          4682,
+          4783,
+          4695
+        ],
+        "failed": 0,
         "load": {
-          "before": 1.7,
-          "after": 2.04,
-          "foreignCores": 0.136229166920292,
-          "foreignTop": "ptyxis 0.02, claude 0.01, claude 0.01"
+          "before": 1.2,
+          "after": 2.19,
+          "foreignCores": 0.09141656362349738,
+          "foreignTop": "gnome-shell 0.02, firefox-bin 0.01"
         }
       },
       "release-2.4.0": {
-        "median": 32157.5,
-        "mean": 32179.666666666668,
-        "stddev": 1126.1537293914282,
+        "median": null,
+        "mean": null,
+        "stddev": null,
         "runs": [
-          32490,
-          30475,
-          34182,
-          31584,
-          32522,
-          31825
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null
         ],
+        "peakRssMb": [],
+        "failed": 10,
         "load": {
-          "before": 1.88,
-          "after": 1.75,
-          "foreignCores": 0.09910755778113235,
-          "foreignTop": "firefox-bin 0.02, claude 0.01, Web Content 0.01"
+          "before": 2.19,
+          "after": 0.84,
+          "foreignCores": 0.051294434247343916,
+          "foreignTop": "claude 0.01, firefox-bin 0.01"
         }
       }
     }

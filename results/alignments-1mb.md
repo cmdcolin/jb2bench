@@ -1,6 +1,6 @@
 # Alignments render benchmark
 
-Region `chr22_2mb:500001-1500000` (1 Mb). In-page navigation→render-complete time, median of 6 runs (ms). Speedup = release-2.4.0 median ÷ current median.
+Region `chr22_2mb:500001-1500000` (1 Mb). In-page navigation→render-complete time, median of 10 runs (ms). Speedup = release-2.4.0 median ÷ current median.
 
 `measured` is when each row was taken. `foreign` is the most CPU any of its cells saw burned by processes **outside this benchmark**, in cores — outside the runner's process tree, and outside the corpus http-servers, which serve the bytes under test and are apparatus rather than contention. A row above 0.5 reports **unusable** in place of a speedup rather than a number that looks like a result, and `by` names what burned it, because a bare 0.55 cannot be acted on. This box idles near 0.28 foreign cores with nobody using it — other agent sessions, a terminal, a browser — so the ceiling is a budget over that floor and not over zero. **Running shell commands against the box during a run spends that budget**; two rows were condemned on 2026-08-23 by the operator's own `find` and `node` invocations.
 
@@ -8,11 +8,28 @@ Region `chr22_2mb:500001-1500000` (1 Mb). In-page navigation→render-complete t
 
 | case | current | release-2.4.0 | speedup vs release-2.4.0 | measured | foreign | by | load |
 |---|---:|---:|---:|---|---:|---|---:|
-| 1mb-20x-shortread-bam | 2097 ±47 | 4136 ±136 | 1.97× | 2026-09-06 | 0.18 | ptyxis 0.06, claude 0.06, gnome-shell 0.01 | 1.2 |
-| 1mb-20x-shortread-cram | 2213 ±24 | 11172 ±517 | 5.05× | 2026-09-06 | 0.18 | claude 0.06, ptyxis 0.06, gnome-shell 0.02 | 1.6 |
-| 1mb-100x-shortread-bam | 5710 ±61 | 14037 ±340 | 2.46× | 2026-09-06 | 0.22 | claude 0.08, ptyxis 0.04, gpg-agent 0.02 | 1.9 |
-| 1mb-100x-shortread-cram | 6017 ±147 | 36848 ±3367 | 6.12× | 2026-09-06 | 0.44 | claude 0.10, ptyxis 0.09, claude 0.05 | 2.4 |
-| 1mb-20x-longread-bam | 3308 ±41 | 4578 ±32 | 1.38× | 2026-09-06 | 0.35 | firefox-bin 0.09, ptyxis 0.04, gnome-shell 0.04 | 2.4 |
-| 1mb-20x-longread-cram | 3619 ±121 | 9040 ±493 | 2.50× | 2026-09-06 | 0.24 | claude 0.08, ptyxis 0.04, firefox-bin 0.03 | 4.5 |
-| 1mb-100x-longread-bam | 9417 ±229 | 14103 ±226 | 1.50× | 2026-09-06 | 0.15 | ptyxis 0.03, claude 0.02, claude 0.02 | 3.1 |
-| 1mb-100x-longread-cram | 10023 ±150 | 32158 ±1126 | 3.21× | 2026-09-06 | 0.14 | ptyxis 0.02, claude 0.01, claude 0.01 | 2.0 |
+| 1mb-20x-shortread-bam | 2108 ±23 | 29715 ±699 | 14.10× | 2026-09-06 | 0.07 | claude 0.02 | 1.9 |
+| 1mb-20x-shortread-cram | 2260 ±28 | 12484 ±239 | 5.53× | 2026-09-06 | 0.08 | gnome-shell 0.01, firefox-bin 0.01 | 2.8 |
+| 1mb-100x-shortread-bam | 5811 ±116 | 38591 ±25314 | 6.64× | 2026-09-06 | 0.11 | gnome-shell 0.02, firefox-bin 0.01, fwupd 0.01 | 1.9 |
+| 1mb-100x-shortread-cram | 5907 ±116 | 53822 ±797 | 9.11× | 2026-09-06 | 0.10 | gnome-shell 0.02, firefox-bin 0.01 | 2.3 |
+| 1mb-20x-longread-bam | 3406 ±89 | 37697 ±554 | 11.07× | 2026-09-06 | 0.06 | — | 2.7 |
+| 1mb-20x-longread-cram | 3553 ±45 | NaN ±NaN | — | 2026-09-06 | 0.06 | claude 0.01, firefox-bin 0.01 | 2.7 |
+| 1mb-100x-longread-bam | 9410 ±176 | 106567 ±1513 | 11.32× | 2026-09-06 | 0.10 | firefox-bin 0.02, gnome-shell 0.02 | 1.3 |
+| 1mb-100x-longread-cram | 10338 ±172 | NaN ±NaN | — | 2026-09-06 | 0.09 | gnome-shell 0.02, firefox-bin 0.01 | 2.2 |
+
+## Peak memory
+
+Highest resident memory across the **whole browser process tree** — browser, GPU, renderer, workers — sampled once a second, in GB. Not the JS heap: a page's cost is spread over several processes and the heap of one of them is not what a machine has to find. The figure is the worst of the row's runs, because a render that peaks at 5.5 GB and settles at 2 fails on a machine with 4 GB free and the settled number would not say so.
+
+`stalled` counts runs that produced no timing at all — the browser stopped making progress and the run was abandoned. At this window that is a property of the build and the cell, not of the box: release 2.4.0 stalls on the heaviest short-read cell about as often as it finishes it, at 5.5 GB.
+
+| case | current | release-2.4.0 |
+|---|---:|---:|
+| 1mb-20x-shortread-bam | 1.7 GB | 4.8 GB |
+| 1mb-20x-shortread-cram | 1.7 GB | 2.4 GB |
+| 1mb-100x-shortread-bam | 3.5 GB | 7.1 GB, 5 stalled |
+| 1mb-100x-shortread-cram | 3.4 GB | 5.3 GB |
+| 1mb-20x-longread-bam | 2.2 GB | 4.8 GB |
+| 1mb-20x-longread-cram | 2.2 GB | — |
+| 1mb-100x-longread-bam | 4.9 GB | 6.5 GB |
+| 1mb-100x-longread-cram | 4.9 GB | — |

@@ -56,6 +56,7 @@ results <- fromJSON(file.path(bench, "results", "alignments-1mb.json"),
 
 rows <- list()
 dropped <- character()
+failed <- character()
 for (i in seq_along(READ_CASES)) {
   for (fmt in names(FORMATS)) {
     key <- paste0(READ_CASES[i], "-", fmt)
@@ -68,6 +69,15 @@ for (i in seq_along(READ_CASES)) {
     ok <- all(vapply(present, function(b) contention_ok(cell[[b]]), logical(1)))
     if (!ok) dropped <- c(dropped, key)
     for (b in present) {
+      # A build that failed every run has no median to plot -- it is a crash,
+      # not a slow measurement, so the point is dropped rather than drawn as
+      # NA and left for ggplot to skip silently.
+      if (is.null(cell[[b]]$median)) {
+        failed <- c(failed, paste0(key, " ", BUILDS[[b]], " (",
+                                    cell[[b]]$failed, "/", length(cell[[b]]$runs),
+                                    " runs failed)"))
+        next
+      }
       s <- spread(cell[[b]]$runs)
       rows[[length(rows) + 1]] <- data.frame(
         case = labels[i], series = BUILDS[[b]], format = FORMATS[[fmt]],
@@ -81,6 +91,10 @@ for (i in seq_along(READ_CASES)) {
 if (length(dropped)) {
   cat("cells over the ", FOREIGN_MAX, " foreign-core ceiling, marked unusable: ",
       paste(dropped, collapse = ", "), "\n", sep = "")
+}
+if (length(failed)) {
+  cat("cells with no successful run, dropped: ",
+      paste(failed, collapse = ", "), "\n", sep = "")
 }
 
 out <- do.call(rbind, rows)
