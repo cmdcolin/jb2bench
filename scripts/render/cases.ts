@@ -35,6 +35,13 @@ export const FORMATS = ['bam', 'cram'] as const
  * contig width: a window that IS the assembly measures a view that cannot be
  * zoomed out of or panned, which is a different thing from a 1 Mb view of a
  * chromosome.
+ *
+ * `19kb-wide` and `100kb-wide` complete a WIDTH SWEEP with `1mb`: three windows
+ * on the chr22_2mb corpus, nested about the same centre, differing in nothing
+ * but width. The sweep needs one corpus to mean anything — `19kb` sits on a
+ * different contig at a different depth ladder, so pairing it with `1mb` varies
+ * two things at once. `19kb-wide` is that window measured where the comparison
+ * holds; it is not a replacement for `19kb`, which every existing figure uses.
  */
 export interface Scale {
   id: string
@@ -60,6 +67,22 @@ export const SCALES: readonly Scale[] = [
     label: '1 Mb',
     assembly: 'chr22_2mb',
     loc: 'chr22_2mb:500001-1500000',
+    coverages: ['20x', '100x'],
+    prefix: '2mb.',
+  },
+  {
+    id: '100kb-wide',
+    label: '100 kb (2 Mb contig)',
+    assembly: 'chr22_2mb',
+    loc: 'chr22_2mb:950001-1050000',
+    coverages: ['20x', '100x'],
+    prefix: '2mb.',
+  },
+  {
+    id: '19kb-wide',
+    label: '19 kb (2 Mb contig)',
+    assembly: 'chr22_2mb',
+    loc: 'chr22_2mb:990501-1009500',
     coverages: ['20x', '100x'],
     prefix: '2mb.',
   },

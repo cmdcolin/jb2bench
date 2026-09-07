@@ -27,6 +27,7 @@ LOGDIR := results/logs
         crosstool-zoom crosstool-pan crosstool-bundles \
         parsers parsers-count cram-samtools multibam backends clean-logs \
         formats toolcheck shots paper-tables paper-figs paper-data wait-quiet \
+        backends-webgpu \
         wasmgate bgzfpool bgzfpool-standalone bgzfpool-endtoend
 
 help:
@@ -61,6 +62,7 @@ help:
 	@echo "  make bgzfpool        the BGZF inflate pool on vs off, query alone and end to end"
 	@echo "  make multibam        multi-track pan"
 	@echo "  make backends        webgl vs webgpu vs canvas"
+	@echo "  make backends-webgpu the same + a WebGPU rung, 19kb/100kb/1mb, headed firefox"
 	@echo ""
 	@echo "present"
 	@echo "  make figures         ggplot2 figures from the recorded JSON"
@@ -217,6 +219,25 @@ multibam: gate | $(LOGDIR)
 
 backends: gate | $(LOGDIR)
 	$(NODE) scripts/render/backends.ts 2>&1 | tee $(LOGDIR)/backends-$(STAMP).log
+
+# The same comparison with a WebGPU rung in it, swept over the three windows.
+#
+# Firefox Nightly, because Chrome's WebGPU canvas is blank on this box: the
+# frame fails Dawn validation after submit, and the app only consoles that
+# error rather than surfacing it, so the run looks like a fast render of
+# nothing. scripts/render/backends.ts has the detail.
+#
+# All three windows sit on the chr22_2mb corpus so width is the only thing that
+# varies across them; pairing the deep 19 kb arm with the 1 Mb one would vary
+# contig and depth ladder too.
+#
+# HEADED: Firefox windows take over :0 for hours. Not a run to start on a
+# machine someone is using.
+backends-webgpu: gate | $(LOGDIR)
+	for s in 19kb-wide 100kb-wide 1mb; do \
+	  SCALE=$$s $(NODE) scripts/render/backends.ts --browser=firefox --runs=5 \
+	    2>&1 | tee $(LOGDIR)/backends-firefox-$$s-$(STAMP).log; \
+	done
 
 # What the BGZF inflate pool is worth, measured twice over the same files and
 # the same windows: once with nothing above the query and once through a real

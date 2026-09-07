@@ -26,15 +26,22 @@
 // Firefox Nightly must run headed (windows appear on :0), so it is not a run to
 // start unattended on a machine someone is using.
 //
+// The window comes from `SCALE` (scripts/render/cases.ts). The default is the
+// deep 19 kb window every other table uses; `19kb-wide`, `100kb-wide` and `1mb`
+// are the width sweep on the chr22_2mb corpus, which is the set to run when the
+// question is how the backends scale with window width rather than with depth.
+//
 // Usage:
 //   node scripts/render/backends.ts                          chrome, 6 cases
 //   node scripts/render/backends.ts --browser=firefox        + WebGPU, headed
+//   SCALE=100kb-wide node scripts/render/backends.ts         one width
 //   CASES=20x-shortread node scripts/render/backends.ts      one case
 //   node scripts/render/backends.ts --wait-for-load=3        start once idle
 import fs from 'fs'
 
 import { launch, type Browser, type Page } from 'puppeteer'
 
+import { resultSuffix, selectScale } from './cases.ts'
 import { loadavg, outliers, peak, type LoadWindow } from './loadavg.ts'
 import { resolveBuild } from './servedbuild.ts'
 
@@ -44,7 +51,12 @@ const arg = (name: string, fallback: string) =>
 const PORT = Number(arg('port', '8000'))
 const RUNS = Number(arg('runs', '5'))
 const WARMUP = 1
-const LOC = 'chr22_mask:124000-143000' // 19kb, same window as every other table
+// Window, assembly and coverage ladder all come from the scale, so the backend
+// question can be asked at more than one width. `SCALE=19kb-wide,100kb-wide,1mb`
+// is the width sweep on one corpus; the default stays the deep 19 kb window
+// every other table here uses, and keeps the unsuffixed result filenames.
+const scale = selectScale()
+const LOC = scale.loc
 const LOAD_CEILING = 4.0
 const BROWSER = arg('browser', 'chrome')
 const FIREFOX_PATH = arg('firefox', '/usr/bin/firefox-nightly')
@@ -80,10 +92,17 @@ const rungs = isFirefox
       { id: 'canvas2d', extra: '&renderer=canvas2d' },
     ]
 
+// BAM only, and no format axis in the case id: this table holds everything but
+// the `?renderer=` rung fixed, and the ids stay the ones `results/backends-*.json`
+// has always used. `enumerateCases` carries a format axis this table does not
+// ask about, so the scale supplies the ladder and the ids are built here.
 const allCases: { id: string; track: string }[] = []
 for (const read of ['shortread', 'longread']) {
-  for (const cov of ['20x', '200x', '1000x']) {
-    allCases.push({ id: `${cov}-${read}`, track: `${cov}.${read}.bam` })
+  for (const cov of scale.coverages) {
+    allCases.push({
+      id: `${cov}-${read}`,
+      track: `${scale.prefix}${cov}.${read}.bam`,
+    })
   }
 }
 const selected = process.env.CASES?.split(',')
@@ -108,7 +127,7 @@ const stddev = (a: number[]) => {
 }
 
 const urlFor = (track: string, extra: string) =>
-  `http://localhost:${PORT}/?loc=${LOC}&assembly=hg19mod&tracks=${track}${extra}`
+  `http://localhost:${PORT}/?loc=${LOC}&assembly=${scale.assembly}&tracks=${track}${extra}`
 
 // One browser per measured run, as profile.ts does: a reused browser serves the
 // second run out of a warm HTTP cache, which is a different question from the
@@ -315,7 +334,7 @@ for (const c of cases) {
       first = await measure(
         c.track,
         b.extra,
-        `screenshots/backends/${BROWSER}-${c.id}-${b.id}.png`,
+        `screenshots/backends/${BROWSER}${resultSuffix(scale)}-${c.id}-${b.id}.png`,
       )
     }
     const runs: number[] = []
@@ -369,18 +388,27 @@ if (blank.length) {
 
 const stamp = new Date().toISOString().slice(0, 10)
 fs.mkdirSync('results', { recursive: true })
-const outfile = `results/backends-${BROWSER}`
+const outfile = `results/backends-${BROWSER}${resultSuffix(scale)}`
 fs.writeFileSync(
   `${outfile}.json`,
   JSON.stringify(
-    { loc: LOC, runs: RUNS, build, port: PORT, browser: BROWSER, stamp, results },
+    {
+      loc: LOC,
+      scale: scale.id,
+      runs: RUNS,
+      build,
+      port: PORT,
+      browser: BROWSER,
+      stamp,
+      results,
+    },
     null,
     2,
   ),
 )
 
 let md = `# Backend comparison (${BROWSER})\n\n`
-md += `Build \`${build}\`, region \`${LOC}\` (19kb), ${BROWSER}, measured ${stamp}. `
+md += `Build \`${build}\`, region \`${LOC}\` (${scale.label}), ${BROWSER}, measured ${stamp}. `
 md += `One build, one machine, one instrument — only the \`?renderer=\` rung `
 md += `changes. In-page navigation→render-complete, median of ${RUNS} runs (ms) `
 md += `± the standard deviation of those runs.\n\n`
