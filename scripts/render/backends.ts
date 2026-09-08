@@ -81,16 +81,24 @@ const WAIT_FOR_LOAD = Number(arg('wait-for-load', '0'))
 const WAIT_MAX_MIN = Number(arg('wait-max-minutes', '180'))
 
 const isFirefox = BROWSER === 'firefox'
-const rungs = isFirefox
-  ? [
-      { id: 'default', extra: '' },
-      { id: 'webgl', extra: '&renderer=webgl' },
-      { id: 'canvas2d', extra: '&renderer=canvas2d' },
-    ]
-  : [
-      { id: 'webgl', extra: '&renderer=webgl' },
-      { id: 'canvas2d', extra: '&renderer=canvas2d' },
-    ]
+const ALL_RUNGS: Record<string, { id: string; extra: string }> = {
+  default: { id: 'default', extra: '' },
+  webgl: { id: 'webgl', extra: '&renderer=webgl' },
+  canvas2d: { id: 'canvas2d', extra: '&renderer=canvas2d' },
+}
+// Chrome's ladder leaves `default` out because its WebGPU paints an empty
+// canvas here. That is a finding about one browser build on one box, so
+// `--rungs=default` is how it gets re-tested against a new one rather than
+// inherited from the note above; the ink column is what answers it.
+const rungs = arg('rungs', isFirefox ? 'default,webgl,canvas2d' : 'webgl,canvas2d')
+  .split(',')
+  .map(id => {
+    const r = ALL_RUNGS[id]
+    if (!r) {
+      throw new Error(`unknown rung ${id}; known: ${Object.keys(ALL_RUNGS).join(',')}`)
+    }
+    return r
+  })
 
 // BAM only, and no format axis in the case id: this table holds everything but
 // the `?renderer=` rung fixed, and the ids stay the ones `results/backends-*.json`
@@ -163,16 +171,33 @@ function launchBrowser(): Promise<Browser> {
       })
 }
 
+// Readiness is `data-display-phase` / `data-display-drawn`, with the `-done`
+// testid suffix kept only as the fallback for builds that predate ADR-065
+// (jbrowse-components, 2026-08-10). Asking for the suffix alone matches nothing
+// on a current build, so every cell here reported FAIL against one — which is
+// indistinguishable from a backend that cannot render. `contentready.ts` states
+// the same two contracts at length.
 const waitReady = (page: Page) =>
   page.waitForFunction(
     ({ stableNeeded }: { stableNeeded: number }) => {
       const w = window as unknown as { __stable?: number; __last?: number }
-      const done = document.querySelectorAll(
-        '[data-testid$="-done"],[data-testid$="_done"]',
-      ).length
       const loading =
         document.querySelectorAll('[data-testid="loading-overlay"]').length > 0
-      const ready = done > 0 && !loading
+      const phaseNodes = document.querySelectorAll('[data-display-phase]').length
+      let done: number
+      let ready: boolean
+      if (phaseNodes > 0) {
+        const outstanding = document.querySelectorAll(
+          '[data-display-phase="loading"],[data-display-drawn="false"]',
+        ).length
+        done = phaseNodes
+        ready = outstanding === 0 && !loading
+      } else {
+        done = document.querySelectorAll(
+          '[data-testid$="-done"],[data-testid$="_done"]',
+        ).length
+        ready = done > 0 && !loading
+      }
       if (ready && done === w.__last) {
         w.__stable = (w.__stable ?? 0) + 1
       } else {
