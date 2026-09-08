@@ -36,6 +36,21 @@ const WINDOWS = [
   { window: '1 Mb, MAF 0, haplotypes', file: '1-mb-window-maf-0-haplotypes.bin' },
 ]
 
+const ALLOW_SOFTWARE = args.includes('--allow-software')
+
+// A software rasterizer answers every WebGPU call correctly and is one to be
+// fooled by: it would record a "WebGPU kernel" row that never touched a GPU.
+// scripts/ld/ldkernel.ts refuses one on the LD side; this is the same refusal
+// on the adapter string the probe prints.
+const SOFTWARE_MARKERS = [
+  'swiftshader',
+  'lavapipe',
+  'llvmpipe',
+  'software',
+  'warp',
+  'microsoft basic',
+]
+
 const only = args.find(a => a.startsWith('--windows='))?.slice(10).split(',')
 const selected = only ? WINDOWS.filter(w => only.includes(w.file)) : WINDOWS
 
@@ -60,6 +75,14 @@ for (const w of selected) {
   const merge = /merge on the gpu matrix \(hclust wasm\): ([\d.]+) ms/.exec(out)
   if (!shape || !timing || !merge) {
     throw new Error(`could not parse the probe's output for ${w.file}:\n${out}`)
+  }
+
+  const marker = SOFTWARE_MARKERS.find(m => timing[1].toLowerCase().includes(m))
+  if (marker && !ALLOW_SOFTWARE) {
+    throw new Error(
+      `refusing to report GPU timings from a software adapter (${marker}: ${timing[1]}).\n` +
+        'Re-run headed, or pass --allow-software to record it deliberately.',
+    )
   }
 
   const row = {
