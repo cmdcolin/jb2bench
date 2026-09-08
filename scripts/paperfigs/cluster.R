@@ -1,21 +1,28 @@
 #!/usr/bin/env Rscript
 # results/figures/paper/pdf/cluster-speedup.pdf, from results/paper/cluster.csv.
 #
-# The sample-by-sample distance build behind row clustering, on real 1000
-# Genomes windows, as the pure-JS implementation JBrowse shipped with
-# (greenelab/hclust), that same phase written the way a JS library would write
-# it today, the wasm that replaced it, and a deliberately naive WebGPU kernel
-# that keeps the wasm merge behind it.
+# Row clustering on real 1000 Genomes windows, as the pure-JS implementation
+# JBrowse shipped with (greenelab/hclust), that same distance build written the
+# way a JS library would write it today, the wasm that replaced it, and the
+# WebGPU kernel that keeps the wasm merge behind it.
 #
-# The optimized-JS curve is ~2x below the reference here, not the 9.3x the
+# THE FOUR SERIES ARE NOT ALL THE SAME QUANTITY, and the CSV's own record says
+# so (cluster-distance-local.json): the two JS series are the distance build
+# alone, while the wasm and hybrid series are the whole clusterData call. That
+# is forced -- hclust's progress callback cannot resolve the split under 100 ms
+# -- and it errs the safe way, since the merge is 0.04% to 4.8% of the calls
+# where it was observed, inside the line on a log axis. The vs-wasm badges are
+# therefore whole call against whole call; the vs-JS-ref badges put a JS
+# distance build against a hybrid whole call, so they are lower bounds.
+#
+# The optimized-JS curve is ~2x below the reference here, not the 8x the
 # end-to-end figure shows for the same pair. Both are right and the difference
-# is the point: this figure is the DISTANCE BUILD ALONE, and almost all of that
-# 9.3x was greenelab's merge, which rescans every cluster pair. What is left
-# once the merge is out of the comparison is a triangle instead of a full
-# square, plus a kernel that keeps four accumulators and reuses each streamed
-# row twice -- ordinary work, worth about 2x, and the honest size of what
-# optimizing JavaScript buys on this phase. The rest of the gap to wasm is the
-# runtime.
+# is the merge: almost all of that 8x was greenelab's, which rescans every
+# cluster pair, and it is out of both curves here. What is left is a triangle
+# instead of a full square, plus a kernel that keeps four accumulators and
+# reuses each streamed row twice -- ordinary work, worth about 2x, and the
+# honest size of what optimizing JavaScript buys on this phase. The rest of the
+# gap to wasm is the runtime.
 #
 # results/paper/cluster.csv also carries the pre-rewrite wasm build (hclust
 # 5.0.0); the figure draws only the current one. Two wasm curves a fixed
@@ -25,8 +32,8 @@
 # One panel per row count, because the two dimensions of the matrix do not cost
 # the same. The distance build is O(n^2 v): doubling the columns doubles the
 # work, doubling the rows quadruples it, and the measurements say so — at
-# v ~ 2,300 the wasm build goes 2.1 s -> 9.3 s across the row doubling, and at
-# v ~ 22,400 it goes 23 s -> 98 s, both a factor of about four. A single axis of
+# v ~ 2,300 the wasm call goes 1.6 s -> 7.5 s across the row doubling, and at
+# v ~ 22,400 it goes 18.1 s -> 70.7 s, both a factor of about four. A single axis of
 # n x v cannot show that: it moves the haplotype cases right by 2x when their
 # work went up by 4x, so the curve slopes it draws are not the algorithm's.
 # Holding n fixed within a panel leaves v as the only variable, and within a
