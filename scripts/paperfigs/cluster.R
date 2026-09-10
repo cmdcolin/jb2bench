@@ -130,8 +130,7 @@ ggsave("results/figures/paper/pdf/cluster-speedup.pdf", fig,
 cat("wrote results/figures/paper/pdf/cluster-speedup.pdf\n")
 
 # PNG at the same geometry, for the documents and slides that will not take a
-# PDF. Written beside the PDF and named for its subject; see the note in
-# scripts/paperfigs/ldband.R.
+# PDF. Written beside the PDF and named for its subject.
 ggsave("results/figures/paper/png/cluster-speedup.png", fig,
        width = 240, height = 140, units = "mm", dpi = 300, device = ragg::agg_png)
 cat("wrote results/figures/paper/png/cluster-speedup.png\n")

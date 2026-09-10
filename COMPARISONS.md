@@ -28,7 +28,6 @@ coverage legible:
 | **track count** | `scripts/render/multibam.ts` | what does a multi-track pan cost? |
 | **tool, cold load** | `results/crosstool.md` | how do we compare to igv.js on the same bytes? |
 | **tool, interaction** | `results/crosstool-pan.md` | and with application startup out of the number? |
-| **compute substrate** | `results/ld-gpu-vs-cpu.md` | is the LD compute shader worth it? |
 | **implementation language** | `ecosystem/vcf-crosslang.json` (transcribed), `ecosystem/results/cram-samtools.md` (run here) | how does our parser stand beside htslib? |
 | **the instrument itself** | `results/quiescence.md` | which completion detector, and how far apart are they? |
 | **tool x format** | `results/format-support.md` | which tools open which formats off a plain static host? |

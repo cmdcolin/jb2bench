@@ -321,7 +321,6 @@ paper-figs:
 	Rscript scripts/paperfigs/perf-interaction.R
 	Rscript scripts/paperfigs/perf-crosstool-zoom.R
 	Rscript scripts/paperfigs/parser.R
-	Rscript scripts/paperfigs/ldband.R
 	Rscript scripts/paperfigs/cluster-endtoend.R
 	Rscript scripts/paperfigs/cluster.R
 	Rscript scripts/paperfigs/wasmgate.R
@@ -340,7 +339,6 @@ paper-data:
 	   Rscript scripts/paperfigs/width-data.R .; \
 	 else echo "no 1 Mb run on disk; width.csv is left as committed"; fi
 	Rscript scripts/paperfigs/parser-data.R .
-	Rscript scripts/paperfigs/ldband-data.R .
 	Rscript scripts/paperfigs/wasmgate-data.R .
 # Standalone alone is enough: that arm needs no staged build, and the figure
 # draws it as a single series until an end-to-end run exists beside it.
