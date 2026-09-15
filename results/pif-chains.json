@@ -1,0 +1,24 @@
+{
+  "input": "input.paf",
+  "rows": 75076,
+  "cigar_ops": "DIM",
+  "aligned_bp": 937845291,
+  "indel_bp": 4343594672,
+  "rows_with_indel_over": {
+    "10000": 1443,
+    "1000000": 43
+  },
+  "largest_indel_bp": 80611198,
+  "widest_row": {
+    "target": "chr3:27714285-151124910",
+    "query": "chr9:90195840-118318961",
+    "aligned_bp": 10899765,
+    "identity": 0.08832112307996172,
+    "identity_after_break": 0.22275974404092763
+  },
+  "break_paf": {
+    "max_size": 100000,
+    "seconds": 4.179450750999999,
+    "rows_out": 75738
+  }
+}

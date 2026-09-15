@@ -727,3 +727,67 @@ On the UCSC hs1-to-mm39 liftOver chains, 75,076 alignments:
 `scripts/paperfigs/pif-deviation.R` draws the record where the coarsened
 encoding is at its worst. On that record the split encoding peaks at 4.22 px;
 its 7.12 px worst is on a different record.
+
+### What would shrink the coarse tier
+
+Nothing here has shipped. `make pif-options PIF=<file.pif.gz> PIF_WORK=<dir>`
+measures each option against a version-2 PIF. `scripts/pif/tier-options.ts`
+inverts the file's `t` rows to PAF in `pi:i:` order and rebuilds it with the
+pinned `@jbrowse/cli` 5.0.0-beta.8 at larger `--coarse` bounds. It also
+rewrites only the `T`/`Q` rows for the other options and indexes them the way
+make-pif does. Bytes are the Tabix chunk-span union, as above. Rebuilt at the
+default bound, the hosted file gives the same `T` and `Q` bytes to the byte, so
+the rebuilds compare directly with it.
+
+| option | `T` bytes | vs hosted | `Q` bytes | vs hosted | cost |
+| --- | ---: | ---: | ---: | ---: | --- |
+| hosted, `--coarse 10000` | 3,107,872 | — | 3,042,584 | — | — |
+| keep indels over 10 kb, same bound | 2,835,854 | −8.8% | 2,766,405 | −9.1% | an indel of 5–10 kb draws as a slope inside a run |
+| `--coarse 20000` | 2,457,638 | −20.9% | 2,387,676 | −21.5% | the tier serves only past 20 kb per pixel |
+| `--coarse 50000` | 2,048,094 | −34.1% | 1,975,845 | −35.1% | the tier serves only past 50 kb per pixel |
+| no coarse row for an alignment under 10 kb on both genomes | 1,339,602 | −56.9% | 1,299,584 | −57.3% | those alignments vanish at whole-genome zoom |
+
+Most of the tier is alignments narrower than a pixel. On hs1-to-mm39, 70,615 of
+75,076 alignments (94%) span under 10 kb on both genomes, the zoom's pixel
+width. They take 69% of the uncompressed `T` rows and hold 4% of the matched
+bases. For the 4,461 wider alignments, `cr:Z:` is 85% of the uncompressed row
+bytes. The tier gets smaller by writing fewer rows, not by shortening each one.
+
+Binning those alignments on a fixed 100 kb grid, the scheme
+`agent-docs/reference/SYNTENY_LOD.md` in jbrowse-components recommends, barely
+reduces them: the 70,615 fall into 56,097 cells (1.26×). liftOver fragments
+scatter rather than cluster along the diagonal. A dense all-vs-all pangenome
+may still bin well. ADR-039 rejects binning at read time and defers a binned
+make-pif tier, so dropping rows at write time is a separate change that the ADR
+doesn't cover.
+
+The keep-indels option keeps an indel only when it exceeds the whole bound.
+make-pif used that threshold until `3936dcfa01`, which lowered it to half the
+bound because an indel in the upper half could open a run already leaning by
+it, reaching 1.5× the bound. The option measured here splits such an indel
+across a run boundary instead, and a point inside an indel lies on the real
+path. Measured with `deviation.ts`'s method, its worst alignment draws 0.997 px
+off, inside the bound.
+
+### Chain files and `rb break-paf`
+
+A liftOver chain links aligned blocks across gaps of any size, so a
+`chain2paf` row can span a chromosome arm while aligning a small fraction of
+it. `scripts/pif/chains.ts` measures this on the PAF `tier-options.ts` writes,
+and times `rb break-paf` (rustybam 0.2.2) on it. On hs1-to-mm39:
+
+- 75,076 rows align 0.94 Gb and hold 4.34 Gb inside indels.
+- 1,443 rows hold an indel over 10 kb, 43 hold one over 1 Mb, and the largest is
+  80.6 Mb.
+- The widest row spans hs1 `chr3:27,714,285-151,124,910` (123 Mb) against mm39
+  chr9 and aligns 10.9 Mb of it.
+- `rb break-paf --max-size 100000` runs the whole file in about 4 s and writes
+  75,738 rows.
+
+Cutting a row doesn't fix its identity coloring. JBrowse colors a row by column
+10 over column 11. The widest row reads 8.8% before the cut and 22.3% over its
+pieces pooled after, because the pieces still count their smaller gaps and
+`chain2paf` writes no `de:f:`. The geometry is what the cut improves. A
+recommendation to run `rb break-paf` before `make-pif` on chain input belongs in
+jbrowse-components' `website/docs/config_guides/synteny_track.md`, beside
+"Quick start: PAF from minimap2"; nobody has written it yet.

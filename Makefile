@@ -28,7 +28,7 @@ LOGDIR := results/logs
         parsers parsers-count cram-samtools multibam backends clean-logs \
         formats toolcheck shots paper-tables paper-figs paper-data wait-quiet \
         backends-webgpu \
-        wasmgate bgzfpool bgzfpool-standalone bgzfpool-endtoend pif
+        wasmgate bgzfpool bgzfpool-standalone bgzfpool-endtoend pif pif-options
 
 help:
 	@echo "preflight"
@@ -61,6 +61,7 @@ help:
 	@echo "  make wasmgate        is a routine worth compiling to wasm, or is the copy bigger?"
 	@echo "  make bgzfpool        the BGZF inflate pool on vs off, query alone and end to end"
 	@echo "  make pif PIF=f.pif.gz what a coarsened PIF's tiers cost, and how far they draw off"
+	@echo "  make pif-options PIF=f.pif.gz PIF_WORK=dir  what would shrink the coarse tier; chains and rb break-paf"
 	@echo "  make multibam        multi-track pan"
 	@echo "  make backends        webgl vs webgpu vs canvas"
 	@echo "  make backends-webgpu the same + a WebGPU rung, 19kb/100kb/1mb, headed firefox"
@@ -296,6 +297,14 @@ pif:
 	@[ -n "$(PIF)" ] || { echo "set PIF=<file.pif.gz>"; exit 1; }
 	$(NODE) scripts/pif/coarsening.ts $(PIF) --json results/pif-coarsening.json
 	$(NODE) --max-old-space-size=12000 scripts/pif/deviation.ts $(PIF)
+
+# Rebuilds and rewrites of the same file, about 900 MB in PIF_WORK, 2 min.
+# chains.ts needs rustybam's `rb` (cargo install rustybam).
+PIF_WORK ?=
+pif-options:
+	@[ -n "$(PIF)" ] && [ -n "$(PIF_WORK)" ] || { echo "set PIF=<file.pif.gz> PIF_WORK=<dir>"; exit 1; }
+	$(NODE) --max-old-space-size=12000 scripts/pif/tier-options.ts $(PIF) --work $(PIF_WORK) --json results/pif-tier-options.json
+	$(NODE) scripts/pif/chains.ts $(PIF_WORK)/input.paf --json results/pif-chains.json
 
 # ------------------------------------------------------------------ present
 

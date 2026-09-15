@@ -1,0 +1,58 @@
+{
+  "input": "hs1ToMm39.over.chain.pif.gz",
+  "header": "#pif\tversion:i:2\twriter:Z:jbrowse-cli/5.0.0-beta.8\ttiers:Z:fine,coarse\tcoarse:i:10000\tcigars:Z:all",
+  "bound_bp": 10000,
+  "alignments": 75076,
+  "rows_with_cigar": 75076,
+  "small": {
+    "rows": 70615,
+    "bytes": 6610900,
+    "matched": 38219354,
+    "cells_at_100kb": 56097
+  },
+  "wide": {
+    "rows": 4461,
+    "bytes": 2939643,
+    "foldBytes": 2513188,
+    "matched": 899625937
+  },
+  "keep_indels_worst_px": 0.9971,
+  "tier_bytes": {
+    "input": {
+      "Q": 3042584,
+      "T": 3107872,
+      "q": 64151538,
+      "t": 64856247
+    },
+    "drop": {
+      "Q": 1299584,
+      "T": 1339602,
+      "q": 64157687,
+      "t": 64856247
+    },
+    "keep-indels": {
+      "Q": 2766405,
+      "T": 2835854,
+      "q": 64154107,
+      "t": 64856247
+    },
+    "coarse 10000": {
+      "Q": 3042584,
+      "T": 3107872,
+      "q": 64151538,
+      "t": 64856247
+    },
+    "coarse 20000": {
+      "Q": 2387676,
+      "T": 2457638,
+      "q": 64158613,
+      "t": 64856247
+    },
+    "coarse 50000": {
+      "Q": 1975845,
+      "T": 2048094,
+      "q": 64155338,
+      "t": 64856247
+    }
+  }
+}

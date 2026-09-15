@@ -17,6 +17,8 @@
     "tablemark": "^4.1.0"
   },
   "devDependencies": {
+    "@jbrowse/cigar-utils": "5.0.0-beta.8",
+    "@jbrowse/cli": "5.0.0-beta.8",
     "@types/node": "^25.9.3",
     "@webgpu/types": "^0.1.71",
     "esbuild": "^0.28.2",
