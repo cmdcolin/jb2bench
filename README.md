@@ -22,6 +22,7 @@ numbers describe the same bytes.
 | `scripts/flamegraph/` | CPU-profile capture and the flamegraph toolkit |
 | `scripts/bgzfpool/` | the BGZF inflate pool on vs off, measured twice: the query on its own and the same query through a jbrowse pan |
 | `scripts/crosstool/` | the igv.js comparison: paint-quiescence profiler and matrix |
+| `scripts/pif/` | a coarsened PIF's two tiers: what each costs to fetch, and how far a coarsened record draws from the alignment it stands for |
 | `crosstool/` | the igv.js and GenomeSpy harness pages, plus symlinks to `data/` and the tool bundles |
 | `scripts/probe.ts`, `scripts/gpucheck.ts` | dev helpers: render testids, GPU backend |
 | `scripts/wasmgate.ts` | the wasm admission test: a routine's cost in JS against the cost of copying its bytes across the wasm boundary |

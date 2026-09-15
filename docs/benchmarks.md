@@ -674,3 +674,44 @@ and alternates their order pass to pass so that drift cannot align with row
 count — but no output has been kept as a result, on purpose. Check
 `pgrep -c claude` before believing anything it prints.
 
+
+## Coarsened PIF: what the tier costs, and what it costs in accuracy
+
+`jbrowse make-pif` writes each alignment twice more, under `T`/`Q`, with the
+CIGAR replaced by a coarse CIGAR (`cr:Z:`): indels longer than half the
+`--coarse` bound kept, and one straight run between each pair. A whole-genome
+synteny view reads that tier instead of the full-CIGAR one. Two questions
+follow, and `make pif PIF=<file.pif.gz>` answers both.
+
+**What does reading a tier transfer?** `scripts/pif/coarsening.ts` unions the
+compressed byte intervals the Tabix index gives each prefix, so the answer comes
+from the index and needs no download. It reads a sample of records back and
+reports which alignment strings that prefix carries, because the coarse tier's
+format changed on 2026-09-02 -- before it, a coarsened record had no alignment
+string at all and was roughly half the size -- and a byte count means a
+different thing either side of that.
+
+**How far does a coarsened record draw from the alignment it stands for?** A run
+is a straight line, so every ribbon edge and every location marker inside one is
+interpolated. `scripts/pif/deviation.ts` walks every full CIGAR in the file and,
+at each vertex of the real path, measures how far the coarsened path sits from
+it on the other genome, in pixels at the zoom the tier is served. A kept indel
+is a vertical step in the coarse path, so a vertex anywhere on it scores zero --
+which is what keeping the indel buys.
+
+It measures a second encoding beside it: cut at every large indel and drop the
+CIGAR, which is what `rb break-paf` produces upstream of a CIGAR-less writer and
+what PIF's own coarse tier used to do. Nothing there bounds what the
+sub-threshold indels left in place do to the straight line across a piece, and
+the comparison is the point rather than a strawman.
+
+On the UCSC hs1-to-mm39 liftOver chains, 75,076 records:
+
+| encoding | median | p99 | worst | records past the bound |
+| --- | ---: | ---: | ---: | ---: |
+| coarsened (`cr:Z:`) | 0.002 px | 0.45 px | **0.87 px** | **0** |
+| split at large indels, CIGAR dropped | 0.002 px | 0.93 px | 7.12 px | 612 |
+
+The bound holds on every record; the alternative leaves it on 0.8% of them, by
+as much as seven pixels. `scripts/paperfigs/pif-deviation.R` draws the record
+where the coarsened encoding is at its worst.

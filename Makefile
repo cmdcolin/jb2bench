@@ -28,7 +28,7 @@ LOGDIR := results/logs
         parsers parsers-count cram-samtools multibam backends clean-logs \
         formats toolcheck shots paper-tables paper-figs paper-data wait-quiet \
         backends-webgpu \
-        wasmgate bgzfpool bgzfpool-standalone bgzfpool-endtoend
+        wasmgate bgzfpool bgzfpool-standalone bgzfpool-endtoend pif
 
 help:
 	@echo "preflight"
@@ -60,6 +60,7 @@ help:
 	@echo "  make cram-samtools   @gmod/cram against samtools, the 2019 paper's benchmark"
 	@echo "  make wasmgate        is a routine worth compiling to wasm, or is the copy bigger?"
 	@echo "  make bgzfpool        the BGZF inflate pool on vs off, query alone and end to end"
+	@echo "  make pif PIF=f.pif.gz what a coarsened PIF's tiers cost, and how far they draw off"
 	@echo "  make multibam        multi-track pan"
 	@echo "  make backends        webgl vs webgpu vs canvas"
 	@echo "  make backends-webgpu the same + a WebGPU rung, 19kb/100kb/1mb, headed firefox"
@@ -282,6 +283,19 @@ cram-samtools: gate | $(LOGDIR)
 # cells there.
 timings: render interaction crosstool parsers cram-samtools
 
+# What a coarsened PIF costs and how far it draws off the alignment. The file is
+# not in data/ -- a two-tier whole-genome PIF is ~130 MB -- so it is named:
+#
+#   make pif PIF=~/data/hs1ToMm39/hs1ToMm39.over.chain.pif.gz
+#
+# coarsening.ts reads the index alone and is instant; deviation.ts walks every
+# CIGAR in the file and takes a few minutes, writing the CSVs the figure draws.
+PIF ?=
+pif:
+	@[ -n "$(PIF)" ] || { echo "set PIF=<file.pif.gz>"; exit 1; }
+	$(NODE) scripts/pif/coarsening.ts $(PIF) --json results/pif-coarsening.json
+	$(NODE) --max-old-space-size=12000 scripts/pif/deviation.ts $(PIF)
+
 # ------------------------------------------------------------------ present
 
 # The four render tables the manuscript prints, as \input files. Same rule as
@@ -324,6 +338,7 @@ paper-figs:
 	Rscript scripts/paperfigs/cluster-endtoend.R
 	Rscript scripts/paperfigs/cluster.R
 	Rscript scripts/paperfigs/wasmgate.R
+	Rscript scripts/paperfigs/pif-deviation.R
 	@if [ -f results/paper/bgzfpool.csv ]; then \
 	   Rscript scripts/paperfigs/bgzfpool.R; \
 	 else echo "no results/paper/bgzfpool.csv; run make bgzfpool then make paper-data"; fi
