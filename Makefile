@@ -286,10 +286,11 @@ timings: render interaction crosstool parsers cram-samtools
 # What a coarsened PIF costs and how far it draws off the alignment. The file is
 # not in data/ -- a two-tier whole-genome PIF is ~130 MB -- so it is named:
 #
-#   make pif PIF=~/data/hs1ToMm39/hs1ToMm39.over.chain.pif.gz
+#   curl -O https://s3.amazonaws.com/jbrowse.org/genomes/hs1_vs_mm39/hs1ToMm39.over.chain.pif.gz{,.tbi}
+#   make pif PIF=hs1ToMm39.over.chain.pif.gz
 #
-# coarsening.ts reads the index alone and is instant; deviation.ts walks every
-# CIGAR in the file and takes a few minutes, writing the CSVs the figure draws.
+# coarsening.ts reads the index alone; deviation.ts folds every t row's CIGAR, in
+# about 12 s, and writes the CSVs the figure draws.
 PIF ?=
 pif:
 	@[ -n "$(PIF)" ] || { echo "set PIF=<file.pif.gz>"; exit 1; }

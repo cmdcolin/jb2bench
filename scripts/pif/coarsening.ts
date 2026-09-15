@@ -5,23 +5,19 @@
 // and `T`/`Q` for the coarsened ones. A whole-genome synteny view reads one
 // prefix, so "what does drawing a whole genome transfer" is answered by the
 // index alone -- the union of the compressed byte intervals that prefix's
-// records occupy. No download, and no estimate: the numbers are BGZF offsets
-// into the file being described.
+// records occupy. The numbers are BGZF offsets into the file being described.
 //
 // Union, not sum. Sibling references share a BGZF block wherever one block
 // holds the tail of one and the head of the next, and summing chunk lengths
-// counts those blocks twice. The check that the arithmetic is right is that the
-// prefixes sum to the file size, which this prints.
+// counts those blocks twice. The prefixes should sum to the file size less the
+// header block and the BGZF end marker; the script prints both.
 //
-// The script also reads the first records under each prefix back and reports
-// which alignment strings they carry, because that is what the byte counts mean
-// and it has changed once already. Before 2026-09-02 a coarsened record carried
-// no alignment string at all -- the writer split each alignment at its large
-// indels and dropped the CIGAR. Since then it carries a `cr:Z:` coarse CIGAR:
-// the indels longer than half the accuracy bound, kept, with one run between
-// each pair recording how far each genome advanced. The second format is larger
-// and is not the one the older hosted files were measured at, so a run of this
-// script reports the format it found rather than assuming either.
+// Byte counts mean different things across coarse-tier formats. Until
+// 2026-09-02 a coarsened record carried no alignment string; since then it may
+// carry a `cr:Z:` fold, and a v2+ file states its format in a `#pif` header,
+// which the script prints. It also lists the alignment tags seen in the first
+// 64 kB under each prefix. That list is a sample: the writer omits `cr:Z:` from
+// a row whose fold is one run, which is most rows, so a sample can miss it.
 //
 //   node --experimental-strip-types scripts/pif/coarsening.ts <file.pif.gz> [--json out.json]
 //
@@ -30,17 +26,22 @@
 
 import { writeFileSync } from 'node:fs'
 
-import { inflateBgzf, readAll, readBytes, readTabix, unionBytes } from './tabix.ts'
+import {
+  inflateBgzf,
+  readAll,
+  readBytes,
+  readTabix,
+  sizeOf,
+  unionBytes,
+} from './tabix.ts'
 
-// enough to hold several BGZF blocks, so a sample is whole records rather than
-// one truncated line
 const SAMPLE_BYTES = 1 << 16
 
 interface PrefixRow {
   prefix: string
   refNames: number
   bytes: number
-  alignmentStrings: string
+  tagsSampled: string
 }
 
 function tagsOn(lines: string[]) {
@@ -56,18 +57,26 @@ function tagsOn(lines: string[]) {
   return seen
 }
 
+async function linesAt(src: string, offset: number) {
+  const text = inflateBgzf(await readBytes(src, offset, SAMPLE_BYTES))
+  return text.slice(0, text.lastIndexOf('\n')).split('\n')
+}
+
 async function main() {
   const args = process.argv.slice(2)
   const src = args[0]
   if (!src) {
-    throw new Error(
-      'usage: coarsening.ts <file.pif.gz> [--json out.json]',
-    )
+    throw new Error('usage: coarsening.ts <file.pif.gz> [--json out.json]')
   }
   const jsonAt = args.indexOf('--json')
   const refs = readTabix(await readAll(`${src}.tbi`))
+  const fileBytes = await sizeOf(src)
+  const header = (await linesAt(src, 0)).find(l => l.startsWith('#pif')) ?? null
 
-  const byPrefix = new Map<string, { refNames: number; chunks: [number, number][] }>()
+  const byPrefix = new Map<
+    string,
+    { refNames: number; chunks: [number, number][] }
+  >()
   for (const { refName, chunks } of refs) {
     const prefix = refName[0]!
     const e = byPrefix.get(prefix) ?? { refNames: 0, chunks: [] }
@@ -79,31 +88,34 @@ async function main() {
   const rows: PrefixRow[] = []
   for (const [prefix, e] of [...byPrefix].sort()) {
     const first = e.chunks.reduce((m, c) => Math.min(m, c[0]), Infinity)
-    const sample = inflateBgzf(await readBytes(src, first, SAMPLE_BYTES))
-    const lines = sample
-      .slice(0, sample.lastIndexOf('\n'))
-      .split('\n')
-      .filter(l => l.startsWith(prefix))
-    const tags = tagsOn(lines)
+    const tags = tagsOn(
+      (await linesAt(src, first)).filter(l => l.startsWith(prefix)),
+    )
     rows.push({
       prefix,
       refNames: e.refNames,
       bytes: unionBytes(e.chunks),
-      alignmentStrings: tags.size === 0 ? 'none' : [...tags].sort().join('+'),
+      tagsSampled: tags.size === 0 ? 'none' : [...tags].sort().join('+'),
     })
   }
 
-  const mb = (n: number) => `${(n / 1e6).toFixed(1)} MB`
-  console.log('prefix  refNames  whole-genome fetch  alignment strings')
+  console.log(header ?? 'no #pif header (a version-1 or older file)')
+  console.log('\nprefix  refNames        bytes  tags sampled')
   for (const r of rows) {
     console.log(
-      `${r.prefix.padEnd(6)}  ${String(r.refNames).padStart(8)}  ${mb(r.bytes).padStart(18)}  ${r.alignmentStrings}`)
+      `${r.prefix.padEnd(6)}  ${String(r.refNames).padStart(8)}  ${String(r.bytes).padStart(11)}  ${r.tagsSampled}`,
+    )
   }
   const total = rows.reduce((s, r) => s + r.bytes, 0)
-  console.log(`\nprefixes sum to ${mb(total)}`)
+  console.log(
+    `\nprefixes sum to ${total} bytes; the file is ${fileBytes} (${fileBytes - total} outside any prefix)`,
+  )
 
   if (jsonAt >= 0) {
-    writeFileSync(args[jsonAt + 1]!, `${JSON.stringify({ src, rows, total }, null, 2)}\n`)
+    writeFileSync(
+      args[jsonAt + 1]!,
+      `${JSON.stringify({ src, header, fileBytes, rows, total }, null, 2)}\n`,
+    )
   }
 }
 

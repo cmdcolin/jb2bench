@@ -9,23 +9,23 @@
 //
 // The measurement, per record: walk the full CIGAR, and at every vertex of the
 // real path ask where the coarsened path is at the same coordinate on the first
-// genome. The answer is a set, not a point, because a kept indel is a vertical
-// step -- so a vertex sitting anywhere on that step scores zero, which is what
-// makes keeping an indel worth its bytes. Divide by bp-per-pixel and the number
-// is what a reader would see.
+// genome. Where the coarsened path is a kept insertion it is vertical, so the
+// answer is a range and a vertex anywhere in it scores zero. Divide by
+// bp-per-pixel and the number is what a reader would see.
 //
 // Two encodings are measured, because the bound is a property of this one and
 // not of coarsening in general:
 //
-//   coarsened   the `cr:Z:` encoding make-pif writes. Indels longer than half
-//               the bound keep their letter; between them, one run per stretch,
-//               closed before its accumulated lean passes half the bound.
-//   split       the alternative: cut the alignment at every indel over the same
-//               size and drop the CIGAR, leaving one straight ribbon per piece.
-//               This is what `rb break-paf` produces upstream of a CIGAR-less
-//               writer, and what PIF's own coarse tier did before 2026-09-02.
-//               Nothing bounds what the sub-threshold indels it leaves in place
-//               do to the straight line across a piece, which is the point.
+//   coarsened   the fold make-pif writes. Indels longer than half the bound
+//               keep their letter; the stretch between two of them is one or
+//               more runs, each closed before its lean passes half the bound.
+//   split       cut the alignment at every indel of at least the bound and drop
+//               the CIGAR, leaving one straight ribbon per piece -- make-pif's
+//               coarse tier from 2026-05-28 to 2026-09-02. `rb break-paf` cuts
+//               the same way but keeps a CIGAR on each piece, so it gives this
+//               shape only in front of a writer or viewer that drops the CIGAR.
+//               Nothing bounds what the smaller indels do to the straight line
+//               across a piece.
 //
 // Reads the `t` records of a PIF rather than a PAF, so the input is the hosted
 // file itself: those records keep the original CIGAR, so the file is its own
@@ -115,7 +115,7 @@ function coarseSegs(cr: string): Seg[] {
   return segs
 }
 
-/** Cut at every indel over `size`; each gap-free stretch is one straight run. */
+/** Cut at every indel of at least `size`, as the old writer's `splitCigarOnLargeGaps` did. */
 function splitSegs(ops: number[], size: number): Seg[] {
   const segs: Seg[] = []
   let own = 0
@@ -123,7 +123,7 @@ function splitSegs(ops: number[], size: number): Seg[] {
   for (let k = 0; k < ops.length; k += 2) {
     const len = ops[k]!
     const op = ops[k + 1]!
-    if (len > size && (op === I || op === D || op === N)) {
+    if (len >= size && (op === I || op === D || op === N)) {
       if (own > 0 || mate > 0) {
         segs.push({ own, mate })
         own = 0
@@ -170,9 +170,8 @@ function trace(ops: number[], segs: Seg[]) {
     let lo: number
     let hi: number
     if (po[i] === own || (i < last && po[i + 1] === own)) {
-      // the coarse path is vertical here -- a kept indel, or the seam between
-      // two runs -- so it covers a RANGE of second-genome coordinates, and a
-      // vertex anywhere in that range is exactly on it
+      // a zero-own segment (a kept insertion) makes the coarse path cover a
+      // range of second-genome coordinates at this point
       let j = po[i] === own ? i : i + 1
       lo = pm[j]!
       while (j < last && po[j + 1] === own) {

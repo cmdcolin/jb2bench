@@ -678,40 +678,52 @@ count — but no output has been kept as a result, on purpose. Check
 ## Coarsened PIF: what the tier costs, and what it costs in accuracy
 
 `jbrowse make-pif` writes each alignment twice more, under `T`/`Q`, with the
-CIGAR replaced by a coarse CIGAR (`cr:Z:`): indels longer than half the
-`--coarse` bound kept, and one straight run between each pair. A whole-genome
-synteny view reads that tier instead of the full-CIGAR one. Two questions
-follow, and `make pif PIF=<file.pif.gz>` answers both.
+CIGAR folded: indels longer than half the `--coarse` bound keep their letter,
+and the alignment between two of them becomes one or more runs, each closed
+before its straight line would leave the bound. A row whose fold is a single
+run carries no tag, since its columns describe it; the rest carry `cr:Z:`
+(5,047 of 75,076 rows on hs1-to-mm39). A whole-genome synteny view reads that
+tier instead of the full-CIGAR one. `make pif PIF=<file.pif.gz>` answers two
+questions about it.
 
 **What does reading a tier transfer?** `scripts/pif/coarsening.ts` unions the
-compressed byte intervals the Tabix index gives each prefix, so the answer comes
-from the index and needs no download. It reads a sample of records back and
-reports which alignment strings that prefix carries, because the coarse tier's
-format changed on 2026-09-02 -- before it, a coarsened record had no alignment
-string at all and was roughly half the size -- and a byte count means a
-different thing either side of that.
+compressed byte intervals the Tabix index gives each prefix, which is what a
+client fetches, so the answer comes from the index and needs no download. This
+is a different number from gzipping a prefix's rows on their own
+(`agent-docs/measurements/pif-coarse-fold-bytes.json` in jbrowse-components),
+which ignores BGZF block boundaries. The script prints the file size beside the
+sum, and the `#pif` header, because the byte counts mean different things across
+formats: until 2026-09-02 a coarsened row carried no alignment string, and the
+tier was about 1.6x smaller.
 
-**How far does a coarsened record draw from the alignment it stands for?** A run
-is a straight line, so every ribbon edge and every location marker inside one is
-interpolated. `scripts/pif/deviation.ts` walks every full CIGAR in the file and,
-at each vertex of the real path, measures how far the coarsened path sits from
-it on the other genome, in pixels at the zoom the tier is served. A kept indel
-is a vertical step in the coarse path, so a vertex anywhere on it scores zero --
-which is what keeping the indel buys.
+| prefix | hosted hs1ToMm39.over.chain.pif.gz, bytes |
+| --- | ---: |
+| `T` coarsened, hs1 | 3,107,872 |
+| `t` full CIGAR, hs1 | 64,856,247 |
+| `Q` coarsened, mm39 | 3,042,584 |
+| `q` full CIGAR, mm39 | 64,151,538 |
+| file | 135,158,383 |
 
-It measures a second encoding beside it: cut at every large indel and drop the
-CIGAR, which is what `rb break-paf` produces upstream of a CIGAR-less writer and
-what PIF's own coarse tier used to do. Nothing there bounds what the
-sub-threshold indels left in place do to the straight line across a piece, and
-the comparison is the point rather than a strawman.
+**How far does a coarsened record draw from the alignment it stands for?**
+JBrowse draws a run as a straight line. `scripts/pif/deviation.ts` reads every
+`t` row, folds its CIGAR with the shipped `coarsenCigar`, and at each vertex of
+the real path measures how far the folded path sits from it on the other genome,
+in pixels at the zoom the tier is served. It takes about 12 s.
 
-On the UCSC hs1-to-mm39 liftOver chains, 75,076 records:
+It measures a second encoding beside it: cut at every indel of at least the
+bound and drop the CIGAR, which is what make-pif's coarse tier did from
+2026-05-28 to 2026-09-02. `rb break-paf` cuts the same way but keeps a CIGAR on
+each piece, so it gives this shape only in front of a writer or viewer that
+drops the CIGAR. Nothing bounds what the smaller indels do to the straight line
+across a piece.
 
-| encoding | median | p99 | worst | records past the bound |
+On the UCSC hs1-to-mm39 liftOver chains, 75,076 alignments:
+
+| encoding | median | p99 | worst | alignments past one pixel |
 | --- | ---: | ---: | ---: | ---: |
-| coarsened (`cr:Z:`) | 0.002 px | 0.45 px | **0.87 px** | **0** |
-| split at large indels, CIGAR dropped | 0.002 px | 0.93 px | 7.12 px | 612 |
+| coarsened | 0.002 px | 0.45 px | **0.87 px** | **0** |
+| cut at indels of 10 kb or more, no CIGAR | 0.002 px | 0.93 px | 7.12 px | 612 |
 
-The bound holds on every record; the alternative leaves it on 0.8% of them, by
-as much as seven pixels. `scripts/paperfigs/pif-deviation.R` draws the record
-where the coarsened encoding is at its worst.
+`scripts/paperfigs/pif-deviation.R` draws the record where the coarsened
+encoding is at its worst. On that record the split encoding peaks at 4.22 px;
+its 7.12 px worst is on a different record.

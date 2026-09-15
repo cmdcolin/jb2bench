@@ -5,7 +5,7 @@
 // walking, and the alternative is a dependency whose whole surface here would be
 // one call -- see docs/methodology.md on what this repo takes on.
 
-import { readFileSync } from 'node:fs'
+import { readFileSync, statSync } from 'node:fs'
 import { gunzipSync, inflateRawSync } from 'node:zlib'
 
 // Bin 37450 is the pseudo-bin. Its two "chunks" are record counts, not file
@@ -101,6 +101,18 @@ export async function readAll(src: string): Promise<Buffer> {
     return Buffer.from(await res.arrayBuffer())
   }
   return readFileSync(src)
+}
+
+export async function sizeOf(src: string): Promise<number> {
+  if (/^https?:/.test(src)) {
+    const res = await fetch(src, { method: 'HEAD' })
+    const len = res.headers.get('content-length')
+    if (!res.ok || len === null) {
+      throw new Error(`${src} answered ${res.status} with no Content-Length`)
+    }
+    return Number(len)
+  }
+  return statSync(src).size
 }
 
 /** Bytes `[start, start+length)` of a local path or an http(s) URL. */

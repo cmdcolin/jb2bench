@@ -52,7 +52,7 @@ results/logs/
 # of the alignment data; stage them per README ("Builds compared").
 builds/
 
-node_modules/
+node_modules
 
 # V8 CPU profiles from flameprofile.ts / interaction-profile.ts, ~600 KB each.
 # The conclusions drawn from them are in flame/*.md, which are tracked.
