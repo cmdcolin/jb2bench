@@ -155,7 +155,8 @@ contention_ok <- function(cell) {
 # newer than the file format), so it is left absent rather than guessed at.
 interaction <- read_results("interaction.json")$results
 contended <- character()
-sides <- c(new = "This work", baseline = "Release 4.3.0", published = "Release 2.4.0")
+sides <- c(new = "This work", canvas = "This work, canvas backend",
+           baseline = "Release 4.3.0", published = "Release 2.4.0")
 for (c in cases) {
   for (mode in c("in", "pan")) {
     panel <- if (mode == "in") "Zoom in, within loaded data" else "Pan, both refetch"

@@ -110,7 +110,8 @@ time_scale_x <- function(name = "time", breaks = TIME_BREAKS, ...) {
 # them in. Shared because the cold-load and interaction figures are separate
 # scripts that both draw "This work" and must agree on its colour.
 PERF_SERIES <- c("Release 2.4.0", "Release 4.1.15", "Release 4.3.0",
-                 "This work", "igv.js 3.8.5", "GenomeSpy 0.85.0")
+                 "This work", "This work, canvas backend",
+                 "igv.js 3.8.5", "GenomeSpy 0.85.0")
 
 # One type scale for every manuscript figure. The stock 11 pt base at 180 mm
 # printed labels at 6 pt, which is legible on paper and not on a screen or a

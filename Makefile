@@ -23,7 +23,7 @@ STAMP := $(shell date +%Y-%m-%d)
 LOGDIR := results/logs
 
 .PHONY: help gate counts timings all figures report serve serve-stop \
-        corpus corpus-paper render render-1mb interaction crosstool crosstool-cold \
+        corpus corpus-paper render render-1mb interaction interaction-canvas crosstool crosstool-cold \
         crosstool-zoom crosstool-pan crosstool-bundles \
         parsers parsers-count cram-samtools multibam backends clean-logs \
         formats toolcheck shots paper-tables paper-figs paper-data wait-quiet \
@@ -52,6 +52,7 @@ help:
 	@echo "  make render          cold load, both formats x both read types"
 	@echo "  make render-1mb      the same, at a 1 Mb window: 20x and 100x over 2 Mb"
 	@echo "  make interaction     zoom and pan time-to-content"
+	@echo "  make interaction-canvas  the same with the build pinned to canvas2d as a fourth arm"
 	@echo "  make crosstool       against igv.js: cold load, zoom and pan, all four arms"
 	@echo "  make crosstool-cold  just the cold-load matrix"
 	@echo "  make crosstool-zoom  just the zoom"
@@ -162,6 +163,12 @@ render-1mb: gate | $(LOGDIR)
 
 interaction: gate | $(LOGDIR)
 	$(NODE) scripts/render/runner-interaction.ts 2>&1 | tee $(LOGDIR)/interaction-$(STAMP).log
+
+# The backend ablation: the build under test twice, on WebGL 2 and on its
+# Canvas2D painter, beside the releases. Zoom-in is the cell that answers what
+# the GPU buys; pan is fetch-bound in every arm and rides along as the control.
+interaction-canvas: gate | $(LOGDIR)
+	CANVAS=1 MODES=in,pan $(NODE) scripts/render/runner-interaction.ts 2>&1 | tee $(LOGDIR)/interaction-canvas-$(STAMP).log
 
 # Every figure in results/figures draws the same four arms: v2.4.0 (what the
 # 2023 paper benchmarked), v4.3.0 (the last release), the build under test, and

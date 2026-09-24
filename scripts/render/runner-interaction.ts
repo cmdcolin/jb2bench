@@ -29,19 +29,36 @@ const LOC = 'chr22_mask:124000-143000'
 // and compresses three years of change into a small ratio; zoom-in is the case
 // the architecture actually changed, so the published-version column is the one
 // a reader of the 2023 paper can act on.
-const ROLES = ['new', 'baseline', 'published'] as const
+// `canvas` is the build under test pinned to its Canvas2D rasterizer, the
+// same page as `new` with `?renderer=canvas2d`. It holds the build fixed and
+// varies only the backend, which is the ablation that says what the GPU
+// itself buys on a zoom: the canvas painter re-rasterizes every read from the
+// same interleaved buffers, so its time grows with coverage where the GPU's
+// stays flat. Opt-in with CANVAS=1, because it doubles the cost of the
+// heaviest arm and the default table is a build comparison, not a backend one.
+const ROLES = ['new', 'canvas', 'baseline', 'published'] as const
 type Role = (typeof ROLES)[number]
-const OPTIONAL_ROLES: readonly Role[] = ['published']
+const OPTIONAL_ROLES: readonly Role[] = ['published', 'canvas']
 const ports: Record<Role, { port: number; extra: string }> = {
   new: { port: 8000, extra: '&renderer=webgl' },
+  canvas: { port: 8000, extra: '&renderer=canvas2d' },
   baseline: { port: 8001, extra: '' },
   published: { port: 8004, extra: '' },
 }
 
 const resolved = await Promise.all(
   ROLES.map(async role => {
+    if (role === 'canvas' && process.env.CANVAS !== '1') {
+      console.log('canvas: set CANVAS=1 to measure the canvas2d backend (optional)')
+      return undefined
+    }
     try {
-      return { role, name: await resolveBuild(ports[role].port), ...ports[role] }
+      const name = await resolveBuild(ports[role].port)
+      return {
+        role,
+        name: role === 'canvas' ? `${name} canvas2d` : name,
+        ...ports[role],
+      }
     } catch (e) {
       if (OPTIONAL_ROLES.includes(role)) {
         console.log(
@@ -58,6 +75,7 @@ for (const b of builds) {
   console.log(`${b.role}: port ${b.port} is serving builds/${b.name}`)
 }
 const hasPublished = builds.some(b => b.role === 'published')
+const hasCanvas = builds.some(b => b.role === 'canvas')
 // Both formats, from the shared enumeration `runner.ts` uses. This matrix was
 // BAM-only until 2026-08-23, so zoom and pan had no format axis at all while
 // cold load had carried one since 2026-08-16 — the gap `cases.ts` exists to
@@ -352,6 +370,7 @@ fs.writeFileSync(
 const NEW = builds.find(b => b.role === 'new')!.name
 const BASE = builds.find(b => b.role === 'baseline')!.name
 const PUB = builds.find(b => b.role === 'published')?.name
+const CAN = builds.find(b => b.role === 'canvas')?.name
 
 // The published column is emitted only when port 8004 was served, so the header
 // and every row have to agree about how many columns there are. These two keep
@@ -359,6 +378,11 @@ const PUB = builds.find(b => b.role === 'published')?.name
 const pubHead = hasPublished ? ` ${PUB} |` : ''
 const pubCell = (r: Partial<Record<Role, Result>>) =>
   hasPublished ? ` ${r.published ? cell(r.published) : '—'} |` : ''
+// The canvas column works the same way: present only when CANVAS=1 served it.
+const canHead = hasCanvas ? ` ${CAN} |` : ''
+const canCell = (r: Partial<Record<Role, Result>>) =>
+  hasCanvas ? ` ${r.canvas ? cell(r.canvas) : '—'} |` : ''
+const optSep = `${hasPublished ? '---:|' : ''}${hasCanvas ? '---:|' : ''}`
 // Read from whatever was actually recorded: a CASES/MODES-filtered run need not
 // have measured the first case's zoom-in this time round.
 const MAX_WAIT_NOTE = `${
@@ -431,24 +455,24 @@ md += `Measured — ${when}. Comparisons *within* a section are same-run; compar
 md += `## Zoom IN — only the old renderer refetches\n\n`
 md += `The new view is a strict subset of already-loaded reads, so the GPU branch re-projects without going to the network. This is its best case.\n\n`
 md += `**This column read 0 ms in every case on 2026-09-04 and does not reproduce.** Re-measured five times on an idle box it reads 146-187 ms, flat across a fifty-fold coverage range, which is the shape of fixed block bookkeeping rather than of drawing (the redraw frame is one vsync either way). The two release columns are unchanged between those runs (4.3.0 at 20x-shortread-bam: 1070 against 1066 ms), so it is not the box: it moved only on the build that can flush the coarse-block throttle, the one where the discrete drive does anything at all. Why the earlier run recorded zeros, with no loading state seen on any step, is not established. Zero was the stronger claim and it is withdrawn.\n\n`
-md += `| case | ${NEW} | ${BASE} |${pubHead} ${NEW} redraw frame |\n`
-md += `|---|---:|---:|${hasPublished ? '---:|' : ''}---:|\n`
+md += `| case | ${NEW} | ${BASE} |${pubHead}${canHead} ${NEW} redraw frame |\n`
+md += `|---|---:|---:|${optSep}---:|\n`
 for (const c of allCases) {
   const w = results[c.id]?.in.new
   const r = results[c.id]?.in.baseline
-  md += `| ${c.id} | ${cell(w)} | ${cell(r)} |${pubCell(results[c.id]!.in)} ${gapCell(w)} |\n`
+  md += `| ${c.id} | ${cell(w)} | ${cell(r)} |${pubCell(results[c.id]!.in)}${canCell(results[c.id]!.in)} ${gapCell(w)} |\n`
 }
 
 md += `\n## Zoom OUT — mostly refused, not measured\n\n`
 md += `Zooming out was meant to be the case where BOTH builds refetch, isolating render cost from avoided fetching. It largely does not work: past a byte threshold JBrowse declines the fetch and renders "Requested too much data (N Mb). Zoom in to see features or force load" instead of reads.\n\n`
 md += `That path is fast and paints nothing, so it previously scored as a ~90ms success — the best-looking number in the table was a refusal to draw. \`_bail_\` marks a cell where no step drew anything; \`(n bail)\` marks partial refusal, with the median taken only over steps that did draw.\n\n`
 md += `The honest reading: for anything heavier than 20x shortread, this comparison has no render timing in it. The PAN section below is the test this was meant to be.\n\n`
-md += `| case | ${NEW} | ${BASE} |${pubHead} ${NEW} redraw frame | drew/attempted |\n`
-md += `|---|---:|---:|${hasPublished ? '---:|' : ''}---:|---:|\n`
+md += `| case | ${NEW} | ${BASE} |${pubHead}${canHead} ${NEW} redraw frame | drew/attempted |\n`
+md += `|---|---:|---:|${optSep}---:|---:|\n`
 for (const c of allCases) {
   const w = results[c.id]?.out.new
   const r = results[c.id]?.out.baseline
-  md += `| ${c.id} | ${cell(w)} | ${cell(r)} |${pubCell(results[c.id]!.out)} ${gapCell(w)} | ${stepsCell(w)} |\n`
+  md += `| ${c.id} | ${cell(w)} | ${cell(r)} |${pubCell(results[c.id]!.out)}${canCell(results[c.id]!.out)} ${gapCell(w)} | ${stepsCell(w)} |\n`
 }
 
 md += `\n## PAN at constant zoom — both builds refetch\n\n`
@@ -456,8 +480,8 @@ md += `One full viewport sideways per step, \`bpPerPx\` unchanged. The region is
 md += `Both architectures pay the fetch here, so this is the branch's *hardest* case — the opposite end from zoom-in. Any remaining gap is render cost, not avoided network.\n\n`
 md += `A 19 kb window gets about five viewport-widths before it runs out of the 250 kb \`chr22_mask\`; steps beyond that are not attempted rather than clamped into a mostly-empty view.\n\n`
 md += `The pan runs **leftward** from the benchmark locus. pbsim's long reads run off the ends of the contig, so long-read depth tapers there — panning right put two of five windows on thinned data (1000x.longread falls 1178 → 938 → 500 over the last three windows), which reads as a speedup in both builds at once. Leftward keeps four of five inside the plateau. Short-read depth is flat across the whole contig either way, and 20x-shortread indeed measures the same in both directions.\n\n`
-md += `| case | ${NEW} | ${BASE} | ratio |${pubHead} ${NEW} redraw frame | steps |\n`
-md += `|---|---:|---:|---:|${hasPublished ? '---:|' : ''}---:|---:|\n`
+md += `| case | ${NEW} | ${BASE} | ratio |${pubHead}${canHead} ${NEW} redraw frame | steps |\n`
+md += `|---|---:|---:|---:|${optSep}---:|---:|\n`
 for (const c of allCases) {
   const w = results[c.id]?.pan.new
   const r = results[c.id]?.pan.baseline
@@ -475,7 +499,7 @@ for (const c of allCases) {
   const ratio = comparable
     ? `${(r.zoomTimeToContentMs / w.zoomTimeToContentMs).toFixed(2)}×`
     : '—'
-  md += `| ${c.id} | ${cell(w)} | ${cell(r)} | ${ratio} |${pubCell(results[c.id]!.pan)} ${gapCell(w)} | ${stepsCell(w)} |\n`
+  md += `| ${c.id} | ${cell(w)} | ${cell(r)} | ${ratio} |${pubCell(results[c.id]!.pan)}${canCell(results[c.id]!.pan)} ${gapCell(w)} | ${stepsCell(w)} |\n`
 }
 fs.writeFileSync('results/interaction.md', md)
 console.log('\n' + md)
