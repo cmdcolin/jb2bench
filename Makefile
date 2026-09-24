@@ -27,7 +27,7 @@ LOGDIR := results/logs
         crosstool-zoom crosstool-pan crosstool-bundles \
         parsers parsers-count cram-samtools multibam backends clean-logs \
         formats toolcheck shots paper-tables paper-figs paper-data wait-quiet \
-        backends-webgpu \
+        backends-webgpu ec2-up ec2-provision ec2-spike ec2-down \
         wasmgate bgzfpool bgzfpool-standalone bgzfpool-endtoend pif pif-options
 
 help:
@@ -406,3 +406,11 @@ all: gate counts timings figures report
 
 clean-logs:
 	rm -rf $(LOGDIR)
+
+# ------------------------------------------------------------------------ ec2
+# The same harness on a rented GPU instance, away from this box's other load.
+# See ec2/config.sh. The instance terminates itself after EC2_MAX_MINUTES.
+ec2-up:        ; ec2/up.sh
+ec2-provision: ; ec2/provision.sh
+ec2-spike:     ; ec2/spike.sh
+ec2-down:      ; ec2/down.sh
