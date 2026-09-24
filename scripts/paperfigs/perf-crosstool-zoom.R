@@ -48,6 +48,9 @@ source("scripts/paperfigs/common.R")
 
 d <- read.csv("results/paper/perf.csv", stringsAsFactors = FALSE)
 d <- subset(d, session == "cross-tool motion" & panel == "Zoom in, both hold the data")
+# Release 4.3.0 is measured and left out on purpose, as on the cold-load
+# figure: the manuscript compares against the published release alone.
+d <- subset(d, series != "Release 4.3.0")
 d$s <- d$ms / 1000
 
 d$coverage <- as.numeric(sub("x .*", "", d$case))
@@ -92,7 +95,6 @@ d$measure <- factor(WAIT, levels = WAIT)
 ARCH <- c(
   "Release 2.4.0"    = "Release 2.4.0 \u2014 worker tiles, re-rasterized",
   "Release 4.1.15"   = "Release 4.1.15",
-  "Release 4.3.0"    = "Release 4.3.0 \u2014 worker tiles, re-rasterized",
   "This work"        = "This work \u2014 GPU, batched",
   "igv.js 3.8.5"     = "igv.js 3.8.5 \u2014 2D canvas, per read",
   "GenomeSpy 0.85.0" = "GenomeSpy 0.85.0 \u2014 GPU"

@@ -33,6 +33,9 @@ source("scripts/paperfigs/common.R")
 
 d <- read.csv("results/paper/perf.csv", stringsAsFactors = FALSE)
 d <- subset(d, session == "interaction")
+# Release 4.3.0 is measured here and left out on purpose, as on the cold-load
+# figure: the manuscript compares against the published release alone.
+d <- subset(d, series != "Release 4.3.0")
 d$s <- d$ms / 1000
 
 # Coverage is the sweep, so it goes on an axis rather than into a row label, and
@@ -115,7 +118,7 @@ fig <- ggplot(plotted, aes(x = coverage, y = s, colour = series)) +
   # `breaks` keeps the legend to the three builds this run measured, which is
   # otherwise five keys wide and runs off the page.
   scale_colour_discrete(drop = FALSE,
-                        breaks = c("Release 2.4.0", "Release 4.3.0", "This work")) +
+                        breaks = c("Release 2.4.0", "This work")) +
   # Titled by what is measured, like every figure in this set. The facet strips
   # already name the two motions; the title names the quantity they share, so
   # the figure still says what it is when it is pulled out of the paper and put
