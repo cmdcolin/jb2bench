@@ -1,0 +1,280 @@
+{
+  "igvVersion": "3.8.5",
+  "jbrowseBuild": "current",
+  "jbrowseBuilds": {
+    "jbrowse": "current",
+    "jbrowse-release-2.4.0": "release-2.4.0"
+  },
+  "rows": {
+    "20x-shortread-bam@19kb": {
+      "jbrowse": {
+        "median": 2412,
+        "mean": 2395,
+        "stddev": 29.13188402192118,
+        "runs": [
+          2354,
+          2419,
+          2412
+        ],
+        "load": {
+          "before": 0.89,
+          "after": 2.27,
+          "foreignCores": 0.028664623900365734,
+          "foreignTop": "nv-hostengine 0.01"
+        }
+      },
+      "jbrowse-release-2.4.0": {
+        "median": 4325,
+        "mean": 4321.333333333333,
+        "stddev": 27.475241379993168,
+        "runs": [
+          4353,
+          4325,
+          4286
+        ],
+        "load": {
+          "before": 0.89,
+          "after": 2.27,
+          "foreignCores": 0.028661790867760436,
+          "foreignTop": "nv-hostengine 0.01"
+        }
+      },
+      "igv": {
+        "median": 1929,
+        "mean": 1928,
+        "stddev": 5.354126134736337,
+        "runs": [
+          1929,
+          1934,
+          1921
+        ],
+        "load": {
+          "before": 0.82,
+          "after": 2.27,
+          "foreignCores": 0.02865895839509834,
+          "foreignTop": "nv-hostengine 0.01"
+        }
+      },
+      "genomespy": {
+        "median": 1883,
+        "mean": 1930.3333333333333,
+        "stddev": 95.08358895671161,
+        "runs": [
+          2063,
+          1883,
+          1845
+        ],
+        "load": {
+          "before": 0.92,
+          "after": 2.27,
+          "foreignCores": 0.028655560166795137,
+          "foreignTop": "nv-hostengine 0.01"
+        }
+      }
+    },
+    "200x-shortread-bam@19kb": {
+      "jbrowse": {
+        "median": 2838,
+        "mean": 2847.3333333333335,
+        "stddev": 28.5345794120436,
+        "runs": [
+          2838,
+          2886,
+          2818
+        ],
+        "load": {
+          "before": 2.27,
+          "after": 2.84,
+          "foreignCores": 0.02365189968811955,
+          "foreignTop": "nv-hostengine 0.01"
+        }
+      },
+      "jbrowse-release-2.4.0": {
+        "median": 7346,
+        "mean": 7376,
+        "stddev": 73.35302765848637,
+        "runs": [
+          7305,
+          7477,
+          7346
+        ],
+        "load": {
+          "before": 2.89,
+          "after": 2.84,
+          "foreignCores": 0.023765911567622706,
+          "foreignTop": "nv-hostengine 0.01"
+        }
+      },
+      "igv": {
+        "median": 8390,
+        "mean": 8365,
+        "stddev": 54.00617248673217,
+        "runs": [
+          8290,
+          8390,
+          8415
+        ],
+        "load": {
+          "before": 2.67,
+          "after": 2.84,
+          "foreignCores": 0.023764258555133075,
+          "foreignTop": "nv-hostengine 0.01"
+        }
+      },
+      "genomespy": {
+        "median": 3813,
+        "mean": 3797.6666666666665,
+        "stddev": 23.837412238374835,
+        "runs": [
+          3813,
+          3816,
+          3764
+        ],
+        "load": {
+          "before": 3.51,
+          "after": 2.84,
+          "foreignCores": 0.02376260577257447,
+          "foreignTop": "nv-hostengine 0.01"
+        }
+      }
+    },
+    "20x-shortread-bam@100kb": {
+      "jbrowse": {
+        "median": 2633,
+        "mean": 2634.3333333333335,
+        "stddev": 29.408993333483707,
+        "runs": [
+          2599,
+          2633,
+          2671
+        ],
+        "load": {
+          "before": 2.84,
+          "after": 2.57,
+          "foreignCores": 0.02489545308325991,
+          "foreignTop": "nv-hostengine 0.01"
+        }
+      },
+      "jbrowse-release-2.4.0": {
+        "median": 7297,
+        "mean": 7313.666666666667,
+        "stddev": 35.490217744549774,
+        "runs": [
+          7363,
+          7297,
+          7281
+        ],
+        "load": {
+          "before": 2.85,
+          "after": 2.57,
+          "foreignCores": 0.024893712239874695,
+          "foreignTop": "nv-hostengine 0.01"
+        }
+      },
+      "igv": {
+        "median": 4234,
+        "mean": 4231,
+        "stddev": 22.55363976538303,
+        "runs": [
+          4202,
+          4234,
+          4257
+        ],
+        "load": {
+          "before": 3.34,
+          "after": 2.57,
+          "foreignCores": 0.024891623549153967,
+          "foreignTop": "nv-hostengine 0.01"
+        }
+      },
+      "genomespy": {
+        "median": 3296,
+        "mean": 3369.6666666666665,
+        "stddev": 124.50524308460089,
+        "runs": [
+          3545,
+          3296,
+          3268
+        ],
+        "load": {
+          "before": 2.97,
+          "after": 2.57,
+          "foreignCores": 0.024889535208904304,
+          "foreignTop": "nv-hostengine 0.01"
+        }
+      }
+    },
+    "200x-shortread-bam@100kb": {
+      "jbrowse": {
+        "median": 4509,
+        "mean": 4529.666666666667,
+        "stddev": 119.29049510427151,
+        "runs": [
+          4685,
+          4395,
+          4509
+        ],
+        "load": {
+          "before": 2.57,
+          "after": 1.54,
+          "foreignCores": 0.017941182969133197,
+          "foreignTop": "nv-hostengine 0.01"
+        }
+      },
+      "jbrowse-release-2.4.0": {
+        "median": 21733,
+        "mean": 21820.333333333332,
+        "stddev": 334.7928049140576,
+        "runs": [
+          21733,
+          21461,
+          22267
+        ],
+        "load": {
+          "before": 2.44,
+          "after": 1.54,
+          "foreignCores": 0.017940628010357826,
+          "foreignTop": "nv-hostengine 0.01"
+        }
+      },
+      "igv": {
+        "median": 30021,
+        "mean": 29954.333333333332,
+        "stddev": 231.0300605741359,
+        "runs": [
+          30198,
+          29644,
+          30021
+        ],
+        "load": {
+          "before": 2.16,
+          "after": 1.54,
+          "foreignCores": 0.017940152358732333,
+          "foreignTop": "nv-hostengine 0.01"
+        }
+      },
+      "genomespy": {
+        "median": 12665,
+        "mean": 12675,
+        "stddev": 134.09200821326627,
+        "runs": [
+          12665,
+          12516,
+          12844
+        ],
+        "load": {
+          "before": 1.64,
+          "after": 1.54,
+          "foreignCores": 0.017939676732327638,
+          "foreignTop": "nv-hostengine 0.01"
+        }
+      }
+    }
+  },
+  "dates": {
+    "20x-shortread-bam@19kb": "2026-09-24",
+    "200x-shortread-bam@19kb": "2026-09-24",
+    "20x-shortread-bam@100kb": "2026-09-24",
+    "200x-shortread-bam@100kb": "2026-09-24"
+  }
+}
