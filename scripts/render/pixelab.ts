@@ -15,6 +15,7 @@ import type { Browser } from 'puppeteer'
 import fs from 'fs'
 import { createRequire } from 'node:module'
 import { join } from 'node:path'
+import { ANGLE_ARGS } from '../angleargs.ts'
 
 // pngjs is not a dependency here and deliberately isn't becoming one — this is
 // the only script that decodes a PNG, and jb2bench's package.json is shared
@@ -83,8 +84,7 @@ const browser = await puppeteer.launch({
   args: [
     '--no-sandbox',
     '--ignore-gpu-blocklist',
-    '--use-angle=gl',
-    '--use-gl=angle',
+    ...ANGLE_ARGS,
     '--window-size=1280,900',
   ],
 })

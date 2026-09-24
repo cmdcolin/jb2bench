@@ -27,6 +27,7 @@ import fs from 'node:fs'
 import { launch } from 'puppeteer'
 
 import { loadavg, type LoadWindow } from './loadavg.ts'
+import { ANGLE_ARGS } from '../angleargs.ts'
 
 const arg = (name: string, fallback: string) =>
   process.argv.find(a => a.startsWith(`--${name}=`))?.split('=')[1] ?? fallback
@@ -123,8 +124,7 @@ const browser = await launch({
     '--no-sandbox',
     '--ignore-gpu-blocklist',
     '--enable-features=Vulkan',
-    '--use-angle=gl',
-    '--use-gl=angle',
+    ...ANGLE_ARGS,
     '--window-size=1280,900',
     // Without these the rAF interval is quantized to the display refresh and
     // the frame column reads 16.7 ms at every row count.

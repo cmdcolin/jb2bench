@@ -44,6 +44,7 @@ import { launch, type Browser, type Page } from 'puppeteer'
 import { resultSuffix, selectScale } from './cases.ts'
 import { loadavg, outliers, peak, type LoadWindow } from './loadavg.ts'
 import { resolveBuild } from './servedbuild.ts'
+import { ANGLE_ARGS } from '../angleargs.ts'
 
 const arg = (name: string, fallback: string) =>
   process.argv.find(a => a.startsWith(`--${name}=`))?.split('=')[1] ?? fallback
@@ -163,8 +164,7 @@ function launchBrowser(): Promise<Browser> {
           '--ignore-gpu-blocklist',
           '--enable-unsafe-webgpu',
           '--enable-features=Vulkan',
-          '--use-angle=gl',
-          '--use-gl=angle',
+          ...ANGLE_ARGS,
           '--window-size=1280,900',
         ],
         defaultViewport: { width: 1280, height: 800 },

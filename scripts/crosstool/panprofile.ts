@@ -70,6 +70,7 @@ import {
   DRAW_CLOCK_RESET,
   isContentDrawn,
 } from './drawclock.ts'
+import { ANGLE_ARGS } from '../angleargs.ts'
 
 const TOOLS = ['jbrowse', 'igv', 'genomespy'] as const
 type ToolKind = (typeof TOOLS)[number]
@@ -156,8 +157,7 @@ const browser = await puppeteer.launch({
     '--no-sandbox',
     '--ignore-gpu-blocklist',
     '--enable-features=Vulkan',
-    '--use-angle=gl',
-    '--use-gl=angle',
+    ...ANGLE_ARGS,
     '--window-size=1280,900',
   ],
 })

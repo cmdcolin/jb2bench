@@ -32,6 +32,7 @@
 // make the tick cheaper has to stagger it or make the repaint cheaper, not
 // suppress it.
 import puppeteer from 'puppeteer'
+import { ANGLE_ARGS } from '../angleargs.ts'
 
 const PORT = Number(process.env.PORT ?? 8020)
 const LOC = process.env.LOC ?? 'chr22_mask:124000-143000'
@@ -56,8 +57,7 @@ const browser = await puppeteer.launch({
     '--no-sandbox',
     '--ignore-gpu-blocklist',
     '--enable-features=Vulkan',
-    '--use-angle=gl',
-    '--use-gl=angle',
+    ...ANGLE_ARGS,
     '--window-size=1280,900',
     '--disable-gpu-vsync',
     '--disable-frame-rate-limit',

@@ -16,6 +16,7 @@
 //
 // Usage: node scripts/render/labeldiag.ts   (PORT/LOC/TRACKS override)
 import puppeteer from 'puppeteer'
+import { ANGLE_ARGS } from '../angleargs.ts'
 
 const PORT = Number(process.env.PORT ?? 8020)
 const LOC = process.env.LOC ?? 'chr22_mask:124000-143000'
@@ -36,8 +37,7 @@ const browser = await puppeteer.launch({
   args: [
     '--no-sandbox',
     '--ignore-gpu-blocklist',
-    '--use-angle=gl',
-    '--use-gl=angle',
+    ...ANGLE_ARGS,
     '--window-size=1280,900',
   ],
 })

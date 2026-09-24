@@ -5,6 +5,7 @@
 //
 // Usage: gpucheck.ts [headless|headful]
 import puppeteer from 'puppeteer'
+import { ANGLE_ARGS } from './angleargs.ts'
 
 const mode = process.argv[2] ?? 'headless'
 const headless = mode !== 'headful'
@@ -16,8 +17,7 @@ const browser = await puppeteer.launch({
     '--ignore-gpu-blocklist',
     '--enable-unsafe-webgpu',
     '--enable-features=Vulkan',
-    '--use-angle=gl',
-    '--use-gl=angle',
+    ...ANGLE_ARGS,
   ],
 })
 const page = await browser.newPage()

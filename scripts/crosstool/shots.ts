@@ -20,6 +20,7 @@
 //   TRACK=200x.shortread.bam LOC=chr22_mask:75000-175000 node ... shots.ts
 import fs from 'node:fs'
 import puppeteer from 'puppeteer'
+import { ANGLE_ARGS } from '../angleargs.ts'
 
 const LOC = process.env.LOC ?? 'chr22_mask:124000-143000'
 const TRACK = process.env.TRACK ?? '20x.shortread.bam'
@@ -42,7 +43,7 @@ fs.mkdirSync(OUT, { recursive: true })
 
 const browser = await puppeteer.launch({
   headless: process.env.HEADLESS !== '0',
-  args: ['--no-sandbox', '--ignore-gpu-blocklist', '--use-angle=gl', '--use-gl=angle'],
+  args: ['--no-sandbox', '--ignore-gpu-blocklist', ...ANGLE_ARGS],
 })
 
 const slug = TRACK.replace(/\./g, '_')

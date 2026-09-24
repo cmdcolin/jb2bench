@@ -15,6 +15,7 @@
 import fs from 'fs'
 
 import puppeteer from 'puppeteer'
+import { ANGLE_ARGS } from '../angleargs.ts'
 
 const arg = (name: string, fallback: string) =>
   process.argv.find(a => a.startsWith(`--${name}=`))?.split('=')[1] ?? fallback
@@ -46,8 +47,7 @@ const browser = await puppeteer.launch({
     '--ignore-gpu-blocklist',
     '--enable-unsafe-webgpu',
     '--enable-features=Vulkan',
-    '--use-angle=gl',
-    '--use-gl=angle',
+    ...ANGLE_ARGS,
     '--window-size=1280,900',
   ],
 })

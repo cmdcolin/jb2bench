@@ -22,14 +22,15 @@ if ! command -v node >/dev/null; then
 fi
 sudo mkdir -p /home/cdiesh/src
 sudo chown ubuntu:ubuntu /home/cdiesh /home/cdiesh/src
+mkdir -p /home/cdiesh/src/jb2bench/builds /home/cdiesh/src/jb2bench/data
 EOF
 
 RS=(rsync -az --info=stats1 -e "ssh ${SSH_OPTS[*]}")
 
 "${RS[@]}" --delete \
-  --exclude .git --exclude .claude --exclude node_modules --exclude data \
-  --exclude builds --exclude results --exclude flame --exclude screenshots \
-  --exclude ec2/.state --exclude crosstool \
+  --exclude .git --exclude /.claude --exclude node_modules --exclude /data \
+  --exclude /builds --exclude /results --exclude /flame --exclude /screenshots \
+  --exclude /ec2/.state --exclude /crosstool \
   "$CODE/" "ubuntu@$IP:$REMOTE_ROOT/"
 
 # crosstool/ carries untracked tool bundles and a relative data symlink, so it

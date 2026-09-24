@@ -18,13 +18,14 @@
 //
 // Usage: cramprobe.ts <url> [waitMs] [screenshotPath]
 import puppeteer from 'puppeteer'
+import { ANGLE_ARGS } from '../angleargs.ts'
 
 const url = process.argv[2]!
 const WAIT = Number(process.argv[3] ?? 20000)
 
 const browser = await puppeteer.launch({
   headless: true,
-  args: ['--no-sandbox', '--use-angle=gl', '--use-gl=angle', '--window-size=1280,900'],
+  args: ['--no-sandbox', ...ANGLE_ARGS, '--window-size=1280,900'],
 })
 const page = await browser.newPage()
 await page.setViewport({ width: 1280, height: 800 })

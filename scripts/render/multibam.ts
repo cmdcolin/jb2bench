@@ -27,6 +27,7 @@ import type { Browser, CDPSession, Page } from 'puppeteer'
 import fs from 'fs'
 import { loadavg, peak } from './loadavg.ts'
 import { resolveBuild } from './servedbuild.ts'
+import { ANGLE_ARGS } from '../angleargs.ts'
 
 // One or two builds. Two ports turns the sweep into an A/B, and the arms are
 // interleaved WITHIN a pass rather than run one after the other — on this box
@@ -369,8 +370,7 @@ const browser = await puppeteer.launch({
     '--no-sandbox',
     '--ignore-gpu-blocklist',
     '--enable-features=Vulkan',
-    '--use-angle=gl',
-    '--use-gl=angle',
+    ...ANGLE_ARGS,
     '--window-size=1280,900',
     ...vsyncArgs,
   ],

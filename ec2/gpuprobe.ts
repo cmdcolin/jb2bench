@@ -1,19 +1,20 @@
 // Which Chrome launch flags reach the instance's GPU in headless mode.
 //
-// The harness launches every page with the flags in HARNESS below. On the
-// workstation they reach the Mesa Intel GPU; on a cloud NVIDIA GPU with no X
-// server they may land on SwiftShader instead, which would time a software
-// rasterizer. Each set is tried in turn, and the WebGL renderer string and
-// WebGPU adapter it gets are printed as one JSON line.
+// The harness launches every page with ANGLE_ARGS (scripts/angleargs.ts). On
+// the workstation the default reaches the Mesa Intel GPU; on the T4 with no X
+// server it gets no WebGL2 at all. Each set is tried in turn and printed as one
+// JSON line: the WebGL renderer, the WebGPU adapter, and `hardware`, which is
+// true only when WebGL2 runs on a real GPU. The paper's numbers are WebGL2, so
+// a software WebGPU adapter does not fail the set.
 //
 // Usage: node --experimental-strip-types ec2/gpuprobe.ts
 import http from 'node:http'
 import puppeteer from 'puppeteer'
-
-const HARNESS = ['--ignore-gpu-blocklist', '--enable-features=Vulkan', '--use-angle=gl', '--use-gl=angle']
+import { ANGLE_ARGS } from '../scripts/angleargs.ts'
 
 const SETS: Record<string, string[]> = {
-  harness: HARNESS,
+  configured: ['--ignore-gpu-blocklist', '--enable-features=Vulkan', ...ANGLE_ARGS],
+  'workstation-default': ['--ignore-gpu-blocklist', '--enable-features=Vulkan', '--use-angle=gl', '--use-gl=angle'],
   'angle-vulkan': ['--ignore-gpu-blocklist', '--enable-features=Vulkan', '--use-angle=vulkan', '--enable-unsafe-webgpu'],
   'angle-gl-egl': ['--ignore-gpu-blocklist', '--use-angle=gl-egl', '--use-gl=angle', '--enable-unsafe-webgpu'],
 }
@@ -40,8 +41,8 @@ for (const [name, flags] of Object.entries(SETS)) {
     }
     return { renderer: String(renderer), webgpu }
   })
-  const software = /swiftshader|llvmpipe|software/i.test(info.renderer + ' ' + info.webgpu)
-  console.log(JSON.stringify({ set: name, ...info, software }))
+  const hardware = info.renderer !== 'no-webgl2' && !/swiftshader|llvmpipe|software/i.test(info.renderer)
+  console.log(JSON.stringify({ set: name, ...info, hardware }))
   await browser.close()
 }
 server.close()

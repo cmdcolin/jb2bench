@@ -4,8 +4,8 @@
 # three runs each. Results land in results/ec2/<stamp>/ here.
 #
 # What to read in them:
-#   gpu.jsonl       the harness flag set must report the NVIDIA GPU, not
-#                   SwiftShader; otherwise every GPU timing is a software one
+#   gpu.jsonl       the `configured` set (CHROME_ANGLE) must report the
+#                   NVIDIA GPU; otherwise every GPU timing is a software one
 #   crosstool.md    per-cell spread across the three runs, and whether the
 #                   order of the tools matches the workstation's
 #   interaction.md  the zoom row should stay flat across 20x and 200x, as it
@@ -21,10 +21,11 @@ mkdir -p "$OUT"
 remote "bash -s" <<EOF | tee "$OUT/spike.log"
 set -uo pipefail
 cd $REMOTE_ROOT && mkdir -p results
+export CHROME_ANGLE='--use-angle=gl-egl --use-gl=angle'
 nvidia-smi -L
 node --experimental-strip-types ec2/gpuprobe.ts | tee results/gpu.jsonl
-if ! grep '"set":"harness"' results/gpu.jsonl | grep -q '"software":false'; then
-  echo "SPIKE STOP: the harness flags land on a software renderer"
+if ! grep '"set":"configured"' results/gpu.jsonl | grep -q '"hardware":true'; then
+  echo "SPIKE STOP: CHROME_ANGLE does not reach a hardware WebGL2"
   exit 1
 fi
 

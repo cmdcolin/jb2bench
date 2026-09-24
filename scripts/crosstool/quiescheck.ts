@@ -32,6 +32,7 @@ import puppeteer from 'puppeteer'
 
 import { loadavg } from '../render/loadavg.ts'
 import { attachQuiescence, paintFloorMs, type Settled } from './quiescence.ts'
+import { ANGLE_ARGS } from '../angleargs.ts'
 
 const RUNS = Number(process.env.RUNS ?? 2)
 const LOC = 'chr22_mask:124000-143000'
@@ -95,8 +96,7 @@ async function measure(h: Harness, strategy: 'draws' | 'paint') {
       '--no-sandbox',
       '--ignore-gpu-blocklist',
       '--enable-features=Vulkan',
-      '--use-angle=gl',
-      '--use-gl=angle',
+      ...ANGLE_ARGS,
       '--window-size=1280,900',
     ],
   })

@@ -68,6 +68,7 @@ import fs from 'fs'
 import path from 'path'
 import puppeteer from 'puppeteer'
 import { isData } from './drewcheck.ts'
+import { ANGLE_ARGS } from '../angleargs.ts'
 
 const WAIT_TIMEOUT = Number(process.env.MAX_WAIT ?? 120000)
 const POLL_MS = Number(process.env.POLL_MS ?? 150)
@@ -92,8 +93,7 @@ const browser = await puppeteer.launch({
     '--no-sandbox',
     '--ignore-gpu-blocklist',
     '--enable-features=Vulkan',
-    '--use-angle=gl',
-    '--use-gl=angle',
+    ...ANGLE_ARGS,
     '--window-size=1280,900',
   ],
 })

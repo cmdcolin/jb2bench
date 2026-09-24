@@ -23,6 +23,7 @@
 import puppeteer from 'puppeteer'
 import { drew, drewCheck } from './drewcheck.ts'
 import { contigSize, selectWindows, WINDOWS, type Window } from './windows.ts'
+import { ANGLE_ARGS } from '../angleargs.ts'
 
 const PORT = Number(process.env.PORT ?? 8003)
 const SETTLE_MS = Number(process.env.SETTLE_MS ?? 15000)
@@ -49,7 +50,7 @@ const tracksFor = (w: Window) =>
 
 const browser = await puppeteer.launch({
   headless: process.env.HEADLESS !== '0',
-  args: ['--no-sandbox', '--ignore-gpu-blocklist', '--use-angle=gl', '--use-gl=angle'],
+  args: ['--no-sandbox', '--ignore-gpu-blocklist', ...ANGLE_ARGS],
 })
 
 // Known capability limits, so a run reports them as expected rather than as

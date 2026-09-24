@@ -17,6 +17,7 @@
 import puppeteer from 'puppeteer'
 import type { CDPSession } from 'puppeteer'
 import fs from 'fs'
+import { ANGLE_ARGS } from '../angleargs.ts'
 
 const url = process.argv[2]
 const label = process.argv[3] ?? 'interaction'
@@ -31,8 +32,7 @@ const browser = await puppeteer.launch({
     '--no-sandbox',
     '--ignore-gpu-blocklist',
     '--enable-features=Vulkan',
-    '--use-angle=gl',
-    '--use-gl=angle',
+    ...ANGLE_ARGS,
     '--window-size=1280,900',
   ],
 })

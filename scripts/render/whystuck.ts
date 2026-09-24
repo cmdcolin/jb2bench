@@ -7,6 +7,7 @@
 //
 // Usage: whystuck.ts <url>
 import puppeteer from 'puppeteer'
+import { ANGLE_ARGS } from '../angleargs.ts'
 
 const url = process.argv[2]
 if (!url) {
@@ -16,7 +17,7 @@ const WAIT = Number(process.env.WAIT ?? 20000)
 
 const browser = await puppeteer.launch({
   headless: true,
-  args: ['--no-sandbox', '--use-angle=gl', '--use-gl=angle'],
+  args: ['--no-sandbox', ...ANGLE_ARGS],
 })
 const page = await browser.newPage()
 await page.setViewport({ width: 1280, height: 800 })

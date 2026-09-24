@@ -25,6 +25,7 @@
 import fs from 'fs'
 import puppeteer from 'puppeteer'
 import { drew, drewCheck, type Drew } from './drewcheck.ts'
+import { ANGLE_ARGS } from '../angleargs.ts'
 
 const JBROWSE_PORT = Number(process.env.JBROWSE_PORT ?? 8000)
 const CROSSTOOL_PORT = Number(process.env.CROSSTOOL_PORT ?? 8003)
@@ -117,7 +118,7 @@ for (const f of formats) {
 
 const browser = await puppeteer.launch({
   headless: process.env.HEADLESS !== '0',
-  args: ['--no-sandbox', '--ignore-gpu-blocklist', '--use-angle=gl', '--use-gl=angle'],
+  args: ['--no-sandbox', '--ignore-gpu-blocklist', ...ANGLE_ARGS],
 })
 
 const results: Record<string, Record<string, Drew & { drew: boolean }>> = {}

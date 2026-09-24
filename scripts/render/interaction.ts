@@ -54,6 +54,7 @@ import {
 } from './contentready.ts'
 import fs from 'fs'
 import path from 'path'
+import { ANGLE_ARGS } from '../angleargs.ts'
 
 const url = process.argv[2]
 const screenshotPath = process.argv[3]
@@ -101,8 +102,7 @@ const browser = await puppeteer.launch({
     '--no-sandbox',
     '--ignore-gpu-blocklist',
     '--enable-features=Vulkan',
-    '--use-angle=gl',
-    '--use-gl=angle',
+    ...ANGLE_ARGS,
     '--window-size=1280,900',
   ],
 })
