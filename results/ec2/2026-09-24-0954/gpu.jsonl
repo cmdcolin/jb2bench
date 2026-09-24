@@ -1,0 +1,4 @@
+{"set":"configured","renderer":"ANGLE (NVIDIA Corporation, Tesla T4/PCIe/SSE2, OpenGL ES 3.2)","webgpu":"no adapter","hardware":true}
+{"set":"workstation-default","renderer":"no-webgl2","webgpu":"no adapter","hardware":false}
+{"set":"angle-vulkan","renderer":"ANGLE (NVIDIA, Vulkan 1.4.329 (NVIDIA Tesla T4 (0x00001EB8)), NVIDIA)","webgpu":"google swiftshader","hardware":true}
+{"set":"angle-gl-egl","renderer":"ANGLE (NVIDIA Corporation, Tesla T4/PCIe/SSE2, OpenGL ES 3.2)","webgpu":"google swiftshader","hardware":true}
