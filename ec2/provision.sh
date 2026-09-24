@@ -39,7 +39,7 @@ RS=(rsync -az --info=stats1 -e "ssh ${SSH_OPTS[*]}")
 
 # Symlinks are copied as symlinks: they point at $PRIMARY/data, which is the
 # same path on the instance.
-for b in current release-4.3.0 release-2.4.0; do
+for b in ${EC2_BUILD:-current} release-4.3.0 release-2.4.0; do
   "${RS[@]}" "$PRIMARY/builds/$b/" "ubuntu@$IP:$REMOTE_ROOT/builds/$b/"
 done
 
