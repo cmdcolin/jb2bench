@@ -5,7 +5,12 @@
 # The instance serves the corpus to itself, so the region never enters a timing.
 
 REGION=${EC2_REGION:-us-east-1}
-INSTANCE_TYPE=${EC2_TYPE:-g4dn.xlarge}
+# g4dn.2xlarge and not xlarge: JBrowse spreads fetch and parse across a worker
+# pool, so it reads the core count where the single-threaded arms barely do.
+# Measured on the 2026-09-24 spike, going from 4 to 8 vCPUs sped JBrowse 20-30%
+# and igv.js and GenomeSpy 6-11%, so the 4-vCPU box understates JBrowse by about
+# a fifth of every ratio. Methods names the vCPU count for the same reason.
+INSTANCE_TYPE=${EC2_TYPE:-g4dn.2xlarge}
 AMI_PARAM=/aws/service/deeplearning/ami/x86_64/base-oss-nvidia-driver-gpu-ubuntu-22.04/latest/ami-id
 KEY_NAME=jb2bench
 KEY_FILE=$HOME/.ssh/jb2bench-ec2.pem

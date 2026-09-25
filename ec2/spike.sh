@@ -16,6 +16,14 @@
 #
 # EC2_BUILD names the builds/ entry served as the build under test (default
 # current); provision.sh copies the same one.
+#
+# EC2_SPIKE=slow spikes the other half of the matrix instead: long reads, CRAM,
+# the 1 Mb window and a pan, at the ten-minute ceiling. The fast spike answers
+# whether the instance is worth a full run; this one answers how long that run
+# takes, which is the question the fast cells cannot reach -- they finish in
+# seconds while these are the cells that sit against the ceiling. Needs
+# EC2_CORPUS=full on the provision, since the spike corpus has no long-read or
+# CRAM files. One run per cell: this is a clock, not a measurement.
 set -euo pipefail
 . "$(dirname "$0")/config.sh"
 load_state
@@ -43,19 +51,34 @@ done
 nohup npx http-server crosstool -p 8003 -s --cors >/dev/null 2>&1 &
 sleep 3
 
-WINDOWS=19kb,100kb CASES=20x-shortread-bam,200x-shortread-bam \
-  TOOLS=jbrowse,jbrowse-release-2.4.0,igv,genomespy JBROWSE_PORTS=8000,8004 \
-  RUNS=3 WARMUP=1 node --experimental-strip-types scripts/crosstool/runner.ts
+if [ "${EC2_SPIKE:-fast}" = slow ]; then
+  ARMS='TOOLS=jbrowse,jbrowse-release-2.4.0,igv,genomespy JBROWSE_PORTS=8000,8004'
 
-MOTION=zoom CASES=20x-shortread-bam,200x-shortread-bam \
-  TOOLS=jbrowse,jbrowse-release-2.4.0,igv,genomespy JBROWSE_PORTS=8000,8004 \
-  node --experimental-strip-types scripts/crosstool/panrunner.ts
+  # 100 kb at the ceiling Methods states, on the cells that reach it.
+  WINDOWS=100kb CASES=1000x-longread-bam,200x-longread-cram MAX_WAIT=600000 \
+    \$ARMS RUNS=1 WARMUP=0 node --experimental-strip-types scripts/crosstool/runner.ts
 
-for rep in 1 2; do
-  MODES=in CASES=20x-shortread-bam,200x-shortread-bam \
-    node --experimental-strip-types scripts/render/runner-interaction.ts
-  cp results/interaction.md results/interaction-rep\$rep.md
-done
+  # The width axis, where 2.4.0 stopped settling at all in the 2026-09-06 run.
+  WINDOWS=1mb CASES=100x-longread-bam MAX_WAIT=120000 \
+    \$ARMS RUNS=1 WARMUP=0 node --experimental-strip-types scripts/crosstool/runner.ts
+
+  MOTION=pan CASES=1000x-longread-bam \$ARMS \
+    node --experimental-strip-types scripts/crosstool/panrunner.ts
+else
+  WINDOWS=19kb,100kb CASES=20x-shortread-bam,200x-shortread-bam \
+    TOOLS=jbrowse,jbrowse-release-2.4.0,igv,genomespy JBROWSE_PORTS=8000,8004 \
+    RUNS=3 WARMUP=1 node --experimental-strip-types scripts/crosstool/runner.ts
+
+  MOTION=zoom CASES=20x-shortread-bam,200x-shortread-bam \
+    TOOLS=jbrowse,jbrowse-release-2.4.0,igv,genomespy JBROWSE_PORTS=8000,8004 \
+    node --experimental-strip-types scripts/crosstool/panrunner.ts
+
+  for rep in 1 2; do
+    MODES=in CASES=20x-shortread-bam,200x-shortread-bam \
+      node --experimental-strip-types scripts/render/runner-interaction.ts
+    cp results/interaction.md results/interaction-rep\$rep.md
+  done
+fi
 uptime
 EOF
 

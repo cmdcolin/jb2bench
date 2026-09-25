@@ -24,10 +24,10 @@ LOGDIR := results/logs
 
 .PHONY: help gate counts timings all figures report serve serve-stop \
         corpus corpus-paper render render-1mb interaction interaction-canvas crosstool crosstool-cold \
-        crosstool-zoom crosstool-pan crosstool-bundles \
+        crosstool-zoom crosstool-pan crosstool-bundles crosstool-cold-paper \
         parsers parsers-count cram-samtools multibam backends clean-logs \
         formats toolcheck shots paper-tables paper-figs paper-data wait-quiet \
-        backends-webgpu ec2-up ec2-provision ec2-spike ec2-down \
+        backends-webgpu ec2-up ec2-provision ec2-spike ec2-run ec2-down \
         wasmgate bgzfpool bgzfpool-standalone bgzfpool-endtoend pif pif-options
 
 help:
@@ -91,8 +91,15 @@ $(LOGDIR):
 # Serving is backgrounded and deliberately not a dependency of anything: a
 # benchmark target that starts its own servers would also have to decide which
 # build goes where, and that decision belongs to whoever staged builds/.
+#
+# BUILD names the builds/ entry that goes on port 8000, the build under test.
+# It is a variable because the entry worth measuring has a version in its name
+# once a release is tagged — `make serve BUILD=release-5.0.0-beta.9` — and
+# `current` only ever means whatever main was on the day it was staged.
+BUILD ?= current
+
 serve: crosstool-bundles
-	npx http-server builds/current       -p 8000 -s --cors &
+	npx http-server builds/$(BUILD)      -p 8000 -s --cors &
 	npx http-server builds/release-4.3.0 -p 8001 -s --cors &
 	npx http-server builds/release-2.4.0 -p 8004 -s --cors &
 	npx http-server crosstool            -p 8003 -s --cors &
@@ -214,6 +221,27 @@ crosstool: crosstool-cold crosstool-zoom crosstool-pan
 crosstool-cold: gate toolcheck crosstool-bundles | $(LOGDIR)
 	$(ARMS) $(TOOLARMS) $(NODE) scripts/crosstool/runner.ts 2>&1 \
 	  | tee $(LOGDIR)/crosstool-cold-$(STAMP).log
+
+# Cold load at the ceilings the manuscript's Methods states: ten minutes at
+# 100 kb, two minutes at 19 kb and 1 Mb. `crosstool-cold` runs every window
+# under one flat `MAX_WAIT`, so the split has to be three passes, and until now
+# it lived only in whatever shell the run was launched from. The censored cells
+# of the 2026-09-06 run read 120000 ms at 19 kb and 1 Mb and 631579 ms at
+# 100 kb, which is the 10.5 minutes that pass was given; 600000 is what Methods
+# claims, so that is what this target uses and what a rerun should record.
+COLD_CEILING_WIDE ?= 120000
+COLD_CEILING_100KB ?= 600000
+
+crosstool-cold-paper: gate toolcheck crosstool-bundles | $(LOGDIR)
+	WINDOWS=19kb MAX_WAIT=$(COLD_CEILING_WIDE) $(ARMS) $(TOOLARMS) \
+	  $(NODE) scripts/crosstool/runner.ts 2>&1 \
+	  | tee $(LOGDIR)/crosstool-cold-19kb-$(STAMP).log
+	WINDOWS=100kb MAX_WAIT=$(COLD_CEILING_100KB) $(ARMS) $(TOOLARMS) \
+	  $(NODE) scripts/crosstool/runner.ts 2>&1 \
+	  | tee $(LOGDIR)/crosstool-cold-100kb-$(STAMP).log
+	WINDOWS=1mb MAX_WAIT=$(COLD_CEILING_WIDE) $(ARMS) $(TOOLARMS) \
+	  $(NODE) scripts/crosstool/runner.ts 2>&1 \
+	  | tee $(LOGDIR)/crosstool-cold-1mb-$(STAMP).log
 
 crosstool-zoom: gate toolcheck | $(LOGDIR)
 	MOTION=zoom $(ARMS) $(MOTIONARMS) $(NODE) scripts/crosstool/panrunner.ts 2>&1 \
@@ -413,4 +441,5 @@ clean-logs:
 ec2-up:        ; ec2/up.sh
 ec2-provision: ; ec2/provision.sh
 ec2-spike:     ; ec2/spike.sh
+ec2-run:       ; ec2/run.sh
 ec2-down:      ; ec2/down.sh
