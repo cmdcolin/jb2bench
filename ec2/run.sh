@@ -11,8 +11,8 @@
 #   ec2/run.sh crosstool-zoom      only the named targets
 #
 # EC2_BUILD names the builds/ entry served on port 8000 as the build under test,
-# and provision.sh copies the same one. Name a tagged release where there is
-# one -- `EC2_BUILD=release-5.0.0-beta.9` -- because `current` records nothing
+# and provision.sh copies the same one. Name a tagged release -- stage it with
+# `make stage-release TAG=<tag>` first -- because `current` records nothing
 # about which commit it was built from and Methods has to name a version.
 #
 # Before this: ec2/up.sh, then EC2_CORPUS=full ec2/provision.sh. The spike

@@ -28,6 +28,7 @@ LOGDIR := results/logs
         parsers parsers-count cram-samtools multibam backends clean-logs \
         formats toolcheck shots paper-tables paper-figs paper-data wait-quiet \
         backends-webgpu ec2-up ec2-provision ec2-spike ec2-run ec2-down \
+        stage-release \
         wasmgate bgzfpool bgzfpool-standalone bgzfpool-endtoend pif pif-options
 
 help:
@@ -440,6 +441,10 @@ clean-logs:
 # See ec2/config.sh. The instance terminates itself after EC2_MAX_MINUTES.
 ec2-up:        ; ec2/up.sh
 ec2-provision: ; ec2/provision.sh
+# Stage a tagged release as the build under test:
+#   make stage-release TAG=v5.0.0-beta.10
+stage-release: ; @shell/stage_release.sh $(TAG)
+
 ec2-spike:     ; ec2/spike.sh
 ec2-run:       ; ec2/run.sh
 ec2-down:      ; ec2/down.sh

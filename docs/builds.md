@@ -13,37 +13,40 @@ symlinks into `data/`, staged by hand and wired up with
 | `release-4.3.0` | last release, old block renderer — the baseline every speedup is against |
 | `release-4.1.15` | retired as an arm on 2026-08-24 — it sat between two releases and moved no conclusion. Still staged; nothing serves it. |
 | `release-2.4.0` | **the version the 2023 Genome Biology paper describes** — see below |
-| `release-5.0.0-beta.9` | **the build under test for the manuscript**, staged 2026-09-25 from the tagged release — see below |
+| `release-5.0.0-beta.*` | **the build under test for the manuscript**, staged from whichever tag the manuscript names — see below |
 
-## `release-5.0.0-beta.9`, the build under test
+## `release-<tag>`, the build under test
 
-Staged 2026-09-25. Every earlier build under test was a `main-<date>` or
-`current` entry copied out of a working checkout, which records the day it was
-staged and nothing a reader can fetch. The manuscript has to name a version in
-Methods, so the arm it measures is a tagged release with a published bundle.
-
-The release ships a prebuilt web bundle, so nothing is built from source. The
-asset is not public, so `curl` on the download URL returns `Not Found` and the
-fetch goes through `gh`:
+Every earlier build under test was a `main-<date>` or `current` entry copied out
+of a working checkout, which records the day it was staged and nothing a reader
+can fetch. The manuscript has to name a version in Methods, so the arm it
+measures is a tagged release with a published bundle:
 
 ```bash
-gh release download v5.0.0-beta.9 -p 'jbrowse-web-*.zip' -D /tmp/jb2beta9 -R GMOD/jbrowse-components
-mkdir -p builds/release-5.0.0-beta.9
-unzip -q -o /tmp/jb2beta9/jbrowse-web-v5.0.0-beta.9.zip -d builds/release-5.0.0-beta.9
-PATH="$PWD/node_modules/.bin:$PATH" ./shell/load_alignments.sh builds/release-5.0.0-beta.9
+make stage-release TAG=v5.0.0-beta.10
 ```
 
-`load_alignments.sh` wires both assemblies, the twelve alignment tracks and the
-`patch_adapters.js` pass that raises `fetchSizeLimit`; without that last one the
-heavy cells refuse the fetch on the build under test alone, which is the failure
-§0 of `NEXT_STEPS.md` records. The bundle stamps `main.9a294218.js`, unique
-against every other `builds/*`, so `servedbuild.ts` resolves its name and no
-runner change is needed. `version.txt` reads `5.0.0-beta.9`.
+A release ships a prebuilt web bundle, so nothing is built from source.
+`stage_release.sh` fetches it through `gh` — the asset is not public on the
+prerelease tags, so the plain download URL answers `Not Found` and leaves a
+9-byte zip behind — unzips it to `builds/release-<tag without the v>`, and runs
+`load_alignments.sh` over it.
 
-Serve it as the build under test with `make serve BUILD=release-5.0.0-beta.9`,
-or on the instance with `EC2_BUILD=release-5.0.0-beta.9`, which `provision.sh`
-and `run.sh` both read. Restage the same way when a later tag is the one the
-manuscript names.
+That last step wires both assemblies, the twelve alignment tracks and the
+`patch_adapters.js` pass that raises `fetchSizeLimit`; without it the heavy
+cells refuse the fetch on the build under test alone, which is the failure §0 of
+`NEXT_STEPS.md` records. The script prints the track count so a silent half-wire
+is visible, and refuses a bundle whose content hash collides with another entry,
+because `servedbuild.ts` names a build by that hash and two that match make the
+column headers a guess.
+
+Serve it as the build under test with `make serve BUILD=release-5.0.0-beta.10`,
+or on the instance with `EC2_BUILD=release-5.0.0-beta.10`, which `provision.sh`
+and `run.sh` both read.
+
+`release-5.0.0-beta.9` was staged 2026-09-25 to prove that path end to end
+before the tag the manuscript names existed. It is not the arm; restage on the
+tag that is, and delete it if the disk is wanted.
 
 ## `release-2.4.0`, the published baseline
 
