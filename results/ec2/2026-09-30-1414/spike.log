@@ -1,0 +1,308 @@
+GPU 0: Tesla T4 (UUID: GPU-e0c95147-c786-f5b6-2f36-4e4bf5a1b5eb)
+{"set":"configured","renderer":"ANGLE (NVIDIA Corporation, Tesla T4/PCIe/SSE2, OpenGL ES 3.2)","webgpu":"no adapter","hardware":true}
+{"set":"workstation-default","renderer":"no-webgl2","webgpu":"no adapter","hardware":false}
+{"set":"angle-vulkan","renderer":"ANGLE (NVIDIA, Vulkan 1.4.329 (NVIDIA Tesla T4 (0x00001EB8)), NVIDIA)","webgpu":"google swiftshader","hardware":true}
+{"set":"angle-gl-egl","renderer":"ANGLE (NVIDIA Corporation, Tesla T4/PCIe/SSE2, OpenGL ES 3.2)","webgpu":"google swiftshader","hardware":true}
+port 8000 is serving builds/release-5.0.0-beta.10
+port 8004 is serving builds/release-2.4.0
+igv.js 3.8.5, GenomeSpy 0.85.0, Gosling 1.0.7
+windows: 19kb (chr22_mask:124000-143000, 19 kb), 100kb (chr22_mask:75000-175000, 100 kb)
+3 pages match crosstool/
+19kb: 6 corpus files reachable on every arm
+100kb: 6 corpus files reachable on every arm
+20x-shortread-bam@19kb jbrowse run 1: 1597
+20x-shortread-bam@19kb jbrowse-release-2.4.0 run 1: 2965
+20x-shortread-bam@19kb igv run 1: 1780
+20x-shortread-bam@19kb genomespy run 1: 2137
+20x-shortread-bam@19kb jbrowse run 2: 1592
+20x-shortread-bam@19kb jbrowse-release-2.4.0 run 2: 2826
+20x-shortread-bam@19kb igv run 2: 1747
+20x-shortread-bam@19kb genomespy run 2: 1928
+20x-shortread-bam@19kb jbrowse run 3: 1532
+20x-shortread-bam@19kb jbrowse-release-2.4.0 run 3: 2901
+20x-shortread-bam@19kb igv run 3: 1806
+20x-shortread-bam@19kb genomespy run 3: 1937
+200x-shortread-bam@19kb jbrowse run 1: 1956
+200x-shortread-bam@19kb jbrowse-release-2.4.0 run 1: 5515
+200x-shortread-bam@19kb igv run 1: 7354
+200x-shortread-bam@19kb genomespy run 1: 3733
+200x-shortread-bam@19kb jbrowse run 2: 1956
+200x-shortread-bam@19kb jbrowse-release-2.4.0 run 2: 6530
+200x-shortread-bam@19kb igv run 2: 7341
+200x-shortread-bam@19kb genomespy run 2: 3710
+200x-shortread-bam@19kb jbrowse run 3: 1956
+200x-shortread-bam@19kb jbrowse-release-2.4.0 run 3: 6510
+200x-shortread-bam@19kb igv run 3: 7350
+200x-shortread-bam@19kb genomespy run 3: 3523
+20x-shortread-bam@100kb jbrowse run 1: 1718
+20x-shortread-bam@100kb jbrowse-release-2.4.0 run 1: 6358
+20x-shortread-bam@100kb igv run 1: 3996
+20x-shortread-bam@100kb genomespy run 1: 3092
+20x-shortread-bam@100kb jbrowse run 2: 1790
+20x-shortread-bam@100kb jbrowse-release-2.4.0 run 2: 5475
+20x-shortread-bam@100kb igv run 2: 3947
+20x-shortread-bam@100kb genomespy run 2: 3059
+20x-shortread-bam@100kb jbrowse run 3: 1764
+20x-shortread-bam@100kb jbrowse-release-2.4.0 run 3: 5432
+20x-shortread-bam@100kb igv run 3: 3889
+20x-shortread-bam@100kb genomespy run 3: 3089
+200x-shortread-bam@100kb jbrowse run 1: 3344
+200x-shortread-bam@100kb jbrowse-release-2.4.0 run 1: 20033
+200x-shortread-bam@100kb igv run 1: 27345
+200x-shortread-bam@100kb genomespy run 1: 11610
+200x-shortread-bam@100kb jbrowse run 2: 3351
+200x-shortread-bam@100kb jbrowse-release-2.4.0 run 2: 18876
+200x-shortread-bam@100kb igv run 2: 27296
+200x-shortread-bam@100kb genomespy run 2: 11581
+200x-shortread-bam@100kb jbrowse run 3: 3325
+200x-shortread-bam@100kb jbrowse-release-2.4.0 run 3: 20194
+200x-shortread-bam@100kb igv run 3: 27155
+200x-shortread-bam@100kb genomespy run 3: 11607
+# Cross-tool render benchmark: JBrowse vs igv.js, GenomeSpy and Gosling
+
+JBrowse against igv.js 3.8.5, GenomeSpy 0.85.0 and Gosling 1.0.7 — same files, same windows, same instrument. The JBrowse arms are `builds/release-5.0.0-beta.10`, `builds/release-2.4.0`; only the build under test is asked for the WebGL2 renderer, since a release that predates the parameter ignores it.
+
+3 windows. The two narrow ones sit on the same contig, the wider containing the narrower; the 1 Mb one is a second corpus beside them — its own assembly, its own files, 20x and 100x rather than the 20x-to-1000x ladder — because a 250 kb contig cannot hold a megabase view: **19kb** `chr22_mask:124000-143000`, **100kb** `chr22_mask:75000-175000`, **1mb** `chr22_2mb:500001-1500000`. Same reads, more of them, so a row pair says how each tool scales with what is on screen rather than with what is in the file.
+
+Three limits decide which cells exist at all, and the table names them rather than leaving a reader to infer them from a suspiciously fast cell:
+
+- **Gosling stops at 20 kb.** `MAX_TILE_WIDTH = 2e4` in its `BamDataFetcher`, checked against every visible tile by `gosling-track.ts:calculateVisibleTiles`, which returns before fetching. Tile width is the declared genome length over 2^zoom, so on this 250 kb assembly the 19 kb window draws and the 100 kb one paints a full axis and no reads. Its 100 kb cells are `n/a`, not a timing — a page that draws nothing settles immediately under this instrument, so timing it would make Gosling the fastest tool in the table at the window it cannot render.
+- **`tile cap raised` is that same build with the cap patched out**, which is the only way Gosling reaches the wider window. Read the pair, not the patched column alone: a patched library is not the one anyone installs. It also fetches a whole tile rather than the window — 40002 reads at 100 kb on the 20x file against roughly 16000 in view — so it is an upper bound on what an unpatched Gosling would cost at this width even if it could draw it.
+- **Neither GenomeSpy nor Gosling reads CRAM**, so the format axis stops at BAM for both columns. igv.js and JBrowse carry the CRAM rows.
+
+The instrument is `scripts/crosstool/paintprofile.ts`: navigation to the last frame in which the pixels change, polled by screenshot. It belongs to neither tool — igv.js hides its spinner when features finish *loading*, before it draws them, so its own loading state would credit it with a render it has not done. Cost: the paint instrument reads a few hundred ms higher than the testid instrument used elsewhere in this repo, because it also waits out the settling of everything else on the page. That bias applies to every column.
+
+**Stable pixels alone were not enough, and the Gosling arms are why.** A page that is working with nothing moving on screen satisfies a pixel-stability test, and Gosling shows a *static* "Fetching" frame for its first few seconds while a worker boots and reads the index — no animation, and no request outstanding either. Measured 2026-08-28, it settled at 2.4 s on an empty plot against a true 7.6 s. So the instrument now also refuses to settle while a corpus read is in flight, and while a harness page exports `__harnessBusy()` returning true; Gosling's is `records === 0`, a content gate that adds no constant once the first feature lands. Correcting it moved the stock 19 kb Gosling cell up by roughly half while the ungated igv arm held within 9% across the same runs. **A page that defines no such predicate is measured exactly as before**, so every column other than GenomeSpy and Gosling is unaffected and comparable with the rows recorded before this axis existed.
+
+Three JBrowse arms and one igv.js arm carry the comparison; the remaining igv columns are controls rather than workload knobs:
+
+- **Downsampling.** igv draws at most `samplingDepth` reads per 100 bp window (default 500, hard maximum 10000) and JBrowse draws every read. On this corpus the deepest 100 bp window holds roughly 700 short reads, so the default clips a little and the maximum clips nothing — if the default and `no downsampling` columns agree, downsampling is not what the comparison is measuring.
+- **Track height.** The harness gives igv a 600 px track; igv's own default for a BAM track is 300, and JBrowse's pileup canvas at this viewport is about 210. igv draws packed rows until it runs out of canvas while JBrowse draws every read it holds and lets the rasterizer clip, so a taller igv track is more igv work and no more JBrowse work. The last two columns are that control, run as its own interleaved pair so it does not disturb the headline ratio.
+
+Median of 3 runs after 1 warmup, tools interleaved within each round. A blank cell was not measured in the run that produced its row; `n/a` is a capability limit named in the list above, and an arm holding one is dropped from the interleaving rather than timed on a page it cannot draw. `>Ns` is an arm that failed to settle within the paint ceiling 2 times and was abandoned for that cell — a result about the tool at that width, not a gap in the run. The ceiling is 120s at every window, and each cell carries the ceiling it was judged against, so a row recorded under the older per-window ceilings still prints the one it actually got.
+
+`foreign` is the most CPU any of the row's cells saw burned by processes **outside this benchmark**, in cores — outside the runner's process tree and outside the corpus http-servers, which serve the bytes under test and are apparatus rather than contention. That, and not the load average, is what says whether a row is trustworthy: a row above 0.5 is contended and its absolute milliseconds are not a run of record. `load` is kept as context, because it counts this benchmark's own threads and a heavy cell inflates it by working — the 1000x long-read cells drive it into the tens on an idle box. Rows recorded before 2026-08-24 have no foreign figure and show `?`; they were judged against a 4.0 load ceiling, which is the best that can be done with what they recorded.
+
+| case | window | JBrowse (release-5.0.0-beta.10) | JBrowse (release-2.4.0) | igv.js 3.8.5 | GenomeSpy 0.85.0 | igv default ÷ JBrowse | measured | foreign | by | load |
+|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|
+| 20x-shortread-bam | 19kb | 1592 ±30 | 2901 ±57 | 1780 ±24 | 1937 ±96 | 1.12× | 2026-09-30 | 0.03 | — | 1.3 |
+| 20x-shortread-bam | 100kb | 1764 ±30 | 5475 ±427 | 3947 ±44 | 3089 ±15 | 2.24× | 2026-09-30 | 0.02 | — | 3.3 |
+| 200x-shortread-bam | 19kb | 1956 ±0 | 6510 ±474 | 7350 ±5 | 3710 ±94 | 3.76× | 2026-09-30 | 0.02 | — | 2.2 |
+| 200x-shortread-bam | 100kb | 3344 ±11 | 20033 ±587 | 27296 ±81 | 11607 ±13 | 8.16× | 2026-09-30 | 0.01 | — | 3.3 |
+
+Median cell load across the matrix: 2.48. No cell stands out from the run.
+
+A ratio above 1 means igv.js took longer. Read the ratios, not the absolutes: every column of a row is measured within seconds of the others, so a ratio survives load the absolutes do not.
+
+port 8000 is serving builds/release-5.0.0-beta.10
+port 8004 is serving builds/release-2.4.0
+igv.js 3.8.5, GenomeSpy 0.85.0
+20x-shortread-bam jbrowse run 1: 3 ms (5 steps, 5 cached, 0 reqs)
+20x-shortread-bam jbrowse-release-2.4.0 run 1: 1106 ms (5 steps, 5 cached, 0 reqs)
+20x-shortread-bam igv run 1: 52 ms (5 steps, 5 cached, 0 reqs)
+20x-shortread-bam genomespy run 1: 5 ms (5 steps, 5 cached, 0 reqs)
+20x-shortread-bam jbrowse run 2: 3 ms (5 steps, 5 cached, 0 reqs)
+20x-shortread-bam jbrowse-release-2.4.0 run 2: 1110 ms (5 steps, 5 cached, 0 reqs)
+20x-shortread-bam igv run 2: 48 ms (5 steps, 5 cached, 0 reqs)
+20x-shortread-bam genomespy run 2: 5 ms (5 steps, 5 cached, 0 reqs)
+20x-shortread-bam jbrowse run 3: 3 ms (5 steps, 5 cached, 0 reqs)
+20x-shortread-bam jbrowse-release-2.4.0 run 3: 1110 ms (5 steps, 5 cached, 0 reqs)
+20x-shortread-bam igv run 3: 47 ms (5 steps, 5 cached, 0 reqs)
+20x-shortread-bam genomespy run 3: 5 ms (5 steps, 5 cached, 0 reqs)
+200x-shortread-bam jbrowse run 1: 3 ms (5 steps, 5 cached, 0 reqs)
+200x-shortread-bam jbrowse-release-2.4.0 run 1: 1163 ms (5 steps, 5 cached, 0 reqs)
+200x-shortread-bam igv run 1: 127 ms (5 steps, 5 cached, 0 reqs)
+200x-shortread-bam genomespy run 1: 5 ms (5 steps, 5 cached, 0 reqs)
+200x-shortread-bam jbrowse run 2: 3 ms (5 steps, 5 cached, 0 reqs)
+200x-shortread-bam jbrowse-release-2.4.0 run 2: 1147 ms (5 steps, 5 cached, 0 reqs)
+200x-shortread-bam igv run 2: 121 ms (5 steps, 5 cached, 0 reqs)
+200x-shortread-bam genomespy run 2: 5 ms (5 steps, 5 cached, 0 reqs)
+200x-shortread-bam jbrowse run 3: 3 ms (5 steps, 5 cached, 0 reqs)
+200x-shortread-bam jbrowse-release-2.4.0 run 3: 1148 ms (5 steps, 5 cached, 0 reqs)
+200x-shortread-bam igv run 3: 124 ms (5 steps, 5 cached, 0 reqs)
+200x-shortread-bam genomespy run 3: 5 ms (5 steps, 5 cached, 0 reqs)
+
+wrote results/crosstool-zoom.md and results/crosstool-zoom.json
+canvas: set CANVAS=1 to measure the canvas2d backend (optional)
+new: port 8000 is serving builds/release-5.0.0-beta.10
+baseline: port 8001 is serving builds/release-4.3.0
+published: port 8004 is serving builds/release-2.4.0
+20x-shortread-bam / release-5.0.0-beta.10 / zoom-in: time-to-content 0ms (loading=false, steps=5, load=0.8→0.6, foreign 0.02)
+20x-shortread-bam / release-4.3.0 / zoom-in: time-to-content 1074ms (loading=true, steps=5, load=0.6→1.0, foreign 0.01)
+20x-shortread-bam / release-2.4.0 / zoom-in: time-to-content 556ms (loading=true, steps=5, load=0.9→0.8, foreign 0.01)
+200x-shortread-bam / release-5.0.0-beta.10 / zoom-in: time-to-content 0ms (loading=false, steps=5, load=0.8→0.7, foreign 0.02)
+200x-shortread-bam / release-4.3.0 / zoom-in: time-to-content 1198ms (loading=true, steps=5, load=0.7→1.0, foreign 0.80: unattended-upgr 0.67, apt-check 0.10, unattended-upgr 0.02)
+200x-shortread-bam / release-2.4.0 / zoom-in: time-to-content 611ms (loading=true, steps=5, load=1.0→1.3, foreign 0.60: unattended-upgr 0.21, apt-check 0.10, apt-check 0.10)
+
+# Zoom interaction benchmark
+
+Region `chr22_mask:124000-143000`. **time-to-content** = ms a loading indicator ("Downloading alignments...") is shown after a zoom before correct content returns; median over the measured steps. redraw = longest frame (ms) of the GPU redraw. A `≥` prefix marks a censored value: the step was still loading at MAX_WAIT (120000 ms), so the true figure is larger.
+
+Contamination, over the cells measured this run: worst **0.80 foreign cores** (`200x-shortread-bam / release-4.3.0 / zoom-in` — unattended-upgr 0.67, apt-check 0.10, unattended-upgr 0.02), median 0.02. That is CPU burned by processes outside this benchmark — its own tree and the corpus servers excluded. This box floors near 0.28 with nobody using it, so read the ceiling as a budget over that floor. Cells not measured this run keep their recorded figure and are absent from these two numbers.
+
+Measured — in: 2026-09-30 (structural), out: unknown (text, pre-2026-08-25), pan: unknown (text, pre-2026-08-25). Comparisons *within* a section are same-run; comparisons across sections may not be.
+
+Every step is a discrete jump, so it ends with `settleCoarseBlocks` rather than leaving the 500 ms `LGVCoarseDynamicBlocks` throttle to expire — the path a UI control takes, and not the per-frame chokepoint a gesture writes through. Flushes: release-5.0.0-beta.10. Predates the action and waits the throttle out on every step: release-4.3.0, release-2.4.0 — half a second of each of those cells is a timer, and it is a difference between the builds rather than one between the columns' instruments.
+
+## Zoom IN — only the old renderer refetches
+
+The new view is a strict subset of already-loaded reads, so the GPU branch re-projects without going to the network. This is its best case.
+
+**This column read 0 ms in every case on 2026-09-04 and does not reproduce.** Re-measured five times on an idle box it reads 146-187 ms, flat across a fifty-fold coverage range, which is the shape of fixed block bookkeeping rather than of drawing (the redraw frame is one vsync either way). The two release columns are unchanged between those runs (4.3.0 at 20x-shortread-bam: 1070 against 1066 ms), so it is not the box: it moved only on the build that can flush the coarse-block throttle, the one where the discrete drive does anything at all. Why the earlier run recorded zeros, with no loading state seen on any step, is not established. Zero was the stronger claim and it is withdrawn.
+
+| case | release-5.0.0-beta.10 | release-4.3.0 | release-2.4.0 | release-5.0.0-beta.10 redraw frame |
+|---|---:|---:|---:|---:|
+| 20x-shortread-bam | 0ms | 1074ms | 556ms | 17ms |
+| 20x-shortread-cram | — | — | — | n/a |
+| 200x-shortread-bam | 0ms | 1198ms | 611ms | 17ms |
+| 200x-shortread-cram | — | — | — | n/a |
+| 1000x-shortread-bam | — | — | — | n/a |
+| 1000x-shortread-cram | — | — | — | n/a |
+| 20x-longread-bam | — | — | — | n/a |
+| 20x-longread-cram | — | — | — | n/a |
+| 200x-longread-bam | — | — | — | n/a |
+| 200x-longread-cram | — | — | — | n/a |
+| 1000x-longread-bam | — | — | — | n/a |
+| 1000x-longread-cram | — | — | — | n/a |
+
+## Zoom OUT — mostly refused, not measured
+
+Zooming out was meant to be the case where BOTH builds refetch, isolating render cost from avoided fetching. It largely does not work: past a byte threshold JBrowse declines the fetch and renders "Requested too much data (N Mb). Zoom in to see features or force load" instead of reads.
+
+That path is fast and paints nothing, so it previously scored as a ~90ms success — the best-looking number in the table was a refusal to draw. `_bail_` marks a cell where no step drew anything; `(n bail)` marks partial refusal, with the median taken only over steps that did draw.
+
+The honest reading: for anything heavier than 20x shortread, this comparison has no render timing in it. The PAN section below is the test this was meant to be.
+
+| case | release-5.0.0-beta.10 | release-4.3.0 | release-2.4.0 | release-5.0.0-beta.10 redraw frame | drew/attempted |
+|---|---:|---:|---:|---:|---:|
+| 20x-shortread-bam | — | — | — | n/a | — |
+| 20x-shortread-cram | — | — | — | n/a | — |
+| 200x-shortread-bam | — | — | — | n/a | — |
+| 200x-shortread-cram | — | — | — | n/a | — |
+| 1000x-shortread-bam | — | — | — | n/a | — |
+| 1000x-shortread-cram | — | — | — | n/a | — |
+| 20x-longread-bam | — | — | — | n/a | — |
+| 20x-longread-cram | — | — | — | n/a | — |
+| 200x-longread-bam | — | — | — | n/a | — |
+| 200x-longread-cram | — | — | — | n/a | — |
+| 1000x-longread-bam | — | — | — | n/a | — |
+| 1000x-longread-cram | — | — | — | n/a | — |
+
+## PAN at constant zoom — both builds refetch
+
+One full viewport sideways per step, `bpPerPx` unchanged. The region is new to both builds so neither can serve it from what it holds, and the bytes per step are the same as the initial render's, so the density cap that turns zoom-out into a refusal test is never approached. This is the refetch-vs-refetch comparison zoom-out was supposed to be.
+
+Both architectures pay the fetch here, so this is the branch's *hardest* case — the opposite end from zoom-in. Any remaining gap is render cost, not avoided network.
+
+A 19 kb window gets about five viewport-widths before it runs out of the 250 kb `chr22_mask`; steps beyond that are not attempted rather than clamped into a mostly-empty view.
+
+The pan runs **leftward** from the benchmark locus. pbsim's long reads run off the ends of the contig, so long-read depth tapers there — panning right put two of five windows on thinned data (1000x.longread falls 1178 → 938 → 500 over the last three windows), which reads as a speedup in both builds at once. Leftward keeps four of five inside the plateau. Short-read depth is flat across the whole contig either way, and 20x-shortread indeed measures the same in both directions.
+
+| case | release-5.0.0-beta.10 | release-4.3.0 | ratio | release-2.4.0 | release-5.0.0-beta.10 redraw frame | steps |
+|---|---:|---:|---:|---:|---:|---:|
+| 20x-shortread-bam | — | — | — | — | n/a | — |
+| 20x-shortread-cram | — | — | — | — | n/a | — |
+| 200x-shortread-bam | — | — | — | — | n/a | — |
+| 200x-shortread-cram | — | — | — | — | n/a | — |
+| 1000x-shortread-bam | — | — | — | — | n/a | — |
+| 1000x-shortread-cram | — | — | — | — | n/a | — |
+| 20x-longread-bam | — | — | — | — | n/a | — |
+| 20x-longread-cram | — | — | — | — | n/a | — |
+| 200x-longread-bam | — | — | — | — | n/a | — |
+| 200x-longread-cram | — | — | — | — | n/a | — |
+| 1000x-longread-bam | — | — | — | — | n/a | — |
+| 1000x-longread-cram | — | — | — | — | n/a | — |
+
+Wrote results/interaction.{json,md}
+canvas: set CANVAS=1 to measure the canvas2d backend (optional)
+new: port 8000 is serving builds/release-5.0.0-beta.10
+baseline: port 8001 is serving builds/release-4.3.0
+published: port 8004 is serving builds/release-2.4.0
+20x-shortread-bam / release-5.0.0-beta.10 / zoom-in: time-to-content 0ms (loading=false, steps=5, load=1.2→1.1, foreign 0.02)
+20x-shortread-bam / release-4.3.0 / zoom-in: time-to-content 1074ms (loading=true, steps=5, load=1.1→1.3, foreign 0.01)
+20x-shortread-bam / release-2.4.0 / zoom-in: time-to-content 541ms (loading=true, steps=5, load=1.3→1.1, foreign 0.02)
+200x-shortread-bam / release-5.0.0-beta.10 / zoom-in: time-to-content 0ms (loading=false, steps=5, load=1.1→1.0, foreign 0.02)
+200x-shortread-bam / release-4.3.0 / zoom-in: time-to-content 1086ms (loading=true, steps=5, load=1.0→0.9, foreign 0.01)
+200x-shortread-bam / release-2.4.0 / zoom-in: time-to-content 644ms (loading=true, steps=5, load=0.9→1.0, foreign 0.02)
+
+# Zoom interaction benchmark
+
+Region `chr22_mask:124000-143000`. **time-to-content** = ms a loading indicator ("Downloading alignments...") is shown after a zoom before correct content returns; median over the measured steps. redraw = longest frame (ms) of the GPU redraw. A `≥` prefix marks a censored value: the step was still loading at MAX_WAIT (120000 ms), so the true figure is larger.
+
+Contamination, over the cells measured this run: worst **0.02 foreign cores** (`200x-shortread-bam / release-5.0.0-beta.10 / zoom-in`), median 0.02. That is CPU burned by processes outside this benchmark — its own tree and the corpus servers excluded. This box floors near 0.28 with nobody using it, so read the ceiling as a budget over that floor. Cells not measured this run keep their recorded figure and are absent from these two numbers.
+
+Measured — in: 2026-09-30 (structural), out: unknown (text, pre-2026-08-25), pan: unknown (text, pre-2026-08-25). Comparisons *within* a section are same-run; comparisons across sections may not be.
+
+Every step is a discrete jump, so it ends with `settleCoarseBlocks` rather than leaving the 500 ms `LGVCoarseDynamicBlocks` throttle to expire — the path a UI control takes, and not the per-frame chokepoint a gesture writes through. Flushes: release-5.0.0-beta.10. Predates the action and waits the throttle out on every step: release-4.3.0, release-2.4.0 — half a second of each of those cells is a timer, and it is a difference between the builds rather than one between the columns' instruments.
+
+## Zoom IN — only the old renderer refetches
+
+The new view is a strict subset of already-loaded reads, so the GPU branch re-projects without going to the network. This is its best case.
+
+**This column read 0 ms in every case on 2026-09-04 and does not reproduce.** Re-measured five times on an idle box it reads 146-187 ms, flat across a fifty-fold coverage range, which is the shape of fixed block bookkeeping rather than of drawing (the redraw frame is one vsync either way). The two release columns are unchanged between those runs (4.3.0 at 20x-shortread-bam: 1070 against 1066 ms), so it is not the box: it moved only on the build that can flush the coarse-block throttle, the one where the discrete drive does anything at all. Why the earlier run recorded zeros, with no loading state seen on any step, is not established. Zero was the stronger claim and it is withdrawn.
+
+| case | release-5.0.0-beta.10 | release-4.3.0 | release-2.4.0 | release-5.0.0-beta.10 redraw frame |
+|---|---:|---:|---:|---:|
+| 20x-shortread-bam | 0ms | 1074ms | 541ms | 17ms |
+| 20x-shortread-cram | — | — | — | n/a |
+| 200x-shortread-bam | 0ms | 1086ms | 644ms | 17ms |
+| 200x-shortread-cram | — | — | — | n/a |
+| 1000x-shortread-bam | — | — | — | n/a |
+| 1000x-shortread-cram | — | — | — | n/a |
+| 20x-longread-bam | — | — | — | n/a |
+| 20x-longread-cram | — | — | — | n/a |
+| 200x-longread-bam | — | — | — | n/a |
+| 200x-longread-cram | — | — | — | n/a |
+| 1000x-longread-bam | — | — | — | n/a |
+| 1000x-longread-cram | — | — | — | n/a |
+
+## Zoom OUT — mostly refused, not measured
+
+Zooming out was meant to be the case where BOTH builds refetch, isolating render cost from avoided fetching. It largely does not work: past a byte threshold JBrowse declines the fetch and renders "Requested too much data (N Mb). Zoom in to see features or force load" instead of reads.
+
+That path is fast and paints nothing, so it previously scored as a ~90ms success — the best-looking number in the table was a refusal to draw. `_bail_` marks a cell where no step drew anything; `(n bail)` marks partial refusal, with the median taken only over steps that did draw.
+
+The honest reading: for anything heavier than 20x shortread, this comparison has no render timing in it. The PAN section below is the test this was meant to be.
+
+| case | release-5.0.0-beta.10 | release-4.3.0 | release-2.4.0 | release-5.0.0-beta.10 redraw frame | drew/attempted |
+|---|---:|---:|---:|---:|---:|
+| 20x-shortread-bam | — | — | — | n/a | — |
+| 20x-shortread-cram | — | — | — | n/a | — |
+| 200x-shortread-bam | — | — | — | n/a | — |
+| 200x-shortread-cram | — | — | — | n/a | — |
+| 1000x-shortread-bam | — | — | — | n/a | — |
+| 1000x-shortread-cram | — | — | — | n/a | — |
+| 20x-longread-bam | — | — | — | n/a | — |
+| 20x-longread-cram | — | — | — | n/a | — |
+| 200x-longread-bam | — | — | — | n/a | — |
+| 200x-longread-cram | — | — | — | n/a | — |
+| 1000x-longread-bam | — | — | — | n/a | — |
+| 1000x-longread-cram | — | — | — | n/a | — |
+
+## PAN at constant zoom — both builds refetch
+
+One full viewport sideways per step, `bpPerPx` unchanged. The region is new to both builds so neither can serve it from what it holds, and the bytes per step are the same as the initial render's, so the density cap that turns zoom-out into a refusal test is never approached. This is the refetch-vs-refetch comparison zoom-out was supposed to be.
+
+Both architectures pay the fetch here, so this is the branch's *hardest* case — the opposite end from zoom-in. Any remaining gap is render cost, not avoided network.
+
+A 19 kb window gets about five viewport-widths before it runs out of the 250 kb `chr22_mask`; steps beyond that are not attempted rather than clamped into a mostly-empty view.
+
+The pan runs **leftward** from the benchmark locus. pbsim's long reads run off the ends of the contig, so long-read depth tapers there — panning right put two of five windows on thinned data (1000x.longread falls 1178 → 938 → 500 over the last three windows), which reads as a speedup in both builds at once. Leftward keeps four of five inside the plateau. Short-read depth is flat across the whole contig either way, and 20x-shortread indeed measures the same in both directions.
+
+| case | release-5.0.0-beta.10 | release-4.3.0 | ratio | release-2.4.0 | release-5.0.0-beta.10 redraw frame | steps |
+|---|---:|---:|---:|---:|---:|---:|
+| 20x-shortread-bam | — | — | — | — | n/a | — |
+| 20x-shortread-cram | — | — | — | — | n/a | — |
+| 200x-shortread-bam | — | — | — | — | n/a | — |
+| 200x-shortread-cram | — | — | — | — | n/a | — |
+| 1000x-shortread-bam | — | — | — | — | n/a | — |
+| 1000x-shortread-cram | — | — | — | — | n/a | — |
+| 20x-longread-bam | — | — | — | — | n/a | — |
+| 20x-longread-cram | — | — | — | — | n/a | — |
+| 200x-longread-bam | — | — | — | — | n/a | — |
+| 200x-longread-cram | — | — | — | — | n/a | — |
+| 1000x-longread-bam | — | — | — | — | n/a | — |
+| 1000x-longread-cram | — | — | — | — | n/a | — |
+
+Wrote results/interaction.{json,md}
+ 18:31:10 up 27 min,  0 users,  load average: 1.00, 1.16, 1.01

@@ -44,9 +44,14 @@ Serve it as the build under test with `make serve BUILD=release-5.0.0-beta.10`,
 or on the instance with `EC2_BUILD=release-5.0.0-beta.10`, which `provision.sh`
 and `run.sh` both read.
 
+`release-5.0.0-beta.10` was staged 2026-09-30 from the tag cut on 2026-09-28,
+and is the arm. The fast EC2 spike ran on it the same day
+(`results/ec2/2026-09-30-1414/`): the four short-read cells and the zoom, on a
+g4dn.2xlarge with Chrome on the T4. The full matrix has not been rerun on it.
+
 `release-5.0.0-beta.9` was staged 2026-09-25 to prove that path end to end
-before the tag the manuscript names existed. It is not the arm; restage on the
-tag that is, and delete it if the disk is wanted.
+before the tag the manuscript names existed. It is not the arm; delete it if
+the disk is wanted.
 
 ## `release-2.4.0`, the published baseline
 
