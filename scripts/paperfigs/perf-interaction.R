@@ -45,7 +45,12 @@ d$coverage <- as.numeric(sub("x .*", "", d$case))
 d$reads <- factor(sub("^[0-9]+x ", "", d$case), levels = c("short read", "long read"))
 d$series <- factor(d$series, levels = PERF_SERIES)
 
-PANELS <- c("Zoom in, within loaded data", "Pan, both refetch")
+# Pan only since 2026-10-01. The zoom row timed JBrowse's own completion
+# markers at 146-171 ms for this work, which contradicted the manuscript's
+# under-30 ms zoom from the cross-tool draw clock (perf-crosstool-zoom.R), and
+# the cross-tool figure is the one the manuscript reports.
+PANELS <- c("Pan, both refetch")
+d <- subset(d, panel %in% PANELS)
 d$panel <- factor(d$panel, levels = PANELS)
 
 # A dropped point truncates its series rather than interpolating across the gap,
@@ -80,17 +85,7 @@ pan_ends <- endpoint_labels(subset(plotted, panel == "Pan, both refetch"),
                             series = "series", reference = "This work")
 pan_ends$label <- sub("\n", " · ", pan_ends$label, fixed = TRUE)
 
-zoom <- subset(plotted, panel == "Zoom in, within loaded data")
-zoom <- zoom[order(-zoom$coverage), ]
-zoom_ends <- zoom[!duplicated(zoom[c("panel", "reads", "series")]), ]
-# Formatted from the value like every other label. It was hardcoded to "0 s"
-# for this work while the column really did read zero, and that hardcode
-# outlived the number: the data moved to 146-171 ms on 2026-09-04 and the figure
-# went on printing 0 s, because a literal cannot be wrong about data it never
-# reads. Nothing on a figure should be a constant that the data could contradict.
-zoom_ends$label <- fmt_time(zoom_ends$s)
-
-ends <- rbind(pan_ends[LABEL_COLS], zoom_ends[LABEL_COLS])
+ends <- pan_ends[LABEL_COLS]
 
 # Read length used to be a linetype within each panel rather than its own facet,
 # which put short and long read on one shared y scale -- and they are not close
@@ -110,7 +105,7 @@ fig <- ggplot(plotted, aes(x = coverage, y = s, colour = series)) +
                   min.segment.length = 0.3, segment.size = 0.25,
                   segment.alpha = 0.5, box.padding = 0.25) +
   drop_note +
-  facet_wrap(~panel + reads, nrow = 2, scales = "free_y") +
+  facet_wrap(~reads, nrow = 1, scales = "free_y") +
   scale_x_log10(breaks = c(20, 200, 1000), labels = c("20×", "200×", "1000×"),
                 expand = expansion(mult = c(0.08, 0.3))) +
   scale_y_continuous(expand = expansion(mult = c(0.05, 0.12))) +
@@ -125,15 +120,15 @@ fig <- ggplot(plotted, aes(x = coverage, y = s, colour = series)) +
   # the figure still says what it is when it is pulled out of the paper and put
   # on a slide.
   labs(x = "coverage", y = "seconds", colour = NULL,
-       title = "Time to content after a zoom and after a pan") +
+       title = "Time to content after a pan of one viewport") +
   paper_theme()
 
 ggsave("results/figures/paper/pdf/perf-interaction.pdf", fig,
-       width = 220, height = 170, units = "mm", device = cairo_pdf)
+       width = 220, height = 100, units = "mm", device = cairo_pdf)
 cat("wrote results/figures/paper/pdf/perf-interaction.pdf\n")
 
 ggsave("results/figures/paper/png/perf-interaction.png", fig,
-       width = 220, height = 170, units = "mm", dpi = 300, device = ragg::agg_png)
+       width = 220, height = 100, units = "mm", dpi = 300, device = ragg::agg_png)
 cat("wrote results/figures/paper/png/perf-interaction.png\n")
 
 # ---- draft caption ----------------------------------------------------------

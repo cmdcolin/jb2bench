@@ -1,0 +1,24 @@
+{
+  "comment": [
+    "The Zarr-against-BigWig load over the manuscript's cohort figure window",
+    "(Figure 1b, the nested chr3 deletion), measured 2026-10-01 with",
+    "",
+    "  node scripts/measure_signal_latency.ts \\",
+    "    --samples test_data/1000g_cnv/samples.tsv \\",
+    "    --region chr3:162,650,000-163,050,000 \\",
+    "    --zarr https://jbrowse.org/demos/1000g/qm2_cn_1kb.zarr",
+    "",
+    "in GMOD/jbrowse-components. zarr.json keeps the chr17 window that the",
+    "population_cnv tutorial states. The first BigWig run (41.1 s) came before",
+    "a Zarr URL fix and is left out; the medians are of the three complete runs."
+  ],
+  "region": "chr3:162,650,000-163,050,000",
+  "samples": 2504,
+  "panel": "1000 Genomes",
+  "runs": {
+    "bigwigs_seconds": [19.9, 18.7, 17.7],
+    "zarr_seconds": [0.5, 0.2, 0.1]
+  },
+  "bigwigs": { "requests": 15048, "megabytes": 48.39, "seconds": 18.7 },
+  "zarr": { "requests": 4, "megabytes": 0.27, "seconds": 0.2 }
+}
