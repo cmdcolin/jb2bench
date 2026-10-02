@@ -223,8 +223,8 @@ endpoint_repel <- function(labels) {
       seed = REPEL_SEED, show.legend = FALSE,
       box.padding = 0.38, point.padding = 0.2,
       force = 3, force_pull = 0.4,
-      min.segment.length = 0.25, segment.size = 0.25,
-      segment.alpha = 0.5, max.overlaps = Inf,
+      min.segment.length = 0.25, segment.size = 0.45,
+      segment.alpha = 0.9, max.overlaps = Inf,
       max.time = 5, max.iter = 60000),
     scale_size_manual(values = c(plain = POINT_LABEL, bold = ENDPOINT_LABEL),
                       guide = "none")
