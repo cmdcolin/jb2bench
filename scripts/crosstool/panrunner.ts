@@ -111,7 +111,7 @@ interface Tool {
   kind: 'jbrowse' | 'igv' | 'genomespy'
   /**
    * Container formats this arm can open, where it cannot open all of them.
-   * GenomeSpy 0.85.0 has no CRAM lazy source, so its CRAM cells are a
+   * GenomeSpy has no CRAM lazy source, so its CRAM cells are a
    * capability limit and not a gap in the run -- recorded as `unsupported`
    * rather than left blank, since blank already means "not measured this run".
    */
@@ -358,6 +358,17 @@ const prior: Recorded = fs.existsSync(RESULTS)
       dates: {},
       locusMismatch: {},
     }
+// A TOOLS= subset merges into the recorded cells, so a file holding GenomeSpy
+// cells from one version and new ones from another would carry a single label
+// over both.
+const recordedGs = prior.gsVersion ?? '0.85.0'
+if (Object.values(prior.rows).some(r => r.genomespy) && recordedGs !== gsVersion) {
+  console.error(
+    `${RESULTS} holds GenomeSpy ${recordedGs} cells and ${gsVersion} is installed; ` +
+      'archive the results files before measuring a new version',
+  )
+  process.exit(1)
+}
 
 const today = new Date().toISOString().slice(0, 10)
 
@@ -631,7 +642,7 @@ const lines: string[] = [
   'largely a difference in drawing. The igv.js columns are not that: igv',
   'maintains its own readers, so they confound parser with renderer. That makes',
   'GenomeSpy the more informative of the two comparisons and the narrower one:',
-  '0.85.0 has no CRAM lazy source, so its CRAM cells read `n/a` rather than a',
+  `${gsVersion} has no CRAM lazy source, so its CRAM cells read \`n/a\` rather than a`,
   'timing.',
   '',
   ...(isZoom

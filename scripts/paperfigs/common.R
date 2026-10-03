@@ -109,9 +109,15 @@ time_scale_x <- function(name = "time", breaks = TIME_BREAKS, ...) {
 # release to newest and then the other tools, which is the order a reader walks
 # them in. Shared because the cold-load and interaction figures are separate
 # scripts that both draw "This work" and must agree on its colour.
+GENOMESPY <- local({
+  g <- unique(grep("^GenomeSpy [0-9]", read.csv("results/paper/perf.csv")$series,
+                   value = TRUE))
+  stopifnot(length(g) == 1)
+  g
+})
 PERF_SERIES <- c("Release 2.4.0", "Release 4.1.15", "Release 4.3.0",
                  "This work", "This work, canvas backend",
-                 "igv.js 3.8.5", "GenomeSpy 0.85.0")
+                 "igv.js 3.8.5", GENOMESPY)
 
 # One type scale for every manuscript figure. The stock 11 pt base at 180 mm
 # printed labels at 6 pt, which is legible on paper and not on a screen or a

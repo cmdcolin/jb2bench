@@ -5,7 +5,7 @@
 # numbers as one faceted figure instead, drawn by perf-coldload-windows.R.
 #
 # Navigation to render-complete on a cold load: this release, the published
-# release 2.4.0, igv.js 3.8.5 and GenomeSpy 0.85.0, over the same files, window,
+# release 2.4.0, igv.js 3.8.5 and GenomeSpy, over the same files, window,
 # machine and browser build. The numbers behind the manuscript's cross-tool
 # table, and behind results/crosstool.md.
 #
@@ -68,7 +68,7 @@ source("scripts/paperfigs/common.R")
 # single point is a comparator the figure asserts and does not show, so the
 # ceiling result is stated in the prose instead. results/crosstool.md in
 # jb2bench keeps the cells.
-DRAWN <- c("Release 2.4.0", "This work", "igv.js 3.8.5", "GenomeSpy 0.85.0")
+DRAWN <- c("Release 2.4.0", "This work", "igv.js 3.8.5", GENOMESPY)
 
 # GenomeSpy reads no CRAM. perf-data.R drops those cells rather than recording a
 # zero, so the series simply stops where its capability does. Said on the figure,

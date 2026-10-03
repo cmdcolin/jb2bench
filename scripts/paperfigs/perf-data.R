@@ -232,11 +232,19 @@ crosstool <- read_results("crosstool.json")$rows
 # They are the more informative pair for a render claim and the harder one:
 # GenomeSpy decodes BAM through the same `@gmod/bam` this work does, so a
 # GenomeSpy column largely isolates the render path rather than the parser.
+gs_versions <- unique(c(
+  read_results("crosstool.json")$gsVersion %||% "0.85.0",
+  read_results("crosstool-zoom.json")$gsVersion %||% "0.85.0",
+  read_results("crosstool-pan.json")$gsVersion %||% "0.85.0"))
+if (length(gs_versions) != 1) {
+  stop("the cross-tool results record GenomeSpy ", paste(gs_versions, collapse = " and "),
+       "; one figure set cannot carry both")
+}
 xt_builds <- c("jbrowse" = "This work",
                "jbrowse-release-4.3.0" = "Release 4.3.0",
                "jbrowse-release-2.4.0" = "Release 2.4.0",
                "igv" = "igv.js 3.8.5",
-               "genomespy" = "GenomeSpy 0.85.0",
+               "genomespy" = paste("GenomeSpy", gs_versions),
                "gosling" = "Gosling 1.0.7")
 # The downsampling control, added to the cold-load extraction only. It is not a
 # comparator -- it exists to check whether igv's default samplingDepth is what

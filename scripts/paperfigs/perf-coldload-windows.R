@@ -38,7 +38,7 @@ source("scripts/paperfigs/common.R")
 # Same set perf-coldload.R draws, for the same reason: the comparator a reader
 # can place is the published release plus the two other renderers measured
 # alongside it in one session.
-DRAWN <- c("Release 2.4.0", "This work", "igv.js 3.8.5", "GenomeSpy 0.85.0")
+DRAWN <- c("Release 2.4.0", "This work", "igv.js 3.8.5", GENOMESPY)
 
 all <- read.csv("results/paper/perf.csv", stringsAsFactors = FALSE)
 all <- subset(all, panel == "Cold load" & session == "cross-tool" &

@@ -194,7 +194,7 @@
       // tabix and vcf, so only the CRAM `no` belongs to the tool.
       if (!track.endsWith('.bam')) {
         const why = track.endsWith('.cram')
-          ? 'genomespy 0.85.0 has no CRAM lazy source'
+          ? 'genomespy has no CRAM lazy source'
           : 'this harness builds a BAM pileup spec only; genomespy itself also reads bigwig, bigbed, vcf, gff3 and tabix'
         const msg = `cannot open "${track}" — ${why}`
         window.__gsState.error = msg

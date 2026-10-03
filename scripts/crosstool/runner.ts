@@ -124,7 +124,7 @@ interface Tool {
   /**
    * Container formats this arm can open, where it cannot open all of them.
    *
-   * Neither GenomeSpy 0.85.0 nor Gosling 1.0.7 has a CRAM reader — GenomeSpy's
+   * Neither GenomeSpy nor Gosling 1.0.7 has a CRAM reader — GenomeSpy's
    * lazy sources are bam, bigbed, bigwig, gff3, tabix and vcf, and Gosling's
    * fetchers are bam, bigwig, vcf, gff, bed and csv — so the format axis the
    * JBrowse and igv.js arms run stops at BAM for those two. A cell no arm can
@@ -466,6 +466,7 @@ type Row = Record<string, Cell>
 const RESULTS = 'results/crosstool.json'
 interface Recorded {
   igvVersion: string
+  gsVersion?: string
   jbrowseBuild: string
   /** every JBrowse arm this file holds, tool id → build directory */
   jbrowseBuilds: Record<string, string>
@@ -474,7 +475,18 @@ interface Recorded {
 }
 const prior: Recorded = fs.existsSync(RESULTS)
   ? JSON.parse(fs.readFileSync(RESULTS, 'utf8'))
-  : { igvVersion, jbrowseBuild, jbrowseBuilds: {}, rows: {}, dates: {} }
+  : { igvVersion, gsVersion, jbrowseBuild, jbrowseBuilds: {}, rows: {}, dates: {} }
+// A TOOLS= subset merges into the recorded cells, so a file holding GenomeSpy
+// cells from one version and new ones from another would carry a single label
+// over both.
+const recordedGs = prior.gsVersion ?? '0.85.0'
+if (Object.values(prior.rows).some(r => r.genomespy) && recordedGs !== gsVersion) {
+  console.error(
+    `${RESULTS} holds GenomeSpy ${recordedGs} cells and ${gsVersion} is installed; ` +
+      'archive the results files before measuring a new version',
+  )
+  process.exit(1)
+}
 // Two relabels in one pass: `<cov>-<read>` -> `<cov>-<read>-bam` for rows
 // recorded before the format axis, and `<case>` -> `<case>@19kb` for rows
 // recorded before the window axis. Both are renames of measurements that were
@@ -625,6 +637,7 @@ function record(key: string, row: Row) {
   prior.rows[key] = { ...prior.rows[key], ...row }
   prior.dates[key] = today
   prior.igvVersion = igvVersion
+  prior.gsVersion = gsVersion
   prior.jbrowseBuild = jbrowseBuild
   prior.jbrowseBuilds = {
     ...prior.jbrowseBuilds,

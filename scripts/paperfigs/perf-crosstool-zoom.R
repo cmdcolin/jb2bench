@@ -96,9 +96,9 @@ ARCH <- c(
   "Release 2.4.0"    = "Release 2.4.0 \u2014 worker tiles, re-rasterized",
   "Release 4.1.15"   = "Release 4.1.15",
   "This work"        = "This work \u2014 GPU, batched",
-  "igv.js 3.8.5"     = "igv.js 3.8.5 \u2014 2D canvas, per read",
-  "GenomeSpy 0.85.0" = "GenomeSpy 0.85.0 \u2014 GPU"
+  "igv.js 3.8.5"     = "igv.js 3.8.5 \u2014 2D canvas, per read"
 )
+ARCH[[GENOMESPY]] <- paste(GENOMESPY, "\u2014 GPU")
 
 endpoints <- function(df) {
   e <- df[order(-df$coverage), ]
