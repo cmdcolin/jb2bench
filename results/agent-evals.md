@@ -19,6 +19,12 @@ was `ho-count-variant-tracks`, which answered 16 where the catalog lists 15, wit
 ONT Open Data bucket, loaded `giab_2025.01/.../SAMPLE.haplotagged.cram` and hit "compression method number 255"
 (its `.crai` offsets are 63 bytes too high), and the other two runs failed the grader.
 
+**A rerun the same day did not reproduce 14 of 15.** Run from this repo at `fa980d301f`, the held-out set passed
+12 of 15: `ho-count-variant-tracks` failed all three runs, each answering 16 against a grader truth of 15, and the
+other four tasks passed 12 of 12. The recorded run passed that task twice and failed it once with the same
+answer, so the task is unstable, not rarely wrong. `results/agent-evals-heldout-rerun.json` holds the rerun. Report
+the held-out score with that task's behavior stated, or fix the task first.
+
 The summaries are `results/agent-evals-<set>.json`. They are copied from `~/agent-evals/<run>/summary.json`, where
 the run directories hold the per-run transcripts.
 
