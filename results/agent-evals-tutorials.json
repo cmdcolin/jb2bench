@@ -1,0 +1,733 @@
+{
+  "commit": "00a301b414",
+  "dirty": false,
+  "server": "/home/cdiesh/src/jbrowse-components/products/jbrowse-desktop/build/mcpServer.js",
+  "startedAt": "2026-10-05T17:53:05.241Z",
+  "claudeVersion": "2.1.289 (Claude Code)",
+  "model": "sonnet",
+  "client": "code",
+  "set": "tutorials",
+  "runs": 3,
+  "passed": 2,
+  "total": 6,
+  "tasksPassingEveryRun": 0,
+  "routes": [
+    {
+      "route": "addTrack",
+      "calls": 1,
+      "errors": 0,
+      "passedRuns": 0,
+      "failedRuns": 1
+    },
+    {
+      "route": "addView",
+      "calls": 0,
+      "errors": 0,
+      "passedRuns": 0,
+      "failedRuns": 0
+    },
+    {
+      "route": "applyDisplaySettings",
+      "calls": 3,
+      "errors": 0,
+      "passedRuns": 0,
+      "failedRuns": 2
+    },
+    {
+      "route": "applyPlot",
+      "calls": 0,
+      "errors": 0,
+      "passedRuns": 0,
+      "failedRuns": 0
+    },
+    {
+      "route": "configuration",
+      "calls": 2,
+      "errors": 1,
+      "passedRuns": 0,
+      "failedRuns": 1
+    },
+    {
+      "route": "describeSlots",
+      "calls": 1,
+      "errors": 0,
+      "passedRuns": 0,
+      "failedRuns": 1
+    },
+    {
+      "route": "ensureRequire",
+      "calls": 0,
+      "errors": 0,
+      "passedRuns": 0,
+      "failedRuns": 0
+    },
+    {
+      "route": "fitToWindow",
+      "calls": 0,
+      "errors": 0,
+      "passedRuns": 0,
+      "failedRuns": 0
+    },
+    {
+      "route": "getConf",
+      "calls": 0,
+      "errors": 0,
+      "passedRuns": 0,
+      "failedRuns": 0
+    },
+    {
+      "route": "getFeatures",
+      "calls": 10,
+      "errors": 3,
+      "passedRuns": 1,
+      "failedRuns": 3
+    },
+    {
+      "route": "help",
+      "calls": 0,
+      "errors": 0,
+      "passedRuns": 0,
+      "failedRuns": 0
+    },
+    {
+      "route": "hideTrack",
+      "calls": 0,
+      "errors": 0,
+      "passedRuns": 0,
+      "failedRuns": 0
+    },
+    {
+      "route": "inspect",
+      "calls": 1,
+      "errors": 0,
+      "passedRuns": 0,
+      "failedRuns": 1
+    },
+    {
+      "route": "launchTrack",
+      "calls": 0,
+      "errors": 0,
+      "passedRuns": 0,
+      "failedRuns": 0
+    },
+    {
+      "route": "layoutViews",
+      "calls": 0,
+      "errors": 0,
+      "passedRuns": 0,
+      "failedRuns": 0
+    },
+    {
+      "route": "listTracks",
+      "calls": 12,
+      "errors": 0,
+      "passedRuns": 2,
+      "failedRuns": 4
+    },
+    {
+      "route": "loadSessionSpec",
+      "calls": 9,
+      "errors": 0,
+      "passedRuns": 2,
+      "failedRuns": 2
+    },
+    {
+      "route": "mobx",
+      "calls": 0,
+      "errors": 0,
+      "passedRuns": 0,
+      "failedRuns": 0
+    },
+    {
+      "route": "mst",
+      "calls": 0,
+      "errors": 0,
+      "passedRuns": 0,
+      "failedRuns": 0
+    },
+    {
+      "route": "navToLocString",
+      "calls": 11,
+      "errors": 2,
+      "passedRuns": 2,
+      "failedRuns": 1
+    },
+    {
+      "route": "notices",
+      "calls": 0,
+      "errors": 0,
+      "passedRuns": 0,
+      "failedRuns": 0
+    },
+    {
+      "route": "plot",
+      "calls": 0,
+      "errors": 0,
+      "passedRuns": 0,
+      "failedRuns": 0
+    },
+    {
+      "route": "plotProblems",
+      "calls": 0,
+      "errors": 0,
+      "passedRuns": 0,
+      "failedRuns": 0
+    },
+    {
+      "route": "readConfObject",
+      "calls": 0,
+      "errors": 0,
+      "passedRuns": 0,
+      "failedRuns": 0
+    },
+    {
+      "route": "require",
+      "calls": 12,
+      "errors": 2,
+      "passedRuns": 0,
+      "failedRuns": 2
+    },
+    {
+      "route": "rootModel",
+      "calls": 0,
+      "errors": 0,
+      "passedRuns": 0,
+      "failedRuns": 0
+    },
+    {
+      "route": "session",
+      "calls": 10,
+      "errors": 1,
+      "passedRuns": 2,
+      "failedRuns": 1
+    },
+    {
+      "route": "sessionSummary",
+      "calls": 17,
+      "errors": 2,
+      "passedRuns": 2,
+      "failedRuns": 4
+    },
+    {
+      "route": "setSession",
+      "calls": 0,
+      "errors": 0,
+      "passedRuns": 0,
+      "failedRuns": 0
+    },
+    {
+      "route": "trackModel",
+      "calls": 8,
+      "errors": 1,
+      "passedRuns": 0,
+      "failedRuns": 2
+    },
+    {
+      "route": "view",
+      "calls": 8,
+      "errors": 2,
+      "passedRuns": 1,
+      "failedRuns": 2
+    },
+    {
+      "route": "views",
+      "calls": 14,
+      "errors": 3,
+      "passedRuns": 2,
+      "failedRuns": 3
+    },
+    {
+      "route": "visibleRegions",
+      "calls": 5,
+      "errors": 0,
+      "passedRuns": 1,
+      "failedRuns": 1
+    },
+    {
+      "route": "waitReady",
+      "calls": 15,
+      "errors": 3,
+      "passedRuns": 2,
+      "failedRuns": 3
+    }
+  ],
+  "totals": {
+    "runJavascript": 69,
+    "errored": 10,
+    "docs": 42,
+    "screenshots": 10,
+    "open": 6,
+    "turns": 140,
+    "seconds": 616,
+    "usd": 2.23,
+    "tokensIn": 220,
+    "cacheWrite": 231568,
+    "cacheRead": 5000653,
+    "tokensOut": 30656,
+    "chars": {
+      "ToolSearch": 0,
+      "docs": 249419,
+      "run_javascript": 96754,
+      "open": 31848,
+      "screenshot": 4417,
+      "Bash": 134
+    },
+    "images": 10
+  },
+  "medians": [
+    {
+      "task": "tut-methylation-haplotypes",
+      "runJavascript": 14,
+      "errored": 3,
+      "tokens": 989753,
+      "chars": 76366,
+      "seconds": 78,
+      "turns": 29,
+      "usd": 0.425,
+      "passes": 0,
+      "runs": 3
+    },
+    {
+      "task": "tut-synteny-tnnt3",
+      "runJavascript": 9,
+      "errored": 1,
+      "tokens": 493499,
+      "chars": 42393,
+      "seconds": 112,
+      "turns": 19,
+      "usd": 0.224,
+      "passes": 2,
+      "runs": 3
+    }
+  ],
+  "metrics": [
+    {
+      "task": "tut-methylation-haplotypes",
+      "run": 1,
+      "client": "code",
+      "pass": false,
+      "detail": {
+        "regions": [
+          {
+            "refName": "chr15",
+            "start": 24953496,
+            "end": 24957498,
+            "assemblyName": "hg38"
+          }
+        ]
+      },
+      "runJavascript": 26,
+      "errored": 1,
+      "docs": 12,
+      "screenshots": 1,
+      "open": 2,
+      "chars": {
+        "ToolSearch": 0,
+        "docs": 96324,
+        "run_javascript": 39507,
+        "open": 15791,
+        "screenshot": 431
+      },
+      "images": 1,
+      "docsArgs": [
+        "live-model",
+        "methylation modifications group by haplotype",
+        "recipes/all",
+        "HG002 bam",
+        "hosted-data/all",
+        "HG002",
+        "colorBy modifications",
+        "model:LinearAlignmentsDisplay",
+        "model:LinearAlignmentsDisplay/Actions",
+        "plots/Facets",
+        "cram uri hg38 modBAM 5mC",
+        "config:LinearAlignmentsDisplay/Slots"
+      ],
+      "routeCalls": {
+        "listTracks": 2,
+        "sessionSummary": 2,
+        "require": 8,
+        "loadSessionSpec": 4,
+        "getFeatures": 3,
+        "trackModel": 2,
+        "applyDisplaySettings": 1,
+        "views": 1,
+        "waitReady": 1
+      },
+      "routeErrors": {
+        "require": 1
+      },
+      "turns": 43,
+      "seconds": 179,
+      "usd": 1.037,
+      "tokensIn": 72,
+      "cacheWrite": 98858,
+      "cacheRead": 2482959,
+      "tokensOut": 14467,
+      "answer": "JBrowse now shows HG002 nanopore reads over the SNRPN CpG island (chr15:24,953,500–24,957,500, hg38), coloured by 5mC and grouped by haplotype. I checked it in a screenshot, but the window was hidden, so that frame may be stale. HP 1 reads are mostly methylated (red) across the island and HP 2 reads mostly unmethylated (blue), which is the expected imprinted split. A third group, HP: none, holds the untagged reads.\n\nI couldn't use a published haplotagged file, so the HP tags are mine.\n- **ONT haplotagged CRAM:** its index is corrupt, and samtools fails on it too.\n- **Older ONT modBAM (`gm24385_mod_2021.09/extra_analysis/all.bam`):** it has no HP tag.\n- **My workaround:** I pulled reads for chr15:24.90–25.01 Mb from `all.bam` and haplotagged them against the phased SNPs in ONT's `wf_snp.vcf.gz`. I assigned HP by majority vote of each read's alleles at phased heterozygous SNPs. That gave 252 reads in HP 1, 207 in HP 2 and 68 untagged.\n\nThe local slice is `/tmp/jbrowse-agent-eval-cwd-nK4VH3/hg002_snrpn.tagged.bam`, and the track will stop loading if that file is removed. I also set `forceLoad` on the display, because the long reads otherwise trip the \"too much data\" gate."
+    },
+    {
+      "task": "tut-methylation-haplotypes",
+      "run": 2,
+      "client": "code",
+      "pass": false,
+      "detail": {
+        "regions": [
+          {
+            "refName": "chr15",
+            "start": 24953999,
+            "end": 24957001,
+            "assemblyName": "hg38"
+          }
+        ]
+      },
+      "runJavascript": 14,
+      "errored": 3,
+      "docs": 10,
+      "screenshots": 1,
+      "open": 2,
+      "chars": {
+        "ToolSearch": 0,
+        "docs": 42054,
+        "run_javascript": 18000,
+        "open": 15773,
+        "screenshot": 539
+      },
+      "images": 1,
+      "docsArgs": [
+        "live-model",
+        "methylation modifications haplotype",
+        "HG002 SNRPN",
+        "ont.bam OR .cram methylation url",
+        "recipes",
+        "HG002 ONT bam",
+        "model:LinearAlignmentsDisplay/CRAM colored by CpG methylation",
+        "hosted-data/Finding the assembly",
+        "model:LinearAlignmentsDisplay/setFacet",
+        "Facet type field tag"
+      ],
+      "routeCalls": {
+        "listTracks": 3,
+        "sessionSummary": 3,
+        "require": 4,
+        "addTrack": 1,
+        "navToLocString": 3,
+        "view": 3,
+        "getFeatures": 3,
+        "visibleRegions": 2,
+        "applyDisplaySettings": 2,
+        "trackModel": 6,
+        "waitReady": 4,
+        "configuration": 2,
+        "describeSlots": 1,
+        "inspect": 1,
+        "views": 1
+      },
+      "routeErrors": {
+        "require": 1,
+        "configuration": 1,
+        "getFeatures": 1,
+        "trackModel": 1,
+        "waitReady": 1
+      },
+      "turns": 29,
+      "seconds": 78,
+      "usd": 0.425,
+      "tokensIn": 44,
+      "cacheWrite": 45520,
+      "cacheRead": 938648,
+      "tokensOut": 5541,
+      "answer": "HG002's nanopore reads are now shown over the SNRPN CpG island (chr15:24,954,000-24,957,000, hg38), colored by 5mC and grouped by haplotype. I confirmed this through the session model. I did not see it drawn, because my screenshot came back stale and showed a different window.\n\n- **Data:** the catalog had no HG002 methylation track, so I used the local `hg002_snrpn.tagged.bam` in the working directory, which has HP tags.\n- **Coloring:** the display colors reads by base modifications, and the `m` (5mC) type is detected in the reads.\n- **Grouping:** reads are split into separate HP 1 and HP 2 sections. In view there are 45 reads in HP 1, 46 in HP 2 and 10 without a tag.\n- **Tags:** the BAM spells its methylation tags `Mm`/`Ml` rather than the usual `MM`/`ML`. JBrowse still detected the modification, so I left it.\n- **Forced load:** the track first refused to draw, reporting \"Requested too much data (10.8 Mb)\". I cleared that by forcing the load, and it then settled and drew with no errors.\n- **Island coordinates:** the SNRPN CpG island is at chr15:24,954,888-24,955,907, per the hg38 CpG Islands track."
+    },
+    {
+      "task": "tut-methylation-haplotypes",
+      "run": 3,
+      "client": "code",
+      "pass": false,
+      "detail": {
+        "regions": [
+          {
+            "refName": "chr7",
+            "start": 155799519,
+            "end": 155812863,
+            "assemblyName": "hg38"
+          }
+        ]
+      },
+      "runJavascript": 3,
+      "errored": 3,
+      "docs": 9,
+      "screenshots": 0,
+      "open": 1,
+      "chars": {
+        "ToolSearch": 0,
+        "docs": 27213,
+        "run_javascript": 1386,
+        "Bash": 134,
+        "open": 223
+      },
+      "images": 0,
+      "docsArgs": [
+        "live-model",
+        "methylation modifications haplotype",
+        "recipes/methylation",
+        "HG002",
+        "model:LinearAlignmentsDisplay/CRAM colored by CpG",
+        "model:LinearAlignmentsDisplay/all",
+        "hosted-data",
+        "haplotagged",
+        "s3.amazonaws.com/jbrowse.org"
+      ],
+      "routeCalls": {
+        "listTracks": 2,
+        "sessionSummary": 1
+      },
+      "routeErrors": {},
+      "turns": 16,
+      "seconds": 27,
+      "usd": 0.111,
+      "tokensIn": 22,
+      "cacheWrite": 7825,
+      "cacheRead": 283747,
+      "tokensOut": 2324,
+      "answer": "I couldn't reproduce the haplotype split, because I couldn't find an HG002 nanopore modBAM to load. The hg38 config I opened has no methylation or nanopore alignment track. Four guessed jbrowse.org and S3 URLs for the BAM returned 404 or 403, and the bundled docs don't give a data URL. I didn't want to point the display at a made-up file, so nothing is set up. If you give me the BAM URL or a local path, I'll add it, set `baseColor` to modifications and group reads by their `HP` tag over the SNRPN CpG island."
+    },
+    {
+      "task": "tut-synteny-tnnt3",
+      "run": 1,
+      "client": "code",
+      "pass": true,
+      "detail": {
+        "rows": [
+          {
+            "assembly": "hg38",
+            "regions": [
+              "chr11:0-135086622"
+            ]
+          },
+          {
+            "assembly": "hs1",
+            "regions": [
+              "chr11:0-135127769"
+            ]
+          }
+        ],
+        "hg38Regions": [
+          {
+            "refName": "chr11",
+            "start": 1914985,
+            "end": 1942987,
+            "assemblyName": "hg38"
+          }
+        ],
+        "tracks": [
+          "hg38_to_hs1_liftOver"
+        ],
+        "color": {
+          "field": "strand"
+        }
+      },
+      "runJavascript": 9,
+      "errored": 1,
+      "docs": 4,
+      "screenshots": 3,
+      "open": 1,
+      "chars": {
+        "ToolSearch": 0,
+        "docs": 30677,
+        "run_javascript": 10570,
+        "open": 61,
+        "screenshot": 1085
+      },
+      "images": 3,
+      "docsArgs": [
+        "live-model",
+        "synteny",
+        "session-spec/Linear synteny view",
+        "hosted-data"
+      ],
+      "routeCalls": {
+        "listTracks": 2,
+        "sessionSummary": 6,
+        "session": 3,
+        "loadSessionSpec": 2,
+        "waitReady": 5,
+        "navToLocString": 3,
+        "view": 3,
+        "views": 3
+      },
+      "routeErrors": {
+        "navToLocString": 1,
+        "sessionSummary": 1,
+        "view": 1,
+        "views": 1,
+        "waitReady": 1
+      },
+      "turns": 19,
+      "seconds": 112,
+      "usd": 0.253,
+      "tokensIn": 30,
+      "cacheWrite": 33487,
+      "cacheRead": 457248,
+      "tokensOut": 2734,
+      "answer": "Opened a synteny view of hg38 (chr11:1,914,987–1,942,987) against T2T-CHM13 hs1 (chr11:1,979,758–2,006,574) at TNNT3, using the `hg38_to_hs1_liftOver` track with ribbons coloured by strand. The view shows ribbons between the two rows, and the hs1 row shows the TNNT3 gene. The hg38 row has no tracks shown.\n\nTo get hs1 I had to open the `all.json` config, so the original hg38-only session was replaced. \"TNNT3\" didn't resolve in the hg38 row, so I gave it explicit coordinates from the search result."
+    },
+    {
+      "task": "tut-synteny-tnnt3",
+      "run": 2,
+      "client": "code",
+      "pass": true,
+      "detail": {
+        "rows": [
+          {
+            "assembly": "hg38",
+            "regions": [
+              "chr11:0-135086622"
+            ]
+          },
+          {
+            "assembly": "hs1",
+            "regions": [
+              "chr11:0-135127769"
+            ]
+          }
+        ],
+        "hg38Regions": [
+          {
+            "refName": "chr11",
+            "start": 1935001,
+            "end": 1965003,
+            "assemblyName": "hg38"
+          }
+        ],
+        "tracks": [
+          "hg38_to_hs1_liftOver"
+        ],
+        "color": {
+          "field": "strand"
+        }
+      },
+      "runJavascript": 11,
+      "errored": 1,
+      "docs": 4,
+      "screenshots": 3,
+      "open": 0,
+      "chars": {
+        "ToolSearch": 0,
+        "docs": 30677,
+        "run_javascript": 12109,
+        "screenshot": 1502
+      },
+      "images": 3,
+      "docsArgs": [
+        "live-model",
+        "synteny",
+        "session-spec/Linear synteny view",
+        "hosted-data"
+      ],
+      "routeCalls": {
+        "sessionSummary": 3,
+        "listTracks": 1,
+        "loadSessionSpec": 1,
+        "views": 7,
+        "visibleRegions": 3,
+        "waitReady": 3,
+        "session": 6,
+        "navToLocString": 5,
+        "getFeatures": 3
+      },
+      "routeErrors": {
+        "getFeatures": 1,
+        "navToLocString": 1,
+        "session": 1,
+        "views": 1
+      },
+      "turns": 20,
+      "seconds": 180,
+      "usd": 0.224,
+      "tokensIn": 30,
+      "cacheWrite": 21150,
+      "cacheRead": 511881,
+      "tokensOut": 3664,
+      "answer": "The synteny view is open with hg38 on top and T2T-CHM13 (hs1) below, both at TNNT3. The ribbons are colored by strand, and the view reads back `color.field` as `strand`. The track is `hg38_to_hs1_liftOver`.\n\nI couldn't verify it visually: the window is hidden, so my last two screenshots were stale and still showed a search dialog. I closed that dialog afterward and didn't re-screenshot. The track returned 2 alignment features across the hg38 window.\n\nTyping \"TNNT3\" into the rows didn't resolve, so I used coordinates instead: chr11:1,935,000-1,965,000 in hg38 and chr11:1,910,000-1,945,000 in hs1. The hs1 window is a bit wider than the hg38 one."
+    },
+    {
+      "task": "tut-synteny-tnnt3",
+      "run": 3,
+      "client": "code",
+      "pass": false,
+      "detail": {
+        "rows": [
+          {
+            "assembly": "hg38",
+            "regions": [
+              "chr11:0-135086622"
+            ]
+          },
+          {
+            "assembly": "hs1",
+            "regions": [
+              "chr11:0-135127769"
+            ]
+          }
+        ],
+        "hg38Regions": [
+          {
+            "refName": "chr11",
+            "start": 1939978,
+            "end": 1974980,
+            "assemblyName": "hg38"
+          }
+        ],
+        "tracks": [
+          "hg38_to_hs1_liftOver"
+        ],
+        "color": {
+          "field": "strand"
+        }
+      },
+      "runJavascript": 6,
+      "errored": 1,
+      "docs": 3,
+      "screenshots": 2,
+      "open": 0,
+      "chars": {
+        "ToolSearch": 0,
+        "docs": 22474,
+        "run_javascript": 15182,
+        "screenshot": 860
+      },
+      "images": 2,
+      "docsArgs": [
+        "live-model",
+        "synteny",
+        "session-spec/Linear synteny view"
+      ],
+      "routeCalls": {
+        "listTracks": 2,
+        "sessionSummary": 2,
+        "loadSessionSpec": 2,
+        "session": 1,
+        "views": 2,
+        "getFeatures": 1,
+        "view": 2,
+        "waitReady": 2
+      },
+      "routeErrors": {
+        "getFeatures": 1,
+        "sessionSummary": 1,
+        "view": 1,
+        "views": 1,
+        "waitReady": 1
+      },
+      "turns": 13,
+      "seconds": 40,
+      "usd": 0.183,
+      "tokensIn": 22,
+      "cacheWrite": 24728,
+      "cacheRead": 326170,
+      "tokensOut": 1926,
+      "answer": "A synteny view of hg38 against T2T-CHM13 (hs1) is open at TNNT3, with ribbons colored by strand. I didn't get a usable screenshot (the window was hidden), so I checked through the model instead. It reports the color as `strand` and nothing unready, but I didn't look at the ribbons themselves.\n\nSearching \"TNNT3\" on hg38 didn't resolve to a single locus and left the search-results dialog open, so I used explicit coordinates. The hg38 row shows chr11:1,939,979–1,974,979. The hs1 row shows chr11:1,979,758–2,006,574. The hg38 window is my own estimate of where the gene sits, so it may not be centered on TNNT3.\n\nThe track is `hg38_to_hs1_liftOver`."
+    }
+  ]
+}

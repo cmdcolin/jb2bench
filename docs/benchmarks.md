@@ -791,3 +791,15 @@ pieces pooled after, because the pieces still count their smaller gaps and
 recommendation to run `rb break-paf` before `make-pif` on chain input belongs in
 jbrowse-components' `website/docs/config_guides/synteny_track.md`, beside
 "Quick start: PAF from minimap2"; nobody has written it yet.
+
+## Review portals and the agent eval
+
+`scripts/portals/` and `scripts/agent-evals/` time what the paper reports for JBrowse's automation. Neither runs under
+`make all`: the structural variant portal reads 242 GiB of reads from local disk, the gene portal fetches its data
+over the network, and the agent eval bills model sessions.
+
+`scripts/portals/variant.ts` times `jb2export batch` over the COLO829 callset for the tumor and matched normal reads,
+then `variant-review-portal`'s `make-portal`. `scripts/portals/gene.ts` times `gene-review-portal` on Tiberius
+chr22 with and without screenshots. `scripts/agent-evals/run.ts` runs the jbrowse-components MCP eval for one task
+set and copies its `summary.json` here. Tables and caveats: `results/portals.md`, `results/agent-evals.md`.
+

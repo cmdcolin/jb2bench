@@ -1,0 +1,3959 @@
+{
+  "commit": "8565ba708e",
+  "dirty": false,
+  "server": "/home/cdiesh/src/jbrowse-components/products/jbrowse-desktop/build/mcpServer.js",
+  "startedAt": "2026-10-05T17:19:39.106Z",
+  "claudeVersion": "2.1.289 (Claude Code)",
+  "model": "sonnet",
+  "client": "code",
+  "set": "dev",
+  "runs": 3,
+  "passed": 78,
+  "total": 78,
+  "tasksPassingEveryRun": 26,
+  "routes": [
+    {
+      "route": "addTrack",
+      "calls": 7,
+      "errors": 0,
+      "passedRuns": 7,
+      "failedRuns": 0
+    },
+    {
+      "route": "addView",
+      "calls": 6,
+      "errors": 0,
+      "passedRuns": 6,
+      "failedRuns": 0
+    },
+    {
+      "route": "applyDisplaySettings",
+      "calls": 23,
+      "errors": 0,
+      "passedRuns": 23,
+      "failedRuns": 0
+    },
+    {
+      "route": "applyPlot",
+      "calls": 1,
+      "errors": 0,
+      "passedRuns": 1,
+      "failedRuns": 0
+    },
+    {
+      "route": "configuration",
+      "calls": 47,
+      "errors": 1,
+      "passedRuns": 27,
+      "failedRuns": 0
+    },
+    {
+      "route": "describeSlots",
+      "calls": 29,
+      "errors": 1,
+      "passedRuns": 23,
+      "failedRuns": 0
+    },
+    {
+      "route": "ensureRequire",
+      "calls": 0,
+      "errors": 0,
+      "passedRuns": 0,
+      "failedRuns": 0
+    },
+    {
+      "route": "fitToWindow",
+      "calls": 3,
+      "errors": 0,
+      "passedRuns": 3,
+      "failedRuns": 0
+    },
+    {
+      "route": "getConf",
+      "calls": 0,
+      "errors": 0,
+      "passedRuns": 0,
+      "failedRuns": 0
+    },
+    {
+      "route": "getFeatures",
+      "calls": 29,
+      "errors": 0,
+      "passedRuns": 19,
+      "failedRuns": 0
+    },
+    {
+      "route": "help",
+      "calls": 0,
+      "errors": 0,
+      "passedRuns": 0,
+      "failedRuns": 0
+    },
+    {
+      "route": "hideTrack",
+      "calls": 10,
+      "errors": 3,
+      "passedRuns": 10,
+      "failedRuns": 0
+    },
+    {
+      "route": "inspect",
+      "calls": 15,
+      "errors": 0,
+      "passedRuns": 10,
+      "failedRuns": 0
+    },
+    {
+      "route": "launchTrack",
+      "calls": 8,
+      "errors": 0,
+      "passedRuns": 8,
+      "failedRuns": 0
+    },
+    {
+      "route": "layoutViews",
+      "calls": 3,
+      "errors": 0,
+      "passedRuns": 3,
+      "failedRuns": 0
+    },
+    {
+      "route": "listTracks",
+      "calls": 50,
+      "errors": 0,
+      "passedRuns": 41,
+      "failedRuns": 0
+    },
+    {
+      "route": "loadSessionSpec",
+      "calls": 3,
+      "errors": 0,
+      "passedRuns": 3,
+      "failedRuns": 0
+    },
+    {
+      "route": "mobx",
+      "calls": 0,
+      "errors": 0,
+      "passedRuns": 0,
+      "failedRuns": 0
+    },
+    {
+      "route": "mst",
+      "calls": 3,
+      "errors": 0,
+      "passedRuns": 3,
+      "failedRuns": 0
+    },
+    {
+      "route": "navToLocString",
+      "calls": 3,
+      "errors": 0,
+      "passedRuns": 3,
+      "failedRuns": 0
+    },
+    {
+      "route": "notices",
+      "calls": 0,
+      "errors": 0,
+      "passedRuns": 0,
+      "failedRuns": 0
+    },
+    {
+      "route": "plot",
+      "calls": 4,
+      "errors": 0,
+      "passedRuns": 2,
+      "failedRuns": 0
+    },
+    {
+      "route": "plotProblems",
+      "calls": 1,
+      "errors": 0,
+      "passedRuns": 1,
+      "failedRuns": 0
+    },
+    {
+      "route": "readConfObject",
+      "calls": 2,
+      "errors": 0,
+      "passedRuns": 2,
+      "failedRuns": 0
+    },
+    {
+      "route": "require",
+      "calls": 0,
+      "errors": 0,
+      "passedRuns": 0,
+      "failedRuns": 0
+    },
+    {
+      "route": "rootModel",
+      "calls": 0,
+      "errors": 0,
+      "passedRuns": 0,
+      "failedRuns": 0
+    },
+    {
+      "route": "session",
+      "calls": 3,
+      "errors": 0,
+      "passedRuns": 3,
+      "failedRuns": 0
+    },
+    {
+      "route": "sessionSummary",
+      "calls": 101,
+      "errors": 3,
+      "passedRuns": 73,
+      "failedRuns": 0
+    },
+    {
+      "route": "setSession",
+      "calls": 0,
+      "errors": 0,
+      "passedRuns": 0,
+      "failedRuns": 0
+    },
+    {
+      "route": "trackModel",
+      "calls": 68,
+      "errors": 1,
+      "passedRuns": 27,
+      "failedRuns": 0
+    },
+    {
+      "route": "view",
+      "calls": 27,
+      "errors": 3,
+      "passedRuns": 24,
+      "failedRuns": 0
+    },
+    {
+      "route": "views",
+      "calls": 23,
+      "errors": 3,
+      "passedRuns": 18,
+      "failedRuns": 0
+    },
+    {
+      "route": "visibleRegions",
+      "calls": 9,
+      "errors": 0,
+      "passedRuns": 9,
+      "failedRuns": 0
+    },
+    {
+      "route": "waitReady",
+      "calls": 59,
+      "errors": 3,
+      "passedRuns": 52,
+      "failedRuns": 0
+    }
+  ],
+  "totals": {
+    "runJavascript": 198,
+    "errored": 9,
+    "docs": 66,
+    "screenshots": 15,
+    "open": 0,
+    "turns": 435,
+    "seconds": 749,
+    "usd": 4.31,
+    "tokensIn": 782,
+    "cacheWrite": 602799,
+    "cacheRead": 7021096,
+    "tokensOut": 49330,
+    "chars": {
+      "ToolSearch": 0,
+      "docs": 367820,
+      "run_javascript": 430029,
+      "screenshot": 4524
+    },
+    "images": 15
+  },
+  "medians": [
+    {
+      "task": "arcs",
+      "runJavascript": 3,
+      "errored": 0,
+      "tokens": 158267,
+      "chars": 17308,
+      "seconds": 18,
+      "turns": 8,
+      "usd": 0.086,
+      "passes": 3,
+      "runs": 3
+    },
+    {
+      "task": "compact",
+      "runJavascript": 2,
+      "errored": 0,
+      "tokens": 76657,
+      "chars": 11946,
+      "seconds": 7,
+      "turns": 5,
+      "usd": 0.058,
+      "passes": 3,
+      "runs": 3
+    },
+    {
+      "task": "side-by-side",
+      "runJavascript": 2,
+      "errored": 0,
+      "tokens": 128382,
+      "chars": 21084,
+      "seconds": 11,
+      "turns": 7,
+      "usd": 0.083,
+      "passes": 3,
+      "runs": 3
+    },
+    {
+      "task": "fit",
+      "runJavascript": 1,
+      "errored": 0,
+      "tokens": 48490,
+      "chars": 740,
+      "seconds": 7,
+      "turns": 3,
+      "usd": 0.019,
+      "passes": 3,
+      "runs": 3
+    },
+    {
+      "task": "count-variants",
+      "runJavascript": 1,
+      "errored": 0,
+      "tokens": 48345,
+      "chars": 571,
+      "seconds": 4,
+      "turns": 3,
+      "usd": 0.013,
+      "passes": 3,
+      "runs": 3
+    },
+    {
+      "task": "gene-most-variants",
+      "runJavascript": 2,
+      "errored": 0,
+      "tokens": 72577,
+      "chars": 7566,
+      "seconds": 6,
+      "turns": 4,
+      "usd": 0.035,
+      "passes": 3,
+      "runs": 3
+    },
+    {
+      "task": "add-bigwig",
+      "runJavascript": 1,
+      "errored": 0,
+      "tokens": 48978,
+      "chars": 1380,
+      "seconds": 7,
+      "turns": 3,
+      "usd": 0.022,
+      "passes": 3,
+      "runs": 3
+    },
+    {
+      "task": "reorder",
+      "runJavascript": 2,
+      "errored": 0,
+      "tokens": 65955,
+      "chars": 830,
+      "seconds": 5,
+      "turns": 4,
+      "usd": 0.022,
+      "passes": 3,
+      "runs": 3
+    },
+    {
+      "task": "navigate-gene",
+      "runJavascript": 1,
+      "errored": 0,
+      "tokens": 48410,
+      "chars": 634,
+      "seconds": 6,
+      "turns": 3,
+      "usd": 0.014,
+      "passes": 3,
+      "runs": 3
+    },
+    {
+      "task": "hide-track",
+      "runJavascript": 2,
+      "errored": 0,
+      "tokens": 65433,
+      "chars": 681,
+      "seconds": 6,
+      "turns": 4,
+      "usd": 0.019,
+      "passes": 3,
+      "runs": 3
+    },
+    {
+      "task": "hide-labels",
+      "runJavascript": 3,
+      "errored": 0,
+      "tokens": 87745,
+      "chars": 5223,
+      "seconds": 8,
+      "turns": 5,
+      "usd": 0.037,
+      "passes": 3,
+      "runs": 3
+    },
+    {
+      "task": "action-not-slot",
+      "runJavascript": 2,
+      "errored": 0,
+      "tokens": 71878,
+      "chars": 9238,
+      "seconds": 7,
+      "turns": 4,
+      "usd": 0.04,
+      "passes": 3,
+      "runs": 3
+    },
+    {
+      "task": "two-views",
+      "runJavascript": 3,
+      "errored": 1,
+      "tokens": 83953,
+      "chars": 1154,
+      "seconds": 8,
+      "turns": 5,
+      "usd": 0.026,
+      "passes": 3,
+      "runs": 3
+    },
+    {
+      "task": "empty-session",
+      "runJavascript": 2,
+      "errored": 0,
+      "tokens": 67271,
+      "chars": 2128,
+      "seconds": 9,
+      "turns": 4,
+      "usd": 0.025,
+      "passes": 3,
+      "runs": 3
+    },
+    {
+      "task": "count-region",
+      "runJavascript": 5,
+      "errored": 0,
+      "tokens": 120715,
+      "chars": 1285,
+      "seconds": 11,
+      "turns": 7,
+      "usd": 0.041,
+      "passes": 3,
+      "runs": 3
+    },
+    {
+      "task": "binned-track",
+      "runJavascript": 2,
+      "errored": 0,
+      "tokens": 109455,
+      "chars": 24612,
+      "seconds": 11,
+      "turns": 7,
+      "usd": 0.093,
+      "passes": 3,
+      "runs": 3
+    },
+    {
+      "task": "unknown-name",
+      "runJavascript": 2,
+      "errored": 0,
+      "tokens": 72359,
+      "chars": 7634,
+      "seconds": 8,
+      "turns": 4,
+      "usd": 0.035,
+      "passes": 3,
+      "runs": 3
+    },
+    {
+      "task": "alias-refname-count",
+      "runJavascript": 1,
+      "errored": 0,
+      "tokens": 48685,
+      "chars": 959,
+      "seconds": 4,
+      "turns": 3,
+      "usd": 0.023,
+      "passes": 3,
+      "runs": 3
+    },
+    {
+      "task": "color-by-strand",
+      "runJavascript": 3,
+      "errored": 0,
+      "tokens": 110317,
+      "chars": 25559,
+      "seconds": 9,
+      "turns": 6,
+      "usd": 0.071,
+      "passes": 3,
+      "runs": 3
+    },
+    {
+      "task": "facet-by-strand",
+      "runJavascript": 3,
+      "errored": 0,
+      "tokens": 112549,
+      "chars": 26221,
+      "seconds": 11,
+      "turns": 7,
+      "usd": 0.077,
+      "passes": 3,
+      "runs": 3
+    },
+    {
+      "task": "filter-feature",
+      "runJavascript": 3,
+      "errored": 0,
+      "tokens": 139131,
+      "chars": 25812,
+      "seconds": 12,
+      "turns": 7,
+      "usd": 0.083,
+      "passes": 3,
+      "runs": 3
+    },
+    {
+      "task": "mark-points",
+      "runJavascript": 5,
+      "errored": 0,
+      "tokens": 310842,
+      "chars": 28893,
+      "seconds": 21,
+      "turns": 14,
+      "usd": 0.174,
+      "passes": 3,
+      "runs": 3
+    },
+    {
+      "task": "edit-session-document",
+      "runJavascript": 2,
+      "errored": 0,
+      "tokens": 68118,
+      "chars": 782,
+      "seconds": 7,
+      "turns": 4,
+      "usd": 0.025,
+      "passes": 3,
+      "runs": 3
+    },
+    {
+      "task": "synteny-view",
+      "runJavascript": 2,
+      "errored": 0,
+      "tokens": 99140,
+      "chars": 16694,
+      "seconds": 11,
+      "turns": 6,
+      "usd": 0.057,
+      "passes": 3,
+      "runs": 3
+    },
+    {
+      "task": "nonexistent-track",
+      "runJavascript": 4,
+      "errored": 0,
+      "tokens": 85622,
+      "chars": 3495,
+      "seconds": 9,
+      "turns": 6,
+      "usd": 0.036,
+      "passes": 3,
+      "runs": 3
+    },
+    {
+      "task": "unknown-setting",
+      "runJavascript": 4,
+      "errored": 1,
+      "tokens": 123736,
+      "chars": 4533,
+      "seconds": 10,
+      "turns": 7,
+      "usd": 0.051,
+      "passes": 3,
+      "runs": 3
+    }
+  ],
+  "metrics": [
+    {
+      "task": "arcs",
+      "run": 1,
+      "client": "code",
+      "pass": true,
+      "detail": {
+        "shown": true,
+        "readConnections": "arc"
+      },
+      "runJavascript": 9,
+      "errored": 2,
+      "docs": 5,
+      "screenshots": 3,
+      "open": 0,
+      "chars": {
+        "ToolSearch": 0,
+        "docs": 8868,
+        "run_javascript": 6844,
+        "screenshot": 1596
+      },
+      "images": 3,
+      "docsArgs": [
+        "arcs",
+        "recipes/The same data under another display",
+        "model:LinearAlignmentsDisplay/Long reads with split/mate reads connected by arcs:",
+        "model:LinearAlignmentsDisplay/Properties",
+        "showPileup"
+      ],
+      "routeCalls": {
+        "sessionSummary": 2,
+        "addTrack": 1,
+        "applyDisplaySettings": 1,
+        "trackModel": 8,
+        "views": 1,
+        "waitReady": 4,
+        "configuration": 3,
+        "describeSlots": 3,
+        "inspect": 1
+      },
+      "routeErrors": {
+        "configuration": 1,
+        "describeSlots": 1,
+        "trackModel": 1
+      },
+      "turns": 19,
+      "seconds": 38,
+      "usd": 0.179,
+      "tokensIn": 28,
+      "cacheWrite": 22985,
+      "cacheRead": 311274,
+      "tokensOut": 2487,
+      "answer": "I added volvox_alignments and set its read connections to arc mode, with the pileup hidden. No arcs are visible on screen, though: the band below the coverage is empty at ctgA:1..30,000. I didn't check whether the reads are paired or split, but that is my guess for the empty band."
+    },
+    {
+      "task": "arcs",
+      "run": 2,
+      "client": "code",
+      "pass": true,
+      "detail": {
+        "shown": true,
+        "readConnections": "arc"
+      },
+      "runJavascript": 2,
+      "errored": 0,
+      "docs": 2,
+      "screenshots": 0,
+      "open": 0,
+      "chars": {
+        "ToolSearch": 0,
+        "docs": 7859,
+        "run_javascript": 684
+      },
+      "images": 0,
+      "docsArgs": [
+        "arcs",
+        "recipes/The same data under another display"
+      ],
+      "routeCalls": {
+        "sessionSummary": 1,
+        "addTrack": 1,
+        "applyDisplaySettings": 1,
+        "trackModel": 1,
+        "waitReady": 1
+      },
+      "routeErrors": {},
+      "turns": 6,
+      "seconds": 13,
+      "usd": 0.047,
+      "tokensIn": 10,
+      "cacheWrite": 5940,
+      "cacheRead": 85504,
+      "tokensOut": 570,
+      "answer": "The volvox_alignments track is now open in the view and drawn as read arcs. I set `readConnections` to `arc` on its alignments display, and a read-back confirmed the setting. I didn't take a screenshot."
+    },
+    {
+      "task": "arcs",
+      "run": 3,
+      "client": "code",
+      "pass": true,
+      "detail": {
+        "shown": true,
+        "readConnections": "arc"
+      },
+      "runJavascript": 3,
+      "errored": 0,
+      "docs": 2,
+      "screenshots": 1,
+      "open": 0,
+      "chars": {
+        "ToolSearch": 0,
+        "docs": 7859,
+        "run_javascript": 16180,
+        "screenshot": 273
+      },
+      "images": 1,
+      "docsArgs": [
+        "arcs",
+        "recipes/The same data under another display"
+      ],
+      "routeCalls": {
+        "sessionSummary": 2,
+        "addTrack": 1,
+        "applyDisplaySettings": 1,
+        "configuration": 1,
+        "describeSlots": 1,
+        "trackModel": 2,
+        "waitReady": 1,
+        "listTracks": 1,
+        "views": 1
+      },
+      "routeErrors": {},
+      "turns": 8,
+      "seconds": 18,
+      "usd": 0.086,
+      "tokensIn": 14,
+      "cacheWrite": 11480,
+      "cacheRead": 145729,
+      "tokensOut": 1044,
+      "answer": "The `volvox_alignments` track is now shown with `readConnections` set to `arc` on its alignments display, which the session reports back as `arc`. The screenshot shows no arcs drawn, probably because this BAM has few or no paired or split reads in view. The pileup and coverage bands are still showing too."
+    },
+    {
+      "task": "compact",
+      "run": 1,
+      "client": "code",
+      "pass": true,
+      "detail": {
+        "displayMode": "compact"
+      },
+      "runJavascript": 2,
+      "errored": 0,
+      "docs": 1,
+      "screenshots": 0,
+      "open": 0,
+      "chars": {
+        "ToolSearch": 0,
+        "run_javascript": 7391,
+        "docs": 4555
+      },
+      "images": 0,
+      "docsArgs": [
+        "compact display mode"
+      ],
+      "routeCalls": {
+        "listTracks": 1,
+        "sessionSummary": 1,
+        "applyDisplaySettings": 1,
+        "trackModel": 1,
+        "waitReady": 1
+      },
+      "routeErrors": {},
+      "turns": 5,
+      "seconds": 7,
+      "usd": 0.073,
+      "tokensIn": 8,
+      "cacheWrite": 13994,
+      "cacheRead": 62210,
+      "tokensOut": 445,
+      "answer": "The gene track (\"GFF3Tabix genes\") is now in compact display mode. I read the setting back from the live display and it reports `compact`. I didn't take a screenshot."
+    },
+    {
+      "task": "compact",
+      "run": 2,
+      "client": "code",
+      "pass": true,
+      "detail": {
+        "displayMode": "compact"
+      },
+      "runJavascript": 3,
+      "errored": 0,
+      "docs": 1,
+      "screenshots": 0,
+      "open": 0,
+      "chars": {
+        "ToolSearch": 0,
+        "docs": 7976,
+        "run_javascript": 9169
+      },
+      "images": 0,
+      "docsArgs": [
+        "live-model"
+      ],
+      "routeCalls": {
+        "listTracks": 1,
+        "sessionSummary": 1,
+        "configuration": 1,
+        "describeSlots": 1,
+        "trackModel": 2,
+        "applyDisplaySettings": 1,
+        "waitReady": 1
+      },
+      "routeErrors": {},
+      "turns": 6,
+      "seconds": 8,
+      "usd": 0.058,
+      "tokensIn": 10,
+      "cacheWrite": 8139,
+      "cacheRead": 95596,
+      "tokensOut": 624,
+      "answer": "The gene track (gff3tabix_genes) is now in compact display mode. The setting applied with nothing unapplied or failed, and reading the mode back from the track gives \"compact\". I didn't take a screenshot."
+    },
+    {
+      "task": "compact",
+      "run": 3,
+      "client": "code",
+      "pass": true,
+      "detail": {
+        "displayMode": "compact"
+      },
+      "runJavascript": 2,
+      "errored": 0,
+      "docs": 1,
+      "screenshots": 0,
+      "open": 0,
+      "chars": {
+        "ToolSearch": 0,
+        "docs": 7976,
+        "run_javascript": 644
+      },
+      "images": 0,
+      "docsArgs": [
+        "live-model"
+      ],
+      "routeCalls": {
+        "sessionSummary": 1,
+        "applyDisplaySettings": 1,
+        "trackModel": 1,
+        "waitReady": 1
+      },
+      "routeErrors": {},
+      "turns": 5,
+      "seconds": 6,
+      "usd": 0.033,
+      "tokensIn": 8,
+      "cacheWrite": 3859,
+      "cacheRead": 67813,
+      "tokensOut": 422,
+      "answer": "The gene track (`gff3tabix_genes`) is now in compact display mode; I confirmed that `displayMode` reads back as `compact`, but I didn't take a screenshot."
+    },
+    {
+      "task": "side-by-side",
+      "run": 1,
+      "client": "code",
+      "pass": true,
+      "detail": {
+        "views": [
+          {
+            "id": "yNFSudIxy3",
+            "type": "LinearGenomeView",
+            "loc": "ctgA:1..30,000",
+            "tracks": [
+              "gff3tabix_genes",
+              "volvox_test_vcf"
+            ]
+          },
+          {
+            "id": "xpzbVoTqE9",
+            "type": "LinearGenomeView",
+            "loc": "ctgB:1..6,079",
+            "tracks": [
+              "gff3tabix_genes"
+            ]
+          }
+        ],
+        "sideBySide": true
+      },
+      "runJavascript": 2,
+      "errored": 0,
+      "docs": 3,
+      "screenshots": 0,
+      "open": 0,
+      "chars": {
+        "ToolSearch": 0,
+        "docs": 19626,
+        "run_javascript": 1458
+      },
+      "images": 0,
+      "docsArgs": [
+        "live-model",
+        "session-spec/side by side",
+        "recipes/Side by side"
+      ],
+      "routeCalls": {
+        "sessionSummary": 2,
+        "addView": 1,
+        "layoutViews": 1,
+        "session": 1,
+        "views": 1,
+        "waitReady": 1
+      },
+      "routeErrors": {},
+      "turns": 7,
+      "seconds": 11,
+      "usd": 0.098,
+      "tokensIn": 12,
+      "cacheWrite": 17090,
+      "cacheRead": 109567,
+      "tokensOut": 783,
+      "answer": "The second view is open at ctgB:1-10,000 with the gene track, and the two views are side by side. It shows ctgB:1..6,079 because ctgB is only 6,079 bp long. I confirmed this from the session summary and didn't take a screenshot."
+    },
+    {
+      "task": "side-by-side",
+      "run": 2,
+      "client": "code",
+      "pass": true,
+      "detail": {
+        "views": [
+          {
+            "id": "Zv1iW5Vx9j",
+            "type": "LinearGenomeView",
+            "loc": "ctgA:1..30,000",
+            "tracks": [
+              "gff3tabix_genes",
+              "volvox_test_vcf"
+            ]
+          },
+          {
+            "id": "UdmNdZ44R9",
+            "type": "LinearGenomeView",
+            "loc": "ctgB:1..6,079",
+            "tracks": [
+              "gff3tabix_genes"
+            ]
+          }
+        ],
+        "sideBySide": true
+      },
+      "runJavascript": 2,
+      "errored": 0,
+      "docs": 3,
+      "screenshots": 0,
+      "open": 0,
+      "chars": {
+        "ToolSearch": 0,
+        "docs": 17720,
+        "run_javascript": 2746
+      },
+      "images": 0,
+      "docsArgs": [
+        "live-model",
+        "session-spec/layout",
+        "recipes/Side by side"
+      ],
+      "routeCalls": {
+        "listTracks": 1,
+        "sessionSummary": 2,
+        "addView": 1,
+        "layoutViews": 1,
+        "session": 1,
+        "views": 1,
+        "waitReady": 1
+      },
+      "routeErrors": {},
+      "turns": 7,
+      "seconds": 11,
+      "usd": 0.069,
+      "tokensIn": 12,
+      "cacheWrite": 9261,
+      "cacheRead": 118251,
+      "tokensOut": 858,
+      "answer": "I opened ctgB:1-10,000 in a second view with the gene track (`gff3tabix_genes`) and arranged both views side by side. The summary lists both views, and the new one shows the gene track. I didn't take a screenshot, so I haven't seen the layout on screen.\n\nThe new view shows ctgB:1..6,079 rather than the full 1-10,000. That is most likely the end of the contig, but I didn't check its length."
+    },
+    {
+      "task": "side-by-side",
+      "run": 3,
+      "client": "code",
+      "pass": true,
+      "detail": {
+        "views": [
+          {
+            "id": "9AlZmFfnU9",
+            "type": "LinearGenomeView",
+            "loc": "ctgA:1..30,000",
+            "tracks": [
+              "gff3tabix_genes",
+              "volvox_test_vcf"
+            ]
+          },
+          {
+            "id": "95Qy8XAjPe",
+            "type": "LinearGenomeView",
+            "loc": "ctgB:1..6,079",
+            "tracks": [
+              "gff3tabix_genes"
+            ]
+          }
+        ],
+        "sideBySide": true
+      },
+      "runJavascript": 2,
+      "errored": 0,
+      "docs": 3,
+      "screenshots": 0,
+      "open": 0,
+      "chars": {
+        "ToolSearch": 0,
+        "run_javascript": 8197,
+        "docs": 19797
+      },
+      "images": 0,
+      "docsArgs": [
+        "live-model",
+        "side by side layout",
+        "recipes/Side by side"
+      ],
+      "routeCalls": {
+        "listTracks": 1,
+        "sessionSummary": 2,
+        "addView": 1,
+        "layoutViews": 1,
+        "session": 1,
+        "views": 1,
+        "waitReady": 1
+      },
+      "routeErrors": {},
+      "turns": 7,
+      "seconds": 11,
+      "usd": 0.083,
+      "tokensIn": 12,
+      "cacheWrite": 12536,
+      "cacheRead": 127468,
+      "tokensOut": 762,
+      "answer": "I opened ctgB:1-10,000 with the gene track in a second view and put the two views side by side. The new view shows ctgB:1..6,079 rather than 1-10,000, which I take to mean ctgB ends at 6,079. I confirmed this from the session summary, not a screenshot."
+    },
+    {
+      "task": "fit",
+      "run": 1,
+      "client": "code",
+      "pass": true,
+      "detail": {
+        "overflow": 0,
+        "tracks": [
+          "gff3tabix_genes",
+          "volvox_test_vcf"
+        ]
+      },
+      "runJavascript": 1,
+      "errored": 0,
+      "docs": 0,
+      "screenshots": 0,
+      "open": 0,
+      "chars": {
+        "ToolSearch": 0,
+        "run_javascript": 740
+      },
+      "images": 0,
+      "docsArgs": [],
+      "routeCalls": {
+        "fitToWindow": 1,
+        "sessionSummary": 1,
+        "waitReady": 1
+      },
+      "routeErrors": {},
+      "turns": 3,
+      "seconds": 7,
+      "usd": 0.044,
+      "tokensIn": 6,
+      "cacheWrite": 8383,
+      "cacheRead": 39802,
+      "tokensOut": 299,
+      "answer": "I ran `jb.fitToWindow()`, and the session now fits the window with no overflow. Both tracks are still shown. `gff3tabix_genes` shrank from 600 to 285 and `volvox_test_vcf` from 600 to 284. I didn't take a screenshot."
+    },
+    {
+      "task": "fit",
+      "run": 2,
+      "client": "code",
+      "pass": true,
+      "detail": {
+        "overflow": 0,
+        "tracks": [
+          "gff3tabix_genes",
+          "volvox_test_vcf"
+        ]
+      },
+      "runJavascript": 1,
+      "errored": 0,
+      "docs": 0,
+      "screenshots": 0,
+      "open": 0,
+      "chars": {
+        "ToolSearch": 0,
+        "run_javascript": 740
+      },
+      "images": 0,
+      "docsArgs": [],
+      "routeCalls": {
+        "fitToWindow": 1,
+        "sessionSummary": 1,
+        "waitReady": 1
+      },
+      "routeErrors": {},
+      "turns": 3,
+      "seconds": 7,
+      "usd": 0.015,
+      "tokensIn": 6,
+      "cacheWrite": 507,
+      "cacheRead": 47679,
+      "tokensOut": 298,
+      "answer": "I shrank the two tracks (`gff3tabix_genes` 600→285 px, `volvox_test_vcf` 600→284 px), so the session now fits the window with no overflow. Both tracks are still shown. I checked this with the fit result and the session summary, not a screenshot."
+    },
+    {
+      "task": "fit",
+      "run": 3,
+      "client": "code",
+      "pass": true,
+      "detail": {
+        "overflow": 0,
+        "tracks": [
+          "gff3tabix_genes",
+          "volvox_test_vcf"
+        ]
+      },
+      "runJavascript": 2,
+      "errored": 0,
+      "docs": 0,
+      "screenshots": 0,
+      "open": 0,
+      "chars": {
+        "ToolSearch": 0,
+        "run_javascript": 624
+      },
+      "images": 0,
+      "docsArgs": [],
+      "routeCalls": {
+        "fitToWindow": 1,
+        "sessionSummary": 2,
+        "waitReady": 2,
+        "views": 1
+      },
+      "routeErrors": {},
+      "turns": 4,
+      "seconds": 13,
+      "usd": 0.019,
+      "tokensIn": 8,
+      "cacheWrite": 583,
+      "cacheRead": 64612,
+      "tokensOut": 421,
+      "answer": "I ran `jb.fitToWindow()`, and the session now fits the window with both tracks still shown. The view is 738px tall in an 822px window.\n\nThe tracks are `gff3tabix_genes` and `volvox_test_vcf`, at 285px and 284px. I checked the numbers only and didn't take a screenshot."
+    },
+    {
+      "task": "count-variants",
+      "run": 1,
+      "client": "code",
+      "pass": true,
+      "detail": {
+        "truth": 109,
+        "said": [
+          109
+        ]
+      },
+      "runJavascript": 1,
+      "errored": 0,
+      "docs": 0,
+      "screenshots": 0,
+      "open": 0,
+      "chars": {
+        "ToolSearch": 0,
+        "run_javascript": 571
+      },
+      "images": 0,
+      "docsArgs": [],
+      "routeCalls": {
+        "getFeatures": 1,
+        "sessionSummary": 1
+      },
+      "routeErrors": {},
+      "turns": 3,
+      "seconds": 4,
+      "usd": 0.043,
+      "tokensIn": 6,
+      "cacheWrite": 8310,
+      "cacheRead": 39814,
+      "tokensOut": 215,
+      "answer": "109"
+    },
+    {
+      "task": "count-variants",
+      "run": 2,
+      "client": "code",
+      "pass": true,
+      "detail": {
+        "truth": 109,
+        "said": [
+          109
+        ]
+      },
+      "runJavascript": 1,
+      "errored": 0,
+      "docs": 0,
+      "screenshots": 0,
+      "open": 0,
+      "chars": {
+        "ToolSearch": 0,
+        "run_javascript": 571
+      },
+      "images": 0,
+      "docsArgs": [],
+      "routeCalls": {
+        "getFeatures": 1,
+        "sessionSummary": 1
+      },
+      "routeErrors": {},
+      "turns": 3,
+      "seconds": 4,
+      "usd": 0.013,
+      "tokensIn": 6,
+      "cacheWrite": 425,
+      "cacheRead": 47697,
+      "tokensOut": 215,
+      "answer": "109"
+    },
+    {
+      "task": "count-variants",
+      "run": 3,
+      "client": "code",
+      "pass": true,
+      "detail": {
+        "truth": 109,
+        "said": [
+          109
+        ]
+      },
+      "runJavascript": 1,
+      "errored": 0,
+      "docs": 0,
+      "screenshots": 0,
+      "open": 0,
+      "chars": {
+        "ToolSearch": 0,
+        "run_javascript": 571
+      },
+      "images": 0,
+      "docsArgs": [],
+      "routeCalls": {
+        "getFeatures": 1,
+        "sessionSummary": 1
+      },
+      "routeErrors": {},
+      "turns": 3,
+      "seconds": 4,
+      "usd": 0.013,
+      "tokensIn": 6,
+      "cacheWrite": 428,
+      "cacheRead": 47697,
+      "tokensOut": 216,
+      "answer": "109"
+    },
+    {
+      "task": "gene-most-variants",
+      "run": 1,
+      "client": "code",
+      "pass": true,
+      "detail": {
+        "best": "EDEN",
+        "ranked": [
+          {
+            "gene": "EDEN",
+            "n": 63
+          },
+          {
+            "gene": "Apple4",
+            "n": 17
+          }
+        ]
+      },
+      "runJavascript": 2,
+      "errored": 0,
+      "docs": 0,
+      "screenshots": 0,
+      "open": 0,
+      "chars": {
+        "ToolSearch": 0,
+        "run_javascript": 7599
+      },
+      "images": 0,
+      "docsArgs": [],
+      "routeCalls": {
+        "listTracks": 1,
+        "sessionSummary": 1,
+        "getFeatures": 1
+      },
+      "routeErrors": {},
+      "turns": 4,
+      "seconds": 6,
+      "usd": 0.065,
+      "tokensIn": 8,
+      "cacheWrite": 12094,
+      "cacheRead": 60058,
+      "tokensOut": 489,
+      "answer": "EDEN"
+    },
+    {
+      "task": "gene-most-variants",
+      "run": 2,
+      "client": "code",
+      "pass": true,
+      "detail": {
+        "best": "EDEN",
+        "ranked": [
+          {
+            "gene": "EDEN",
+            "n": 63
+          },
+          {
+            "gene": "Apple4",
+            "n": 17
+          }
+        ]
+      },
+      "runJavascript": 2,
+      "errored": 0,
+      "docs": 0,
+      "screenshots": 0,
+      "open": 0,
+      "chars": {
+        "ToolSearch": 0,
+        "run_javascript": 7451
+      },
+      "images": 0,
+      "docsArgs": [],
+      "routeCalls": {
+        "listTracks": 1,
+        "sessionSummary": 1,
+        "visibleRegions": 1,
+        "getFeatures": 1
+      },
+      "routeErrors": {},
+      "turns": 4,
+      "seconds": 6,
+      "usd": 0.035,
+      "tokensIn": 8,
+      "cacheWrite": 4076,
+      "cacheRead": 67980,
+      "tokensOut": 465,
+      "answer": "EDEN"
+    },
+    {
+      "task": "gene-most-variants",
+      "run": 3,
+      "client": "code",
+      "pass": true,
+      "detail": {
+        "best": "EDEN",
+        "ranked": [
+          {
+            "gene": "EDEN",
+            "n": 63
+          },
+          {
+            "gene": "Apple4",
+            "n": 17
+          }
+        ]
+      },
+      "runJavascript": 2,
+      "errored": 0,
+      "docs": 0,
+      "screenshots": 0,
+      "open": 0,
+      "chars": {
+        "ToolSearch": 0,
+        "run_javascript": 7566
+      },
+      "images": 0,
+      "docsArgs": [],
+      "routeCalls": {
+        "listTracks": 1,
+        "sessionSummary": 1,
+        "getFeatures": 1
+      },
+      "routeErrors": {},
+      "turns": 4,
+      "seconds": 6,
+      "usd": 0.035,
+      "tokensIn": 8,
+      "cacheWrite": 4165,
+      "cacheRead": 67930,
+      "tokensOut": 474,
+      "answer": "EDEN"
+    },
+    {
+      "task": "add-bigwig",
+      "run": 1,
+      "client": "code",
+      "pass": true,
+      "detail": {
+        "shown": true,
+        "phase": "ready"
+      },
+      "runJavascript": 1,
+      "errored": 0,
+      "docs": 0,
+      "screenshots": 0,
+      "open": 0,
+      "chars": {
+        "ToolSearch": 0,
+        "run_javascript": 1380
+      },
+      "images": 0,
+      "docsArgs": [],
+      "routeCalls": {
+        "addTrack": 1,
+        "sessionSummary": 1
+      },
+      "routeErrors": {},
+      "turns": 3,
+      "seconds": 10,
+      "usd": 0.046,
+      "tokensIn": 6,
+      "cacheWrite": 8777,
+      "cacheRead": 39870,
+      "tokensOut": 325,
+      "answer": "I added volvox.bw as a track named \"Coverage\" and it now shows in the open volvox view as a quantitative wiggle track. The summary after adding it lists the track, but I didn't take a screenshot or read any data back."
+    },
+    {
+      "task": "add-bigwig",
+      "run": 2,
+      "client": "code",
+      "pass": true,
+      "detail": {
+        "shown": true,
+        "phase": "ready"
+      },
+      "runJavascript": 2,
+      "errored": 0,
+      "docs": 0,
+      "screenshots": 0,
+      "open": 0,
+      "chars": {
+        "ToolSearch": 0,
+        "run_javascript": 1698
+      },
+      "images": 0,
+      "docsArgs": [],
+      "routeCalls": {
+        "addTrack": 1,
+        "sessionSummary": 1,
+        "listTracks": 1
+      },
+      "routeErrors": {},
+      "turns": 4,
+      "seconds": 7,
+      "usd": 0.022,
+      "tokensIn": 8,
+      "cacheWrite": 1178,
+      "cacheRead": 64881,
+      "tokensOut": 425,
+      "answer": "I added volvox.bw as a bigWig track named \"Coverage\" (trackId `volvox.bw-82002638`) and it is now shown in the open volvox view. The settle check reported it ready, and a track search lists it under that name. I didn't take a screenshot to see it drawn."
+    },
+    {
+      "task": "add-bigwig",
+      "run": 3,
+      "client": "code",
+      "pass": true,
+      "detail": {
+        "shown": true,
+        "phase": "ready"
+      },
+      "runJavascript": 1,
+      "errored": 0,
+      "docs": 0,
+      "screenshots": 0,
+      "open": 0,
+      "chars": {
+        "ToolSearch": 0,
+        "run_javascript": 835
+      },
+      "images": 0,
+      "docsArgs": [],
+      "routeCalls": {
+        "addTrack": 1,
+        "sessionSummary": 1
+      },
+      "routeErrors": {},
+      "turns": 3,
+      "seconds": 5,
+      "usd": 0.015,
+      "tokensIn": 6,
+      "cacheWrite": 583,
+      "cacheRead": 47781,
+      "tokensOut": 316,
+      "answer": "Added the bigWig as a track named \"Coverage\" (trackId `volvox.bw-82002638`) and it's now showing in the view. The session summary lists it in the volvox view; I didn't take a screenshot or check that it drew."
+    },
+    {
+      "task": "reorder",
+      "run": 1,
+      "client": "code",
+      "pass": true,
+      "detail": {
+        "order": [
+          "volvox_test_vcf",
+          "gff3tabix_genes"
+        ]
+      },
+      "runJavascript": 2,
+      "errored": 0,
+      "docs": 0,
+      "screenshots": 0,
+      "open": 0,
+      "chars": {
+        "ToolSearch": 0,
+        "run_javascript": 830
+      },
+      "images": 0,
+      "docsArgs": [],
+      "routeCalls": {
+        "configuration": 2,
+        "sessionSummary": 1,
+        "view": 2
+      },
+      "routeErrors": {},
+      "turns": 4,
+      "seconds": 6,
+      "usd": 0.05,
+      "tokensIn": 8,
+      "cacheWrite": 8620,
+      "cacheRead": 56876,
+      "tokensOut": 451,
+      "answer": "The VCF track (`volvox_test_vcf`) now sits above the gene track (`gff3tabix_genes`) in the volvox view. I confirmed this by reading the track order back from the view; I didn't take a screenshot."
+    },
+    {
+      "task": "reorder",
+      "run": 2,
+      "client": "code",
+      "pass": true,
+      "detail": {
+        "order": [
+          "volvox_test_vcf",
+          "gff3tabix_genes"
+        ]
+      },
+      "runJavascript": 2,
+      "errored": 0,
+      "docs": 0,
+      "screenshots": 0,
+      "open": 0,
+      "chars": {
+        "ToolSearch": 0,
+        "run_javascript": 1563
+      },
+      "images": 0,
+      "docsArgs": [],
+      "routeCalls": {
+        "configuration": 2,
+        "sessionSummary": 1,
+        "view": 2
+      },
+      "routeErrors": {},
+      "turns": 4,
+      "seconds": 5,
+      "usd": 0.022,
+      "tokensIn": 8,
+      "cacheWrite": 1087,
+      "cacheRead": 65079,
+      "tokensOut": 433,
+      "answer": "The VCF track (`volvox_test_vcf`) is now above the gene track (`gff3tabix_genes`) in the view. I checked the track order in the view afterward, but I didn't take a screenshot."
+    },
+    {
+      "task": "reorder",
+      "run": 3,
+      "client": "code",
+      "pass": true,
+      "detail": {
+        "order": [
+          "volvox_test_vcf",
+          "gff3tabix_genes"
+        ]
+      },
+      "runJavascript": 2,
+      "errored": 0,
+      "docs": 0,
+      "screenshots": 0,
+      "open": 0,
+      "chars": {
+        "ToolSearch": 0,
+        "run_javascript": 707
+      },
+      "images": 0,
+      "docsArgs": [],
+      "routeCalls": {
+        "configuration": 2,
+        "sessionSummary": 1,
+        "view": 2
+      },
+      "routeErrors": {},
+      "turns": 4,
+      "seconds": 5,
+      "usd": 0.021,
+      "tokensIn": 8,
+      "cacheWrite": 720,
+      "cacheRead": 64667,
+      "tokensOut": 472,
+      "answer": "The VCF track (`volvox_test_vcf`) now sits above the gene track (`gff3tabix_genes`) in the view. I checked the track order in the view model afterward, but I didn't take a screenshot."
+    },
+    {
+      "task": "navigate-gene",
+      "run": 1,
+      "client": "code",
+      "pass": true,
+      "detail": {
+        "refName": "ctgA",
+        "start": 0,
+        "end": 10591,
+        "assemblyName": "volvox"
+      },
+      "runJavascript": 1,
+      "errored": 0,
+      "docs": 0,
+      "screenshots": 0,
+      "open": 0,
+      "chars": {
+        "ToolSearch": 0,
+        "run_javascript": 634
+      },
+      "images": 0,
+      "docsArgs": [],
+      "routeCalls": {
+        "navToLocString": 1,
+        "sessionSummary": 1,
+        "view": 1,
+        "visibleRegions": 1,
+        "waitReady": 1
+      },
+      "routeErrors": {},
+      "turns": 3,
+      "seconds": 6,
+      "usd": 0.044,
+      "tokensIn": 6,
+      "cacheWrite": 8338,
+      "cacheRead": 39778,
+      "tokensOut": 300,
+      "answer": "JBrowse is now on EDEN in the volvox assembly, showing ctgA:1..10,591. I only read the visible region back and didn't take a screenshot."
+    },
+    {
+      "task": "navigate-gene",
+      "run": 2,
+      "client": "code",
+      "pass": true,
+      "detail": {
+        "refName": "ctgA",
+        "start": 0,
+        "end": 10591,
+        "assemblyName": "volvox"
+      },
+      "runJavascript": 1,
+      "errored": 0,
+      "docs": 0,
+      "screenshots": 0,
+      "open": 0,
+      "chars": {
+        "ToolSearch": 0,
+        "run_javascript": 634
+      },
+      "images": 0,
+      "docsArgs": [],
+      "routeCalls": {
+        "navToLocString": 1,
+        "sessionSummary": 1,
+        "view": 1,
+        "visibleRegions": 1,
+        "waitReady": 1
+      },
+      "routeErrors": {},
+      "turns": 3,
+      "seconds": 6,
+      "usd": 0.014,
+      "tokensIn": 6,
+      "cacheWrite": 471,
+      "cacheRead": 47643,
+      "tokensOut": 259,
+      "answer": "Navigated the view to the gene EDEN; it now shows ctgA:1..10,591 in volvox."
+    },
+    {
+      "task": "navigate-gene",
+      "run": 3,
+      "client": "code",
+      "pass": true,
+      "detail": {
+        "refName": "ctgA",
+        "start": 0,
+        "end": 10591,
+        "assemblyName": "volvox"
+      },
+      "runJavascript": 1,
+      "errored": 0,
+      "docs": 0,
+      "screenshots": 0,
+      "open": 0,
+      "chars": {
+        "ToolSearch": 0,
+        "run_javascript": 634
+      },
+      "images": 0,
+      "docsArgs": [],
+      "routeCalls": {
+        "navToLocString": 1,
+        "sessionSummary": 1,
+        "view": 1,
+        "visibleRegions": 1,
+        "waitReady": 1
+      },
+      "routeErrors": {},
+      "turns": 3,
+      "seconds": 7,
+      "usd": 0.014,
+      "tokensIn": 6,
+      "cacheWrite": 479,
+      "cacheRead": 47643,
+      "tokensOut": 282,
+      "answer": "Navigated to EDEN: the view now shows ctgA:1..10,591 in volvox. I checked this against the visible region only, not the gene feature itself."
+    },
+    {
+      "task": "hide-track",
+      "run": 1,
+      "client": "code",
+      "pass": true,
+      "detail": {
+        "order": [
+          "gff3tabix_genes"
+        ]
+      },
+      "runJavascript": 2,
+      "errored": 0,
+      "docs": 0,
+      "screenshots": 0,
+      "open": 0,
+      "chars": {
+        "ToolSearch": 0,
+        "run_javascript": 681
+      },
+      "images": 0,
+      "docsArgs": [],
+      "routeCalls": {
+        "sessionSummary": 2,
+        "hideTrack": 1,
+        "view": 1,
+        "views": 1,
+        "waitReady": 1
+      },
+      "routeErrors": {},
+      "turns": 4,
+      "seconds": 5,
+      "usd": 0.048,
+      "tokensIn": 8,
+      "cacheWrite": 8436,
+      "cacheRead": 56659,
+      "tokensOut": 332,
+      "answer": "I closed the variant track (`volvox_test_vcf`). The session summary now lists only the gene track, `gff3tabix_genes`, in that view."
+    },
+    {
+      "task": "hide-track",
+      "run": 2,
+      "client": "code",
+      "pass": true,
+      "detail": {
+        "order": [
+          "gff3tabix_genes"
+        ]
+      },
+      "runJavascript": 2,
+      "errored": 0,
+      "docs": 0,
+      "screenshots": 0,
+      "open": 0,
+      "chars": {
+        "ToolSearch": 0,
+        "run_javascript": 681
+      },
+      "images": 0,
+      "docsArgs": [],
+      "routeCalls": {
+        "sessionSummary": 2,
+        "hideTrack": 1,
+        "view": 1,
+        "views": 1,
+        "waitReady": 1
+      },
+      "routeErrors": {},
+      "turns": 4,
+      "seconds": 8,
+      "usd": 0.019,
+      "tokensIn": 8,
+      "cacheWrite": 578,
+      "cacheRead": 64518,
+      "tokensOut": 329,
+      "answer": "I closed the variant track (`volvox_test_vcf`). The session summary now lists only the `gff3tabix_genes` track in the view."
+    },
+    {
+      "task": "hide-track",
+      "run": 3,
+      "client": "code",
+      "pass": true,
+      "detail": {
+        "order": [
+          "gff3tabix_genes"
+        ]
+      },
+      "runJavascript": 2,
+      "errored": 0,
+      "docs": 0,
+      "screenshots": 0,
+      "open": 0,
+      "chars": {
+        "ToolSearch": 0,
+        "run_javascript": 681
+      },
+      "images": 0,
+      "docsArgs": [],
+      "routeCalls": {
+        "sessionSummary": 2,
+        "hideTrack": 1,
+        "view": 1,
+        "views": 1,
+        "waitReady": 1
+      },
+      "routeErrors": {},
+      "turns": 4,
+      "seconds": 6,
+      "usd": 0.018,
+      "tokensIn": 8,
+      "cacheWrite": 578,
+      "cacheRead": 64519,
+      "tokensOut": 323,
+      "answer": "I closed the variant track (`volvox_test_vcf`); the view now shows only the `gff3tabix_genes` track."
+    },
+    {
+      "task": "hide-labels",
+      "run": 1,
+      "client": "code",
+      "pass": true,
+      "detail": {
+        "showLabels": "none",
+        "subfeatureLabels": "none",
+        "displayMode": "normal"
+      },
+      "runJavascript": 3,
+      "errored": 0,
+      "docs": 0,
+      "screenshots": 0,
+      "open": 0,
+      "chars": {
+        "ToolSearch": 0,
+        "run_javascript": 5223
+      },
+      "images": 0,
+      "docsArgs": [],
+      "routeCalls": {
+        "listTracks": 1,
+        "sessionSummary": 1,
+        "configuration": 1,
+        "describeSlots": 1,
+        "trackModel": 2,
+        "applyDisplaySettings": 1,
+        "waitReady": 1
+      },
+      "routeErrors": {},
+      "turns": 5,
+      "seconds": 8,
+      "usd": 0.064,
+      "tokensIn": 10,
+      "cacheWrite": 10652,
+      "cacheRead": 76492,
+      "tokensOut": 591,
+      "answer": "I set `showLabels` to `none` on the gene track (`gff3tabix_genes`), and the call reported it as applied. I didn't take a screenshot. The only check was reading `showLabels` back from the display, which returned `false` rather than `\"none\"`, so I'm assuming that getter is a boolean."
+    },
+    {
+      "task": "hide-labels",
+      "run": 2,
+      "client": "code",
+      "pass": true,
+      "detail": {
+        "showLabels": "none",
+        "subfeatureLabels": "none",
+        "displayMode": "normal"
+      },
+      "runJavascript": 3,
+      "errored": 0,
+      "docs": 0,
+      "screenshots": 0,
+      "open": 0,
+      "chars": {
+        "ToolSearch": 0,
+        "run_javascript": 5163
+      },
+      "images": 0,
+      "docsArgs": [],
+      "routeCalls": {
+        "listTracks": 1,
+        "sessionSummary": 1,
+        "configuration": 1,
+        "describeSlots": 1,
+        "trackModel": 2,
+        "applyDisplaySettings": 1,
+        "waitReady": 1
+      },
+      "routeErrors": {},
+      "turns": 5,
+      "seconds": 8,
+      "usd": 0.034,
+      "tokensIn": 10,
+      "cacheWrite": 2765,
+      "cacheRead": 84303,
+      "tokensOut": 556,
+      "answer": "Feature labels are now hidden on the gene track (`gff3tabix_genes`). I set its `showLabels` display setting to `none`, and the call reported it as applied. I didn't take a screenshot to check the track visually."
+    },
+    {
+      "task": "hide-labels",
+      "run": 3,
+      "client": "code",
+      "pass": true,
+      "detail": {
+        "showLabels": "none",
+        "subfeatureLabels": "none",
+        "displayMode": "normal"
+      },
+      "runJavascript": 3,
+      "errored": 0,
+      "docs": 0,
+      "screenshots": 0,
+      "open": 0,
+      "chars": {
+        "ToolSearch": 0,
+        "run_javascript": 6840
+      },
+      "images": 0,
+      "docsArgs": [],
+      "routeCalls": {
+        "listTracks": 1,
+        "sessionSummary": 1,
+        "configuration": 1,
+        "describeSlots": 1,
+        "trackModel": 2,
+        "applyDisplaySettings": 1,
+        "waitReady": 1
+      },
+      "routeErrors": {},
+      "turns": 5,
+      "seconds": 8,
+      "usd": 0.037,
+      "tokensIn": 10,
+      "cacheWrite": 3498,
+      "cacheRead": 85791,
+      "tokensOut": 551,
+      "answer": "I set the gene track's (`gff3tabix_genes`) label setting to \"none\". The call reported it applied, and the display's `showLabels` now reads false. I didn't take a screenshot."
+    },
+    {
+      "task": "action-not-slot",
+      "run": 1,
+      "client": "code",
+      "pass": true,
+      "detail": {
+        "shown": true,
+        "resolution": 5
+      },
+      "runJavascript": 2,
+      "errored": 0,
+      "docs": 0,
+      "screenshots": 0,
+      "open": 0,
+      "chars": {
+        "ToolSearch": 0,
+        "run_javascript": 9238
+      },
+      "images": 0,
+      "docsArgs": [],
+      "routeCalls": {
+        "configuration": 2,
+        "describeSlots": 1,
+        "sessionSummary": 1,
+        "trackModel": 2,
+        "applyDisplaySettings": 1,
+        "waitReady": 1
+      },
+      "routeErrors": {},
+      "turns": 4,
+      "seconds": 7,
+      "usd": 0.063,
+      "tokensIn": 8,
+      "cacheWrite": 11607,
+      "cacheRead": 59826,
+      "tokensOut": 437,
+      "answer": "I set the `volvox_microarray` track's resolution to 5, and the setting reports back as 5 on both the display and its configuration. I didn't take a screenshot to check the rendering."
+    },
+    {
+      "task": "action-not-slot",
+      "run": 2,
+      "client": "code",
+      "pass": true,
+      "detail": {
+        "shown": true,
+        "resolution": 5
+      },
+      "runJavascript": 2,
+      "errored": 0,
+      "docs": 0,
+      "screenshots": 0,
+      "open": 0,
+      "chars": {
+        "ToolSearch": 0,
+        "run_javascript": 9232
+      },
+      "images": 0,
+      "docsArgs": [],
+      "routeCalls": {
+        "configuration": 1,
+        "describeSlots": 1,
+        "sessionSummary": 1,
+        "trackModel": 2,
+        "applyDisplaySettings": 1,
+        "mst": 1
+      },
+      "routeErrors": {},
+      "turns": 4,
+      "seconds": 6,
+      "usd": 0.04,
+      "tokensIn": 8,
+      "cacheWrite": 5650,
+      "cacheRead": 65772,
+      "tokensOut": 420,
+      "answer": "The volvox_microarray track's resolution is now 5. The settings call reported `resolution` as applied, and reading the value back from the display returned 5."
+    },
+    {
+      "task": "action-not-slot",
+      "run": 3,
+      "client": "code",
+      "pass": true,
+      "detail": {
+        "shown": true,
+        "resolution": 5
+      },
+      "runJavascript": 2,
+      "errored": 0,
+      "docs": 0,
+      "screenshots": 0,
+      "open": 0,
+      "chars": {
+        "ToolSearch": 0,
+        "run_javascript": 9259
+      },
+      "images": 0,
+      "docsArgs": [],
+      "routeCalls": {
+        "configuration": 2,
+        "describeSlots": 1,
+        "sessionSummary": 1,
+        "trackModel": 2,
+        "applyDisplaySettings": 1,
+        "waitReady": 1
+      },
+      "routeErrors": {},
+      "turns": 4,
+      "seconds": 7,
+      "usd": 0.033,
+      "tokensIn": 8,
+      "cacheWrite": 3752,
+      "cacheRead": 67717,
+      "tokensOut": 445,
+      "answer": "I set the resolution of the `volvox_microarray` track to 5. The settings call reported `resolution` as applied with nothing unapplied or failed, and reading the display back gave 5."
+    },
+    {
+      "task": "two-views",
+      "run": 1,
+      "client": "code",
+      "pass": true,
+      "detail": [
+        {
+          "refName": "ctgA",
+          "tracks": [
+            "gff3tabix_genes",
+            "volvox_test_vcf"
+          ]
+        },
+        {
+          "refName": "ctgB",
+          "tracks": []
+        }
+      ],
+      "runJavascript": 3,
+      "errored": 1,
+      "docs": 0,
+      "screenshots": 0,
+      "open": 0,
+      "chars": {
+        "ToolSearch": 0,
+        "run_javascript": 1264
+      },
+      "images": 0,
+      "docsArgs": [],
+      "routeCalls": {
+        "configuration": 2,
+        "sessionSummary": 2,
+        "views": 3,
+        "visibleRegions": 1,
+        "hideTrack": 1,
+        "view": 1,
+        "waitReady": 1
+      },
+      "routeErrors": {
+        "hideTrack": 1,
+        "sessionSummary": 1,
+        "view": 1,
+        "views": 1,
+        "waitReady": 1
+      },
+      "turns": 5,
+      "seconds": 8,
+      "usd": 0.056,
+      "tokensIn": 10,
+      "cacheWrite": 9020,
+      "cacheRead": 74577,
+      "tokensOut": 544,
+      "answer": "I closed the gene track (`gff3tabix_genes`) in the view showing ctgB. That view now has no tracks, and the other view still has its gene and VCF tracks."
+    },
+    {
+      "task": "two-views",
+      "run": 2,
+      "client": "code",
+      "pass": true,
+      "detail": [
+        {
+          "refName": "ctgA",
+          "tracks": [
+            "gff3tabix_genes",
+            "volvox_test_vcf"
+          ]
+        },
+        {
+          "refName": "ctgB",
+          "tracks": []
+        }
+      ],
+      "runJavascript": 3,
+      "errored": 1,
+      "docs": 0,
+      "screenshots": 0,
+      "open": 0,
+      "chars": {
+        "ToolSearch": 0,
+        "run_javascript": 1154
+      },
+      "images": 0,
+      "docsArgs": [],
+      "routeCalls": {
+        "sessionSummary": 3,
+        "views": 3,
+        "visibleRegions": 1,
+        "hideTrack": 1,
+        "view": 1,
+        "waitReady": 1
+      },
+      "routeErrors": {
+        "hideTrack": 1,
+        "sessionSummary": 1,
+        "view": 1,
+        "views": 1,
+        "waitReady": 1
+      },
+      "turns": 5,
+      "seconds": 8,
+      "usd": 0.026,
+      "tokensIn": 10,
+      "cacheWrite": 1063,
+      "cacheRead": 82282,
+      "tokensOut": 537,
+      "answer": "I closed the gene track (`gff3tabix_genes`) in the view showing ctgB. I checked afterwards: that view now has no tracks, and the ctgA view still has its gene and VCF tracks."
+    },
+    {
+      "task": "two-views",
+      "run": 3,
+      "client": "code",
+      "pass": true,
+      "detail": [
+        {
+          "refName": "ctgA",
+          "tracks": [
+            "gff3tabix_genes",
+            "volvox_test_vcf"
+          ]
+        },
+        {
+          "refName": "ctgB",
+          "tracks": []
+        }
+      ],
+      "runJavascript": 3,
+      "errored": 1,
+      "docs": 0,
+      "screenshots": 0,
+      "open": 0,
+      "chars": {
+        "ToolSearch": 0,
+        "run_javascript": 1102
+      },
+      "images": 0,
+      "docsArgs": [],
+      "routeCalls": {
+        "sessionSummary": 3,
+        "hideTrack": 1,
+        "view": 1,
+        "views": 2,
+        "waitReady": 1
+      },
+      "routeErrors": {
+        "hideTrack": 1,
+        "sessionSummary": 1,
+        "view": 1,
+        "views": 1,
+        "waitReady": 1
+      },
+      "turns": 5,
+      "seconds": 8,
+      "usd": 0.026,
+      "tokensIn": 10,
+      "cacheWrite": 1106,
+      "cacheRead": 82312,
+      "tokensOut": 525,
+      "answer": "I closed the gene track (`gff3tabix_genes`) in the view showing ctgB. That view now has no tracks. The other view, on ctgA, still has its gene and VCF tracks."
+    },
+    {
+      "task": "empty-session",
+      "run": 1,
+      "client": "code",
+      "pass": true,
+      "detail": {
+        "region": {
+          "refName": "ctgA",
+          "start": 4993,
+          "end": 14995,
+          "assemblyName": "volvox"
+        },
+        "tracks": [
+          "gff3tabix_genes"
+        ]
+      },
+      "runJavascript": 4,
+      "errored": 0,
+      "docs": 0,
+      "screenshots": 1,
+      "open": 0,
+      "chars": {
+        "ToolSearch": 0,
+        "run_javascript": 8555,
+        "screenshot": 225
+      },
+      "images": 1,
+      "docsArgs": [],
+      "routeCalls": {
+        "listTracks": 2,
+        "sessionSummary": 3,
+        "loadSessionSpec": 1,
+        "visibleRegions": 1,
+        "waitReady": 2,
+        "hideTrack": 1,
+        "launchTrack": 1,
+        "view": 1,
+        "views": 1
+      },
+      "routeErrors": {},
+      "turns": 7,
+      "seconds": 16,
+      "usd": 0.09,
+      "tokensIn": 14,
+      "cacheWrite": 13915,
+      "cacheRead": 123107,
+      "tokensOut": 935,
+      "answer": "The view is open at ctgA:4,994..14,994, showing \"GFF3Tabix genes\" with the genes drawn. I used that track because the \"Genes\" (NCList) track failed to load with a `replaceAll` TypeError. Several other tracks have \"genes\" in their names, so I picked this one as \"the gene track\". The view starts at 4,994 rather than 5,000 because it rounds to its own window."
+    },
+    {
+      "task": "empty-session",
+      "run": 2,
+      "client": "code",
+      "pass": true,
+      "detail": {
+        "region": {
+          "refName": "ctgA",
+          "start": 4993,
+          "end": 14995,
+          "assemblyName": "volvox"
+        },
+        "tracks": [
+          "gff3tabix_genes"
+        ]
+      },
+      "runJavascript": 2,
+      "errored": 0,
+      "docs": 0,
+      "screenshots": 0,
+      "open": 0,
+      "chars": {
+        "ToolSearch": 0,
+        "run_javascript": 2128
+      },
+      "images": 0,
+      "docsArgs": [],
+      "routeCalls": {
+        "listTracks": 1,
+        "sessionSummary": 2,
+        "loadSessionSpec": 1,
+        "visibleRegions": 1,
+        "waitReady": 1
+      },
+      "routeErrors": {},
+      "turns": 4,
+      "seconds": 9,
+      "usd": 0.025,
+      "tokensIn": 8,
+      "cacheWrite": 1539,
+      "cacheRead": 65110,
+      "tokensOut": 614,
+      "answer": "The view now shows the \"GFF3Tabix genes\" track on volvox at ctgA:4,994–14,994. That is about 6 bp off the 5,000–15,000 you asked for. I checked this against the session summary and visible region, but I didn't take a screenshot. There are 11 gene-named tracks in this session, and I picked `gff3tabix_genes`."
+    },
+    {
+      "task": "empty-session",
+      "run": 3,
+      "client": "code",
+      "pass": true,
+      "detail": {
+        "region": {
+          "refName": "ctgA",
+          "start": 4993,
+          "end": 14995,
+          "assemblyName": "volvox"
+        },
+        "tracks": [
+          "gff3tabix_genes"
+        ]
+      },
+      "runJavascript": 2,
+      "errored": 0,
+      "docs": 0,
+      "screenshots": 0,
+      "open": 0,
+      "chars": {
+        "ToolSearch": 0,
+        "run_javascript": 2128
+      },
+      "images": 0,
+      "docsArgs": [],
+      "routeCalls": {
+        "listTracks": 1,
+        "sessionSummary": 2,
+        "loadSessionSpec": 1,
+        "visibleRegions": 1,
+        "waitReady": 1
+      },
+      "routeErrors": {},
+      "turns": 4,
+      "seconds": 9,
+      "usd": 0.021,
+      "tokensIn": 8,
+      "cacheWrite": 589,
+      "cacheRead": 66026,
+      "tokensOut": 565,
+      "answer": "The view is open on volvox at ctgA:4,994–14,994 (about 10 kb, close to the 5,000–15,000 you asked for) with the \"GFF3Tabix genes\" track showing. The session has 11 gene tracks, so I picked that one. I checked the view's region and track list but didn't take a screenshot."
+    },
+    {
+      "task": "count-region",
+      "run": 1,
+      "client": "code",
+      "pass": true,
+      "detail": {
+        "truth": 0,
+        "said": [
+          0
+        ]
+      },
+      "runJavascript": 5,
+      "errored": 0,
+      "docs": 0,
+      "screenshots": 0,
+      "open": 0,
+      "chars": {
+        "ToolSearch": 0,
+        "run_javascript": 1285
+      },
+      "images": 0,
+      "docsArgs": [],
+      "routeCalls": {
+        "getFeatures": 5,
+        "listTracks": 1,
+        "sessionSummary": 2
+      },
+      "routeErrors": {},
+      "turns": 7,
+      "seconds": 10,
+      "usd": 0.07,
+      "tokensIn": 14,
+      "cacheWrite": 9602,
+      "cacheRead": 110174,
+      "tokensOut": 925,
+      "answer": "0"
+    },
+    {
+      "task": "count-region",
+      "run": 2,
+      "client": "code",
+      "pass": true,
+      "detail": {
+        "truth": 0,
+        "said": [
+          0
+        ]
+      },
+      "runJavascript": 5,
+      "errored": 0,
+      "docs": 0,
+      "screenshots": 0,
+      "open": 0,
+      "chars": {
+        "ToolSearch": 0,
+        "run_javascript": 1633
+      },
+      "images": 0,
+      "docsArgs": [],
+      "routeCalls": {
+        "listTracks": 1,
+        "getFeatures": 4
+      },
+      "routeErrors": {},
+      "turns": 7,
+      "seconds": 11,
+      "usd": 0.041,
+      "tokensIn": 14,
+      "cacheWrite": 1897,
+      "cacheRead": 118502,
+      "tokensOut": 958,
+      "answer": "0"
+    },
+    {
+      "task": "count-region",
+      "run": 3,
+      "client": "code",
+      "pass": true,
+      "detail": {
+        "truth": 0,
+        "said": [
+          0
+        ]
+      },
+      "runJavascript": 4,
+      "errored": 0,
+      "docs": 0,
+      "screenshots": 0,
+      "open": 0,
+      "chars": {
+        "ToolSearch": 0,
+        "run_javascript": 828
+      },
+      "images": 0,
+      "docsArgs": [],
+      "routeCalls": {
+        "getFeatures": 4,
+        "listTracks": 1
+      },
+      "routeErrors": {},
+      "turns": 6,
+      "seconds": 11,
+      "usd": 0.035,
+      "tokensIn": 12,
+      "cacheWrite": 1372,
+      "cacheRead": 99937,
+      "tokensOut": 943,
+      "answer": "0"
+    },
+    {
+      "task": "binned-track",
+      "run": 1,
+      "client": "code",
+      "pass": true,
+      "detail": {
+        "truth": [
+          19,
+          60,
+          30,
+          0,
+          0,
+          0
+        ],
+        "scored": [
+          [
+            19,
+            60,
+            30,
+            0,
+            0,
+            0
+          ]
+        ]
+      },
+      "runJavascript": 2,
+      "errored": 0,
+      "docs": 3,
+      "screenshots": 0,
+      "open": 0,
+      "chars": {
+        "ToolSearch": 0,
+        "docs": 11232,
+        "run_javascript": 13380
+      },
+      "images": 0,
+      "docsArgs": [
+        "live-model",
+        "recipes",
+        "recipes/Show a value you computed as a track"
+      ],
+      "routeCalls": {
+        "listTracks": 1,
+        "sessionSummary": 1,
+        "getFeatures": 1,
+        "launchTrack": 1,
+        "view": 1,
+        "waitReady": 1
+      },
+      "routeErrors": {},
+      "turns": 7,
+      "seconds": 11,
+      "usd": 0.108,
+      "tokensIn": 10,
+      "cacheWrite": 19961,
+      "cacheRead": 88429,
+      "tokensOut": 1055,
+      "answer": "I added a \"variants per 5 kb\" track over ctgA:1-30,000, and it loaded without errors. I didn't take a screenshot, so I haven't seen it drawn.\n\nThe counts come from the `volvox_test_vcf` track, 109 variants in total:\n\n| Bin | Variants |\n|---|---|\n| 0–5 kb | 19 |\n| 5–10 kb | 60 |\n| 10–15 kb | 30 |\n| 15–20 kb | 0 |\n| 20–25 kb | 0 |\n| 25–30 kb | 0 |\n\nThe track is a snapshot of those counts stored in the session, so it won't update if the VCF changes."
+    },
+    {
+      "task": "binned-track",
+      "run": 2,
+      "client": "code",
+      "pass": true,
+      "detail": {
+        "truth": [
+          19,
+          60,
+          30,
+          0,
+          0,
+          0
+        ],
+        "scored": [
+          [
+            19,
+            60,
+            30,
+            0,
+            0,
+            0
+          ]
+        ]
+      },
+      "runJavascript": 2,
+      "errored": 0,
+      "docs": 3,
+      "screenshots": 0,
+      "open": 0,
+      "chars": {
+        "ToolSearch": 0,
+        "docs": 20898,
+        "run_javascript": 13380
+      },
+      "images": 0,
+      "docsArgs": [
+        "live-model",
+        "variants per bin density",
+        "recipes/Show a value you computed as a track"
+      ],
+      "routeCalls": {
+        "listTracks": 1,
+        "sessionSummary": 1,
+        "getFeatures": 1,
+        "launchTrack": 1,
+        "view": 1,
+        "waitReady": 1
+      },
+      "routeErrors": {},
+      "turns": 7,
+      "seconds": 15,
+      "usd": 0.093,
+      "tokensIn": 10,
+      "cacheWrite": 15645,
+      "cacheRead": 103442,
+      "tokensOut": 1000,
+      "answer": "I added a track named \"variants per 5 kb\" to the open view over ctgA:1-30,000. The track settled with no `notReady` entries, and I didn't take a screenshot.\n\nThe six 5 kb bins have 19, 60, 30, 0, 0 and 0 variants, which sum to the 109 variants `jb.getFeatures` returned for the region.\n\nThe counts are computed once from the `volvox_test_vcf` track and stored in the track config. The track won't update if that VCF changes."
+    },
+    {
+      "task": "binned-track",
+      "run": 3,
+      "client": "code",
+      "pass": true,
+      "detail": {
+        "truth": [
+          19,
+          60,
+          30,
+          0,
+          0,
+          0
+        ],
+        "scored": [
+          [
+            19,
+            60,
+            30,
+            0,
+            0,
+            0
+          ]
+        ]
+      },
+      "runJavascript": 2,
+      "errored": 0,
+      "docs": 3,
+      "screenshots": 0,
+      "open": 0,
+      "chars": {
+        "ToolSearch": 0,
+        "docs": 11232,
+        "run_javascript": 13380
+      },
+      "images": 0,
+      "docsArgs": [
+        "live-model",
+        "recipes",
+        "recipes/Show a value you computed as a track"
+      ],
+      "routeCalls": {
+        "listTracks": 1,
+        "sessionSummary": 1,
+        "getFeatures": 1,
+        "launchTrack": 1,
+        "view": 1,
+        "waitReady": 1
+      },
+      "routeErrors": {},
+      "turns": 7,
+      "seconds": 10,
+      "usd": 0.062,
+      "tokensIn": 10,
+      "cacheWrite": 8113,
+      "cacheRead": 100283,
+      "tokensOut": 955,
+      "answer": "I added a \"variants per 5 kb\" track over ctgA:1-30,000, built from the `volvox_test_vcf` variants (109 in total). The bin counts are 19, 60, 30, 0, 0 and 0 for the six 5 kb bins from the start. The track settled with no errors, but I didn't take a screenshot."
+    },
+    {
+      "task": "unknown-name",
+      "run": 1,
+      "client": "code",
+      "pass": true,
+      "detail": {
+        "trackId": "volvox_alignments",
+        "phase": "ready"
+      },
+      "runJavascript": 2,
+      "errored": 0,
+      "docs": 0,
+      "screenshots": 0,
+      "open": 0,
+      "chars": {
+        "ToolSearch": 0,
+        "run_javascript": 7634
+      },
+      "images": 0,
+      "docsArgs": [],
+      "routeCalls": {
+        "listTracks": 1,
+        "sessionSummary": 2,
+        "launchTrack": 1,
+        "view": 1,
+        "views": 1,
+        "waitReady": 1
+      },
+      "routeErrors": {},
+      "turns": 4,
+      "seconds": 8,
+      "usd": 0.064,
+      "tokensIn": 8,
+      "cacheWrite": 11904,
+      "cacheRead": 60001,
+      "tokensOut": 442,
+      "answer": "The alignments track (volvox-sorted.bam, `volvox_alignments`) is now showing in the open view. I confirmed it's in the view's track list with its alignments display, but I didn't take a screenshot to check that reads are drawn. I picked it from several alignment tracks in the catalog because it covers ctgA, the region already in view."
+    },
+    {
+      "task": "unknown-name",
+      "run": 2,
+      "client": "code",
+      "pass": true,
+      "detail": {
+        "trackId": "volvox_alignments",
+        "phase": "ready"
+      },
+      "runJavascript": 2,
+      "errored": 0,
+      "docs": 0,
+      "screenshots": 0,
+      "open": 0,
+      "chars": {
+        "ToolSearch": 0,
+        "run_javascript": 8206
+      },
+      "images": 0,
+      "docsArgs": [],
+      "routeCalls": {
+        "listTracks": 1,
+        "sessionSummary": 2,
+        "addTrack": 1,
+        "views": 1
+      },
+      "routeErrors": {},
+      "turns": 4,
+      "seconds": 8,
+      "usd": 0.035,
+      "tokensIn": 8,
+      "cacheWrite": 4294,
+      "cacheRead": 67861,
+      "tokensOut": 414,
+      "answer": "The alignments track (volvox-sorted.bam, ctgA) is now shown in the view and settled. I didn't take a screenshot, so I haven't looked at the drawn reads. The session is taller than the window, so the new track may sit below the visible area."
+    },
+    {
+      "task": "unknown-name",
+      "run": 3,
+      "client": "code",
+      "pass": true,
+      "detail": {
+        "trackId": "volvox_alignments",
+        "phase": "ready"
+      },
+      "runJavascript": 2,
+      "errored": 0,
+      "docs": 0,
+      "screenshots": 0,
+      "open": 0,
+      "chars": {
+        "ToolSearch": 0,
+        "run_javascript": 7634
+      },
+      "images": 0,
+      "docsArgs": [],
+      "routeCalls": {
+        "listTracks": 1,
+        "sessionSummary": 2,
+        "launchTrack": 1,
+        "view": 1,
+        "views": 1,
+        "waitReady": 1
+      },
+      "routeErrors": {},
+      "turns": 4,
+      "seconds": 8,
+      "usd": 0.034,
+      "tokensIn": 8,
+      "cacheWrite": 4067,
+      "cacheRead": 67861,
+      "tokensOut": 423,
+      "answer": "The alignments track (`volvox_alignments`, volvox-sorted.bam) is now showing in the view at ctgA:1..30,000. I confirmed it in the session summary but didn't take a screenshot."
+    },
+    {
+      "task": "alias-refname-count",
+      "run": 1,
+      "client": "code",
+      "pass": true,
+      "detail": {
+        "truth": 114,
+        "said": [
+          114
+        ]
+      },
+      "runJavascript": 1,
+      "errored": 0,
+      "docs": 0,
+      "screenshots": 0,
+      "open": 0,
+      "chars": {
+        "ToolSearch": 0,
+        "run_javascript": 23
+      },
+      "images": 0,
+      "docsArgs": [],
+      "routeCalls": {
+        "getFeatures": 1
+      },
+      "routeErrors": {},
+      "turns": 3,
+      "seconds": 6,
+      "usd": 0.042,
+      "tokensIn": 6,
+      "cacheWrite": 8051,
+      "cacheRead": 39838,
+      "tokensOut": 219,
+      "answer": "114"
+    },
+    {
+      "task": "alias-refname-count",
+      "run": 2,
+      "client": "code",
+      "pass": true,
+      "detail": {
+        "truth": 114,
+        "said": [
+          114
+        ]
+      },
+      "runJavascript": 1,
+      "errored": 0,
+      "docs": 0,
+      "screenshots": 0,
+      "open": 0,
+      "chars": {
+        "ToolSearch": 0,
+        "run_javascript": 959
+      },
+      "images": 0,
+      "docsArgs": [],
+      "routeCalls": {
+        "getFeatures": 1
+      },
+      "routeErrors": {},
+      "turns": 3,
+      "seconds": 4,
+      "usd": 0.023,
+      "tokensIn": 6,
+      "cacheWrite": 2596,
+      "cacheRead": 45807,
+      "tokensOut": 295,
+      "answer": "114"
+    },
+    {
+      "task": "alias-refname-count",
+      "run": 3,
+      "client": "code",
+      "pass": true,
+      "detail": {
+        "truth": 114,
+        "said": [
+          114
+        ]
+      },
+      "runJavascript": 1,
+      "errored": 0,
+      "docs": 0,
+      "screenshots": 0,
+      "open": 0,
+      "chars": {
+        "ToolSearch": 0,
+        "run_javascript": 959
+      },
+      "images": 0,
+      "docsArgs": [],
+      "routeCalls": {
+        "getFeatures": 1
+      },
+      "routeErrors": {},
+      "turns": 3,
+      "seconds": 4,
+      "usd": 0.012,
+      "tokensIn": 6,
+      "cacheWrite": 0,
+      "cacheRead": 48403,
+      "tokensOut": 276,
+      "answer": "114"
+    },
+    {
+      "task": "color-by-strand",
+      "run": 1,
+      "client": "code",
+      "pass": true,
+      "detail": {
+        "color": {
+          "field": "strand"
+        }
+      },
+      "runJavascript": 2,
+      "errored": 0,
+      "docs": 2,
+      "screenshots": 0,
+      "open": 0,
+      "chars": {
+        "ToolSearch": 0,
+        "run_javascript": 7334,
+        "docs": 22495
+      },
+      "images": 0,
+      "docsArgs": [
+        "color by strand",
+        "model:LinearBasicDisplay/Actions"
+      ],
+      "routeCalls": {
+        "listTracks": 1,
+        "sessionSummary": 1,
+        "trackModel": 1,
+        "waitReady": 1
+      },
+      "routeErrors": {},
+      "turns": 6,
+      "seconds": 9,
+      "usd": 0.108,
+      "tokensIn": 10,
+      "cacheWrite": 20868,
+      "cacheRead": 92837,
+      "tokensOut": 569,
+      "answer": "The gene track (`gff3tabix_genes`) now colors its features by strand. I confirmed it by reading the display's `colorByMode`, which now returns `strand`. I didn't take a screenshot, so I haven't seen the colors drawn."
+    },
+    {
+      "task": "color-by-strand",
+      "run": 2,
+      "client": "code",
+      "pass": true,
+      "detail": {
+        "color": {
+          "field": "strand"
+        }
+      },
+      "runJavascript": 3,
+      "errored": 0,
+      "docs": 1,
+      "screenshots": 0,
+      "open": 0,
+      "chars": {
+        "ToolSearch": 0,
+        "docs": 7976,
+        "run_javascript": 11805
+      },
+      "images": 0,
+      "docsArgs": [
+        "live-model"
+      ],
+      "routeCalls": {
+        "listTracks": 1,
+        "sessionSummary": 1,
+        "configuration": 2,
+        "describeSlots": 1,
+        "trackModel": 2,
+        "applyDisplaySettings": 1,
+        "mst": 1,
+        "waitReady": 1
+      },
+      "routeErrors": {},
+      "turns": 6,
+      "seconds": 9,
+      "usd": 0.063,
+      "tokensIn": 10,
+      "cacheWrite": 9221,
+      "cacheRead": 96592,
+      "tokensOut": 635,
+      "answer": "The gene track (`gff3tabix_genes`) now colors its features by strand: the display's `color.field` is set to `strand`, and the settings call reported it applied with nothing rejected. I checked the display config only and didn't take a screenshot, so I haven't seen the colors drawn."
+    },
+    {
+      "task": "color-by-strand",
+      "run": 3,
+      "client": "code",
+      "pass": true,
+      "detail": {
+        "color": {
+          "field": "strand"
+        }
+      },
+      "runJavascript": 3,
+      "errored": 0,
+      "docs": 1,
+      "screenshots": 0,
+      "open": 0,
+      "chars": {
+        "ToolSearch": 0,
+        "docs": 7976,
+        "run_javascript": 17583
+      },
+      "images": 0,
+      "docsArgs": [
+        "live-model"
+      ],
+      "routeCalls": {
+        "listTracks": 1,
+        "sessionSummary": 1,
+        "configuration": 2,
+        "describeSlots": 1,
+        "trackModel": 2,
+        "applyDisplaySettings": 1,
+        "mst": 1,
+        "waitReady": 1
+      },
+      "routeErrors": {},
+      "turns": 6,
+      "seconds": 9,
+      "usd": 0.071,
+      "tokensIn": 10,
+      "cacheWrite": 11100,
+      "cacheRead": 98549,
+      "tokensOut": 658,
+      "answer": "The gene track (`gff3tabix_genes`) now colors features by strand. The display accepted the `color` setting with `field: 'strand'`, and I read it back from the config to confirm. I didn't take a screenshot, so I haven't seen the colors drawn. By the docs, forward-strand features should be tomato and reverse-strand ones cornflowerblue."
+    },
+    {
+      "task": "facet-by-strand",
+      "run": 1,
+      "client": "code",
+      "pass": true,
+      "detail": {
+        "facet": {
+          "field": "strand"
+        }
+      },
+      "runJavascript": 3,
+      "errored": 0,
+      "docs": 2,
+      "screenshots": 1,
+      "open": 0,
+      "chars": {
+        "ToolSearch": 0,
+        "run_javascript": 17544,
+        "docs": 22378,
+        "screenshot": 225
+      },
+      "images": 1,
+      "docsArgs": [
+        "strand",
+        "model:LinearBasicDisplay/Actions"
+      ],
+      "routeCalls": {
+        "listTracks": 1,
+        "sessionSummary": 1,
+        "configuration": 1,
+        "describeSlots": 1,
+        "trackModel": 2,
+        "waitReady": 1
+      },
+      "routeErrors": {},
+      "turns": 8,
+      "seconds": 11,
+      "usd": 0.137,
+      "tokensIn": 12,
+      "cacheWrite": 25909,
+      "cacheRead": 130578,
+      "tokensOut": 701,
+      "answer": "I split the GFF3Tabix genes track by strand, and the screenshot shows it grouped into \"Forward strand\", \"Reverse strand\" and \"No strand\" sections. The \"No strand\" section is there because some features in the region have no strand."
+    },
+    {
+      "task": "facet-by-strand",
+      "run": 2,
+      "client": "code",
+      "pass": true,
+      "detail": {
+        "facet": {
+          "field": "strand"
+        }
+      },
+      "runJavascript": 3,
+      "errored": 0,
+      "docs": 1,
+      "screenshots": 1,
+      "open": 0,
+      "chars": {
+        "ToolSearch": 0,
+        "run_javascript": 17656,
+        "docs": 8340,
+        "screenshot": 225
+      },
+      "images": 1,
+      "docsArgs": [
+        "strand"
+      ],
+      "routeCalls": {
+        "listTracks": 1,
+        "sessionSummary": 1,
+        "configuration": 2,
+        "describeSlots": 1,
+        "inspect": 1,
+        "trackModel": 2,
+        "applyDisplaySettings": 1,
+        "waitReady": 1
+      },
+      "routeErrors": {},
+      "turns": 7,
+      "seconds": 14,
+      "usd": 0.077,
+      "tokensIn": 10,
+      "cacheWrite": 12542,
+      "cacheRead": 99315,
+      "tokensOut": 682,
+      "answer": "I split the GFF3Tabix genes track by strand with `facet: {field: 'strand'}`, and the screenshot shows the result. The track now has a \"Forward strand\" row and a \"Reverse strand\" row. It also has a third \"No strand\" row for features with no strand."
+    },
+    {
+      "task": "facet-by-strand",
+      "run": 3,
+      "client": "code",
+      "pass": true,
+      "detail": {
+        "facet": {
+          "field": "strand"
+        }
+      },
+      "runJavascript": 3,
+      "errored": 0,
+      "docs": 1,
+      "screenshots": 1,
+      "open": 0,
+      "chars": {
+        "ToolSearch": 0,
+        "docs": 7457,
+        "run_javascript": 10844,
+        "screenshot": 225
+      },
+      "images": 1,
+      "docsArgs": [
+        "strand separate rows"
+      ],
+      "routeCalls": {
+        "sessionSummary": 1,
+        "configuration": 2,
+        "describeSlots": 1,
+        "trackModel": 2,
+        "applyDisplaySettings": 1,
+        "waitReady": 1
+      },
+      "routeErrors": {},
+      "turns": 7,
+      "seconds": 10,
+      "usd": 0.059,
+      "tokensIn": 10,
+      "cacheWrite": 8708,
+      "cacheRead": 91754,
+      "tokensOut": 617,
+      "answer": "The GFF3Tabix genes track is now split into separate \"Forward strand\" and \"Reverse strand\" rows, which I confirmed in a screenshot. I did this by setting the display's `facet` to `strand`. It also adds a \"No strand\" row for unstranded features."
+    },
+    {
+      "task": "filter-feature",
+      "run": 1,
+      "client": "code",
+      "pass": true,
+      "detail": {
+        "filter": [
+          "jexl:get(feature,'name')=='EDEN'"
+        ]
+      },
+      "runJavascript": 3,
+      "errored": 0,
+      "docs": 1,
+      "screenshots": 1,
+      "open": 0,
+      "chars": {
+        "ToolSearch": 0,
+        "docs": 7976,
+        "run_javascript": 17611,
+        "screenshot": 225
+      },
+      "images": 1,
+      "docsArgs": [
+        "live-model"
+      ],
+      "routeCalls": {
+        "listTracks": 1,
+        "sessionSummary": 1,
+        "configuration": 2,
+        "describeSlots": 1,
+        "trackModel": 2,
+        "applyDisplaySettings": 1,
+        "getFeatures": 1,
+        "readConfObject": 1,
+        "waitReady": 1
+      },
+      "routeErrors": {},
+      "turns": 7,
+      "seconds": 12,
+      "usd": 0.111,
+      "tokensIn": 12,
+      "cacheWrite": 20052,
+      "cacheRead": 118368,
+      "tokensOut": 699,
+      "answer": "The GFF3Tabix genes track now has the display filter `jexl:get(feature,'name')=='EDEN'`, and a screenshot of ctgA:1..30,000 shows only EDEN drawn."
+    },
+    {
+      "task": "filter-feature",
+      "run": 2,
+      "client": "code",
+      "pass": true,
+      "detail": {
+        "filter": [
+          "jexl:get(feature,'name')=='EDEN'"
+        ]
+      },
+      "runJavascript": 3,
+      "errored": 0,
+      "docs": 1,
+      "screenshots": 1,
+      "open": 0,
+      "chars": {
+        "ToolSearch": 0,
+        "docs": 7976,
+        "run_javascript": 18530,
+        "screenshot": 225
+      },
+      "images": 1,
+      "docsArgs": [
+        "live-model"
+      ],
+      "routeCalls": {
+        "listTracks": 1,
+        "sessionSummary": 1,
+        "configuration": 2,
+        "describeSlots": 1,
+        "trackModel": 2,
+        "applyDisplaySettings": 1,
+        "getFeatures": 1,
+        "readConfObject": 1,
+        "waitReady": 1
+      },
+      "routeErrors": {},
+      "turns": 7,
+      "seconds": 11,
+      "usd": 0.083,
+      "tokensIn": 12,
+      "cacheWrite": 12660,
+      "cacheRead": 126716,
+      "tokensOut": 694,
+      "answer": "The GFF3Tabix genes track now has the display filter `jexl:get(feature,'name')=='EDEN'`, and a screenshot shows only EDEN drawn in that track."
+    },
+    {
+      "task": "filter-feature",
+      "run": 3,
+      "client": "code",
+      "pass": true,
+      "detail": {
+        "filter": [
+          "jexl:get(feature,'name')=='EDEN'"
+        ]
+      },
+      "runJavascript": 3,
+      "errored": 0,
+      "docs": 1,
+      "screenshots": 1,
+      "open": 0,
+      "chars": {
+        "ToolSearch": 0,
+        "docs": 9876,
+        "run_javascript": 10880,
+        "screenshot": 225
+      },
+      "images": 1,
+      "docsArgs": [
+        "filter by feature name"
+      ],
+      "routeCalls": {
+        "sessionSummary": 1,
+        "configuration": 2,
+        "describeSlots": 1,
+        "trackModel": 2,
+        "applyDisplaySettings": 1,
+        "waitReady": 1
+      },
+      "routeErrors": {},
+      "turns": 7,
+      "seconds": 14,
+      "usd": 0.063,
+      "tokensIn": 10,
+      "cacheWrite": 9482,
+      "cacheRead": 93184,
+      "tokensOut": 688,
+      "answer": "The gene track (`gff3tabix_genes`) now has the display filter `get(feature,'name')=='EDEN'`. A screenshot of the current view (ctgA:1..30,000) shows only EDEN drawn there. I didn't check other regions."
+    },
+    {
+      "task": "mark-points",
+      "run": 1,
+      "client": "code",
+      "pass": true,
+      "detail": {
+        "type": "LinearMarkDisplay",
+        "marks": [
+          {
+            "mark": "point",
+            "encoding": {
+              "y": "QUAL"
+            }
+          }
+        ]
+      },
+      "runJavascript": 7,
+      "errored": 1,
+      "docs": 6,
+      "screenshots": 3,
+      "open": 0,
+      "chars": {
+        "ToolSearch": 0,
+        "run_javascript": 9386,
+        "docs": 18652,
+        "screenshot": 855
+      },
+      "images": 3,
+      "docsArgs": [
+        "variant point plot",
+        "plots",
+        "plots/A worked example",
+        "plots/The encoding",
+        "model:VariantTrack/replaceDisplay",
+        "replaceDisplay"
+      ],
+      "routeCalls": {
+        "configuration": 2,
+        "describeSlots": 1,
+        "inspect": 4,
+        "sessionSummary": 1,
+        "trackModel": 7,
+        "waitReady": 2,
+        "applyDisplaySettings": 1,
+        "getFeatures": 1
+      },
+      "routeErrors": {},
+      "turns": 18,
+      "seconds": 34,
+      "usd": 0.19,
+      "tokensIn": 30,
+      "cacheWrite": 23635,
+      "cacheRead": 362609,
+      "tokensOut": 2281,
+      "answer": "The `volvox_test_vcf` track now shows as a point plot, one point per variant, with each point's height set by its QUAL value. In the screenshot, ctgA:1..30,000 shows 109 points, all at QUAL 100.\n\nI switched the track to the mark display and set a single point mark. That left an empty \"Edit plot\" dialog open, so I closed it with Cancel. The marks setting itself is in place and the track still draws."
+    },
+    {
+      "task": "mark-points",
+      "run": 2,
+      "client": "code",
+      "pass": true,
+      "detail": {
+        "type": "LinearMarkDisplay",
+        "marks": [
+          {
+            "mark": "point",
+            "encoding": {
+              "y": "QUAL"
+            }
+          }
+        ]
+      },
+      "runJavascript": 5,
+      "errored": 0,
+      "docs": 6,
+      "screenshots": 1,
+      "open": 0,
+      "chars": {
+        "ToolSearch": 0,
+        "docs": 42148,
+        "run_javascript": 17389,
+        "screenshot": 225
+      },
+      "images": 1,
+      "docsArgs": [
+        "live-model",
+        "applyPlot point plot",
+        "variant track point plot one point per variant display",
+        "recipes/The same data under another display",
+        "live-model/The model, oriented",
+        "plots/The encoding"
+      ],
+      "routeCalls": {
+        "listTracks": 1,
+        "sessionSummary": 1,
+        "configuration": 1,
+        "describeSlots": 1,
+        "inspect": 1,
+        "trackModel": 4,
+        "plot": 2,
+        "applyPlot": 1,
+        "getFeatures": 1,
+        "launchTrack": 1,
+        "plotProblems": 1,
+        "view": 1,
+        "waitReady": 1
+      },
+      "routeErrors": {},
+      "turns": 14,
+      "seconds": 20,
+      "usd": 0.174,
+      "tokensIn": 20,
+      "cacheWrite": 25508,
+      "cacheRead": 283772,
+      "tokensOut": 1542,
+      "answer": "The volvox_test_vcf track is now a point plot with one point per variant, switched to the mark display with a point mark at each variant's QUAL. The screenshot shows the points on the 0–100 axis, and the track returns 109 features in view (ctgA:1..30,000)."
+    },
+    {
+      "task": "mark-points",
+      "run": 3,
+      "client": "code",
+      "pass": true,
+      "detail": {
+        "type": "LinearMarkDisplay",
+        "marks": [
+          {
+            "mark": "point",
+            "encoding": {
+              "y": "jexl:1"
+            }
+          }
+        ]
+      },
+      "runJavascript": 4,
+      "errored": 0,
+      "docs": 4,
+      "screenshots": 0,
+      "open": 0,
+      "chars": {
+        "ToolSearch": 0,
+        "run_javascript": 9043,
+        "docs": 14809
+      },
+      "images": 0,
+      "docsArgs": [
+        "point plot variant display",
+        "recipes/The same data under another display",
+        "recipes/Plot a field of a track you already have",
+        "plots/The encoding"
+      ],
+      "routeCalls": {
+        "configuration": 1,
+        "describeSlots": 1,
+        "sessionSummary": 1,
+        "trackModel": 4,
+        "launchTrack": 1,
+        "plot": 2,
+        "view": 1,
+        "waitReady": 2,
+        "applyDisplaySettings": 1
+      },
+      "routeErrors": {},
+      "turns": 10,
+      "seconds": 21,
+      "usd": 0.091,
+      "tokensIn": 18,
+      "cacheWrite": 9916,
+      "cacheRead": 190902,
+      "tokensOut": 1316,
+      "answer": "The `volvox_test_vcf` track now draws as a point plot, using the `LinearMarkDisplay` with one point per variant. The settle reported no problems, but I didn't take a screenshot to look at it.\n\nThe VCF has no score values, so the points would otherwise all have been skipped. I set every point's height to a constant, which puts them in a single row and means height carries no information."
+    },
+    {
+      "task": "edit-session-document",
+      "run": 1,
+      "client": "code",
+      "pass": true,
+      "detail": {
+        "name": "renamed session",
+        "views": [
+          {
+            "id": "a-3bPexYQ4",
+            "tracks": [
+              "gff3tabix_genes"
+            ]
+          }
+        ],
+        "expectedId": "a-3bPexYQ4"
+      },
+      "runJavascript": 2,
+      "errored": 0,
+      "docs": 0,
+      "screenshots": 0,
+      "open": 0,
+      "chars": {
+        "ToolSearch": 0,
+        "run_javascript": 3532
+      },
+      "images": 0,
+      "docsArgs": [],
+      "routeCalls": {
+        "inspect": 1,
+        "sessionSummary": 2,
+        "hideTrack": 1,
+        "view": 1,
+        "waitReady": 1
+      },
+      "routeErrors": {},
+      "turns": 4,
+      "seconds": 7,
+      "usd": 0.055,
+      "tokensIn": 8,
+      "cacheWrite": 9797,
+      "cacheRead": 57895,
+      "tokensOut": 418,
+      "answer": "The session is now named \"renamed session\", and I closed the variant track (`volvox_test_vcf`). The session summary confirms both. The view is still on ctgA:1..30,000 with only the `gff3tabix_genes` track showing."
+    },
+    {
+      "task": "edit-session-document",
+      "run": 2,
+      "client": "code",
+      "pass": true,
+      "detail": {
+        "name": "renamed session",
+        "views": [
+          {
+            "id": "W-zCUbc_DS",
+            "tracks": [
+              "gff3tabix_genes"
+            ]
+          }
+        ],
+        "expectedId": "W-zCUbc_DS"
+      },
+      "runJavascript": 2,
+      "errored": 0,
+      "docs": 0,
+      "screenshots": 0,
+      "open": 0,
+      "chars": {
+        "ToolSearch": 0,
+        "run_javascript": 774
+      },
+      "images": 0,
+      "docsArgs": [],
+      "routeCalls": {
+        "inspect": 1,
+        "sessionSummary": 2,
+        "hideTrack": 1,
+        "view": 1,
+        "views": 1,
+        "waitReady": 1
+      },
+      "routeErrors": {},
+      "turns": 4,
+      "seconds": 7,
+      "usd": 0.021,
+      "tokensIn": 8,
+      "cacheWrite": 739,
+      "cacheRead": 64723,
+      "tokensOut": 486,
+      "answer": "I renamed the session to \"renamed session\" and closed the variant track (`volvox_test_vcf`). A summary of the session afterwards shows the new name. The view still shows `ctgA:1..30,000` with only the `gff3tabix_genes` track."
+    },
+    {
+      "task": "edit-session-document",
+      "run": 3,
+      "client": "code",
+      "pass": true,
+      "detail": {
+        "name": "renamed session",
+        "views": [
+          {
+            "id": "Z82UxCkOzB",
+            "tracks": [
+              "gff3tabix_genes"
+            ]
+          }
+        ],
+        "expectedId": "Z82UxCkOzB"
+      },
+      "runJavascript": 3,
+      "errored": 0,
+      "docs": 0,
+      "screenshots": 0,
+      "open": 0,
+      "chars": {
+        "ToolSearch": 0,
+        "run_javascript": 782
+      },
+      "images": 0,
+      "docsArgs": [],
+      "routeCalls": {
+        "inspect": 2,
+        "sessionSummary": 2,
+        "hideTrack": 1,
+        "view": 1,
+        "views": 1,
+        "waitReady": 1
+      },
+      "routeErrors": {},
+      "turns": 5,
+      "seconds": 8,
+      "usd": 0.025,
+      "tokensIn": 10,
+      "cacheWrite": 816,
+      "cacheRead": 81849,
+      "tokensOut": 540,
+      "answer": "The session is now named \"renamed session\" and the variant track (`volvox_test_vcf`) is closed. I checked the session afterwards: the name reads back as expected, and the only track left in the view is `gff3tabix_genes`. I didn't touch the view's location or anything else."
+    },
+    {
+      "task": "synteny-view",
+      "run": 1,
+      "client": "code",
+      "pass": true,
+      "detail": [
+        {
+          "type": "LinearGenomeView",
+          "assemblyNames": [
+            "volvox"
+          ]
+        },
+        {
+          "type": "LinearSyntenyView",
+          "assemblyNames": [
+            "volvox",
+            "volvox_del"
+          ]
+        }
+      ],
+      "runJavascript": 2,
+      "errored": 0,
+      "docs": 2,
+      "screenshots": 0,
+      "open": 0,
+      "chars": {
+        "ToolSearch": 0,
+        "docs": 14498,
+        "run_javascript": 2196
+      },
+      "images": 0,
+      "docsArgs": [
+        "recipes/synteny",
+        "session-spec/Linear synteny view"
+      ],
+      "routeCalls": {
+        "listTracks": 1,
+        "sessionSummary": 2,
+        "addView": 1,
+        "waitReady": 1
+      },
+      "routeErrors": {},
+      "turns": 6,
+      "seconds": 10,
+      "usd": 0.085,
+      "tokensIn": 10,
+      "cacheWrite": 15503,
+      "cacheRead": 82995,
+      "tokensOut": 632,
+      "answer": "I added a synteny view between volvox and volvox_del using the `volvox_del.paf` track, and the original volvox view is still open beside it. The session summary shows both views, with the synteny view's volvox row on ctgA and ctgB and its volvox_del row on the matching regions. I didn't take a screenshot, so I haven't checked that the alignment ribbons actually draw."
+    },
+    {
+      "task": "synteny-view",
+      "run": 2,
+      "client": "code",
+      "pass": true,
+      "detail": [
+        {
+          "type": "LinearGenomeView",
+          "assemblyNames": [
+            "volvox"
+          ]
+        },
+        {
+          "type": "LinearSyntenyView",
+          "assemblyNames": [
+            "volvox",
+            "volvox_del"
+          ]
+        }
+      ],
+      "runJavascript": 2,
+      "errored": 0,
+      "docs": 2,
+      "screenshots": 0,
+      "open": 0,
+      "chars": {
+        "ToolSearch": 0,
+        "docs": 14498,
+        "run_javascript": 2167
+      },
+      "images": 0,
+      "docsArgs": [
+        "recipes/synteny",
+        "session-spec/Linear synteny view"
+      ],
+      "routeCalls": {
+        "listTracks": 1,
+        "sessionSummary": 2,
+        "addView": 1,
+        "waitReady": 1
+      },
+      "routeErrors": {},
+      "turns": 6,
+      "seconds": 11,
+      "usd": 0.055,
+      "tokensIn": 10,
+      "cacheWrite": 7619,
+      "cacheRead": 90881,
+      "tokensOut": 629,
+      "answer": "I opened a new synteny view between volvox (top) and volvox_del (bottom) using the volvox_del.paf track, and the original linear genome view is still open. I confirmed both views in the session summary. I didn't take a screenshot, so I haven't checked the alignment ribbons on screen."
+    },
+    {
+      "task": "synteny-view",
+      "run": 3,
+      "client": "code",
+      "pass": true,
+      "detail": [
+        {
+          "type": "LinearGenomeView",
+          "assemblyNames": [
+            "volvox"
+          ]
+        },
+        {
+          "type": "LinearSyntenyView",
+          "assemblyNames": [
+            "volvox",
+            "volvox_del"
+          ]
+        }
+      ],
+      "runJavascript": 2,
+      "errored": 0,
+      "docs": 2,
+      "screenshots": 0,
+      "open": 0,
+      "chars": {
+        "ToolSearch": 0,
+        "docs": 14498,
+        "run_javascript": 3149
+      },
+      "images": 0,
+      "docsArgs": [
+        "recipes/synteny",
+        "session-spec/Linear synteny view"
+      ],
+      "routeCalls": {
+        "listTracks": 1,
+        "sessionSummary": 2,
+        "addView": 1,
+        "waitReady": 1
+      },
+      "routeErrors": {},
+      "turns": 6,
+      "seconds": 11,
+      "usd": 0.057,
+      "tokensIn": 10,
+      "cacheWrite": 8113,
+      "cacheRead": 91867,
+      "tokensOut": 653,
+      "answer": "I added a synteny view between volvox and volvox_del using the `volvox_del.paf` track. The original volvox linear genome view is still open beside it.\n\nI checked the session summary: both views are present. The synteny view shows volvox on top and volvox_del below, both at ctgA:1–30,000. I didn't take a screenshot, so I haven't looked at how the alignments draw."
+    },
+    {
+      "task": "nonexistent-track",
+      "run": 1,
+      "client": "code",
+      "pass": true,
+      "detail": {
+        "order": [
+          "gff3tabix_genes",
+          "volvox_test_vcf"
+        ],
+        "answer": "There's no track with the ID `volvox_rnaseq_coverage` in this session, so I showed nothing. The closest matches are `spliced` (volvox-rnaseq demo) and `paired_end_stranded_rnaseq`, which are alignment tracks. Tell me if you want one of those."
+      },
+      "runJavascript": 3,
+      "errored": 0,
+      "docs": 0,
+      "screenshots": 0,
+      "open": 0,
+      "chars": {
+        "ToolSearch": 0,
+        "run_javascript": 3495
+      },
+      "images": 0,
+      "docsArgs": [],
+      "routeCalls": {
+        "listTracks": 3,
+        "sessionSummary": 1
+      },
+      "routeErrors": {},
+      "turns": 5,
+      "seconds": 8,
+      "usd": 0.063,
+      "tokensIn": 10,
+      "cacheWrite": 10195,
+      "cacheRead": 74628,
+      "tokensOut": 761,
+      "answer": "There's no track with the ID `volvox_rnaseq_coverage` in this session, so I showed nothing. The closest matches are `spliced` (volvox-rnaseq demo) and `paired_end_stranded_rnaseq`, which are alignment tracks. Tell me if you want one of those."
+    },
+    {
+      "task": "nonexistent-track",
+      "run": 2,
+      "client": "code",
+      "pass": true,
+      "detail": {
+        "order": [
+          "gff3tabix_genes",
+          "volvox_test_vcf"
+        ],
+        "answer": "There's no `volvox_rnaseq_coverage` track in this session, so I didn't show anything. The closest matches are `spliced` (volvox-rnaseq demo), `paired_end_stranded_rnaseq`, and the two \"Volvox - BAM coverage\" tracks. Tell me which one you want and I'll show it."
+      },
+      "runJavascript": 4,
+      "errored": 0,
+      "docs": 0,
+      "screenshots": 0,
+      "open": 0,
+      "chars": {
+        "ToolSearch": 0,
+        "run_javascript": 1978
+      },
+      "images": 0,
+      "docsArgs": [],
+      "routeCalls": {
+        "listTracks": 4,
+        "sessionSummary": 1
+      },
+      "routeErrors": {},
+      "turns": 6,
+      "seconds": 9,
+      "usd": 0.033,
+      "tokensIn": 12,
+      "cacheWrite": 1613,
+      "cacheRead": 99130,
+      "tokensOut": 719,
+      "answer": "There's no `volvox_rnaseq_coverage` track in this session, so I didn't show anything. The closest matches are `spliced` (volvox-rnaseq demo), `paired_end_stranded_rnaseq`, and the two \"Volvox - BAM coverage\" tracks. Tell me which one you want and I'll show it."
+    },
+    {
+      "task": "nonexistent-track",
+      "run": 3,
+      "client": "code",
+      "pass": true,
+      "detail": {
+        "order": [
+          "gff3tabix_genes",
+          "volvox_test_vcf"
+        ],
+        "answer": "There is no track called `volvox_rnaseq_coverage` in this session, so I didn't show anything. I searched the track list by ID and name for \"rnaseq\", \"coverage\" and wiggle-type tracks.\n\nThe closest matches are `spliced` (\"volvox-rnaseq demo\"), `paired_end_stranded_rnaseq` (\"volvox-stranded-rnaseq\") and the \"Volvox - BAM coverage\" tracks (`p7FU-K6WqS_` and `pOOtg9wxcUC`). Tell me which one you meant and I'll show it."
+      },
+      "runJavascript": 4,
+      "errored": 0,
+      "docs": 0,
+      "screenshots": 0,
+      "open": 0,
+      "chars": {
+        "ToolSearch": 0,
+        "run_javascript": 4443
+      },
+      "images": 0,
+      "docsArgs": [],
+      "routeCalls": {
+        "listTracks": 4,
+        "sessionSummary": 1
+      },
+      "routeErrors": {},
+      "turns": 6,
+      "seconds": 11,
+      "usd": 0.036,
+      "tokensIn": 10,
+      "cacheWrite": 2811,
+      "cacheRead": 82002,
+      "tokensOut": 799,
+      "answer": "There is no track called `volvox_rnaseq_coverage` in this session, so I didn't show anything. I searched the track list by ID and name for \"rnaseq\", \"coverage\" and wiggle-type tracks.\n\nThe closest matches are `spliced` (\"volvox-rnaseq demo\"), `paired_end_stranded_rnaseq` (\"volvox-stranded-rnaseq\") and the \"Volvox - BAM coverage\" tracks (`p7FU-K6WqS_` and `pOOtg9wxcUC`). Tell me which one you meant and I'll show it."
+    },
+    {
+      "task": "unknown-setting",
+      "run": 1,
+      "client": "code",
+      "pass": true,
+      "detail": {
+        "answer": "I couldn't set it: the gene track (`gff3tabix_genes`) has no glow intensity setting. Trying `glowIntensity` returned \"no-slot\", and nothing glow-related appears in the display's settings or the docs. I changed nothing."
+      },
+      "runJavascript": 4,
+      "errored": 1,
+      "docs": 1,
+      "screenshots": 0,
+      "open": 0,
+      "chars": {
+        "ToolSearch": 0,
+        "run_javascript": 4224,
+        "docs": 223
+      },
+      "images": 0,
+      "docsArgs": [
+        "glow"
+      ],
+      "routeCalls": {
+        "listTracks": 1,
+        "sessionSummary": 1,
+        "configuration": 3,
+        "describeSlots": 3,
+        "trackModel": 3,
+        "applyDisplaySettings": 1,
+        "inspect": 1
+      },
+      "routeErrors": {},
+      "turns": 7,
+      "seconds": 10,
+      "usd": 0.075,
+      "tokensIn": 14,
+      "cacheWrite": 10793,
+      "cacheRead": 111989,
+      "tokensOut": 940,
+      "answer": "I couldn't set it: the gene track (`gff3tabix_genes`) has no glow intensity setting. Trying `glowIntensity` returned \"no-slot\", and nothing glow-related appears in the display's settings or the docs. I changed nothing."
+    },
+    {
+      "task": "unknown-setting",
+      "run": 2,
+      "client": "code",
+      "pass": true,
+      "detail": {
+        "answer": "I couldn't set it: the gene track (`gff3tabix_genes`) has no glow intensity setting, so nothing changed. JBrowse rejected `glowIntensity` as having no matching slot, and the display's other settings and the docs don't mention glow either."
+      },
+      "runJavascript": 5,
+      "errored": 1,
+      "docs": 1,
+      "screenshots": 0,
+      "open": 0,
+      "chars": {
+        "ToolSearch": 0,
+        "run_javascript": 4310,
+        "docs": 223
+      },
+      "images": 0,
+      "docsArgs": [
+        "glow"
+      ],
+      "routeCalls": {
+        "listTracks": 1,
+        "sessionSummary": 1,
+        "configuration": 3,
+        "describeSlots": 3,
+        "trackModel": 4,
+        "inspect": 2,
+        "applyDisplaySettings": 1
+      },
+      "routeErrors": {},
+      "turns": 8,
+      "seconds": 11,
+      "usd": 0.051,
+      "tokensIn": 16,
+      "cacheWrite": 3087,
+      "cacheRead": 139257,
+      "tokensOut": 1039,
+      "answer": "I couldn't set it: the gene track (`gff3tabix_genes`) has no glow intensity setting, so nothing changed. JBrowse rejected `glowIntensity` as having no matching slot, and the display's other settings and the docs don't mention glow either."
+    },
+    {
+      "task": "unknown-setting",
+      "run": 3,
+      "client": "code",
+      "pass": true,
+      "detail": {
+        "answer": "I couldn't set it: JBrowse has no \"glow intensity\" setting for the gene track (`gff3tabix_genes`). The display's config slots, the live model and the bundled docs have no glow-related setting, so I changed nothing."
+      },
+      "runJavascript": 3,
+      "errored": 1,
+      "docs": 1,
+      "screenshots": 0,
+      "open": 0,
+      "chars": {
+        "ToolSearch": 0,
+        "run_javascript": 12083,
+        "docs": 223
+      },
+      "images": 0,
+      "docsArgs": [
+        "glow"
+      ],
+      "routeCalls": {
+        "listTracks": 1,
+        "sessionSummary": 1,
+        "configuration": 1,
+        "describeSlots": 1,
+        "trackModel": 2,
+        "inspect": 1,
+        "view": 1
+      },
+      "routeErrors": {},
+      "turns": 6,
+      "seconds": 8,
+      "usd": 0.05,
+      "tokensIn": 12,
+      "cacheWrite": 5354,
+      "cacheRead": 108256,
+      "tokensOut": 673,
+      "answer": "I couldn't set it: JBrowse has no \"glow intensity\" setting for the gene track (`gff3tabix_genes`). The display's config slots, the live model and the bundled docs have no glow-related setting, so I changed nothing."
+    }
+  ]
+}

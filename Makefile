@@ -28,7 +28,7 @@ LOGDIR := results/logs
         parsers parsers-count cram-samtools multibam backends clean-logs \
         formats toolcheck shots paper-tables paper-figs paper-data wait-quiet \
         backends-webgpu ec2-up ec2-provision ec2-spike ec2-run ec2-down \
-        stage-release \
+        stage-release portals-fetch portals-variant portals-gene agent-evals \
         wasmgate bgzfpool bgzfpool-standalone bgzfpool-endtoend pif pif-options
 
 help:
@@ -65,6 +65,13 @@ help:
 	@echo "  make pif PIF=f.pif.gz what a coarsened PIF's tiers cost, and how far they draw off"
 	@echo "  make pif-options PIF=f.pif.gz PIF_WORK=dir  what would shrink the coarse tier; chains and rb break-paf"
 	@echo "  make multibam        multi-track pan"
+	@echo ""
+	@echo "automation — network, a 242 GiB download or billed model sessions; not part of make all"
+	@echo "  make portals-fetch PORTAL_DATA=dir    download the COLO829 reads for the variant portal"
+	@echo "  make portals-variant PORTAL_DATA=dir  time the structural variant review portal"
+	@echo "  make portals-gene APP_DIR=build       time the gene review portal, with and without screenshots"
+	@echo "  make agent-evals SET=heldout CONFIG_DIR=~/.claude3  the MCP agent eval; SET is dev, heldout or tutorials"
+	@echo ""
 	@echo "  make backends        webgl vs webgpu vs canvas"
 	@echo "  make backends-webgpu the same + a WebGPU rung, 19kb/100kb/1mb, headed firefox"
 	@echo ""
@@ -448,3 +455,26 @@ stage-release: ; @shell/stage_release.sh $(TAG)
 ec2-spike:     ; ec2/spike.sh
 ec2-run:       ; ec2/run.sh
 ec2-down:      ; ec2/down.sh
+
+# ------------------------------------------------------------ automation
+#
+# Not part of `all`: the variant portal needs 242 GiB of reads on local disk, the gene portal fetches its data over
+# the network, and the agent eval bills model sessions. None of them needs `make gate` to pass first for its
+# result to mean something, except that a timing taken on a loaded box is still worth discarding.
+
+PORTAL_DATA ?= $(HOME)/data/colo829-portal
+APP_DIR ?= $(HOME)/src/jbrowse-components/products/jbrowse-web/build
+SET ?= heldout
+CONFIG_DIR ?=
+
+portals-fetch:
+	scripts/portals/fetch-colo829.sh $(PORTAL_DATA)
+
+portals-variant:
+	$(NODE) scripts/portals/variant.ts $(PORTAL_DATA) --evict
+
+portals-gene:
+	$(NODE) scripts/portals/gene.ts --app-dir $(APP_DIR)
+
+agent-evals:
+	$(NODE) scripts/agent-evals/run.ts $(SET) $(if $(CONFIG_DIR),--config-dir $(CONFIG_DIR))

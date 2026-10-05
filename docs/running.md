@@ -203,3 +203,11 @@ whatever the machine was doing at the time.
 that way, since these scripts are run straight from source with
 `--experimental-strip-types` and so get no other compile-time check.
 
+## Targets outside `make all`
+
+`make portals-fetch`, `portals-variant`, `portals-gene` and `agent-evals` are left out of `make all` on purpose.
+`portals-variant` needs the 242 GiB `portals-fetch` downloads; `portals-gene` fetches its data from jbrowse.org and
+needs a built `jbrowse-web` (`APP_DIR`); `agent-evals` runs `claude -p` sessions and bills them, through the account
+in `CONFIG_DIR`. A run with the 2026-10-05 numbers takes about 12 minutes for the dev set at three runs per task, 3 for
+the held-out set, and 10 for the tutorial set.
+

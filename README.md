@@ -22,6 +22,8 @@ numbers describe the same bytes.
 | `scripts/flamegraph/` | CPU-profile capture and the flamegraph toolkit |
 | `scripts/bgzfpool/` | the BGZF inflate pool on vs off, measured twice: the query on its own and the same query through a jbrowse pan |
 | `scripts/crosstool/` | the igv.js comparison: paint-quiescence profiler and matrix |
+| `scripts/portals/` | the structural variant and gene review portals, timed: data fetch, local config, runners |
+| `scripts/agent-evals/` | the jbrowse-components MCP agent eval, run through a chosen Claude account |
 | `scripts/pif/` | a coarsened PIF's two tiers: what each costs to fetch, and how far a coarsened record draws from the alignment it stands for |
 | `crosstool/` | the igv.js and GenomeSpy harness pages, plus symlinks to `data/` and the tool bundles |
 | `scripts/probe.ts`, `scripts/gpucheck.ts` | dev helpers: render testids, GPU backend |
@@ -59,6 +61,8 @@ Every number lives in a file; nothing is summarized only here.
 | [`flame/FINDINGS.md`](flame/FINDINGS.md) | why is 1000x-shortread a regression? |
 | [`flame/ZOOM_SETTLE.md`](flame/ZOOM_SETTLE.md) | why does a zoom take 0.8 s to stop changing? |
 | [`flame/WORKER_FINDINGS.md`](flame/WORKER_FINDINGS.md) | which worker-side plugin optimizations are worth doing? |
+| [`results/portals.md`](results/portals.md) | how long do the structural variant and gene review portals take to build? |
+| [`results/agent-evals.md`](results/agent-evals.md) | does an agent drive JBrowse Desktop over MCP, on tasks the docs were not tuned against? |
 | [`results/crosstool.md`](results/crosstool.md) | how does the render time compare against igv.js? |
 | [`results/crosstool-pan.md`](results/crosstool-pan.md) | and how does a *pan* compare, with startup out of the number? |
 | [`results/crosstool-zoom.md`](results/crosstool-zoom.md) | and a *zoom*, where nothing has to be fetched at all? |
