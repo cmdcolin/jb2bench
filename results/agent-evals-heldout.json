@@ -1,14 +1,14 @@
 {
-  "commit": "00a301b414",
+  "commit": "231c700ddf",
   "dirty": false,
   "server": "/home/cdiesh/src/jbrowse-components/products/jbrowse-desktop/build/mcpServer.js",
-  "startedAt": "2026-10-05T17:50:27.224Z",
+  "startedAt": "2026-10-05T22:02:14.434Z",
   "claudeVersion": "2.1.289 (Claude Code)",
   "model": "sonnet",
   "client": "code",
   "set": "heldout",
   "runs": 3,
-  "passed": 14,
+  "passed": 13,
   "total": 15,
   "tasksPassingEveryRun": 4,
   "routes": [
@@ -21,8 +21,8 @@
     },
     {
       "route": "addView",
-      "calls": 3,
-      "errors": 0,
+      "calls": 5,
+      "errors": 1,
       "passedRuns": 3,
       "failedRuns": 0
     },
@@ -42,10 +42,10 @@
     },
     {
       "route": "configuration",
-      "calls": 1,
-      "errors": 0,
-      "passedRuns": 0,
-      "failedRuns": 1
+      "calls": 7,
+      "errors": 1,
+      "passedRuns": 5,
+      "failedRuns": 0
     },
     {
       "route": "describeSlots",
@@ -77,9 +77,9 @@
     },
     {
       "route": "getFeatures",
-      "calls": 6,
-      "errors": 0,
-      "passedRuns": 3,
+      "calls": 10,
+      "errors": 4,
+      "passedRuns": 4,
       "failedRuns": 0
     },
     {
@@ -91,9 +91,9 @@
     },
     {
       "route": "hideTrack",
-      "calls": 0,
+      "calls": 1,
       "errors": 0,
-      "passedRuns": 0,
+      "passedRuns": 1,
       "failedRuns": 0
     },
     {
@@ -119,16 +119,16 @@
     },
     {
       "route": "listTracks",
-      "calls": 12,
-      "errors": 0,
-      "passedRuns": 11,
-      "failedRuns": 1
+      "calls": 20,
+      "errors": 2,
+      "passedRuns": 12,
+      "failedRuns": 2
     },
     {
       "route": "loadSessionSpec",
-      "calls": 0,
+      "calls": 5,
       "errors": 0,
-      "passedRuns": 0,
+      "passedRuns": 5,
       "failedRuns": 0
     },
     {
@@ -140,15 +140,15 @@
     },
     {
       "route": "mst",
-      "calls": 0,
-      "errors": 0,
-      "passedRuns": 0,
+      "calls": 5,
+      "errors": 1,
+      "passedRuns": 4,
       "failedRuns": 0
     },
     {
       "route": "navToLocString",
       "calls": 3,
-      "errors": 0,
+      "errors": 3,
       "passedRuns": 3,
       "failedRuns": 0
     },
@@ -196,78 +196,78 @@
     },
     {
       "route": "session",
-      "calls": 0,
+      "calls": 2,
       "errors": 0,
-      "passedRuns": 0,
+      "passedRuns": 1,
       "failedRuns": 0
     },
     {
       "route": "sessionSummary",
-      "calls": 21,
-      "errors": 0,
+      "calls": 32,
+      "errors": 4,
       "passedRuns": 12,
       "failedRuns": 0
     },
     {
       "route": "setSession",
-      "calls": 0,
+      "calls": 1,
       "errors": 0,
-      "passedRuns": 0,
+      "passedRuns": 1,
       "failedRuns": 0
     },
     {
       "route": "trackModel",
-      "calls": 3,
+      "calls": 1,
       "errors": 0,
-      "passedRuns": 3,
+      "passedRuns": 1,
       "failedRuns": 0
     },
     {
       "route": "view",
-      "calls": 3,
-      "errors": 0,
-      "passedRuns": 3,
+      "calls": 13,
+      "errors": 4,
+      "passedRuns": 8,
       "failedRuns": 0
     },
     {
       "route": "views",
-      "calls": 6,
-      "errors": 0,
-      "passedRuns": 6,
+      "calls": 10,
+      "errors": 2,
+      "passedRuns": 4,
       "failedRuns": 0
     },
     {
       "route": "visibleRegions",
-      "calls": 3,
-      "errors": 0,
+      "calls": 4,
+      "errors": 1,
       "passedRuns": 3,
       "failedRuns": 0
     },
     {
       "route": "waitReady",
-      "calls": 8,
-      "errors": 0,
-      "passedRuns": 8,
+      "calls": 15,
+      "errors": 4,
+      "passedRuns": 9,
       "failedRuns": 0
     }
   ],
   "totals": {
-    "runJavascript": 31,
-    "errored": 0,
-    "docs": 5,
+    "runJavascript": 52,
+    "errored": 10,
+    "docs": 10,
     "screenshots": 0,
     "open": 0,
-    "turns": 66,
-    "seconds": 114,
-    "usd": 0.79,
-    "tokensIn": 122,
-    "cacheWrite": 125889,
-    "cacheRead": 1025822,
-    "tokensOut": 8484,
+    "turns": 92,
+    "seconds": 343,
+    "usd": 1.06,
+    "tokensIn": 174,
+    "cacheWrite": 151943,
+    "cacheRead": 1603057,
+    "tokensOut": 13344,
     "chars": {
       "ToolSearch": 0,
-      "run_javascript": 139682,
-      "docs": 39880
+      "run_javascript": 142333,
+      "docs": 56547
     },
     "images": 0
   },
@@ -276,35 +276,35 @@
       "task": "ho-last-gene-end",
       "runJavascript": 3,
       "errored": 0,
-      "tokens": 93851,
-      "chars": 7786,
+      "tokens": 93678,
+      "chars": 7619,
       "seconds": 8,
       "turns": 5,
-      "usd": 0.043,
+      "usd": 0.079,
       "passes": 3,
       "runs": 3
     },
     {
       "task": "ho-jump-keep-track",
-      "runJavascript": 2,
-      "errored": 0,
-      "tokens": 72585,
-      "chars": 7741,
-      "seconds": 8,
-      "turns": 4,
-      "usd": 0.035,
+      "runJavascript": 3,
+      "errored": 1,
+      "tokens": 93708,
+      "chars": 8214,
+      "seconds": 10,
+      "turns": 5,
+      "usd": 0.045,
       "passes": 3,
       "runs": 3
     },
     {
       "task": "ho-double-height",
-      "runJavascript": 2,
+      "runJavascript": 4,
       "errored": 0,
-      "tokens": 72195,
-      "chars": 8770,
-      "seconds": 6,
-      "turns": 5,
-      "usd": 0.034,
+      "tokens": 116801,
+      "chars": 11696,
+      "seconds": 27,
+      "turns": 7,
+      "usd": 0.063,
       "passes": 3,
       "runs": 3
     },
@@ -312,23 +312,23 @@
       "task": "ho-count-variant-tracks",
       "runJavascript": 1,
       "errored": 0,
-      "tokens": 60309,
+      "tokens": 60288,
       "chars": 20206,
-      "seconds": 6,
+      "seconds": 7,
       "turns": 3,
-      "usd": 0.064,
-      "passes": 2,
+      "usd": 0.063,
+      "passes": 1,
       "runs": 3
     },
     {
       "task": "ho-second-view-genes-only",
-      "runJavascript": 2,
+      "runJavascript": 5,
       "errored": 0,
-      "tokens": 79379,
-      "chars": 16115,
-      "seconds": 8,
-      "turns": 5,
-      "usd": 0.051,
+      "tokens": 138681,
+      "chars": 16969,
+      "seconds": 31,
+      "turns": 7,
+      "usd": 0.059,
       "passes": 3,
       "runs": 3
     }
@@ -352,7 +352,7 @@
       "open": 0,
       "chars": {
         "ToolSearch": 0,
-        "run_javascript": 13583
+        "run_javascript": 7619
       },
       "images": 0,
       "docsArgs": [],
@@ -363,12 +363,12 @@
       },
       "routeErrors": {},
       "turns": 5,
-      "seconds": 9,
-      "usd": 0.09,
+      "seconds": 8,
+      "usd": 0.079,
       "tokensIn": 10,
-      "cacheWrite": 16691,
-      "cacheRead": 78863,
-      "tokensOut": 778,
+      "cacheWrite": 14024,
+      "cacheRead": 78970,
+      "tokensOut": 674,
       "answer": "11500"
     },
     {
@@ -382,30 +382,36 @@
           11500
         ]
       },
-      "runJavascript": 3,
-      "errored": 0,
-      "docs": 0,
+      "runJavascript": 8,
+      "errored": 5,
+      "docs": 2,
       "screenshots": 0,
       "open": 0,
       "chars": {
         "ToolSearch": 0,
-        "run_javascript": 7578
+        "run_javascript": 8238,
+        "docs": 4116
       },
       "images": 0,
-      "docsArgs": [],
+      "docsArgs": [
+        "live-model/getFeatures",
+        "live-model/Reading data directly (fast path)"
+      ],
       "routeCalls": {
-        "listTracks": 1,
+        "listTracks": 2,
         "sessionSummary": 1,
-        "getFeatures": 2
+        "getFeatures": 6
       },
-      "routeErrors": {},
-      "turns": 5,
-      "seconds": 8,
-      "usd": 0.043,
-      "tokensIn": 10,
-      "cacheWrite": 4456,
-      "cacheRead": 88604,
-      "tokensOut": 727,
+      "routeErrors": {
+        "getFeatures": 4
+      },
+      "turns": 12,
+      "seconds": 20,
+      "usd": 0.109,
+      "tokensIn": 24,
+      "cacheWrite": 9812,
+      "cacheRead": 244414,
+      "tokensOut": 2092,
       "answer": "11500"
     },
     {
@@ -419,30 +425,30 @@
           11500
         ]
       },
-      "runJavascript": 3,
+      "runJavascript": 2,
       "errored": 0,
       "docs": 0,
       "screenshots": 0,
       "open": 0,
       "chars": {
         "ToolSearch": 0,
-        "run_javascript": 7786
+        "run_javascript": 7409
       },
       "images": 0,
       "docsArgs": [],
       "routeCalls": {
         "listTracks": 1,
         "sessionSummary": 1,
-        "getFeatures": 2
+        "getFeatures": 1
       },
       "routeErrors": {},
-      "turns": 5,
-      "seconds": 8,
-      "usd": 0.043,
-      "tokensIn": 10,
-      "cacheWrite": 4527,
-      "cacheRead": 88577,
-      "tokensOut": 737,
+      "turns": 4,
+      "seconds": 7,
+      "usd": 0.035,
+      "tokensIn": 8,
+      "cacheWrite": 4036,
+      "cacheRead": 67958,
+      "tokensOut": 567,
       "answer": "11500"
     },
     {
@@ -458,39 +464,46 @@
           "assemblyName": "volvox"
         },
         "tracks": [
-          "gff3tabix_genes",
           "volvox_test_vcf"
         ]
       },
-      "runJavascript": 2,
-      "errored": 0,
+      "runJavascript": 3,
+      "errored": 1,
       "docs": 0,
       "screenshots": 0,
       "open": 0,
       "chars": {
         "ToolSearch": 0,
-        "run_javascript": 7741
+        "run_javascript": 8214
       },
       "images": 0,
       "docsArgs": [],
       "routeCalls": {
-        "listTracks": 1,
-        "sessionSummary": 2,
+        "listTracks": 2,
+        "sessionSummary": 3,
+        "configuration": 1,
         "navToLocString": 1,
         "view": 1,
-        "views": 1,
-        "visibleRegions": 1,
+        "waitReady": 1,
+        "loadSessionSpec": 1,
+        "visibleRegions": 1
+      },
+      "routeErrors": {
+        "configuration": 1,
+        "listTracks": 1,
+        "navToLocString": 1,
+        "sessionSummary": 1,
+        "view": 1,
         "waitReady": 1
       },
-      "routeErrors": {},
-      "turns": 4,
-      "seconds": 8,
-      "usd": 0.065,
-      "tokensIn": 8,
-      "cacheWrite": 12038,
-      "cacheRead": 60058,
-      "tokensOut": 481,
-      "answer": "The view is now at ctgB:2,000-4,000, and the \"volvox 1000genomes vcf\" variant track is open there. I checked the view's region and track list but didn't take a screenshot, so I haven't confirmed that variants are drawn. The visible region is ctgB:1,999..3,999, one base off the requested range."
+      "turns": 5,
+      "seconds": 10,
+      "usd": 0.074,
+      "tokensIn": 10,
+      "cacheWrite": 12552,
+      "cacheRead": 80383,
+      "tokensOut": 732,
+      "answer": "The view is at ctgB:2,000-4,000 (the display reads ctgB:1,999..3,999) in the volvox assembly, with the \"volvox 1000genomes vcf\" variant track open. I checked this from the session state, not a screenshot. There was no view on that assembly before, so I rebuilt the session with a single view."
     },
     {
       "task": "ho-jump-keep-track",
@@ -505,39 +518,38 @@
           "assemblyName": "volvox"
         },
         "tracks": [
-          "gff3tabix_genes",
           "volvox_test_vcf"
         ]
       },
-      "runJavascript": 2,
+      "runJavascript": 3,
       "errored": 0,
       "docs": 0,
       "screenshots": 0,
       "open": 0,
       "chars": {
         "ToolSearch": 0,
-        "run_javascript": 7741
+        "run_javascript": 8566
       },
       "images": 0,
       "docsArgs": [],
       "routeCalls": {
-        "listTracks": 1,
-        "sessionSummary": 2,
-        "navToLocString": 1,
+        "listTracks": 2,
+        "sessionSummary": 3,
+        "configuration": 1,
         "view": 1,
-        "views": 1,
-        "visibleRegions": 1,
-        "waitReady": 1
+        "waitReady": 1,
+        "loadSessionSpec": 1,
+        "visibleRegions": 1
       },
       "routeErrors": {},
-      "turns": 4,
-      "seconds": 7,
-      "usd": 0.035,
-      "tokensIn": 8,
-      "cacheWrite": 4153,
-      "cacheRead": 67939,
-      "tokensOut": 467,
-      "answer": "The view is now at ctgB:2,000-4,000, and the variant track (\"volvox 1000genomes vcf\") was already open and is still showing. The summary reports the visible region as ctgB:1,999..3,999, a one-base display offset. I checked this through the session state only and didn't take a screenshot."
+      "turns": 5,
+      "seconds": 31,
+      "usd": 0.045,
+      "tokensIn": 10,
+      "cacheWrite": 4872,
+      "cacheRead": 88449,
+      "tokensOut": 768,
+      "answer": "The view is now at ctgB:2,000-4,000 (volvox assembly) with the \"volvox 1000genomes vcf\" variant track showing. The session reports it as drawing with no errors, but I didn't take a screenshot.\n\nThe session had no view with an assembly, so I replaced it with a new one. I picked that VCF track because several variant tracks exist."
     },
     {
       "task": "ho-jump-keep-track",
@@ -552,38 +564,45 @@
           "assemblyName": "volvox"
         },
         "tracks": [
-          "gff3tabix_genes",
           "volvox_test_vcf"
         ]
       },
-      "runJavascript": 2,
-      "errored": 0,
+      "runJavascript": 3,
+      "errored": 1,
       "docs": 0,
       "screenshots": 0,
       "open": 0,
       "chars": {
         "ToolSearch": 0,
-        "run_javascript": 7935
+        "run_javascript": 8214
       },
       "images": 0,
       "docsArgs": [],
       "routeCalls": {
-        "listTracks": 1,
-        "sessionSummary": 2,
+        "listTracks": 2,
+        "sessionSummary": 3,
         "navToLocString": 1,
+        "view": 1,
+        "visibleRegions": 2,
+        "waitReady": 1,
+        "loadSessionSpec": 1
+      },
+      "routeErrors": {
+        "listTracks": 1,
+        "navToLocString": 1,
+        "sessionSummary": 1,
         "view": 1,
         "visibleRegions": 1,
         "waitReady": 1
       },
-      "routeErrors": {},
-      "turns": 4,
+      "turns": 5,
       "seconds": 10,
-      "usd": 0.035,
-      "tokensIn": 8,
-      "cacheWrite": 4234,
-      "cacheRead": 67941,
-      "tokensOut": 436,
-      "answer": "The view is now at ctgB:2,000-4,000, and the variant track (\"volvox 1000genomes vcf\") was already open there. I confirmed this from the session state and didn't take a screenshot, so I haven't checked that the track is drawing variants."
+      "usd": 0.044,
+      "tokensIn": 10,
+      "cacheWrite": 4678,
+      "cacheRead": 88273,
+      "tokensOut": 747,
+      "answer": "The view is now at ctgB:2,000-4,000 (volvox) with the \"volvox 1000genomes vcf\" variant track open and drawing, with no errors. I didn't take a screenshot or check that there are variants in that window. The session had no assembly set, so I rebuilt it as a new session, which replaced whatever was open before."
     },
     {
       "task": "ho-double-height",
@@ -601,45 +620,7 @@
       "chars": {
         "ToolSearch": 0,
         "docs": 7976,
-        "run_javascript": 794
-      },
-      "images": 0,
-      "docsArgs": [
-        "live-model"
-      ],
-      "routeCalls": {
-        "sessionSummary": 2,
-        "trackModel": 1,
-        "views": 1,
-        "waitReady": 1
-      },
-      "routeErrors": {},
-      "turns": 5,
-      "seconds": 6,
-      "usd": 0.064,
-      "tokensIn": 8,
-      "cacheWrite": 11802,
-      "cacheRead": 59954,
-      "tokensOut": 429,
-      "answer": "The gene track (`gff3tabix_genes`) is now 280 px tall, up from 140 px. I checked this by reading the session summary afterwards. I didn't take a screenshot."
-    },
-    {
-      "task": "ho-double-height",
-      "run": 2,
-      "client": "code",
-      "pass": true,
-      "detail": {
-        "height": 280
-      },
-      "runJavascript": 2,
-      "errored": 0,
-      "docs": 1,
-      "screenshots": 0,
-      "open": 0,
-      "chars": {
-        "ToolSearch": 0,
-        "run_javascript": 844,
-        "docs": 7976
+        "run_javascript": 830
       },
       "images": 0,
       "docsArgs": [
@@ -655,12 +636,56 @@
       "routeErrors": {},
       "turns": 5,
       "seconds": 7,
-      "usd": 0.034,
+      "usd": 0.064,
       "tokensIn": 8,
-      "cacheWrite": 4009,
-      "cacheRead": 67826,
-      "tokensOut": 472,
-      "answer": "The gene track (`gff3tabix_genes`) is now 280 px tall, up from 140. I confirmed the new height in the session summary but didn't take a screenshot."
+      "cacheWrite": 11841,
+      "cacheRead": 59958,
+      "tokensOut": 447,
+      "answer": "The gene track (`gff3tabix_genes`) is now 280 px tall, up from 140 px. I confirmed the new height in the session summary but didn't take a screenshot."
+    },
+    {
+      "task": "ho-double-height",
+      "run": 2,
+      "client": "code",
+      "pass": true,
+      "detail": {
+        "height": 280
+      },
+      "runJavascript": 5,
+      "errored": 0,
+      "docs": 1,
+      "screenshots": 0,
+      "open": 0,
+      "chars": {
+        "ToolSearch": 0,
+        "docs": 7976,
+        "run_javascript": 3720
+      },
+      "images": 0,
+      "docsArgs": [
+        "live-model"
+      ],
+      "routeCalls": {
+        "sessionSummary": 2,
+        "listTracks": 1,
+        "waitReady": 1,
+        "configuration": 3,
+        "mst": 2,
+        "session": 2,
+        "view": 3,
+        "views": 2,
+        "setSession": 1,
+        "loadSessionSpec": 1
+      },
+      "routeErrors": {},
+      "turns": 8,
+      "seconds": 74,
+      "usd": 0.063,
+      "tokensIn": 14,
+      "cacheWrite": 6154,
+      "cacheRead": 131966,
+      "tokensOut": 1183,
+      "answer": "I doubled the gene track's height, from 140 to 280 px (`gff3tabix_genes`). The view was stuck initializing, so I rebuilt the session from a spec to apply it. The rebuilt view is on ctgA:1-30,000 and now shows both the gene track at 280 and the VCF track at 100. The session name was reset to a default \"New session…\" name because my spec used an invalid `name` key. I didn't take a screenshot."
     },
     {
       "task": "ho-double-height",
@@ -670,35 +695,38 @@
       "detail": {
         "height": 280
       },
-      "runJavascript": 2,
+      "runJavascript": 4,
       "errored": 0,
       "docs": 1,
       "screenshots": 0,
       "open": 0,
       "chars": {
         "ToolSearch": 0,
-        "run_javascript": 784,
-        "docs": 7976
+        "docs": 7976,
+        "run_javascript": 3740
       },
       "images": 0,
       "docsArgs": [
         "live-model"
       ],
       "routeCalls": {
-        "sessionSummary": 2,
-        "trackModel": 1,
-        "views": 1,
-        "waitReady": 1
+        "sessionSummary": 3,
+        "listTracks": 1,
+        "waitReady": 1,
+        "configuration": 1,
+        "mst": 1,
+        "view": 1,
+        "loadSessionSpec": 1
       },
       "routeErrors": {},
-      "turns": 5,
-      "seconds": 6,
-      "usd": 0.034,
-      "tokensIn": 8,
-      "cacheWrite": 3933,
-      "cacheRead": 67827,
-      "tokensOut": 427,
-      "answer": "The gene track (`gff3tabix_genes`) is now 280 px tall, up from 140. I confirmed the new height in the session summary but didn't take a screenshot."
+      "turns": 7,
+      "seconds": 27,
+      "usd": 0.054,
+      "tokensIn": 12,
+      "cacheWrite": 5824,
+      "cacheRead": 110070,
+      "tokensOut": 895,
+      "answer": "The gene track (`gff3tabix_genes`) is now 280 px tall, up from 140, and the summary confirms it. I rebuilt the session to apply the change, so the session name is now \"New session 10/5/2026, 6:14:42 PM\" instead of \"agent eval\". The view still shows ctgA:1–30,000 with the VCF track at 100 px. The call also raised an error toast about an unknown top-level `assembly` key. That key was ignored, so it had no effect."
     },
     {
       "task": "ho-count-variant-tracks",
@@ -706,77 +734,7 @@
       "client": "code",
       "pass": true,
       "detail": {
-        "truth": 15,
-        "said": [
-          15
-        ]
-      },
-      "runJavascript": 1,
-      "errored": 0,
-      "docs": 0,
-      "screenshots": 0,
-      "open": 0,
-      "chars": {
-        "ToolSearch": 0,
-        "run_javascript": 20206
-      },
-      "images": 0,
-      "docsArgs": [],
-      "routeCalls": {
-        "listTracks": 1
-      },
-      "routeErrors": {},
-      "turns": 3,
-      "seconds": 6,
-      "usd": 0.093,
-      "tokensIn": 6,
-      "cacheWrite": 19902,
-      "cacheRead": 39807,
-      "tokensOut": 585,
-      "answer": "15"
-    },
-    {
-      "task": "ho-count-variant-tracks",
-      "run": 2,
-      "client": "code",
-      "pass": true,
-      "detail": {
-        "truth": 15,
-        "said": [
-          15
-        ]
-      },
-      "runJavascript": 1,
-      "errored": 0,
-      "docs": 0,
-      "screenshots": 0,
-      "open": 0,
-      "chars": {
-        "ToolSearch": 0,
-        "run_javascript": 20206
-      },
-      "images": 0,
-      "docsArgs": [],
-      "routeCalls": {
-        "listTracks": 1
-      },
-      "routeErrors": {},
-      "turns": 3,
-      "seconds": 6,
-      "usd": 0.064,
-      "tokensIn": 6,
-      "cacheWrite": 12029,
-      "cacheRead": 47688,
-      "tokensOut": 586,
-      "answer": "15"
-    },
-    {
-      "task": "ho-count-variant-tracks",
-      "run": 3,
-      "client": "code",
-      "pass": false,
-      "detail": {
-        "truth": 15,
+        "truth": 16,
         "said": [
           16
         ]
@@ -788,23 +746,92 @@
       "open": 0,
       "chars": {
         "ToolSearch": 0,
-        "run_javascript": 20261
+        "run_javascript": 20262
       },
       "images": 0,
       "docsArgs": [],
       "routeCalls": {
-        "listTracks": 1,
-        "configuration": 1
+        "listTracks": 1
       },
       "routeErrors": {},
       "turns": 4,
-      "seconds": 8,
-      "usd": 0.028,
+      "seconds": 7,
+      "usd": 0.102,
       "tokensIn": 8,
-      "cacheWrite": 649,
-      "cacheRead": 88268,
-      "tokensOut": 798,
+      "cacheWrite": 20448,
+      "cacheRead": 68381,
+      "tokensOut": 697,
       "answer": "16"
+    },
+    {
+      "task": "ho-count-variant-tracks",
+      "run": 2,
+      "client": "code",
+      "pass": false,
+      "detail": {
+        "truth": 16,
+        "said": [
+          15
+        ]
+      },
+      "runJavascript": 1,
+      "errored": 0,
+      "docs": 0,
+      "screenshots": 0,
+      "open": 0,
+      "chars": {
+        "ToolSearch": 0,
+        "run_javascript": 17624
+      },
+      "images": 0,
+      "docsArgs": [],
+      "routeCalls": {
+        "listTracks": 1
+      },
+      "routeErrors": {},
+      "turns": 3,
+      "seconds": 8,
+      "usd": 0.051,
+      "tokensIn": 6,
+      "cacheWrite": 8988,
+      "cacheRead": 47694,
+      "tokensOut": 550,
+      "answer": "15"
+    },
+    {
+      "task": "ho-count-variant-tracks",
+      "run": 3,
+      "client": "code",
+      "pass": false,
+      "detail": {
+        "truth": 16,
+        "said": [
+          15
+        ]
+      },
+      "runJavascript": 1,
+      "errored": 0,
+      "docs": 0,
+      "screenshots": 0,
+      "open": 0,
+      "chars": {
+        "ToolSearch": 0,
+        "run_javascript": 20206
+      },
+      "images": 0,
+      "docsArgs": [],
+      "routeCalls": {
+        "listTracks": 1
+      },
+      "routeErrors": {},
+      "turns": 3,
+      "seconds": 5,
+      "usd": 0.063,
+      "tokensIn": 6,
+      "cacheWrite": 12028,
+      "cacheRead": 47694,
+      "tokensOut": 560,
+      "answer": "15"
     },
     {
       "task": "ho-second-view-genes-only",
@@ -813,7 +840,7 @@
       "pass": true,
       "detail": [
         {
-          "id": "Eim9WarZFh",
+          "id": "5UBIwfVMvj",
           "refName": "ctgA",
           "tracks": [
             "gff3tabix_genes",
@@ -821,42 +848,57 @@
           ]
         },
         {
-          "id": "O7qrXJzp0z",
+          "id": "qDx4CO9juN",
           "refName": "ctgB",
           "tracks": [
             "gff3tabix_genes"
           ]
         }
       ],
-      "runJavascript": 2,
-      "errored": 0,
-      "docs": 1,
+      "runJavascript": 7,
+      "errored": 3,
+      "docs": 4,
       "screenshots": 0,
       "open": 0,
       "chars": {
         "ToolSearch": 0,
-        "docs": 7976,
-        "run_javascript": 8139
+        "run_javascript": 9208,
+        "docs": 20527
       },
       "images": 0,
       "docsArgs": [
-        "live-model"
+        "session-spec/assembly",
+        "session-spec/Linear genome view (simple)",
+        "live-model/addView",
+        "session-spec/LinearGenomeView keys"
       ],
       "routeCalls": {
         "listTracks": 1,
-        "sessionSummary": 2,
-        "addView": 1,
-        "waitReady": 1
+        "sessionSummary": 7,
+        "addView": 3,
+        "views": 6,
+        "waitReady": 5,
+        "view": 3,
+        "mst": 1,
+        "navToLocString": 1
       },
-      "routeErrors": {},
-      "turns": 5,
-      "seconds": 8,
-      "usd": 0.08,
-      "tokensIn": 8,
-      "cacheWrite": 15517,
-      "cacheRead": 63328,
-      "tokensOut": 526,
-      "answer": "I added a second view showing ctgB (ctgB:1..6,079) with only the gene track (`gff3tabix_genes`). The first view is unchanged, still on ctgA with its gene and VCF tracks. I checked this through the session summary; I didn't take a screenshot."
+      "routeErrors": {
+        "mst": 1,
+        "navToLocString": 1,
+        "sessionSummary": 2,
+        "view": 2,
+        "views": 2,
+        "waitReady": 2,
+        "addView": 1
+      },
+      "turns": 13,
+      "seconds": 78,
+      "usd": 0.16,
+      "tokensIn": 24,
+      "cacheWrite": 22726,
+      "cacheRead": 261591,
+      "tokensOut": 1712,
+      "answer": "I added a second view of ctgB (ctgB:1..6,079) that shows only the gene track, \"GFF3Tabix genes\". The first view is unchanged, still on ctgA with its gene and VCF tracks.\n\nI checked this by reading the session summary back, not by taking a screenshot. My first attempt left a view stuck initializing, so I removed that one and added the view again."
     },
     {
       "task": "ho-second-view-genes-only",
@@ -865,7 +907,7 @@
       "pass": true,
       "detail": [
         {
-          "id": "y62Qlb5Pqn",
+          "id": "SJ7RI_cSFa",
           "refName": "ctgA",
           "tracks": [
             "gff3tabix_genes",
@@ -873,40 +915,44 @@
           ]
         },
         {
-          "id": "NjdxnNqf5_",
+          "id": "zknsE5S1pD",
           "refName": "ctgB",
           "tracks": [
             "gff3tabix_genes"
           ]
         }
       ],
-      "runJavascript": 2,
+      "runJavascript": 5,
       "errored": 0,
       "docs": 0,
       "screenshots": 0,
       "open": 0,
       "chars": {
         "ToolSearch": 0,
-        "run_javascript": 7945
+        "run_javascript": 9490
       },
       "images": 0,
       "docsArgs": [],
       "routeCalls": {
-        "listTracks": 1,
-        "sessionSummary": 2,
+        "listTracks": 2,
+        "sessionSummary": 3,
+        "configuration": 1,
+        "view": 2,
         "addView": 1,
+        "waitReady": 2,
+        "hideTrack": 1,
         "views": 1,
-        "waitReady": 1
+        "getFeatures": 1
       },
       "routeErrors": {},
-      "turns": 4,
-      "seconds": 10,
-      "usd": 0.035,
-      "tokensIn": 8,
-      "cacheWrite": 4266,
-      "cacheRead": 67934,
-      "tokensOut": 469,
-      "answer": "I added a second view at ctgB (ctgB:1..6,079) that shows only the gene track (GFF3Tabix genes). I checked the session summary. The first view is unchanged: it is still at ctgA:1..30,000 with the gene and VCF tracks. I didn't take a screenshot."
+      "turns": 7,
+      "seconds": 20,
+      "usd": 0.059,
+      "tokensIn": 14,
+      "cacheWrite": 5656,
+      "cacheRead": 131993,
+      "tokensOut": 1018,
+      "answer": "I added a second view on ctgB (ctgB:1..6,079) showing only the `gff3tabix_genes` track. It loads and returns 5 features. The first view (ctgA, genes plus VCF) is unchanged.\n\nI used `gff3tabix_genes` because it's the gene track the first view already uses. The \"NCList genes\" track (`Genes`) threw a `replaceAll` error when I tried it, so I swapped it out."
     },
     {
       "task": "ho-second-view-genes-only",
@@ -915,7 +961,7 @@
       "pass": true,
       "detail": [
         {
-          "id": "ZPozGAQyyV",
+          "id": "0wumPVPxRM",
           "refName": "ctgA",
           "tracks": [
             "gff3tabix_genes",
@@ -923,14 +969,14 @@
           ]
         },
         {
-          "id": "Q-M9iplOyX",
+          "id": "QWN8o38LZl",
           "refName": "ctgB",
           "tracks": [
             "gff3tabix_genes"
           ]
         }
       ],
-      "runJavascript": 2,
+      "runJavascript": 3,
       "errored": 0,
       "docs": 1,
       "screenshots": 0,
@@ -938,26 +984,29 @@
       "chars": {
         "ToolSearch": 0,
         "docs": 7976,
-        "run_javascript": 8139
+        "run_javascript": 8993
       },
       "images": 0,
       "docsArgs": [
         "live-model"
       ],
       "routeCalls": {
-        "listTracks": 1,
-        "sessionSummary": 2,
+        "listTracks": 2,
+        "sessionSummary": 3,
+        "mst": 1,
+        "view": 1,
+        "waitReady": 2,
         "addView": 1
       },
       "routeErrors": {},
-      "turns": 5,
-      "seconds": 7,
-      "usd": 0.051,
-      "tokensIn": 8,
-      "cacheWrite": 7683,
-      "cacheRead": 71208,
-      "tokensOut": 566,
-      "answer": "I added a second view showing ctgB (ctgB:1..6,079) with only the GFF3Tabix genes track. The first view is unchanged: it still shows ctgA with the genes and VCF tracks. I checked this from the session summary and didn't take a screenshot."
+      "turns": 6,
+      "seconds": 31,
+      "usd": 0.059,
+      "tokensIn": 10,
+      "cacheWrite": 8304,
+      "cacheRead": 95263,
+      "tokensOut": 702,
+      "answer": "I added a second view on ctgB (ctgB:1..6,079) that shows only the GFF3Tabix genes track. The first view is unchanged and still shows ctgA:1..30,000 with its gene and VCF tracks."
     }
   ]
 }

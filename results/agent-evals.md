@@ -8,22 +8,32 @@ config dir>`. Measured 2026-10-05 with Claude Code 2.1.289, `--model sonnet`, `-
 | set | tasks | commit | passed | `run_javascript` errors | cost |
 | --- | --- | --- | --- | --- | --- |
 | dev | 26 | `8565ba708e` | 78 of 78 | 9 of 198 | $4.31 |
-| heldout | 5 | `00a301b414` | 14 of 15 | 0 of 31 | $0.79 |
+| heldout | 5 | `231c700ddf` | 13 of 15 | 10 of 52 | $1.06 |
 | tutorials | 2 | `00a301b414` | 2 of 6 | 10 of 69 | $2.23 |
 
 **The held-out set is the score.** The documentation and the `jb` surface were tuned against the dev set, so its
-perfect score says little. The held-out tasks are phrased apart from the documentation. The one failed held-out run
-was `ho-count-variant-tracks`, which answered 16 where the catalog lists 15, with no errored call.
+perfect score says little. The held-out tasks are phrased apart from the documentation. The table's held-out row is
+the run of record, scored by the corrected grader described below.
+
+**The `ho-count-variant-tracks` grader changed after the first runs.** It counted tracks whose `assemblyNames`
+include `volvox`, which gives 15 and leaves out `volvox_filtered_vcf_assembly_alias`, registered under `vvx`, an alias
+of `volvox`. It now resolves each track's assembly through the assembly manager, which gives 16
+(`jbrowse-components` `231c700ddf`). The prompt is unchanged. The agent answers 15 or 16 from run to run (5 of 9 runs
+said 16), so the prompt reads two ways and the task separates a counting choice, not a skill.
+
+| held-out run | commit | answer counts | old grader | corrected grader |
+| --- | --- | --- | --- | --- |
+| first (`results/agent-evals-heldout-first-old-grader.json`) | `00a301b414` | 15, 15, 16 | 14 of 15 | 13 of 15 |
+| rerun (`results/agent-evals-heldout-rerun.json`) | `fa980d301f` | 16, 16, 16 | 12 of 15 | 15 of 15 |
+| corrected (`results/agent-evals-heldout.json`) | `231c700ddf` | 16, 15, 15 | | 13 of 15 |
+
+The first two rows were scored by the old grader when run. Their corrected-grader columns come from regrading the saved
+answers by hand, because the harness cannot regrade a saved session. Every other held-out task passed all runs in
+all three.
 
 **The tutorial set is too small to report.** It has two tasks. In `tut-methylation-haplotypes` one run searched the
 ONT Open Data bucket, loaded `giab_2025.01/.../SAMPLE.haplotagged.cram` and hit "compression method number 255"
 (its `.crai` offsets are 63 bytes too high), and the other two runs failed the grader.
-
-**A rerun the same day did not reproduce 14 of 15.** Run from this repo at `fa980d301f`, the held-out set passed
-12 of 15: `ho-count-variant-tracks` failed all three runs, each answering 16 against a grader truth of 15, and the
-other four tasks passed 12 of 12. The recorded run passed that task twice and failed it once with the same
-answer, so the task is unstable, not rarely wrong. `results/agent-evals-heldout-rerun.json` holds the rerun. Report
-the held-out score with that task's behavior stated, or fix the task first.
 
 The summaries are `results/agent-evals-<set>.json`. They are copied from `~/agent-evals/<run>/summary.json`, where
 the run directories hold the per-run transcripts.
