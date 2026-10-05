@@ -16,8 +16,10 @@ from the matched normal ONT BAM, then `variant-review-portal` builds the page. `
 
 Every local run rendered 135 of 135 images. The second run over the network rendered 134 of 135, and the failed
 record was chr7 record 51. Over the network CPU use stayed at 18–59% with ingress near 14–20 MB/s; on local disk the
-tumor run used 3–6 cores and the normal run about 10, so the local runs are bound by the renderer. Cold runs start
-after `posix_fadvise(DONTNEED)` on the file.
+tumor run used 3–6 cores and the normal run about 10, so the local runs are bound by the renderer. The 26 s cold tumor
+run was the first read after the download. `variant.ts --evict` drops the file with `posix_fadvise(DONTNEED)`, which
+evicts less than a 180 GB download does: the rerun from this repo on ada took 12.3 s cold and 11.9 s warm for the
+tumor, 15.9 s and 15.3 s for the normal, and 0.3 s for the page, all 135 of 135.
 
 The inputs are 78.8 GB of tumor CRAM and 179 GB of normal BAM, 242 GiB with the reference and indexes
 (`scripts/portals/fetch-colo829.sh`). `scripts/portals/localconfig.ts` rewrites the demo config
