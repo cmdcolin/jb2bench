@@ -88,7 +88,7 @@ Until that is settled, **1.65x is what this repo can show for BAM**, and the
 twin driven by a `useBgzfWorkerPool` config slot, and that slot was removed
 from jbrowse-components deliberately — it was test-only and is not shipping.
 The arm needs rewiring to compare two builds instead; see
-`agent-docs/bgzfpool-linux-runbook.md`.
+`agent-docs/reference/bgzfpool-linux-runbook.md`.
 
 ## What is being compared
 
