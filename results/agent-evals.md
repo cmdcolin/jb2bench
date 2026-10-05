@@ -17,7 +17,7 @@ was `ho-count-variant-tracks`, which answered 16 where the catalog lists 15, wit
 
 **The tutorial set is too small to report.** It has two tasks. In `tut-methylation-haplotypes` one run searched the
 ONT Open Data bucket, loaded `giab_2025.01/.../SAMPLE.haplotagged.cram` and hit "compression method number 255"
-(its `.crai` offsets are 63 bytes too high), and the other two runs failed the grader on the tutorial's own data.
+(its `.crai` offsets are 63 bytes too high), and the other two runs failed the grader.
 
 The summaries are `results/agent-evals-<set>.json`. They are copied from `~/agent-evals/<run>/summary.json`, where
 the run directories hold the per-run transcripts.
