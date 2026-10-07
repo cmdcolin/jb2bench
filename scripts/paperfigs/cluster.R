@@ -54,8 +54,8 @@ d <- read.csv("results/paper/cluster.csv", stringsAsFactors = FALSE)
 
 # Slowest first, so the stock discrete scale walks its colours in the same
 # direction the measurements improve.
-SERIES <- c("greenelab/hclust (JS)", "optimized JS", "hclust (wasm)",
-            "hybrid WebGPU + wasm")
+SERIES <- c("greenelab/hclust (JS)", "optimized JS", "WASM",
+            "WebGPU+WASM")
 d$series <- c("greenelab/hclust (JS)" = SERIES[1], "optimized JS" = SERIES[2],
               "hclust 5.1.0 (wasm)" = SERIES[3], "WebGPU kernel" = SERIES[4])[d$series]
 d <- d[!is.na(d$series), ]
@@ -69,7 +69,7 @@ d$rows <- factor(sprintf("%s %s", format(d$n, big.mark = ","), unit),
                  levels = unique(sprintf("%s %s", format(d$n, big.mark = ","), unit)[order(d$n)]))
 
 # Two ratios per column, both against the GPU, because "how much faster" has
-# two honest answers here and neither subsumes the other: "vs wasm" is the
+# two honest answers here and neither subsumes the other: "vs WASM" is the
 # choice a reader actually faces, since nobody runs the JS baseline any more;
 # "vs JS ref" is where the whole system started. Two and not four: the
 # optimized-JS curve is on the figure to be read against the reference above it
@@ -81,7 +81,7 @@ d$rows <- factor(sprintf("%s %s", format(d$n, big.mark = ","), unit),
 # point instead, in the margin the axis already carries for the point's own
 # time label above it.
 #
-# The "vs wasm"/"vs JS ref" tag names the comparator only on the widest column of
+# The "vs WASM"/"vs JS ref" tag names the comparator only on the widest column of
 # each panel: that column sits alone on the right with room to spell it out,
 # while the two narrow-window columns sit close enough in v that a second full
 # tag collides with the first. A bare number reads fine there once the wide
@@ -91,11 +91,11 @@ w <- reshape(d[, c("case", "v", "rows", "series", "s")], idvar = c("case", "v", 
 widest <- ave(w$v, w$rows, FUN = function(x) x == max(x))
 tag <- function(s) ifelse(widest == 1, paste("", s), "")
 ratio_wasm <- data.frame(v = w$v, rows = w$rows,
-                         mid = sqrt(w$`s.hybrid WebGPU + wasm` * w$`s.hclust (wasm)`),
-                         lab = paste0(fmt_ratio(w$`s.hclust (wasm)` / w$`s.hybrid WebGPU + wasm`), tag("vs wasm")))
+                         mid = sqrt(w$`s.WebGPU+WASM` * w$`s.WASM`),
+                         lab = paste0(fmt_ratio(w$`s.WASM` / w$`s.WebGPU+WASM`), tag("vs WASM")))
 ratio_js <- data.frame(v = w$v, rows = w$rows,
-                       mid = w$`s.hybrid WebGPU + wasm` / 1.8,
-                       lab = paste0(fmt_ratio(w$`s.greenelab/hclust (JS)` / w$`s.hybrid WebGPU + wasm`),
+                       mid = w$`s.WebGPU+WASM` / 1.8,
+                       lab = paste0(fmt_ratio(w$`s.greenelab/hclust (JS)` / w$`s.WebGPU+WASM`),
                                     tag("vs JS ref")))
 
 # A line chart, not bars: geom_col draws from zero, which under log10 is minus
