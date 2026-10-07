@@ -458,8 +458,8 @@ ec2-down:      ; ec2/down.sh
 
 # ------------------------------------------------------------ automation
 #
-# Not part of `all`: the variant portal needs 242 GiB of reads on local disk, the gene portal fetches its data over
-# the network, and the agent eval bills model sessions. None of them needs `make gate` to pass first for its
+# Not part of `all`: the variant portal needs 242 GiB of reads on local disk, the gene portal needs its inputs
+# fetched first, and the agent eval bills model sessions. None of them needs `make gate` to pass first for its
 # result to mean something, except that a timing taken on a loaded box is still worth discarding.
 
 PORTAL_DATA ?= $(HOME)/data/colo829-portal
@@ -473,8 +473,13 @@ portals-fetch:
 portals-variant:
 	$(NODE) scripts/portals/variant.ts $(PORTAL_DATA) --evict
 
+GENE_DATA ?= $(HOME)/data/tiberius-portal
+
+portals-gene-fetch:
+	scripts/portals/fetch-tiberius.sh $(GENE_DATA) $(PORTAL_DATA)
+
 portals-gene:
-	$(NODE) scripts/portals/gene.ts --app-dir $(APP_DIR)
+	$(NODE) scripts/portals/gene.ts --app-dir $(APP_DIR) --local $(GENE_DATA) --runs 3
 
 agent-evals:
 	$(NODE) scripts/agent-evals/run.ts $(SET) $(if $(CONFIG_DIR),--config-dir $(CONFIG_DIR))

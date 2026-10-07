@@ -1,10 +1,11 @@
 // Time the gene review portal on Tiberius predictions for human chr22, read against GENCODE v49, with and
 // without the screenshots.
 //
-//   node --experimental-strip-types scripts/portals/gene.ts --app-dir <jbrowse-web build> [--runs 2] [--out results/portals-gene.json]
+//   node --experimental-strip-types scripts/portals/gene.ts --app-dir <jbrowse-web build> [--local <dir>] [--runs 2] [--out results/portals-gene.json]
 //
 // --app-dir is required: the published jbrowse CLI's --with-app bundles v4.3.0, and every capture times out against it.
-// GENE_PORTAL sets the gene-review-portal checkout (default ~/src/gene-review-portal). All data is fetched over the network.
+// GENE_PORTAL sets the gene-review-portal checkout (default ~/src/gene-review-portal). With --local, every input comes
+// from <dir>, which scripts/portals/fetch-tiberius.sh fills; without it, all data is fetched over the network.
 
 import { spawnSync } from 'node:child_process'
 import { mkdirSync, rmSync, writeFileSync } from 'node:fs'
@@ -16,20 +17,31 @@ const argv = process.argv.slice(2)
 const opt = (n: string, d?: string) => (argv.includes(n) ? argv[argv.indexOf(n) + 1] : d)
 const appDir = opt('--app-dir')
 if (!appDir) {
-  console.error('usage: gene.ts --app-dir <jbrowse-web build> [--runs N] [--out file]')
+  console.error('usage: gene.ts --app-dir <jbrowse-web build> [--local dir] [--runs N] [--out file]')
   process.exit(2)
 }
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '../..')
 const runs = Number(opt('--runs', '2'))
 const out = resolve(root, opt('--out', 'results/portals-gene.json')!)
 const portal = process.env.GENE_PORTAL ?? resolve(homedir(), 'src/gene-review-portal')
-const work = resolve(tmpdir(), 'jb2bench-portals-gene')
-const D = 'https://jbrowse.org/demos/tiberius_review'
+const local = opt('--local') && resolve(opt('--local')!)
+const work = local ? resolve(local, 'out') : resolve(tmpdir(), 'jb2bench-portals-gene')
+const D = local ?? 'https://jbrowse.org/demos/tiberius_review'
+
+const inputs = local
+  ? [
+      '--prediction', `${local}/tiberius_grch38.gff.gz`,
+      '--fasta', `${local}/hg38.prefix.fa.gz`, '--aliases', `${local}/hg38_aliases.txt`,
+      '--reference', `${local}/gencode.v49.chr22.gff3.gz`, '--reference-name', 'GENCODE V49',
+    ]
+  : [
+      '--prediction', 'https://jbrowse.org/genomes/GRCh38/tiberius_grch38.gff.gz',
+      '--hub', 'hg38', '--reference-track', 'hg38-gencodeComp',
+    ]
 
 const args = (outDir: string, extra: string[]) => [
   resolve(portal, 'bin/make-portal.mjs'),
-  '--prediction', 'https://jbrowse.org/genomes/GRCh38/tiberius_grch38.gff.gz',
-  '--hub', 'hg38', '--reference-track', 'hg38-gencodeComp',
+  ...inputs,
   '--rnaseq', `${D}/HBR_brain_rnaseq_chr22.bam`, '--rnaseq-name', 'RNA-seq brain (HBR)',
   '--rnaseq', `${D}/UHR_reference_rnaseq_chr22.bam`, '--rnaseq-name', 'RNA-seq UHR',
   '--assembly', 'hg38', '--region', 'chr22', '--out', outDir, ...extra,
@@ -63,7 +75,7 @@ writeFileSync(out, JSON.stringify({
   host: hostname(),
   cpu: cpus()[0].model,
   threads: cpus().length,
-  source: 'remote',
+  source: local ? 'local disk' : 'remote',
   geneReviewPortal: rev,
   appDir: resolve(appDir),
   runs: results,

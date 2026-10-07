@@ -28,24 +28,36 @@ The inputs are 78.8 GB of tumor CRAM and 179 GB of normal BAM, 242 GiB with the 
 
 ## Gene portal
 
-Tiberius predictions for chr22 against GENCODE v49 (`--hub hg38 --reference-track hg38-gencodeComp`), with two
-RNA-seq BAMs. 559 models, 135 flagged, 28 cards kept at the default cap of 12 per class. Data comes over the network.
-i9-9880H laptop, `gene-review-portal` at `ea77ec5`, `@jbrowse/capture` 5.0.0-beta.8, Chrome 154.
+Tiberius predictions for chr22 against GENCODE v49, with two RNA-seq BAMs. 559 models, 135 flagged, 28 cards kept at
+the default cap of 12 per class. `gene-review-portal` at `ea77ec5`, `@jbrowse/capture` 5.0.0-beta.8, a local
+5.0.0-beta.11 `jbrowse-web` build passed as `--app-dir`.
 
-| run | wall | screenshots | per screenshot |
-| --- | --- | --- | --- |
-| capture 1 | 159 s | 28 | 5.7 s |
-| capture 2 | 191 s | 28 | 6.8 s |
-| `--no-capture` | 5 s | 0 | |
+| source | machine | wall | screenshots | per screenshot | without screenshots |
+| --- | --- | --- | --- | --- | --- |
+| local disk | i9-12900K, 24 cores | 93–98 s, six runs | 28 | 3.3–3.5 s | 5 s |
+| local disk | i9-9880H, 16 threads | 130 s, 165 s | 28 | 4.6–5.9 s | 5.5 s |
+| network | i9-9880H, 16 threads | 159 s, 191 s | 28 | 5.7–6.8 s | 5 s |
 
-No capture failed. The published `jbrowse` CLI's `--with-app` bundles v4.3.0, which lacks the readiness marker, so
-every capture timed out against it; these runs pass `--app-dir` a local 5.0.0-beta.11 `jbrowse-web` build.
+The i9-12900K row is the machine the structural variant portal ran on, measured 2026-10-07 with `--local`
+(`results/portals-gene.json` holds three of the six runs, the other three ran `make-portal` by hand). The network row
+is from 2026-10-05 with `--hub hg38 --reference-track hg38-gencodeComp`. No capture failed in any run, and every run
+found the same models, flags and cards. Reading from local disk saves about a fifth on the laptop, so the time per
+screenshot is the capture: `gene-review-portal` starts one `@jbrowse/capture` process per card, one at a time, at 40–58%
+of one core.
+
+The local run reads GENCODE v49 cut to chr22 (`scripts/portals/fetch-tiberius.sh`). `gene-review-portal` reads a local
+GFF into one string, and the whole-genome file fails with `ERR_STRING_TOO_LONG`. Write the output to disk: the portal
+copies the 1 GB FASTA into its output directory, and a tmpfs `/tmp` ran out of quota on the second run.
+
+The published `jbrowse` CLI's `--with-app` bundles v4.3.0, which lacks the readiness marker, so every capture timed
+out against it.
 
 ## Rerunning
 
 ```bash
 make portals-fetch PORTAL_DATA=~/data/colo829-portal    # 242 GiB, resumable
 make portals-variant PORTAL_DATA=~/data/colo829-portal  # → results/portals-variant.json
+make portals-gene-fetch                                 # inputs into ~/data/tiberius-portal
 make portals-gene APP_DIR=<jbrowse-web build>           # → results/portals-gene.json
 ```
 

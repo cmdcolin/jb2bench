@@ -1,0 +1,74 @@
+{
+  "date": "2026-10-07",
+  "host": "Ada",
+  "cpu": "12th Gen Intel(R) Core(TM) i9-12900K",
+  "threads": 24,
+  "source": "local disk",
+  "geneReviewPortal": "ea77ec5",
+  "appDir": "/home/cdiesh/data/tiberius-portal/jbrowse-web-build",
+  "runs": [
+    {
+      "mode": "capture",
+      "run": 1,
+      "seconds": 93.2,
+      "models": 559,
+      "flagged": 135,
+      "cards": 28,
+      "captures": 28,
+      "failed": 0,
+      "perScreenshot": 3.33
+    },
+    {
+      "mode": "capture",
+      "run": 2,
+      "seconds": 92.5,
+      "models": 559,
+      "flagged": 135,
+      "cards": 28,
+      "captures": 28,
+      "failed": 0,
+      "perScreenshot": 3.3
+    },
+    {
+      "mode": "capture",
+      "run": 3,
+      "seconds": 93,
+      "models": 559,
+      "flagged": 135,
+      "cards": 28,
+      "captures": 28,
+      "failed": 0,
+      "perScreenshot": 3.32
+    },
+    {
+      "mode": "no-capture",
+      "run": 1,
+      "seconds": 4.9,
+      "models": 559,
+      "flagged": 135,
+      "cards": 28,
+      "captures": 0,
+      "failed": 0
+    },
+    {
+      "mode": "no-capture",
+      "run": 2,
+      "seconds": 5.1,
+      "models": 559,
+      "flagged": 135,
+      "cards": 28,
+      "captures": 0,
+      "failed": 0
+    },
+    {
+      "mode": "no-capture",
+      "run": 3,
+      "seconds": 5,
+      "models": 559,
+      "flagged": 135,
+      "cards": 28,
+      "captures": 0,
+      "failed": 0
+    }
+  ]
+}
