@@ -121,7 +121,7 @@ fig <- ggplot(d, aes(x = v, y = s, colour = series)) +
   # labels saying the same thing.
   scale_x_log10(breaks = c(2500, 5000, 10000, 20000),
                 labels = function(x) format(x, big.mark = ",", scientific = FALSE, trim = TRUE),
-                expand = expansion(mult = c(0.12, 0.16))) +
+                expand = expansion(mult = c(0.12, 0.22))) +
   labs(x = "variant columns (log scale)", colour = NULL) +
   paper_theme()
 
