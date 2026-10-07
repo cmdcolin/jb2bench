@@ -16,7 +16,8 @@ for u in https://jbrowse.org/genomes/GRCh38/tiberius_grch38.gff.gz{,.tbi} $D/{HB
   [ -s "$(basename "$u")" ] || curl -fSLO "$u"
 done
 if [ ! -s gencode.v49.chr22.gff3.gz.tbi ]; then
-  (curl -fsSL $G | zcat | sed -n '/^#/p;/^[^#]/q'; tabix $G chr22) | bgzip > gencode.v49.chr22.gff3.gz
+  tabix -h $G chr22 | bgzip > gencode.v49.chr22.gff3.gz
+  rm -f "$(basename $G).csi"
   tabix -p gff gencode.v49.chr22.gff3.gz
 fi
 for f in hg38.prefix.fa.gz{,.fai,.gzi} hg38_aliases.txt; do
