@@ -170,8 +170,7 @@ draw <- function(win, out, width_label,
     # from the data rather than from DRAWN, because the contention gate can
     # empty a series out of one window and not the other, and naming it in a
     # legend that has no curve for it prints a key with no glyph beside it.
-    scale_colour_discrete(drop = FALSE,
-                          breaks = intersect(PERF_SERIES,
+    perf_colour_scale(breaks = intersect(PERF_SERIES,
                                              unique(as.character(d$series)))) +
     guides(colour = guide_legend(nrow = 1)) +
     # Below the panels, not above them, and in the same place as on every other

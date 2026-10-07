@@ -139,7 +139,7 @@ zoom_panel <- function(df, ends, y_breaks) {
     scale_x_log10(breaks = c(20, 200, 1000), labels = c("20×", "200×", "1000×"),
                   expand = expansion(mult = c(0.08, 0.3))) +
     time_scale_y(name = NULL, breaks = y_breaks) +
-    scale_colour_discrete(drop = FALSE, labels = function(x) unname(ARCH[x]),
+    perf_colour_scale(labels = function(x) unname(ARCH[x]),
                           breaks = PERF_SERIES[PERF_SERIES %in% df$series]) +
     labs(x = "coverage", colour = NULL) +
     paper_theme()

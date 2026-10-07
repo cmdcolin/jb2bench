@@ -112,9 +112,8 @@ fig <- ggplot(plotted, aes(x = coverage, y = s, colour = series)) +
   # drop = FALSE keeps "This work" the colour it is in the cold-load figure;
   # `breaks` keeps the legend to the three builds this run measured, which is
   # otherwise five keys wide and runs off the page.
-  scale_colour_discrete(drop = FALSE,
-                        breaks = c("Release 2.4.0", "This work",
-                                   "This work, canvas backend")) +
+  perf_colour_scale(breaks = intersect(PERF_SERIES,
+                                     unique(as.character(d$series)))) +
   # Titled by what is measured, like every figure in this set. The facet strips
   # already name the two motions; the title names the quantity they share, so
   # the figure still says what it is when it is pulled out of the paper and put

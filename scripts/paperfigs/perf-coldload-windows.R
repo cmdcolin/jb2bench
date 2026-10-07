@@ -87,8 +87,7 @@ fig <- ggplot(d, aes(x = coverage, y = s, colour = series)) +
   time_scale_y("time (log scale)",
                breaks = c(1, 2, 5, 10, 20, 60, 120, 600, 900),
                expand = expansion(mult = c(0.17, 0.28))) +
-  scale_colour_discrete(drop = FALSE,
-                        breaks = intersect(PERF_SERIES,
+  perf_colour_scale(breaks = intersect(PERF_SERIES,
                                            unique(as.character(d$series)))) +
   guides(colour = guide_legend(nrow = 1)) +
   labs(title = "Navigating to a genomic region, by window size",

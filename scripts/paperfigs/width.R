@@ -73,8 +73,7 @@ fig <- ggplot(d, aes(x = coverage, y = s, colour = series)) +
                expand = expansion(mult = c(0.17, 0.28))) +
   # drop = FALSE so both arms keep the colour they have on every other figure
   # here, which is the whole point of drawing this one to overlay them.
-  scale_colour_discrete(drop = FALSE,
-                        breaks = intersect(PERF_SERIES,
+  perf_colour_scale(breaks = intersect(PERF_SERIES,
                                            unique(as.character(d$series)))) +
   guides(colour = guide_legend(nrow = 1)) +
   labs(title = "Navigating to a 1 Mb genomic region",

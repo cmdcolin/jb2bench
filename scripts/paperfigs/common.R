@@ -104,8 +104,8 @@ time_scale_x <- function(name = "time", breaks = TIME_BREAKS, ...) {
 }
 
 # One series order for every measured-time figure, so a series keeps its colour
-# across all of them: pair this with `scale_colour_discrete(drop = FALSE)` and
-# limit the legend with `breaks` rather than by dropping levels. Ordered oldest
+# across all of them: pair this with `perf_colour_scale()` and limit the legend
+# with `breaks` rather than by dropping levels. Ordered oldest
 # release to newest and then the other tools, which is the order a reader walks
 # them in. Shared because the cold-load and interaction figures are separate
 # scripts that both draw "This work" and must agree on its colour.
@@ -118,6 +118,15 @@ GENOMESPY <- local({
 PERF_SERIES <- c("Release 2.4.0", "Release 4.1.15", "Release 4.3.0",
                  "This work", "This work, canvas backend",
                  "igv.js 3.8.5", GENOMESPY)
+# Named, because ggplot's default hue palette is spaced by level count: a
+# seventh series moved every colour after it on every figure. The six original
+# series keep hue_pal()(6); a series added later takes a colour of its own.
+PERF_COLOURS <- setNames(
+  c("#F8766D", "#B79F00", "#00BA38", "#00BFC4", "#007C80", "#619CFF", "#F564E3"),
+  PERF_SERIES)
+perf_colour_scale <- function(...) {
+  scale_colour_manual(values = PERF_COLOURS, drop = FALSE, ...)
+}
 
 # One type scale for every manuscript figure. The stock 11 pt base at 180 mm
 # printed labels at 6 pt, which is legible on paper and not on a screen or a
