@@ -64,7 +64,8 @@ const viewId = await page.evaluate(
     return session.addView('GraphGenomeView', {
       loadedTrackId,
       loadedRegion: region,
-      ...(haplotypes === 'all' ? {} : { subgraphHaplotypes: lanes }),
+      // [] is the display's "every haplotype" state; unset would follow defaultHaplotypes
+      subgraphHaplotypes: haplotypes === 'all' ? [] : lanes,
       ...(layoutMode ? { layoutMode } : {}),
     }).id
   },
