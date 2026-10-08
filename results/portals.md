@@ -5,21 +5,22 @@
 
 ## Structural variant portal
 
-COLO829 somatic callset, 135 records; `jb2export batch` renders one image per record from the tumor ONT CRAM and
-from the matched normal ONT BAM, then `variant-review-portal` builds the page. `@jbrowse/img` 5.0.0-beta.11,
-`variant-review-portal` at `02aa0f1`.
+COLO829 somatic callset, 135 records; one `jb2export batch` run renders one image per record holding the tumor ONT CRAM
+above the matched normal ONT BAM, then `variant-review-portal` builds the page. `@jbrowse/img` 5.0.0-beta.13,
+`variant-review-portal` at `30b0c86`. Measured 2026-10-08.
 
-| source | machine | tumor | matched normal | page build |
+| source | machine | images | per image | page build |
 | --- | --- | --- | --- | --- |
-| local disk | i9-12900K, 24 cores | 26 s cold, 12 s warm | 17 s cold, 16 s warm | 0.4 s |
-| ONT S3 bucket | i9-9880H, 16 threads | 74 s, 90 s | 395 s | 0.3 s |
+| local disk | i9-12900K, 24 cores | 25.4 s cold, 24.0 s and 24.4 s warm | 0.18–0.19 s | 0.2 s |
+| ONT S3 bucket | i9-9880H, 16 threads | 282 s, one run | 2.1 s | 0.4 s |
 
-Every local run rendered 135 of 135 images. The second run over the network rendered 134 of 135, and the failed
-record was chr7 record 51. Over the network CPU use stayed at 18–59% with ingress near 14–20 MB/s; on local disk the
-tumor run used 3–6 cores and the normal run about 10, so the local runs are bound by the renderer. The 26 s cold tumor
-run was the first read after the download. `variant.ts --evict` drops the file with `posix_fadvise(DONTNEED)`, which
-evicts less than a 180 GB download does: the rerun from this repo on ada took 12.3 s cold and 11.9 s warm for the
-tumor, 15.9 s and 15.3 s for the normal, and 0.3 s for the page, all 135 of 135.
+Every run rendered 135 of 135 images. `variant.ts --evict` drops both read files from the page cache with
+`posix_fadvise(DONTNEED)` before the cold run. The network run was `jb2export batch` by hand against the demo config's
+URLs, timed from its log's creation to its manifest.
+
+Rendering the two tracks into separate images (2026-10-05, `@jbrowse/img` 5.0.0-beta.11) took 12 s for the tumor and
+16 s for the normal on the same local disk, and 74–90 s and 395 s over the network: one image of both costs less than
+the two it replaces.
 
 The inputs are 78.8 GB of tumor CRAM and 179 GB of normal BAM, 242 GiB with the reference and indexes
 (`scripts/portals/fetch-colo829.sh`). `scripts/portals/localconfig.ts` rewrites the demo config
