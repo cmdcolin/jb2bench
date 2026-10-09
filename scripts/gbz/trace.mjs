@@ -12,7 +12,7 @@ const page = await browser.newPage()
 await page.setViewport({ width: 1600, height: 1000 })
 let t0 = Date.now()
 const net = { req: 0, bytes: 0, inflight: 0, last: 0 }
-const isData = u => /\.gbz\.db|haplotype-index|\.pif\.gz/.test(u)
+const isData = u => /\.gbz\.db|haplotype-index|\.pif\.gz|\.(walks|nodes|links)\.bed\.gz/.test(u)
 const watch = c => { const ids = new Set(); c.on('Network.requestWillBeSent', e => { if (isData(e.request.url)) { ids.add(e.requestId); net.req++; net.inflight++ } }); const d = e => { if (ids.delete(e.requestId)) { net.inflight--; net.bytes += e.encodedDataLength ?? 0; net.last = Date.now() - t0 } }; c.on('Network.loadingFinished', d); c.on('Network.loadingFailed', d) }
 const pc = await page.createCDPSession(); await pc.send('Network.enable'); watch(pc)
 page.on('workercreated', async w => { try { await w.client.send('Network.enable'); watch(w.client) } catch {} })
