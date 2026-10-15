@@ -57,7 +57,7 @@ Every number lives in a file; nothing is summarized only here.
 | [`results/interaction-cpu.md`](results/interaction-cpu.md) | where does per-frame main-thread time go during a zoom? |
 | [`results/crampool.md`](results/crampool.md) | does @gmod/cram's slice worker pool make a pan faster? (no run of record yet) |
 | [`results/bgzfpool-levers.md`](results/bgzfpool-levers.md) | how much more is left in the pool — worker count against query concurrency? |
-| [`results/bgzfpool.md`](results/bgzfpool.md) | does the BGZF inflate pool make a pan faster, for BAM and for tabix VCF? (no run of record yet) |
+| [`results/bgzfpool.md`](results/bgzfpool.md) | does the BGZF inflate pool make a pan faster, for BAM and for tabix VCF? (BAM end to end: 1.00-1.10x, one run over the CPU gate) |
 | [`flame/FINDINGS.md`](flame/FINDINGS.md) | why is 1000x-shortread a regression? |
 | [`flame/ZOOM_SETTLE.md`](flame/ZOOM_SETTLE.md) | why does a zoom take 0.8 s to stop changing? |
 | [`flame/WORKER_FINDINGS.md`](flame/WORKER_FINDINGS.md) | which worker-side plugin optimizations are worth doing? |

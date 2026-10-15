@@ -84,11 +84,31 @@ what would tell them apart:
 Until that is settled, **1.65x is what this repo can show for BAM**, and the
 1.95x is someone else's measurement of something not yet reproduced here.
 
-**The end-to-end arm: still none of record.** It compares two builds of one
-tree now, `builds/pool` and `builds/nopool`, since the `useBgzfWorkerPool` slot
-its `.nopool` twins relied on was removed from jbrowse-components on purpose.
-`agent-docs/reference/bgzfpool-linux-runbook.md` stages them. Its table lands in
+**The end-to-end arm, 2026-10-15.** Two builds of jbrowse-components
+`36cccd4ca2`, one with `sharedBgzfWorkerPool()` returning undefined, on the
+Linux box: five 19 kb pans on `chr22_mask` per page load, seven reps alternated
+ABBA, ratio per pair. Raw in `results/bgzfpool.json`, table in
 [`bgzfpool-endtoend.md`](bgzfpool-endtoend.md).
+
+| track | in process | pooled | paired speedup |
+| --- | ---: | ---: | --- |
+| 20x shortread BAM | 597 ms | 597 ms | 1.00x [0.99, 1.01] |
+| 200x shortread BAM | 558 ms | 594 ms | 1.02x [0.92, 1.10] |
+| 1000x shortread BAM | 714 ms | 649 ms | 1.10x [1.00, 1.19] |
+| 20x longread BAM | 598 ms | 598 ms | 1.01x [0.99, 1.02] |
+| 200x longread BAM | 580 ms | 561 ms | 1.01x [0.97, 1.06] |
+| 1000x longread BAM | 1277 ms | 1185 ms | 1.09x [1.01, 1.20] |
+
+- **Every row is over the foreign-CPU gate**, 0.77-1.11 cores, from one other
+  user's job on a 24-thread box, and the generated table marks them unusable.
+  They are kept as a run, by the owner's call, rather than as the clean run of
+  record the gate asks for. Blob workers were 4/0 on every track.
+- **A pan rarely waits on the inflate.** The ~600 ms rows are jbrowse's
+  `FetchVisibleRegions` debounce: these pans follow each other within 600 ms of
+  the last fetch, which it coalesces, so the inflate is a slice of what is left.
+- **So 1.95x end to end is not reproduced on this corpus.** The 1000x long-read
+  row, the one that claim names, is 1.09x through a pan, against 1.65x for the
+  query alone above.
 
 ## What is being compared
 
