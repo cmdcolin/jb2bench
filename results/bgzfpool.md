@@ -84,11 +84,11 @@ what would tell them apart:
 Until that is settled, **1.65x is what this repo can show for BAM**, and the
 1.95x is someone else's measurement of something not yet reproduced here.
 
-**The end-to-end arm: still none.** It compared a track against a `.nopool`
-twin driven by a `useBgzfWorkerPool` config slot, and that slot was removed
-from jbrowse-components deliberately — it was test-only and is not shipping.
-The arm needs rewiring to compare two builds instead; see
-`agent-docs/reference/bgzfpool-linux-runbook.md`.
+**The end-to-end arm: still none of record.** It compares two builds of one
+tree now, `builds/pool` and `builds/nopool`, since the `useBgzfWorkerPool` slot
+its `.nopool` twins relied on was removed from jbrowse-components on purpose.
+`agent-docs/reference/bgzfpool-linux-runbook.md` stages them. Its table lands in
+[`bgzfpool-endtoend.md`](bgzfpool-endtoend.md).
 
 ## What is being compared
 
@@ -136,15 +136,16 @@ Neither shows up in the ratio, so both are gates rather than notes.
 
 ## Running it
 
-Needs a jbrowse-web built from a tree carrying the `useBgzfWorkerPool` config
-slot on `BamAdapter`, `VcfTabixAdapter` and `Gff3TabixAdapter`. Without it the
-`.nopool` twin is still created, mobx-state-tree drops the unknown key, both
-arms run pooled, and the blob-worker column is what says so.
+The end-to-end arm needs two jbrowse-web builds of one tree:
+`builds/pool`, unmodified, and `builds/nopool`, with a local, never-committed
+edit making `sharedBgzfWorkerPool()` return `Promise.resolve(undefined)`. If the
+two do not differ, both arms run pooled and the blob-worker column says so.
 
 ```bash
 make corpus                           # includes generate_bgzf_vcf.sh and,
-                                      # once builds/ is staged, the .nopool twins
-npx http-server builds/current -p 8010 -s --cors &
+                                      # once builds/ is staged, the loaders
+npx http-server builds/pool   -p 8010 -s --cors &
+npx http-server builds/nopool -p 8011 -s --cors &
 make bgzfpool                         # both arms, gated and logged
 make paper-data paper-figs            # csv, then the figure
 ```

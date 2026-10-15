@@ -2,13 +2,17 @@
  * Pan latency in jbrowse with the BGZF inflate pool on vs off, for BAM and for
  * tabix VCF.
  *
- * Setup, because this needs a build carrying both arms:
+ * Setup, because the two arms are two builds of the same tree:
  *
- *   1. build jbrowse-web from a tree with the `useBgzfWorkerPool` config slot
- *      (BamAdapter, VcfTabixAdapter, Gff3TabixAdapter), stage it in builds/
- *   2. shell/load_alignments.sh, then shell/load_bgzf_tracks.sh <build>
- *      to add the indexed VCFs and the `.nopool` twins
- *   3. serve it on :8010, then
+ *   1. stage builds/pool, jbrowse-web built from the tree unmodified, and
+ *      builds/nopool, the same tree with a local, never-committed edit making
+ *      `sharedBgzfWorkerPool()` return `Promise.resolve(undefined)` — the
+ *      documented fallback, so every adapter inflates in process and nothing
+ *      else changes
+ *   2. shell/load_alignments.sh, then shell/load_bgzf_tracks.sh, which load
+ *      both builds and raise every bgzip-backed track's fetchSizeLimit
+ *   3. serve builds/pool on :8010 and builds/nopool on :8011 (BASE_POOL and
+ *      BASE_NOPOOL move them), then
  *      `node --experimental-strip-types scripts/bgzfpool/endtoend.ts [reps]`,
  *      or a subset of the corpus with `TRACKS=1000x.longread.bam,...`
  *
@@ -38,7 +42,8 @@ import { DEFAULT_TRACKS, REF, TIMED, WINDOWS } from './windows.ts'
 
 import type { Browser, Page, Target } from 'puppeteer'
 
-const BASE = process.env.BASE ?? 'http://localhost:8010'
+const BASE_POOL = process.env.BASE_POOL ?? 'http://localhost:8010'
+const BASE_NOPOOL = process.env.BASE_NOPOOL ?? 'http://localhost:8011'
 const REPS = Number(process.argv[2] ?? process.env.REPS ?? 5)
 const TRACKS = (process.env.TRACKS ?? DEFAULT_TRACKS.join(',')).split(',')
 
@@ -69,7 +74,11 @@ interface ArmRun {
   blobWorkers: number
 }
 
-async function panSeries(browser: Browser, trackId: string): Promise<ArmRun> {
+async function panSeries(
+  browser: Browser,
+  base: string,
+  trackId: string,
+): Promise<ArmRun> {
   // Counted at the browser rather than the page: a pool worker is spawned by
   // the RPC worker, so it is a target nested one level below the page.
   let blobWorkers = 0
@@ -84,7 +93,7 @@ async function panSeries(browser: Browser, trackId: string): Promise<ArmRun> {
   try {
     const [s0, e0] = WINDOWS[0]!
     await page.goto(
-      `${BASE}/?loc=${REF}:${s0}-${e0}&assembly=hg19mod&tracks=${trackId}`,
+      `${base}/?loc=${REF}:${s0}-${e0}&assembly=hg19mod&tracks=${trackId}`,
       { waitUntil: 'domcontentloaded', timeout: 120000 },
     )
     if (!(await waitReady(page))) {
@@ -191,7 +200,8 @@ for (const track of TRACKS) {
     for (const arm of order) {
       const run = await panSeries(
         browser,
-        arm === 'pooled' ? track : `${track}.nopool`,
+        arm === 'pooled' ? BASE_POOL : BASE_NOPOOL,
+        track,
       )
       if (arm === 'pooled') {
         pooled.push(run.times)
@@ -248,14 +258,15 @@ for (const track of TRACKS) {
     console.log(
       `  !! ${track} pooled arm spawned NO blob: workers — the pool fell back ` +
         `to inflating in process and this row compares nothing. Check that ` +
-        `the build has the useBgzfWorkerPool slot and that nested workers are ` +
+        `builds/pool is the unmodified tree and that nested workers are ` +
         `available.`,
     )
   }
   if (blobWorkers.plain > 0) {
     console.log(
-      `  !! ${track}.nopool spawned ${blobWorkers.plain} blob: workers — the ` +
-        `twin did not disable the pool. Check the .nopool track's adapter.`,
+      `  !! ${track} spawned ${blobWorkers.plain} blob: workers on ` +
+        `${BASE_NOPOOL} — that build still has the pool. Check its edit to ` +
+        `sharedBgzfWorkerPool().`,
     )
   }
 }
@@ -264,7 +275,7 @@ await browser.close()
 fs.mkdirSync('results', { recursive: true })
 fs.writeFileSync(
   'results/bgzfpool.json',
-  JSON.stringify({ base: BASE, reps: REPS, windows: WINDOWS, measuredAt, results }, null, 2),
+  JSON.stringify({ base: { pool: BASE_POOL, nopool: BASE_NOPOOL }, reps: REPS, windows: WINDOWS, measuredAt, results }, null, 2),
 )
 
 let md = `# BGZF worker pool, on vs off, end to end in jbrowse\n\n`
@@ -275,7 +286,7 @@ md += `rather than between aggregates. Speedup above 1.0 means the pool is faste
 md += `Two things invalidate a row and neither shows up in the ratio. **Foreign `
 md += `cores** above ${FOREIGN_CORE_CEILING} means something else was using the machine. `
 md += `**Blob workers** is how many \`blob:\` worker targets each arm spawned: `
-md += `4/0 is the pool engaged in the pooled arm and off in the twin, and anything `
+md += `4/0 is the pool engaged in builds/pool and off in builds/nopool, and anything `
 md += `else means the two arms were not different — \`getSharedWorkerPool()\` `
 md += `returns undefined wherever a Worker cannot be created and every read then `
 md += `quietly inflates in process, with no error and nothing failing.\n\n`
@@ -296,6 +307,7 @@ for (const track of Object.keys(results)) {
   md += `| ${r.blobWorkers.pooled}/${r.blobWorkers.plain} `
   md += `| ${(r.load.foreignCores ?? Number.NaN).toFixed(2)} |\n`
 }
-fs.writeFileSync('results/bgzfpool.md', md)
+// not results/bgzfpool.md, which is the hand-written page this table is read in
+fs.writeFileSync('results/bgzfpool-endtoend.md', md)
 console.log('\n' + md)
-console.log('Wrote results/bgzfpool.json and results/bgzfpool.md')
+console.log('Wrote results/bgzfpool.json and results/bgzfpool-endtoend.md')

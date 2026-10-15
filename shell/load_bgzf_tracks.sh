@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # Load the BGZF pool benchmark's tracks into every build in builds/: the
-# indexed VCF sweep, plus a `.nopool` twin of every bgzip-backed track.
+# indexed VCF sweep, with fetchSizeLimit raised on every bgzip-backed track.
 #
 # Run after load_alignments.sh, which puts the assembly and the BAM tracks in.
 # Track ids stay the bare filename, because the harness addresses tracks as
@@ -21,6 +21,6 @@ for l in builds/*; do
       fi
     done
   done
-  node shell/patch_nopool.js "$l"
+  node shell/patch_fetch_limit.js "$l"
 done
 echo "DONE loading bgzf pool tracks"

@@ -290,10 +290,10 @@ backends-webgpu: gate | $(LOGDIR)
 # never reaches, and quoting it alone is the mistake results/crampool.md records
 # this repo already making about the CRAM slice pool.
 #
-# The end-to-end half needs a build carrying the `useBgzfWorkerPool` config slot
-# and a `.nopool` twin of every bgzip-backed track (`shell/load_bgzf_tracks.sh`,
-# which `make corpus` runs). Against a build without the slot both arms run
-# pooled and the run reports ~1.00x; the blob-worker count it prints is what
+# The end-to-end half needs two builds of one tree, builds/pool unmodified and
+# builds/nopool with `sharedBgzfWorkerPool()` returning undefined, served on
+# :8010 and :8011 (agent-docs/reference/bgzfpool-linux-runbook.md). If the two
+# do not differ the run reports ~1.00x; the blob-worker count it prints is what
 # says so rather than leaving it to be inferred from a flat number.
 #
 # Out of `timings` deliberately. It needs a build the other targets do not, and

@@ -53,19 +53,13 @@ So: don't set out to "confirm 2x". Set out to find which of those three it is.
 
 ## Do the two things that are actually blocking
 
-### 1. The end-to-end arm needs rewiring — do NOT reinstate the config slot
+### 1. Stage the two builds
 
-`scripts/bgzfpool/endtoend.ts` compares a track against a `.nopool` twin, which
-depended on a `useBgzfWorkerPool` config slot on BamAdapter / VcfTabixAdapter /
-Gff3TabixAdapter. **That slot was removed on purpose — it was test-only and is
-not something to ship.** Don't add it back.
-
-Today `sharedBgzfWorkerPool()` is called unconditionally, so if you run
-endtoend.ts as-is, mobx-state-tree drops the unknown `.nopool` key, both arms
-run pooled, and you get ~1.00x with a blob-worker column reading 4/4.
-
-Compare two **builds** instead, which is how this repo already compares
-webgl-poc against releases:
+`scripts/bgzfpool/endtoend.ts` compares two **builds** of one tree, served on
+`BASE_POOL` (default `:8010`) and `BASE_NOPOOL` (`:8011`). It used to compare a
+track against a `.nopool` twin, which relied on a `useBgzfWorkerPool` config
+slot on BamAdapter / VcfTabixAdapter / Gff3TabixAdapter. **That slot was removed
+on purpose — it was test-only and is not something to ship.** Don't add it back.
 
 - `builds/pool` — jbrowse-web built from the tree unmodified.
 - `builds/nopool` — the same tree with one local, never-committed edit to
@@ -73,10 +67,9 @@ webgl-poc against releases:
   return `Promise.resolve(undefined)`. That is the documented fallback path, so
   every adapter then inflates in process with no other behaviour change.
 
-Then change `endtoend.ts` to take two base URLs rather than a track and its
-twin. Keep the blob-worker gate exactly as it is — it is what proves the two
-arms differ: **4 on the pool build, 0 on the nopool build.** Any other pair
-means the arms were not different and the run is worthless.
+Keep the blob-worker gate exactly as it is — it is what proves the two arms
+differ: **4 on the pool build, 0 on the nopool build.** Any other pair means the
+arms were not different and the run is worthless.
 
 ### 2. Widen the windows, at least for tabix
 
@@ -127,7 +120,7 @@ the load with `--warn` and call the scripts directly:
 node --experimental-strip-types scripts/gate.ts --warn   # reports, exits 0
 JBROWSE=$HOME/src/jbrowse-components \
   node --experimental-strip-types scripts/bgzfpool/standalone.ts 9
-# ... after doing (1) above:
+# after staging builds/pool and builds/nopool (1):
 npx http-server builds/pool   -p 8010 -s --cors &
 npx http-server builds/nopool -p 8011 -s --cors &
 node --experimental-strip-types scripts/bgzfpool/endtoend.ts 5
@@ -150,20 +143,14 @@ touch.
 
 ## Traps that are not in the ratio
 
-### patch_nopool.js is half dead, and the live half is load-bearing
+### patch_fetch_limit.js is load-bearing
 
-`shell/patch_nopool.js` does two things, and only the first is obsolete:
-
-- it adds the `.nopool` twins off the removed config slot — dead, and the
-  reason the end-to-end arm needs the two-build rework above;
-- **it raises `fetchSizeLimit` to 1e10 on every bgzip-backed track** — very much
-  alive. Over the 5 MB default a track renders "Requested too much data" and
-  never fetches: no error, no failing render, just an arm that is fast because
-  it did nothing. A 3,000-sample VCF over a 19 kb window is comfortably past it,
-  and a wide window puts the BAM tracks past it too.
-
-So do not delete the script as dead code. Keep the `fetchSizeLimit` pass and
-apply it to **both** builds.
+`shell/patch_fetch_limit.js` **raises `fetchSizeLimit` to 1e10 on every
+bgzip-backed track**. Over the 5 MB default a track renders "Requested too much
+data" and never fetches: no error, no failing render, just an arm that is fast
+because it did nothing. A 3,000-sample VCF over a 19 kb window is comfortably
+past it, and a wide window puts the BAM tracks past it too. Apply it to **both**
+builds; `load_bgzf_tracks.sh` does, for everything in `builds/`.
 
 ### make corpus fails at the end without builds/ staged
 
