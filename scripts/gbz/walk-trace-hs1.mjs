@@ -3,13 +3,13 @@ import puppeteer from 'puppeteer'
 // node walk-trace-hs1.mjs <8|all> <refName> <start> <end> [walkStepBudget|''] [layoutMode]
 // walk-trace.mjs on T2T-CHM13: opens a GraphGenomeView on the hs1 walk-indexed
 // track of test_data/graphgenomeview/hprc.json, served by the main build, and
-// counts the range requests to the CHM13 walk, node and link files and their
-// indexes until the graph is cut and drawn. SCREENSHOT=<png> saves the page
+// counts the range requests to the CHM13 walk file and its index
+// until the graph is cut and drawn. SCREENSHOT=<png> saves the page
 // once drawn. TRACK_JSON=<file> adds that track config to the session first,
 // for checking a track before the config carrying it deploys.
 const [haplotypes, refName, start, end, budget, layoutMode] = process.argv.slice(2)
 const trackId = process.env.TRACK_ID ?? 'hprc_v2_1_walks_hs1'
-const dataPrefix = process.env.DATA_PREFIX ?? 'hprc-v2.1-mc-grch38.CHM13.'
+const dataPrefix = process.env.DATA_PREFIX ?? 'hprc-v2.1-mc-grch38-f3.CHM13.'
 const screenshot = process.env.SCREENSHOT
 const trackJson = process.env.TRACK_JSON ? fs.readFileSync(process.env.TRACK_JSON, 'utf8') : undefined
 const build = 'https://jbrowse.org/code/jb2/main/'
