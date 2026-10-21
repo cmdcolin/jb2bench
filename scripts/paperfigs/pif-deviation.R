@@ -61,7 +61,7 @@ fig <- ggplot(trace, aes(mb, px, colour = series)) +
                                         levels(trace$series))) +
   scale_y_continuous(breaks = scales::breaks_width(2)) +
   labs(
-    title = "Deviation of a coarsened PIF record from its alignment",
+    title = "Where a coarsened alignment record draws, against the alignment it stands for",
     subtitle = sprintf(
       paste0("%s, the record whose coarsened encoding deviates most.\n",
              "Drawn at %s bp per pixel, the zoom the coarse tier is served at; ",
