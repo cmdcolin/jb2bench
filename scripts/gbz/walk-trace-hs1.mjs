@@ -9,7 +9,7 @@ import puppeteer from 'puppeteer'
 // for checking a track before the config carrying it deploys.
 const [haplotypes, refName, start, end, budget, layoutMode] = process.argv.slice(2)
 const trackId = process.env.TRACK_ID ?? 'hprc_v2_1_walks_hs1'
-const dataPrefix = process.env.DATA_PREFIX ?? 'hprc-v2.1-mc-grch38-f4.CHM13.'
+const dataPrefix = process.env.DATA_PREFIX ?? 'hprc-v2.1-mc-grch38-f5.CHM13.'
 const screenshot = process.env.SCREENSHOT
 const trackJson = process.env.TRACK_JSON ? fs.readFileSync(process.env.TRACK_JSON, 'utf8') : undefined
 const build = 'https://jbrowse.org/code/jb2/main/'

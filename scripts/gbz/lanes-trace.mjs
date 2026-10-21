@@ -5,7 +5,7 @@ import puppeteer from 'puppeteer'
 // to that track's files until the network has been quiet for 8 s.
 const [trackId, loc] = process.argv.slice(2)
 const match = {
-  hprc_v2_1_walk_lanes: u => u.includes('/demos/hprc/hprc-v2.1-mc-grch38-f4.GRCh38'),
+  hprc_v2_1_walk_lanes: u => u.includes('/demos/hprc/hprc-v2.1-mc-grch38-f5.GRCh38'),
   hprc_v2_1_gbz_lanes: u => u.includes('gbz.db') || u.includes('haplotype-index'),
   hprc_v2_1_pif_lanes: u => u.includes('hprc_multiway_gfa.pif.gz'),
 }[trackId]
