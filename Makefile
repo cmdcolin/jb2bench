@@ -27,7 +27,8 @@ LOGDIR := results/logs
         crosstool-zoom crosstool-pan crosstool-bundles crosstool-cold-paper \
         parsers parsers-count cram-samtools multibam backends clean-logs \
         formats toolcheck shots paper-tables paper-figs paper-data wait-quiet \
-        backends-webgpu ec2-up ec2-provision ec2-spike ec2-run ec2-down \
+        backends-webgpu ec2-up ec2-provision ec2-spike ec2-run ec2-run-light ec2-down \
+        crosstool-cold-light crosstool-zoom-light \
         stage-release portals-fetch portals-variant portals-gene agent-evals \
         wasmgate bgzfpool bgzfpool-standalone bgzfpool-endtoend pif pif-options
 
@@ -58,6 +59,7 @@ help:
 	@echo "  make crosstool-cold  just the cold-load matrix"
 	@echo "  make crosstool-zoom  just the zoom"
 	@echo "  make crosstool-pan   just the pan"
+	@echo "  make crosstool-cold-light / crosstool-zoom-light  the paper's arms only"
 	@echo "  make parsers         the parser libraries, 2023 vs current, + the sweep"
 	@echo "  make cram-samtools   @gmod/cram against samtools, the 2019 paper's benchmark"
 	@echo "  make wasmgate        is a routine worth compiling to wasm, or is the copy bigger?"
@@ -200,8 +202,12 @@ ARMS := JBROWSE_PORTS=8000,8001,8004
 # driver per tool. GenomeSpy gained one on 2026-09-02 and is in both lists now;
 # Gosling has none, so naming it in a motion run would have it silently filtered
 # out and quietly narrow the table.
-TOOLARMS := TOOLS=jbrowse,jbrowse-release-4.3.0,jbrowse-release-2.4.0,igv,igv-deep,genomespy,gosling
+# igv-tall is igv.js with a track tall enough for every packed row, the
+# sensitivity check on igv drawing only the rows its 600 px canvas holds. It
+# rides in the zoom but not the pan, where a 1000x tall track would add hours.
+TOOLARMS := TOOLS=jbrowse,jbrowse-release-4.3.0,jbrowse-release-2.4.0,igv,igv-deep,igv-tall,genomespy,gosling
 MOTIONARMS := TOOLS=jbrowse,jbrowse-release-4.3.0,jbrowse-release-2.4.0,igv,igv-deep,genomespy
+ZOOMARMS := TOOLS=jbrowse,jbrowse-release-4.3.0,jbrowse-release-2.4.0,igv,igv-deep,igv-tall,genomespy
 
 # The Gosling harness is the one arm that needs a build step. gosling.js ships
 # ESM with bare specifiers, so a browser cannot load it out of node_modules the
@@ -251,9 +257,22 @@ crosstool-cold-paper: gate toolcheck crosstool-bundles | $(LOGDIR)
 	  $(NODE) scripts/crosstool/runner.ts 2>&1 \
 	  | tee $(LOGDIR)/crosstool-cold-1mb-$(STAMP).log
 
+# Timed to the compositor frame swap (panprofile.ts INSTRUMENT=frames, the zoom
+# default), not to the last draw call.
 crosstool-zoom: gate toolcheck | $(LOGDIR)
-	MOTION=zoom $(ARMS) $(MOTIONARMS) $(NODE) scripts/crosstool/panrunner.ts 2>&1 \
+	MOTION=zoom INSTRUMENT=frames $(ZOOMFORMATS) $(ARMS) $(ZOOMARMS) $(NODE) scripts/crosstool/panrunner.ts 2>&1 \
 	  | tee $(LOGDIR)/crosstool-zoom-$(STAMP).log
+
+# The light set: every cell the paper plots, on the arms it names -- the build
+# under test, v2.4.0, igv.js at 600 px and with every row, GenomeSpy. No v4.3.0
+# and no Gosling, and the zoom on BAM alone, as the zoom figure draws it.
+LIGHTARMS := ARMS=JBROWSE_PORTS=8000,8004
+crosstool-cold-light:
+	$(MAKE) crosstool-cold-paper $(LIGHTARMS) \
+	  TOOLARMS=TOOLS=jbrowse,jbrowse-release-2.4.0,igv,igv-tall,genomespy
+crosstool-zoom-light:
+	$(MAKE) crosstool-zoom $(LIGHTARMS) ZOOMFORMATS=FORMATS=bam \
+	  ZOOMARMS=TOOLS=jbrowse,jbrowse-release-2.4.0,igv,igv-tall,genomespy
 
 crosstool-pan: gate toolcheck | $(LOGDIR)
 	MOTION=pan $(ARMS) $(MOTIONARMS) $(NODE) scripts/crosstool/panrunner.ts 2>&1 \
@@ -454,6 +473,7 @@ stage-release: ; @shell/stage_release.sh $(TAG)
 
 ec2-spike:     ; ec2/spike.sh
 ec2-run:       ; ec2/run.sh
+ec2-run-light: ; PHASES="crosstool-cold-light crosstool-zoom-light" ec2/run.sh
 ec2-down:      ; ec2/down.sh
 
 # ------------------------------------------------------------ automation

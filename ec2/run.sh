@@ -21,18 +21,19 @@
 # quietly measuring the cells it does have.
 #
 # The instance powers itself off MAX_MINUTES after launch whatever is running,
-# so set EC2_MAX_MINUTES before ec2/up.sh for a run this long. The 2026-09-24
-# spike put the cold-load phases in the hours rather than the minutes, and a
-# power-off mid-phase loses that phase; it does not lose the ones already
-# pulled back, which is why each one rsyncs on its own.
+# so set EC2_MAX_MINUTES before ec2/up.sh for a run this long: the default
+# PHASES take about 20 hours. A power-off mid-phase loses what was not yet
+# pulled back, which is why results sync every SYNC_SECONDS.
 set -euo pipefail
 . "$(dirname "$0")/config.sh"
 load_state
 
-# Cold load first: it is the longest phase and the one the manuscript's main
-# figure reads, so a run that gets cut short should have it in hand. Parsers and
-# cram-samtools are node-only, cost minutes, and go last for the same reason.
-PHASES=${PHASES:-"crosstool-cold-paper crosstool-zoom crosstool-pan render render-1mb interaction parsers cram-samtools"}
+# The two phases the manuscript's figures read: cold load (with memory) and
+# zoom. Cold load first, since it is the longest and the main figure. The
+# others -- crosstool-pan render render-1mb interaction parsers cram-samtools --
+# are named on the command line when wanted; parsers needs ecosystem/.libs
+# node_modules, which provision.sh does not copy.
+PHASES=${PHASES:-"crosstool-cold-paper crosstool-zoom"}
 [ $# -gt 0 ] && PHASES="$*"
 
 STAMP=$(date +%Y-%m-%d-%H%M)
@@ -42,8 +43,14 @@ echo "build under test: ${EC2_BUILD:-current}"
 echo "phases: $PHASES"
 echo "results: $OUT"
 
+# `[e]` so the pattern does not match the remote shell running the pgrep.
+DRIVER="pgrep -f '[e]c2/phases.sh' >/dev/null"
+
 # Servers stay up across every phase, and the build under test is whatever
-# EC2_BUILD named. `make serve` reads BUILD for exactly this.
+# EC2_BUILD named. Skipped when reattaching, since it restarts the servers.
+if remote "$DRIVER"; then
+  echo "a phase driver is already running on the instance; attaching"
+else
 remote "bash -s" <<EOF 2>&1 | tee "$OUT/serve.log"
 set -euo pipefail
 cd $REMOTE_ROOT
@@ -55,24 +62,32 @@ if ! grep '"set":"configured"' results-gpu.jsonl | grep -q '"hardware":true'; th
   exit 1
 fi
 pkill -f http-server || true
-make serve BUILD=${EC2_BUILD:-current}
-EOF
-
-for phase in $PHASES; do
-  echo "=== $phase ==="
-  # `|| true` so one failed phase does not abandon the ones after it; the log
-  # and the gate output say which cells are missing, and a phase is cheaper to
-  # repeat on its own than the whole matrix is.
-  remote "bash -s" <<EOF 2>&1 | tee "$OUT/$phase.log" || true
-set -uo pipefail
-cd $REMOTE_ROOT
-export CHROME_ANGLE='--use-angle=gl-egl --use-gl=angle'
-make $phase
-uptime
-EOF
-  rsync -az -e "ssh ${SSH_OPTS[*]}" "ubuntu@$IP:$REMOTE_ROOT/results/" "$OUT/"
-  echo "--- $phase pulled back into $OUT"
+make crosstool-bundles
+# nohup and no shared stdout, as in spike.sh: a server holding the ssh
+# channel's stdout keeps this session open forever, which \`make serve\`'s
+# plain \`&\` does.
+for pb in 8000:${EC2_BUILD:-current} 8001:release-4.3.0 8004:release-2.4.0; do
+  nohup npx http-server builds/\${pb#*:} -p \${pb%%:*} -s --cors >/dev/null 2>&1 &
 done
+nohup npx http-server crosstool -p 8003 -s --cors >/dev/null 2>&1 &
+sleep 5
+node --experimental-strip-types scripts/gate.ts --warn
+EOF
+remote "cd $REMOTE_ROOT && setsid nohup ec2/phases.sh $PHASES >results/ec2-run.log 2>&1 </dev/null &"
+fi
+
+# The phases run detached on the instance (ec2/phases.sh), and this loop only
+# pulls results back every SYNC_SECONDS until the instance says it is done. A
+# dropped connection costs nothing: rerun `make ec2-run` with the same PHASES and
+# it reattaches to a running driver, or restarts one that skips finished phases.
+SYNC_SECONDS=${SYNC_SECONDS:-600}
+until remote "test -f $REMOTE_ROOT/results/.ec2/finished && ! $DRIVER"; do
+  sleep "$SYNC_SECONDS"
+  rsync -az -e "ssh ${SSH_OPTS[*]}" "ubuntu@$IP:$REMOTE_ROOT/results/" "$OUT/" || true
+  remote "tail -n 3 $REMOTE_ROOT/results/ec2-run.log; uptime" || true
+done
+rsync -az -e "ssh ${SSH_OPTS[*]}" "ubuntu@$IP:$REMOTE_ROOT/results/" "$OUT/"
+cat "$OUT/ec2-run.log"
 
 rsync -az -e "ssh ${SSH_OPTS[*]}" "ubuntu@$IP:$REMOTE_ROOT/results-gpu.jsonl" "$OUT/gpu.jsonl" || true
 echo

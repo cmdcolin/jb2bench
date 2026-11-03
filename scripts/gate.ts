@@ -55,6 +55,12 @@ interface Check {
   detail: string
   /** a failure that stops a timing run but not a counting one */
   timingOnly?: boolean
+  /**
+   * A corpus only one benchmark reads, which fails on its own file when it is
+   * missing. Reported, never blocking: the EC2 instance carries the alignment
+   * corpus alone, and these used to stop every phase there.
+   */
+  advisory?: boolean
 }
 
 const checks: Check[] = []
@@ -156,6 +162,7 @@ add({
     missingOrdinary.length === 0
       ? `${ordinary.length} files (10x, 30x)`
       : `missing ${missingOrdinary.length} of ${ordinary.length} — only scripts/bgzfpool/levers.ts reads these; make corpus`,
+  advisory: true,
 })
 
 const extras: [string, string, string][] = [
@@ -174,6 +181,7 @@ for (const [name, path, how] of extras) {
     name,
     ok: fs.existsSync(path),
     detail: fs.existsSync(path) ? path : `absent — ${how}`,
+    advisory: name !== 'wide-window corpus',
   })
 }
 
@@ -253,10 +261,10 @@ add({
 
 const pad = Math.max(...checks.map(c => c.name.length))
 for (const c of checks) {
-  console.log(`${c.ok ? ' ok ' : 'FAIL'}  ${c.name.padEnd(pad)}  ${c.detail}`)
+  console.log(`${c.ok ? ' ok ' : c.advisory ? 'warn' : 'FAIL'}  ${c.name.padEnd(pad)}  ${c.detail}`)
 }
 
-const failed = checks.filter(c => !c.ok)
+const failed = checks.filter(c => !c.ok && !c.advisory)
 const blockingTimings = failed.filter(c => c.timingOnly)
 console.log()
 if (failed.length === 0) {

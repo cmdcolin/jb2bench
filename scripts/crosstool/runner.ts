@@ -29,7 +29,8 @@
 //   CASES=20x-shortread,...   subset of rows (CASES=none regenerates the report)
 //   WINDOWS=19kb,100kb        subset of windows; see scripts/crosstool/windows.ts
 //   TOOLS=jbrowse,igv,igv-deep  subset of columns
-//   RUNS=3 WARMUP=1
+//   RUNS=5 WARMUP=1
+//   RESULTS_DIR=results       where crosstool.json and crosstool.md go
 import { execFileSync } from 'child_process'
 import fs from 'fs'
 import { enumerateCases, SCALES, selectCases, type Case } from '../render/cases.ts'
@@ -44,6 +45,7 @@ import {
   type LoadWindow,
 } from '../render/loadavg.ts'
 import { resolveBuild } from '../render/servedbuild.ts'
+import type { MemorySample } from './memory.ts'
 import {
   checkHarnessPages,
   corpusPaths,
@@ -59,7 +61,7 @@ import {
   type Window,
 } from './windows.ts'
 
-const RUNS = Number(process.env.RUNS ?? 3)
+const RUNS = Number(process.env.RUNS ?? 5)
 const WARMUP = Number(process.env.WARMUP ?? 1)
 const LOAD_CEILING = 4.0
 // igv's samplingDepth is per samplingWindowSize (100 bp). 10000 is igv's own
@@ -157,6 +159,16 @@ const allTools: Tool[] = [
     label: `igv.js ${igvVersion}, no downsampling`,
     url: (t, w) =>
       `http://localhost:${IGV_PORT}/?loc=${w.loc}&track=${t}&ref=${w.scale.assembly}&depth=${DEEP}`,
+  },
+  {
+    // Every packed row drawn. igv culls rows below its track's bottom edge, so
+    // at 600 px the deep cells draw a fraction of what igv holds while JBrowse
+    // draws every read. `height=auto` is igv's own autoHeight, which grows the
+    // track to its content; each run records `content.rowsFit` to show it did.
+    id: 'igv-tall',
+    label: `igv.js ${igvVersion}, every row`,
+    url: (t, w) =>
+      `http://localhost:${IGV_PORT}/?loc=${w.loc}&track=${t}&ref=${w.scale.assembly}&height=auto`,
   },
   {
     // Height control. The harness gives igv a 600 px track; igv's own default
@@ -423,7 +435,13 @@ const ceilingFor = (_w: Window) => Number(process.env.MAX_WAIT ?? CEILING_MS)
  */
 const FAIL_LIMIT = 2
 
-function runOnce(url: string, ceiling: number): number {
+interface Detail {
+  memory: MemorySample
+  content: unknown
+  dataRequests: number
+}
+
+function runOnce(url: string, ceiling: number) {
   let out = ''
   try {
     out = execFileSync('node', ['scripts/crosstool/paintprofile.ts', url], {
@@ -438,15 +456,42 @@ function runOnce(url: string, ceiling: number): number {
   } catch (e) {
     out = (e as { stdout?: string }).stdout ?? ''
   }
-  const val = Number.parseFloat(out.trim().split('\n').pop() || 'NaN')
-  return Number.isFinite(val) ? val : Number.NaN
+  const lines = out.trim().split('\n')
+  const val = Number.parseFloat(lines.at(-1) ?? 'NaN')
+  const detailLine = lines.find(l => l.startsWith('DETAIL '))
+  return {
+    ms: Number.isFinite(val) ? val : Number.NaN,
+    detail: detailLine ? (JSON.parse(detailLine.slice(7)) as Detail) : null,
+  }
+}
+
+const memorySummary = (samples: (Detail | null)[]) => {
+  const got = samples.filter(d => d !== null).map(d => d.memory)
+  const med = (pick: (m: MemorySample) => number | undefined) => {
+    const v = got.map(pick).filter((x): x is number => typeof x === 'number')
+    return v.length ? Number(median(v).toFixed(1)) : null
+  }
+  return {
+    jsHeapUsedMB: med(m => m.jsHeap.usedMB),
+    rendererPssMB: med(m => m.process?.byType.renderer?.pssMB),
+    gpuProcessPssMB: med(m => m.process?.byType['gpu-process']?.pssMB),
+    totalPssMB: med(m => m.process?.totalPssMB),
+    gpuDeviceDeltaMB: med(m => m.gpuDevice?.deltaMB),
+  }
 }
 
 interface Cell {
   median: number
   mean: number
   stddev: number
+  lo?: number
+  hi?: number
   runs: number[]
+  /** per measured run, aligned with `runs`; null where the run failed */
+  memory?: (MemorySample | null)[]
+  memoryMedian?: ReturnType<typeof memorySummary>
+  /** the page's `__harnessContent()` on the last run, where it defines one */
+  content?: unknown
   load: LoadWindow
   /** Set instead of a timing where the arm cannot open this cell at all. */
   unsupported?: string
@@ -463,7 +508,9 @@ interface Cell {
 }
 type Row = Record<string, Cell>
 
-const RESULTS = 'results/crosstool.json'
+const RESULTS_DIR = process.env.RESULTS_DIR ?? 'results'
+fs.mkdirSync(RESULTS_DIR, { recursive: true })
+const RESULTS = `${RESULTS_DIR}/crosstool.json`
 interface Recorded {
   igvVersion: string
   gsVersion?: string
@@ -509,6 +556,7 @@ const today = new Date().toISOString().slice(0, 10)
 async function measureRow(c: Case, w: Window): Promise<Row> {
   const key = rowKey(c.id, w.id)
   const runs: Record<string, number[]> = {}
+  const details: Record<string, (Detail | null)[]> = {}
   const before: Record<string, number> = {}
   const foreignCores: Record<string, number> = {}
   const foreignTop: Record<string, string | undefined> = {}
@@ -528,11 +576,11 @@ async function measureRow(c: Case, w: Window): Promise<Row> {
   const fails: Record<string, number> = {}
   const attempt = (t: Tool) => {
     if (abandoned.has(t.id)) {
-      return Number.NaN
+      return { ms: Number.NaN, detail: null }
     }
-    const ms = runOnce(t.url(c.track, w), ceiling)
-    if (Number.isFinite(ms)) {
-      return ms
+    const got = runOnce(t.url(c.track, w), ceiling)
+    if (Number.isFinite(got.ms)) {
+      return got
     }
     fails[t.id] = (fails[t.id] ?? 0) + 1
     if (fails[t.id]! >= FAIL_LIMIT) {
@@ -542,10 +590,11 @@ async function measureRow(c: Case, w: Window): Promise<Row> {
           `${FAIL_LIMIT} times — abandoning this cell`,
       )
     }
-    return Number.NaN
+    return { ms: Number.NaN, detail: null }
   }
   for (const t of measurable) {
     runs[t.id] = []
+    details[t.id] = []
     // The previous cell's Chrome is still tearing down when execFileSync
     // returns, so a cell that starts immediately measures the last one's exit.
     // Same settle the render matrix takes, for the same reason.
@@ -566,9 +615,11 @@ async function measureRow(c: Case, w: Window): Promise<Row> {
       if (abandoned.has(t.id)) {
         continue
       }
-      const ms = attempt(t)
+      const { ms, detail } = attempt(t)
       runs[t.id]!.push(ms)
-      console.log(`${key} ${t.id} run ${r + 1}: ${ms}`)
+      details[t.id]!.push(detail)
+      const heap = detail ? ` (js heap ${detail.memory.jsHeap.usedMB.toFixed(0)} MB, pss ${detail.memory.process?.totalPssMB.toFixed(0) ?? '?'} MB)` : ''
+      console.log(`${key} ${t.id} run ${r + 1}: ${ms}${heap}`)
     }
   }
   // Foreign CPU, not the load average, is what says whether a cell is
@@ -601,7 +652,12 @@ async function measureRow(c: Case, w: Window): Promise<Row> {
       median: vals.length ? median(vals) : Number.NaN,
       mean: vals.length ? mean(vals) : Number.NaN,
       stddev: vals.length ? stddev(vals) : Number.NaN,
+      lo: vals.length ? Math.min(...vals) : Number.NaN,
+      hi: vals.length ? Math.max(...vals) : Number.NaN,
       runs: runs[t.id]!,
+      memory: details[t.id]!.map(d => d?.memory ?? null),
+      memoryMedian: memorySummary(details[t.id]!),
+      content: details[t.id]!.findLast(d => d !== null)?.content ?? null,
       load: {
         before: before[t.id]!,
         after: loadavg(),
@@ -897,5 +953,34 @@ lines.push(
   'A ratio above 1 means igv.js took longer. Read the ratios, not the absolutes: every column of a row is measured within seconds of the others, so a ratio survives load the absolutes do not.',
 )
 lines.push('')
-fs.writeFileSync('results/crosstool.md', lines.join('\n'))
+const memTools = shownTools.filter(t =>
+  Object.values(prior.rows).some(r => r[t.id]?.memoryMedian),
+)
+if (memTools.length) {
+  lines.push('## Memory at the end of the cold load')
+  lines.push('')
+  lines.push(
+    'Median over the measured runs of each cell: JS heap used, summed over the page and its dedicated workers (`Runtime.getHeapUsage`), then total PSS over every Chrome process (`/proc/<pid>/smaps_rollup`), then the GPU device memory the run added (`nvidia-smi`, where present). MB. See `scripts/crosstool/memory.ts`.',
+  )
+  lines.push('')
+  const memHeader = ['case', 'window', ...memTools.map(t => t.label)]
+  lines.push(`| ${memHeader.join(' | ')} |`)
+  lines.push(`|${memHeader.map((_, i) => (i === 0 ? '---' : '---:')).join('|')}|`)
+  const mb = (v: number | null | undefined) => (typeof v === 'number' ? v.toFixed(0) : '—')
+  for (const [key, row] of Object.entries(prior.rows)) {
+    if (memTools.some(t => row[t.id]?.memoryMedian)) {
+      const [id, win] = key.split('@')
+      lines.push(
+        `| ${id} | ${win} | ${memTools
+          .map(t => {
+            const m = row[t.id]?.memoryMedian
+            return m ? `${mb(m.jsHeapUsedMB)} / ${mb(m.totalPssMB)} / ${mb(m.gpuDeviceDeltaMB)}` : ''
+          })
+          .join(' | ')} |`,
+      )
+    }
+  }
+  lines.push('')
+}
+fs.writeFileSync(`${RESULTS_DIR}/crosstool.md`, lines.join('\n'))
 console.log(lines.join('\n'))

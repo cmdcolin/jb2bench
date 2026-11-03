@@ -59,13 +59,10 @@ labels <- c(
 
 rows <- list()
 
-# The spread behind a plotted median, as the RANGE of the replicate runs.
-#
-# Range and not a standard deviation or an interval, because every one of these
-# cells is three runs. An SD over n=3 is a number with no useful precision and a
-# 95% interval over n=3 is worse -- both would dress three measurements as a
-# distribution. The range says exactly what was seen and claims nothing else,
-# and the figures label it as what it is.
+# The spread behind a plotted median: the RANGE of the replicate runs, which is
+# what the figures draw, and their standard deviation beside it. Runs recorded
+# before 2026-11-03 are three per cell, where an SD is a number with little
+# precision; the rerun records five.
 #
 # What is NOT a replicate here: the five steps inside one run. A zoom step
 # halves the width again each time, so those five are five different workloads
@@ -74,8 +71,8 @@ rows <- list()
 spread <- function(runs) {
   v <- unlist(runs)
   v <- v[!is.null(v) & !is.na(v)]
-  if (length(v) < 2) c(lo = NA_real_, hi = NA_real_)
-  else c(lo = min(v), hi = max(v))
+  if (length(v) < 2) c(lo = NA_real_, hi = NA_real_, sd = NA_real_, n = length(v))
+  else c(lo = min(v), hi = max(v), sd = sd(v), n = length(v))
 }
 
 # `session` records which benchmark run a number came from, and it is what the
@@ -103,6 +100,7 @@ add <- function(panel, case, series, ms, usable = TRUE, session = NA, format = "
     series = series, ms = ms, usable = usable, session = session, format = format,
     window = window, censored = censored, metric = metric,
     lo = unname(s["lo"]), hi = unname(s["hi"]),
+    sd = unname(s["sd"]), n = unname(s["n"]),
     stringsAsFactors = FALSE
   )
 }
@@ -251,7 +249,8 @@ xt_builds <- c("jbrowse" = "This work",
 # makes it fast -- and the zoom/pan motion loop below shares `xt_builds` with no
 # DRAWN filter of its own, so folding it into the shared vector put a seventh,
 # uncaptioned line on perf-crosstool-zoom.pdf the first time this was tried.
-xt_builds_cold <- c(xt_builds, "igv-deep" = "igv.js 3.8.5, no downsampling")
+xt_builds_cold <- c(xt_builds, "igv-deep" = "igv.js 3.8.5, no downsampling",
+                    "igv-tall" = "igv.js 3.8.5, every row")
 # Both formats: the version sweep above is BAM-only because that reader has
 # always meant BAM, but cross-tool's own JSON keys every case by format
 # already, so the only change here is not throwing CRAM's half away.
@@ -329,7 +328,8 @@ for (base in names(WIDE_CASES)) {
         panel = "Cold load", case = WIDE_CASES[[base]], series = xt_builds_cold[[b]],
         ms = ms, usable = contention_ok(arm), session = "cross-tool",
         format = FORMATS[[fmt]], window = "1mb", censored = censored, metric = NA,
-        lo = unname(s["lo"]), hi = unname(s["hi"]), stringsAsFactors = FALSE)
+        lo = unname(s["lo"]), hi = unname(s["hi"]),
+        sd = unname(s["sd"]), n = unname(s["n"]), stringsAsFactors = FALSE)
     }
   }
 }
@@ -397,6 +397,12 @@ for (f in names(MOTIONS)) {
         "put it back in the figures.\n", sep = "")
     next
   }
+  instruments <- unique(unlist(lapply(motion, function(r) lapply(r, function(a) a$instrument))))
+  if (f == "crosstool-zoom.json" && !identical(instruments, "frames")) {
+    cat("note: ", f, " was recorded with the draw clock (",
+        paste(c(instruments, "none recorded")[1], collapse = ", "),
+        "), not the frame-swap instrument; rerun make crosstool-zoom for pixel times\n", sep = "")
+  }
   for (base in READ_CASES) {
     key <- paste0(base, "-", FORMAT)
     cell <- cell_for(motion, key, f)
@@ -427,4 +433,25 @@ out <- do.call(rbind, rows)
 out$case <- factor(out$case, levels = labels)
 dir.create("generated", showWarnings = FALSE)
 write.csv(out, "results/paper/perf.csv", row.names = FALSE)
+
+# Memory at the end of each cold load, from runs recorded since 2026-11-03
+# (scripts/crosstool/memory.ts). Medians over the measured runs, in MB.
+mem_rows <- list()
+for (key in names(crosstool)) {
+  for (b in names(xt_builds_cold)) {
+    m <- crosstool[[key]][[b]]$memoryMedian
+    if (!is.null(m)) {
+      num <- function(x) if (is.null(x)) NA_real_ else x
+      mem_rows[[length(mem_rows) + 1]] <- data.frame(
+        cell = key, series = xt_builds_cold[[b]],
+        js_heap_mb = num(m$jsHeapUsedMB), renderer_pss_mb = num(m$rendererPssMB),
+        gpu_process_pss_mb = num(m$gpuProcessPssMB), total_pss_mb = num(m$totalPssMB),
+        gpu_device_mb = num(m$gpuDeviceDeltaMB), stringsAsFactors = FALSE)
+    }
+  }
+}
+if (length(mem_rows)) {
+  write.csv(do.call(rbind, mem_rows), "results/paper/memory.csv", row.names = FALSE)
+  cat("wrote results/paper/memory.csv,", length(mem_rows), "rows\n")
+}
 cat("wrote results/paper/perf.csv,", nrow(out), "rows, from", bench, "\n")

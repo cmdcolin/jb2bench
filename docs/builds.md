@@ -49,6 +49,12 @@ and is the arm. The fast EC2 spike ran on it the same day
 (`results/ec2/2026-09-30-1414/`): the four short-read cells and the zoom, on a
 g4dn.2xlarge with Chrome on the T4. The full matrix has not been rerun on it.
 
+`release-5.0.0-beta.20` was staged 2026-11-03 from the tag cut that day, the
+latest before v5.0.0, for the rerun that answers the journal reviewers: five
+runs per cell, memory per cold load, an igv.js arm tall enough for every row,
+and zoom timed to the compositor frame swap. Same 25 tracks as beta.10. Launch
+it with `EC2_BUILD=release-5.0.0-beta.20`.
+
 `release-5.0.0-beta.9` was staged 2026-09-25 to prove that path end to end
 before the tag the manuscript names existed. It is not the arm; delete it if
 the disk is wanted.

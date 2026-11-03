@@ -55,8 +55,17 @@
 // where each actually landed so the claim is checkable rather than assumed. A
 // step whose two tools disagree about the locus is reported, not averaged in.
 //
+// INSTRUMENT=frames, the zoom default, times to pixels on screen rather than
+// to the last draw call. A WebGL draw call returns once the command is queued,
+// so the draw clock can read before the GPU has finished. A DevTools screencast
+// delivers every compositor frame that changed with the timestamp of its swap,
+// and a step is done at the swap of the last frame whose pixels differ from the
+// one before it. The draw clock still gates the wait (draws and network quiet)
+// and is recorded beside the frame time as `drawClockMs`.
+//
 // Usage: panprofile.ts <url> <jbrowse|igv|genomespy> [screenshotDir]
 //   MOTION=pan|zoom   which interaction to time (default pan)
+//   INSTRUMENT=frames|draws|paint  (default frames for zoom, draws for pan)
 // Prints JSON: per-step ms and landed locus.
 import crypto from 'crypto'
 import fs from 'fs'
@@ -108,13 +117,18 @@ const READY_TIMEOUT = Number(process.env.READY_TIMEOUT ?? CEILING)
 // length. `drawclock.ts` has the measurement. Paint is kept because the two
 // bracket the truth from either side: a draw call precedes the compositor, a
 // screenshot follows it.
-const INSTRUMENT = process.env.INSTRUMENT === 'paint' ? 'paint' : 'draws'
+const MOTION = process.env.MOTION === 'zoom' ? 'zoom' : 'pan'
+const INSTRUMENTS = ['draws', 'paint', 'frames'] as const
+const INSTRUMENT =
+  INSTRUMENTS.find(k => k === process.env.INSTRUMENT) ?? (MOTION === 'zoom' ? 'frames' : 'draws')
+// How long the screencast must deliver no new frame before the last one is
+// believed. Only ever waited after the draw clock has already been quiet for
+// QUIET_MS, so it is a margin and never part of the reported time.
+const FRAME_QUIET_MS = Number(process.env.FRAME_QUIET_MS ?? 300)
 // Settling margin on the final draw burst — NOT the completion criterion. The
 // criterion is `isContentDrawn`: a canvas was drawn after the region's bytes
 // arrived. See drawclock.ts for the trace that forced the distinction.
 const QUIET_MS = Number(process.env.QUIET_MS ?? DEFAULT_QUIET_MS)
-
-const MOTION = process.env.MOTION === 'zoom' ? 'zoom' : 'pan'
 
 // Pan LEFT, for the reason interaction.ts documents at length: pbsim's long
 // reads run off both ends of chr22_mask, so long-read depth tapers there, and
@@ -264,6 +278,61 @@ async function drawsSettled(t0: number) {
   }
 }
 
+// Compositor frames, in frames mode only. Acked at once so Chrome keeps
+// sending; half-size JPEG because only a change in content is asked of a frame.
+interface Frame {
+  at: number
+  hash: string
+}
+const frames: Frame[] = []
+async function startScreencast() {
+  const cdp = await page.createCDPSession()
+  cdp.on('Page.screencastFrame', ev => {
+    cdp.send('Page.screencastFrameAck', { sessionId: ev.sessionId }).catch(() => {})
+    const ts = ev.metadata.timestamp
+    frames.push({ at: ts ? ts * 1000 : Date.now(), hash: hash(Buffer.from(ev.data, 'base64')) })
+  })
+  await cdp.send('Page.startScreencast', {
+    format: 'jpeg',
+    quality: 70,
+    maxWidth: 640,
+    maxHeight: 400,
+    everyNthFrame: 1,
+  })
+}
+
+/**
+ * After the draw clock has settled, the swap time of the last frame whose
+ * pixels changed, relative to `t0`. `before` is the last frame delivered
+ * before the step, so a step that changed nothing on screen is a failure
+ * rather than a zero.
+ */
+async function framesSettled(t0: number, before: string | undefined) {
+  for (;;) {
+    const last = frames.at(-1)
+    if (Date.now() - t0 > MAX_WAIT) {
+      throw new Error(`no settled frame within ${MAX_WAIT} ms`)
+    }
+    if (last && Date.now() - last.at > FRAME_QUIET_MS) {
+      break
+    }
+    await new Promise(r => setTimeout(r, 50))
+  }
+  const after = frames.filter(f => f.at >= t0)
+  let prev = before
+  let lastChange: Frame | undefined
+  for (const f of after) {
+    if (f.hash !== prev) {
+      lastChange = f
+    }
+    prev = f.hash
+  }
+  if (!lastChange) {
+    throw new Error(`${tool} put no changed frame on screen after the step`)
+  }
+  return { ms: lastChange.at - t0, frames: after.length, finalHash: prev }
+}
+
 /**
  * Wait for the pixels to stop changing and to differ from `reference`.
  *
@@ -330,6 +399,10 @@ interface Step {
    * renderer and reporting a timer.
    */
   drawMs: number
+  /** frames mode: the draw clock's time for the same step, for comparison */
+  drawClockMs?: number
+  /** frames mode: compositor frames delivered during the step */
+  frames?: number
   /** data-file responses during this step — 0 means it was served from cache */
   requests: number
   /** their content-length total */
@@ -408,6 +481,12 @@ try {
   const initial = await settle(t0, blank)
   shotCosts.push(initial.shotMs)
   let reference = await shot()
+  let frameReference: string | undefined
+  if (INSTRUMENT === 'frames') {
+    await startScreencast()
+    await new Promise(r => setTimeout(r, 500))
+    frameReference = frames.at(-1)?.hash
+  }
 
   // Recorded per run rather than assumed, because it is the difference between
   // the two numbers this benchmark could report for a JBrowse motion and the
@@ -542,7 +621,18 @@ try {
     let ms: number
     let polls = 0
     let drawMs = Number.NaN
-    if (INSTRUMENT === 'draws') {
+    let drawClockMs: number | undefined
+    let frameCount: number | undefined
+    if (INSTRUMENT === 'frames') {
+      const got = await drawsSettled(tStep)
+      const fr = await framesSettled(tStep, frameReference)
+      ms = fr.ms
+      polls = got.count
+      drawMs = got.burstMs
+      drawClockMs = got.ms
+      frameCount = fr.frames
+      frameReference = fr.finalHash
+    } else if (INSTRUMENT === 'draws') {
       const got = await drawsSettled(tStep)
       ms = got.ms
       polls = got.count
@@ -590,6 +680,8 @@ try {
       ms,
       polls,
       drawMs,
+      drawClockMs,
+      frames: frameCount,
       requests: stepRequests,
       bytes: stepBytes,
       locus,
@@ -642,6 +734,8 @@ console.log(
     // these few milliseconds, and still worth keeping apart now that the
     // discrete drive has brought the wait down to 7-30 ms.
     medianDrawMs: done.length ? median(done.map(s => s.drawMs)) : null,
+    medianDrawClockMs:
+      INSTRUMENT === 'frames' && done.length ? median(done.map(s => s.drawClockMs ?? Number.NaN)) : null,
     // Steps that issued no data request at all. Not a footnote: a step served
     // from cache is not the "both tools must fetch" case this benchmark claims
     // to be, and the report refuses to call such a row a comparison.
@@ -655,7 +749,9 @@ console.log(
     // A median at or near the floor means "too fast for this detector", which
     // is a different statement from a measured duration.
     instrument:
-      INSTRUMENT === 'draws'
+      INSTRUMENT === 'frames'
+        ? { kind: 'frames', quietMs: QUIET_MS, frameQuietMs: FRAME_QUIET_MS }
+        : INSTRUMENT === 'draws'
         ? { kind: 'draws', quietMs: QUIET_MS }
         : {
             kind: 'paint',

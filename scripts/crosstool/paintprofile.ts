@@ -62,13 +62,17 @@
 // build where both apply, this one is wrong and the results are not usable.
 //
 // Usage: paintprofile.ts <url> [screenshotPath]
-// Prints: a single floating-point millisecond value on stdout (or "FAIL").
+// Prints: a `DETAIL {json}` line with memory (see memory.ts) and whatever the
+// page's `__harnessContent()` reports, then a single floating-point
+// millisecond value as the last line on stdout (or "FAIL"). Memory is sampled
+// after the clock stops, so it costs the timing nothing.
 import crypto from 'crypto'
 import fs from 'fs'
 import path from 'path'
 import puppeteer from 'puppeteer'
 import { isData } from './drewcheck.ts'
 import { ANGLE_ARGS } from '../angleargs.ts'
+import { gpuDeviceUsedMB, sampleMemory } from './memory.ts'
 
 const WAIT_TIMEOUT = Number(process.env.MAX_WAIT ?? 120000)
 const POLL_MS = Number(process.env.POLL_MS ?? 150)
@@ -83,6 +87,7 @@ if (screenshotPath) {
   fs.mkdirSync(path.dirname(screenshotPath), { recursive: true })
 }
 
+const gpuBaselineMB = gpuDeviceUsedMB()
 const browser = await puppeteer.launch({
   headless: process.env.HEADLESS !== '0',
   // Above MAX_WAIT, or a cell that blocks the main thread longer than
@@ -183,6 +188,13 @@ try {
     }
     await new Promise(r => setTimeout(r, POLL_MS))
   }
+  const memory = await sampleMemory(browser, page, gpuBaselineMB)
+  const content = await page.evaluate(() => {
+    const f = (window as unknown as { __harnessContent?: () => unknown })
+      .__harnessContent
+    return typeof f === 'function' ? f() : null
+  })
+  console.log(`DETAIL ${JSON.stringify({ memory, content, dataRequests: fetches })}`)
   if (screenshotPath) {
     await page.screenshot({ path: screenshotPath })
   }

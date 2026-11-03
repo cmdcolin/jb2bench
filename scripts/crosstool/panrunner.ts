@@ -54,7 +54,8 @@
 //   JBROWSE_PORTS=8000,8001,8004  one JBrowse arm per port; 8004 is the version
 //                               the 2023 paper benchmarked against igv.js
 //   MOTION=pan|zoom             which interaction to measure
-//   RUNS=3 STEPS=5 PAN_DIR=left
+//   RUNS=5 WARMUP=1 STEPS=5 PAN_DIR=left
+//   RESULTS_DIR=results         where crosstool-<motion>.{json,md} go
 import { execFileSync } from 'child_process'
 import fs from 'fs'
 import { enumerateCases, selectCases } from '../render/cases.ts'
@@ -62,7 +63,8 @@ import { enumerateCases, selectCases } from '../render/cases.ts'
 import { loadavg, outliers, peak, type LoadWindow } from '../render/loadavg.ts'
 import { resolveBuild } from '../render/servedbuild.ts'
 
-const RUNS = Number(process.env.RUNS ?? 3)
+const RUNS = Number(process.env.RUNS ?? 5)
+const WARMUP = Number(process.env.WARMUP ?? 1)
 const MOTION = process.env.MOTION === 'zoom' ? 'zoom' : 'pan'
 const LOC = 'chr22_mask:124000-143000'
 const LOAD_CEILING = 4.0
@@ -143,6 +145,14 @@ const allTools: Tool[] = [
     url: t => `http://localhost:${CROSSTOOL_PORT}/?loc=${LOC}&track=${t}&depth=${DEEP}`,
   },
   {
+    // igv's own autoHeight, so every packed row is drawn: see the same arm in
+    // runner.ts.
+    id: 'igv-tall',
+    label: `igv.js ${igvVersion}, every row`,
+    kind: 'igv',
+    url: t => `http://localhost:${CROSSTOOL_PORT}/?loc=${LOC}&track=${t}&height=auto`,
+  },
+  {
     // GenomeSpy, on the same BAM through its own lazy source. It joined the
     // cold-load matrix on 2026-08-29 and this one only now, which left the
     // motion runs answering "is a multi-second zoom what a browser costs" with
@@ -204,6 +214,10 @@ const median = (a: number[]) => {
   const m = Math.floor(s.length / 2)
   return s.length % 2 ? s[m]! : (s[m - 1]! + s[m]!) / 2
 }
+const stddev = (a: number[]) => {
+  const m = a.reduce((x, y) => x + y, 0) / a.length
+  return Math.sqrt(a.reduce((n, x) => n + (x - m) ** 2, 0) / a.length)
+}
 
 /**
  * Both tools report a locus, and neither reports it the same way: JBrowse says
@@ -233,6 +247,7 @@ interface PanResult {
   appliedSteps: number
   medianMs: number | null
   medianDrawMs: number | null
+  medianDrawClockMs?: number | null
   cachedSteps: number
   totalRequests: number
   totalBytes: number
@@ -268,6 +283,15 @@ function runOnce(url: string, kind: string): PanResult | undefined {
 
 interface Cell {
   median: number
+  /** population SD, min and max of `runs` */
+  stddev?: number
+  lo?: number
+  hi?: number
+  /** which panprofile instrument produced `median`: frames, draws or paint */
+  instrument?: string
+  /** frames mode: the draw clock's median over the same runs, and its runs */
+  drawClockMedian?: number
+  drawClockRuns?: number[]
   /**
    * The final draw burst alone, with the waiting taken out. Time-to-content is
    * what a user waits, so it stays the headline — but the two are not the same
@@ -328,8 +352,9 @@ type Row = Record<string, Cell>
 
 // One file per motion. They are separate benchmarks that happen to share a
 // runner, and a merged file would make "the median" ambiguous.
-const RESULTS = `results/crosstool-${MOTION}.json`
-const REPORT = `results/crosstool-${MOTION}.md`
+const RESULTS_DIR = process.env.RESULTS_DIR ?? 'results'
+const RESULTS = `${RESULTS_DIR}/crosstool-${MOTION}.json`
+const REPORT = `${RESULTS_DIR}/crosstool-${MOTION}.md`
 interface Recorded {
   igvVersion: string
   gsVersion?: string
@@ -385,6 +410,8 @@ for (const c of cases) {
   const draws: Record<string, number[]> = {}
   const drawMs: Record<string, number[]> = {}
   const settles: Record<string, boolean | undefined> = {}
+  const drawClock: Record<string, number[]> = {}
+  const instrument: Record<string, string | undefined> = {}
   // Out of the rotation, not out of the row: an arm that cannot open this
   // container is recorded below with its reason.
   const measurable = tools.filter(t => {
@@ -404,6 +431,10 @@ for (const c of cases) {
     bytes[t.id] = 0
     draws[t.id] = []
     drawMs[t.id] = []
+    drawClock[t.id] = []
+    for (let i = 0; i < WARMUP; i++) {
+      runOnce(t.url(c.track), t.kind)
+    }
   }
 
   // Interleaved: one round runs every tool back to back, so drift lands on all
@@ -422,6 +453,10 @@ for (const c of cases) {
         drawMs[t.id]!.push(got.medianDrawMs)
       }
       settles[t.id] = got.settlesCoarseBlocks
+      instrument[t.id] = got.instrument.kind
+      if (typeof got.medianDrawClockMs === 'number' && Number.isFinite(got.medianDrawClockMs)) {
+        drawClock[t.id]!.push(got.medianDrawClockMs)
+      }
       applied[t.id]!.push(got.appliedSteps)
       loci[t.id] = got.steps.filter(s => s.applied).map(s => s.locus)
       const fetched = got.steps.filter(s => s.applied && s.requests > 0)
@@ -465,6 +500,12 @@ for (const c of cases) {
     const vals = runs[t.id]!.filter((v): v is number => typeof v === 'number')
     row[t.id] = {
       median: vals.length ? median(vals) : Number.NaN,
+      stddev: vals.length ? stddev(vals) : Number.NaN,
+      lo: vals.length ? Math.min(...vals) : Number.NaN,
+      hi: vals.length ? Math.max(...vals) : Number.NaN,
+      instrument: instrument[t.id],
+      drawClockMedian: drawClock[t.id]!.length ? median(drawClock[t.id]!) : undefined,
+      drawClockRuns: drawClock[t.id]!,
       drawMedian: drawMs[t.id]!.length ? median(drawMs[t.id]!) : Number.NaN,
       fetchedMedian: fetchedRuns[t.id]!.length
         ? median(fetchedRuns[t.id]!)
@@ -533,7 +574,7 @@ for (const c of cases) {
     ...prior.jbrowseBuilds,
     ...Object.fromEntries(jbrowseArms.map(a => [a.id, a.build])),
   }
-  fs.mkdirSync('results', { recursive: true })
+  fs.mkdirSync(RESULTS_DIR, { recursive: true })
   fs.writeFileSync(RESULTS, JSON.stringify(prior, null, 2))
 }
 
@@ -594,6 +635,20 @@ const lines: string[] = [
   `Each cell is the median over ${RUNS} runs of`,
   'each run\'s median step; tools are interleaved within a round.',
   '',
+  ...(isZoom
+    ? [
+        '## Zoom is timed to pixels on screen',
+        '',
+        'Since 2026-11-03 a zoom step ends at the compositor swap of the last',
+        'frame whose pixels changed (`INSTRUMENT=frames` in `panprofile.ts`), read',
+        'from a DevTools screencast. A WebGL draw call returns once the command is',
+        'queued, so the draw clock described below can stop before the GPU has',
+        'finished; the frame swap cannot. The draw clock still decides when to stop',
+        'waiting, and its own reading is kept as `drawClockMedian`. Frames arrive on',
+        'a ~16.7 ms cadence, so a step faster than one frame reads as one frame.',
+        '',
+      ]
+    : []),
   '## The instrument, and why it is not screenshots',
   '',
   'A step is done when **the page has stopped drawing to any canvas and stopped',
@@ -703,7 +758,10 @@ const cell = (c: Cell | undefined) => {
   // would restrict to the failure mode. Every applied step counts.
   if (isZoom) {
     return Number.isFinite(c.median)
-      ? { text: `${fmt(c.median)} ms`, comparable: true }
+      ? {
+          text: `${fmt(c.median)} ms${c.stddev !== undefined && Number.isFinite(c.stddev) ? ` ±${fmt(c.stddev)}` : ''}`,
+          comparable: true,
+        }
       : { text: '—', comparable: false }
   }
   if (Number.isFinite(c.fetchedMedian)) {

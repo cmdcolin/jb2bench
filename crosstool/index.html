@@ -11,6 +11,7 @@
     ?loc=chr22_mask:124000-143000 the shared benchmark window
     ?depth=N                      igv's samplingDepth; omit for igv's default
     ?height=N                     track height in px (default 600)
+    ?height=auto                  igv's own autoHeight: the track grows to every packed row
     ?igv=2.12.1                   igv build to load; omit for the pinned 3.8.5
 
   igv is selectable because the 2023 JBrowse 2 paper timed igv.js v2.12.1, and a
@@ -63,7 +64,12 @@
       // Span of the requested window, for the visibility cap below.
       const [start, end] = (locus.split(':')[1] ?? '0-0').split('-').map(Number)
       const depth = params.get('depth')
-      const height = Number(params.get('height') ?? 600)
+      const heightParam = params.get('height') ?? '600'
+      const autoHeight = heightParam === 'auto'
+      // Chrome's largest canvas side. igv culls rows below the track's bottom
+      // edge, so a track that reaches this has stopped drawing rows again.
+      const MAX_CANVAS_PX = 32000
+      const height = autoHeight ? 600 : Number(heightParam)
       // The format axis, for the capability matrix rather than for the timing
       // runs, which stay on alignments. Each entry is what igv.js needs to open
       // that format from a plain static host: a track type, and an index where
@@ -118,6 +124,7 @@
             ...(fmt.index ? { indexURL: `./data/${track}${fmt.index}` } : {}),
             name: track,
             height,
+            ...(autoHeight ? { autoHeight: true, maxHeight: MAX_CANVAS_PX } : {}),
             // The whole window must be inside the visibility window or igv
             // declines to draw, the same way JBrowse's byte gate does. Derived
             // from the locus rather than fixed at 1 Mb: at a 1 Mb window a fixed
@@ -130,6 +137,19 @@
       }
 
       window.__igvState = { ready: false, error: null, version: igvVersion ?? '3.8.5' }
+      // What the alignment track drew against what it holds: igv draws only the
+      // packed rows that fall inside the track's height.
+      window.__harnessContent = () => {
+        const tv = window.igvBrowser?.trackViews.find(t => t.track.type === 'alignment')
+        const contentHeight = tv?.viewports[0]?.getContentHeight()
+        return tv
+          ? {
+              trackHeight: tv.track.height,
+              contentHeight,
+              rowsFit: contentHeight <= tv.track.height,
+            }
+          : null
+      }
       igv
         .createBrowser(document.getElementById('igv'), options)
         .then(browser => {
