@@ -73,7 +73,7 @@ nohup npx http-server crosstool -p 8003 -s --cors >/dev/null 2>&1 &
 sleep 5
 node --experimental-strip-types scripts/gate.ts --warn
 EOF
-remote "cd $REMOTE_ROOT && setsid nohup ec2/phases.sh $PHASES >results/ec2-run.log 2>&1 </dev/null &"
+remote "cd $REMOTE_ROOT && mkdir -p results/.ec2 && setsid nohup ec2/phases.sh $PHASES >results/ec2-run.log 2>&1 </dev/null &"
 fi
 
 # The phases run detached on the instance (ec2/phases.sh), and this loop only
