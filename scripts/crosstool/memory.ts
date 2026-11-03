@@ -11,6 +11,13 @@
 //             browser without double counting; `peakRss` is VmHWM, each
 //             process's own high-water mark, so its sum is an upper bound on
 //             the simultaneous peak.
+//             On macOS there is no /proc: `ps -axo pid=,ppid=,rss=,command=`
+//             gives each process's resident set, grouped the same way. RSS
+//             counts a shared page once per process mapping it, so the macOS
+//             sum overstates the browser's footprint where the Linux PSS sum
+//             does not, and macOS has no per-process high-water mark to read.
+//             Apple silicon has unified memory, so GPU allocations land in the
+//             GPU process's RSS rather than in a separate device counter.
 //   gpuDevice nvidia-smi's memory.used for the whole device at the end, minus
 //             the same reading taken before Chrome launched. One browser runs
 //             at a time, so the difference is this page's device allocations
@@ -79,7 +86,53 @@ function processMemory(root: number) {
     } catch {}
   }
   const totalPssMB = Object.values(byType).reduce((n, t) => n + t.pssMB, 0)
-  return { byType, totalPssMB }
+  return { source: 'proc' as const, byType, totalPssMB }
+}
+
+interface PsRow {
+  pid: number
+  ppid: number
+  rssKB: number
+  command: string
+}
+
+export function parsePs(text: string) {
+  const rows: PsRow[] = []
+  for (const line of text.split('\n')) {
+    const m = /^\s*(\d+)\s+(\d+)\s+(\d+)\s+(.*)$/.exec(line)
+    if (m) {
+      rows.push({ pid: Number(m[1]), ppid: Number(m[2]), rssKB: Number(m[3]), command: m[4]! })
+    }
+  }
+  return rows
+}
+
+export function psMemory(rows: PsRow[], root: number) {
+  const tree = [root]
+  for (let i = 0; i < tree.length; i++) {
+    for (const r of rows) {
+      if (r.ppid === tree[i]) {
+        tree.push(r.pid)
+      }
+    }
+  }
+  const byType: Record<string, { count: number; rssMB: number }> = {}
+  for (const r of rows.filter(r => tree.includes(r.pid))) {
+    const type = /--type=([\w-]+)/.exec(r.command)?.[1] ?? (r.pid === root ? 'browser' : 'other')
+    const t = (byType[type] ??= { count: 0, rssMB: 0 })
+    t.count++
+    t.rssMB += r.rssKB / 1024
+  }
+  const totalRssMB = Object.values(byType).reduce((n, t) => n + t.rssMB, 0)
+  return { source: 'ps-rss' as const, byType, totalRssMB }
+}
+
+function darwinProcessMemory(root: number) {
+  const out = execFileSync('ps', ['-ww', '-axo', 'pid=,ppid=,rss=,command='], {
+    encoding: 'utf8',
+    maxBuffer: 1 << 24,
+  })
+  return psMemory(parsePs(out), root)
 }
 
 async function jsHeap(page: Page) {
@@ -108,7 +161,7 @@ export async function sampleMemory(browser: Browser, page: Page, gpuBaselineMB: 
   const gpuNow = gpuDeviceUsedMB()
   return {
     jsHeap: await jsHeap(page),
-    process: pid ? processMemory(pid) : null,
+    process: pid ? (process.platform === 'darwin' ? darwinProcessMemory(pid) : processMemory(pid)) : null,
     gpuDevice:
       gpuNow !== null && gpuBaselineMB !== null
         ? { usedMB: gpuNow, baselineMB: gpuBaselineMB, deltaMB: gpuNow - gpuBaselineMB }
@@ -117,3 +170,5 @@ export async function sampleMemory(browser: Browser, page: Page, gpuBaselineMB: 
 }
 
 export type MemorySample = Awaited<ReturnType<typeof sampleMemory>>
+
+export const procMemory = (m: MemorySample) => (m.process?.source === 'proc' ? m.process : undefined)

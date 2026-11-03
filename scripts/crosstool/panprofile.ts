@@ -80,6 +80,7 @@ import {
   isContentDrawn,
 } from './drawclock.ts'
 import { ANGLE_ARGS } from '../angleargs.ts'
+import { gpuInfo } from './gpuinfo.ts'
 
 const TOOLS = ['jbrowse', 'igv', 'genomespy'] as const
 type ToolKind = (typeof TOOLS)[number]
@@ -718,6 +719,10 @@ const meanShot = shotCosts.length
   ? shotCosts.reduce((a, b) => a + b, 0) / shotCosts.length
   : Number.NaN
 const floor = floorMs(meanShot)
+
+if (process.env.GPU_PROBE === '1') {
+  console.log(`GPU ${JSON.stringify(await gpuInfo(page).catch((e: unknown) => ({ error: String(e) })))}`)
+}
 
 console.log(
   JSON.stringify({

@@ -73,6 +73,7 @@ import puppeteer from 'puppeteer'
 import { isData } from './drewcheck.ts'
 import { ANGLE_ARGS } from '../angleargs.ts'
 import { gpuDeviceUsedMB, sampleMemory } from './memory.ts'
+import { gpuInfo } from './gpuinfo.ts'
 
 const WAIT_TIMEOUT = Number(process.env.MAX_WAIT ?? 120000)
 const POLL_MS = Number(process.env.POLL_MS ?? 150)
@@ -195,6 +196,9 @@ try {
     return typeof f === 'function' ? f() : null
   })
   console.log(`DETAIL ${JSON.stringify({ memory, content, dataRequests: fetches })}`)
+  if (process.env.GPU_PROBE === '1') {
+    console.log(`GPU ${JSON.stringify(await gpuInfo(page).catch((e: unknown) => ({ error: String(e) })))}`)
+  }
   if (screenshotPath) {
     await page.screenshot({ path: screenshotPath })
   }

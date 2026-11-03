@@ -45,7 +45,7 @@ import {
   type LoadWindow,
 } from '../render/loadavg.ts'
 import { resolveBuild } from '../render/servedbuild.ts'
-import type { MemorySample } from './memory.ts'
+import { procMemory, type MemorySample } from './memory.ts'
 import {
   checkHarnessPages,
   corpusPaths,
@@ -473,9 +473,9 @@ const memorySummary = (samples: (Detail | null)[]) => {
   }
   return {
     jsHeapUsedMB: med(m => m.jsHeap.usedMB),
-    rendererPssMB: med(m => m.process?.byType.renderer?.pssMB),
-    gpuProcessPssMB: med(m => m.process?.byType['gpu-process']?.pssMB),
-    totalPssMB: med(m => m.process?.totalPssMB),
+    rendererPssMB: med(m => procMemory(m)?.byType.renderer?.pssMB),
+    gpuProcessPssMB: med(m => procMemory(m)?.byType['gpu-process']?.pssMB),
+    totalPssMB: med(m => procMemory(m)?.totalPssMB),
     gpuDeviceDeltaMB: med(m => m.gpuDevice?.deltaMB),
   }
 }
@@ -618,7 +618,7 @@ async function measureRow(c: Case, w: Window): Promise<Row> {
       const { ms, detail } = attempt(t)
       runs[t.id]!.push(ms)
       details[t.id]!.push(detail)
-      const heap = detail ? ` (js heap ${detail.memory.jsHeap.usedMB.toFixed(0)} MB, pss ${detail.memory.process?.totalPssMB.toFixed(0) ?? '?'} MB)` : ''
+      const heap = detail ? ` (js heap ${detail.memory.jsHeap.usedMB.toFixed(0)} MB, pss ${procMemory(detail.memory)?.totalPssMB.toFixed(0) ?? '?'} MB)` : ''
       console.log(`${key} ${t.id} run ${r + 1}: ${ms}${heap}`)
     }
   }
