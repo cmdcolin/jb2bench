@@ -76,6 +76,7 @@ help:
 	@echo ""
 	@echo "  make backends        webgl vs webgpu vs canvas"
 	@echo "  make backends-webgpu the same + a WebGPU rung, 19kb/100kb/1mb, headed firefox"
+	@echo "  make mac-up HOST=mac1|mac2 CONFIRM=1  hardware panel on an EC2 Mac (ec2mac/README.md); DRY_RUN=1 to preview"
 	@echo ""
 	@echo "present"
 	@echo "  make figures         ggplot2 figures from the recorded JSON"
@@ -475,6 +476,9 @@ ec2-spike:     ; ec2/spike.sh
 ec2-run:       ; ec2/run.sh
 ec2-run-light: ; PHASES="crosstool-cold-light crosstool-zoom-light" ec2/run.sh
 ec2-down:      ; ec2/down.sh
+
+# The hardware panel on EC2 Mac hosts and the Linux CPU sweep: ec2mac/README.md.
+include ec2mac/targets.mk
 
 # ------------------------------------------------------------ automation
 #
