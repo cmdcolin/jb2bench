@@ -130,3 +130,6 @@ ecosystem/.libs
 # scripts/crosstool/goslingbundle.ts.
 /crosstool/gosling.bundle.js
 /crosstool/gosling-patched.bundle.js
+
+# Written by scripts/cohort-signal/build-bedgraph.ts from the published Zarr store.
+/data/cohort-signal/

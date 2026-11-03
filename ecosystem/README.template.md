@@ -525,31 +525,60 @@ so a CLI benchmark is blind to the largest single change to CRAM decode since th
 paper. [`../results/crampool.md`](../results/crampool.md) measures it where it
 exists.
 
-## Zarr is measured elsewhere
+## Zarr and a multi-column bedGraph against N BigWigs
+
+The Zarr store buys little over a multi-column bedGraph. Both fix the same
+problem, the cost of opening N BigWigs, by putting every sample in one file,
+and that accounts for nearly the whole gain. Zarr is ahead only when zoomed out
+past what one bedGraph resolution can serve cheaply, and then by about 2x on a
+whole chromosome. The tables below are the evidence.
 
 The other ecosystem change worth reporting is a format, not a parser: packing a
-cohort's per-sample signal into one Zarr store instead of N BigWigs. That one is
+cohort's per-sample signal into one file instead of N BigWigs. That one is
 network-bound rather than CPU-bound, so it does not belong in this in-process
-matrix. It has its own harness in `jbrowse-components`:
+matrix. `scripts/cohort-signal/` measures it over HTTP, every file on
+jbrowse.org:
 
 ```bash
-node scripts/measure_signal_latency.ts \
-  --samples 1000g_cnv_build/samples.tsv \
-  --region {{zarrRegion}} \
-  --zarr https://jbrowse.org/code/jb2/main/test_data/1000g_cnv/qm2_cn_1kb.zarr
+# once per store; then upload each beside its store on jbrowse.org/demos/1000g/
+node scripts/cohort-signal/build-bedgraph.ts https://jbrowse.org/demos/1000g/qm2_cn_1kb.zarr data/cohort-signal/qm2_cn_1kb.bedgraph.gz
+node scripts/cohort-signal/build-bedgraph.ts https://jbrowse.org/demos/1000g/qm2_cn_wg_10kb.zarr data/cohort-signal/qm2_cn_wg_10kb.bedgraph.gz
+HOST_LABEL=<machine> node scripts/cohort-signal/measure.ts
 ```
 
-which counts every request and byte by wrapping `fetch`. For {{zarrSamples}}
-individuals of the {{zarrPanel}} panel over one window:
+The bedGraph is the Zarr store's 1 kb level written out as text, one row per
+bin and one column per sample, bgzipped and Tabix-indexed. It is not a standard
+layout, but JBrowse reads it, and it is the nearest thing to a multi-sample
+signal file that a Tabix reader already handles. Both files hold the same
+values over the same windows, and the run checks that all three arms return
+them. For {{zarrSamples}} individuals of the {{zarrPanel}} panel over
+{{zarrRegion}}, from `results/cohort-signal/{{zarrRun}}` on {{zarrHost}}:
 
 {{zarrTable}}
 
 The bytes are not what costs; the request count is. Each BigWig needs several
 reads to locate a region before it can read it, and those reads wait on each
-other, so the cost is a round trip times the number of files.
+other, so the cost is a round trip times the number of files. The bedGraph
+needs the same 3 requests as the Zarr store and about the same time, so at this
+window the Zarr layout adds nothing a single indexed file does not.
 
-Those numbers are transcribed into `zarr.json`, which is where to update them
-after a re-run; nothing here re-measures them.
+Zoomed out to all of chromosome 17 (83 Mb over 1,500 pixels), the files are
+the whole-genome ones: the Zarr store's 10 kb-and-up pyramid, and its 10 kb
+level written out as a bedGraph, which has no coarser level to read. The Zarr
+arm reads the 30 kb level's mean, minimum and maximum, as the adapter does, and
+the bedGraph returns all 8,326 rows in view:
+
+{{wideTable}}
+
+The Zarr store moves more bytes here, because it reads three arrays, and takes
+less time, because it parses no text: read from local disk, the bedGraph's
+rows take about 0.1 s and parsing their 20.8 million values about 1 s. The
+gap would grow with a wider view. A whole-genome view would make the bedGraph
+fetch and parse the whole 178 MB file where the store reads its 1 Mb level,
+but that window is not measured here. A bedGraph per resolution would close
+most of the gap, leaving the parsing cost. Against the store's advantage zoomed
+out: its layout is a JBrowse convention that needs a plugin, and it takes 662
+MB to the bedGraph's 178 MB for the whole genome.
 
 ## Generated output
 
@@ -583,7 +612,8 @@ different question.
 
 - `versions.json` — the two-point pins, with SHAs, and any deliberate patch
 - `sweep.json` — the per-major pins for `make sweep`, and the selection rule
-- `zarr.json` — the Zarr measurement, transcribed from its own harness
+- `../scripts/cohort-signal/` — the Zarr, bedGraph and BigWig measurement over
+  HTTP; `report.ts` reads its newest run from `../results/cohort-signal/`
 - `vcf-crosslang.json` — brentp/vcf-bench's cross-language table, transcribed,
   with the caveats that have to travel with it
 - `setup.sh` — clone + build both sides; writes `.libs/manifest.txt`

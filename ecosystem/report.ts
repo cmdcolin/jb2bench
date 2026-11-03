@@ -5,7 +5,7 @@
 // from results/paper/*.tex, which this writes, so re-running the benchmark and
 // re-syncing is the only way those numbers change. That is the whole point: a
 // constant copied into prose is a constant that goes stale silently.
-import { mkdirSync, readFileSync, writeFileSync } from 'node:fs'
+import { mkdirSync, readdirSync, readFileSync, writeFileSync } from 'node:fs'
 
 interface Bench {
   name: string
@@ -19,7 +19,42 @@ const readJson = (p: string) => JSON.parse(readFileSync(here(p), 'utf8'))
 
 const raw = readJson('results/bench.json')
 const versions = readJson('versions.json')
-const zarr = readJson('zarr.json')
+// The newest run of scripts/cohort-signal/measure.ts, at the tutorial's chr17
+// window, which is the one the paper and the population_cnv tutorial state.
+const cohortSignalDir = '../results/cohort-signal/'
+const cohortSignalRun = readdirSync(here(cohortSignalDir))
+  .filter(f => f.endsWith('.json'))
+  .sort()
+  .at(-1)
+if (!cohortSignalRun) {
+  throw new Error('no results/cohort-signal/*.json — run scripts/cohort-signal/measure.ts')
+}
+const cohortSignal = readJson(`${cohortSignalDir}${cohortSignalRun}`)
+const zarrWindow = cohortSignal.windows.find((w: any) => w.label === 'population_cnv tutorial')
+const wideWindow = cohortSignal.windows.find((w: any) => w.label === 'whole chromosome 17')
+const armSummary = (arm: any) => {
+  const mid = (xs: number[]) => [...xs].sort((a, b) => a - b)[xs.length >> 1]!
+  return {
+    requests: mid(arm.requests),
+    megabytes: mid(arm.megabytes),
+    seconds: arm.medianSeconds.toFixed(1),
+  }
+}
+const zarr = {
+  samples: cohortSignal.samples,
+  panel: '1000 Genomes',
+  region: `${zarrWindow.refName}:${zarrWindow.start.toLocaleString('en-US')}-${zarrWindow.end.toLocaleString('en-US')}`,
+  run: cohortSignalRun,
+  host: cohortSignal.host,
+  bigwigs: armSummary(zarrWindow.arms.bigwigs),
+  zarr: armSummary(zarrWindow.arms.zarr),
+  bedgraph: armSummary(zarrWindow.arms.bedgraph),
+  wide: {
+    bigwigs: armSummary(wideWindow.arms.bigwigs),
+    zarr: armSummary(wideWindow.arms.zarr),
+    bedgraph: armSummary(wideWindow.arms.bedgraph),
+  },
+}
 
 const lib = (name: string) => {
   const l = versions.libraries.find((x: any) => x.name === name)
@@ -333,6 +368,18 @@ const macros: [string, string][] = [
   ['zarrStoreRequests', String(zarr.zarr.requests)],
   ['zarrStoreMb', String(zarr.zarr.megabytes)],
   ['zarrStoreSeconds', String(zarr.zarr.seconds)],
+  ['bedgraphRequests', String(zarr.bedgraph.requests)],
+  ['bedgraphMb', String(zarr.bedgraph.megabytes)],
+  ['bedgraphSeconds', String(zarr.bedgraph.seconds)],
+  ['wideBwRequests', zarr.wide.bigwigs.requests.toLocaleString('en-US')],
+  ['wideBwMb', String(zarr.wide.bigwigs.megabytes)],
+  ['wideBwSeconds', String(zarr.wide.bigwigs.seconds)],
+  ['wideZarrRequests', String(zarr.wide.zarr.requests)],
+  ['wideZarrMb', String(zarr.wide.zarr.megabytes)],
+  ['wideZarrSeconds', String(zarr.wide.zarr.seconds)],
+  ['wideBedgraphRequests', String(zarr.wide.bedgraph.requests)],
+  ['wideBedgraphMb', String(zarr.wide.bedgraph.megabytes)],
+  ['wideBedgraphSeconds', String(zarr.wide.bedgraph.seconds)],
 ]
 
 for (const [name, value] of macros) {
@@ -394,6 +441,15 @@ const zarrTable = [
   '| --- | --- | --- | --- |',
   `| ${zarr.samples.toLocaleString('en-US')} BigWigs | ${zarr.bigwigs.requests.toLocaleString('en-US')} | ${zarr.bigwigs.megabytes} MB | ${zarr.bigwigs.seconds} s |`,
   `| one Zarr store | ${zarr.zarr.requests} | ${zarr.zarr.megabytes} MB | ${zarr.zarr.seconds} s |`,
+  `| one multi-column bedGraph | ${zarr.bedgraph.requests} | ${zarr.bedgraph.megabytes} MB | ${zarr.bedgraph.seconds} s |`,
+].join('\n')
+
+const wideTable = [
+  '| | requests | bytes | time |',
+  '| --- | --- | --- | --- |',
+  `| ${zarr.samples.toLocaleString('en-US')} BigWigs | ${zarr.wide.bigwigs.requests.toLocaleString('en-US')} | ${zarr.wide.bigwigs.megabytes} MB | ${zarr.wide.bigwigs.seconds} s |`,
+  `| Zarr store, 30 kb level | ${zarr.wide.zarr.requests} | ${zarr.wide.zarr.megabytes} MB | ${zarr.wide.zarr.seconds} s |`,
+  `| multi-column bedGraph, 10 kb rows | ${zarr.wide.bedgraph.requests} | ${zarr.wide.bedgraph.megabytes} MB | ${zarr.wide.bedgraph.seconds} s |`,
 ].join('\n')
 
 const speedupTable = [
@@ -407,8 +463,11 @@ const bindings = new Map<string, string>([
   ...macros,
   ['versionsTable', versionsTable],
   ['zarrTable', zarrTable],
+  ['wideTable', wideTable],
   ['speedupTable', speedupTable],
   ['zarrRegion', zarr.region],
+  ['zarrRun', zarr.run],
+  ['zarrHost', zarr.host],
   ['pinRev', versions.pinRev],
   ['pinDateIso', versions.pinDate],
 ])

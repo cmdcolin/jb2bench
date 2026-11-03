@@ -1,0 +1,145 @@
+{
+  "measured": "2026-11-03T17:08:43.944Z",
+  "host": "laptop-precision-7540",
+  "samples": 2504,
+  "zarr": "https://jbrowse.org/demos/1000g/qm2_cn_1kb.zarr",
+  "bedgraph": "https://jbrowse.org/demos/1000g/qm2_cn_1kb.bedgraph.gz",
+  "rounds": 3,
+  "warmup": 1,
+  "concurrency": 24,
+  "pixels": 1500,
+  "windows": [
+    {
+      "label": "population_cnv tutorial",
+      "refName": "chr17",
+      "start": 36080000,
+      "end": 36270000,
+      "agree": {
+        "zarrBedgraph": true,
+        "zarrBigwigs": true
+      },
+      "arms": {
+        "bigwigs": {
+          "requests": [
+            15048,
+            15048,
+            15048
+          ],
+          "megabytes": [
+            48.39,
+            48.39,
+            48.39
+          ],
+          "seconds": [
+            15.44,
+            14.93,
+            15.05
+          ],
+          "medianSeconds": 15
+        },
+        "zarr": {
+          "requests": [
+            3,
+            3,
+            3
+          ],
+          "megabytes": [
+            0.19,
+            0.19,
+            0.19
+          ],
+          "seconds": [
+            0.07,
+            0.07,
+            0.09
+          ],
+          "medianSeconds": 0.1
+        },
+        "bedgraph": {
+          "requests": [
+            3,
+            3,
+            3
+          ],
+          "megabytes": [
+            0.31,
+            0.31,
+            0.31
+          ],
+          "seconds": [
+            0.13,
+            0.13,
+            0.1
+          ],
+          "medianSeconds": 0.1
+        }
+      }
+    },
+    {
+      "label": "Figure 2, nested deletion",
+      "refName": "chr3",
+      "start": 162650000,
+      "end": 163050000,
+      "agree": {
+        "zarrBedgraph": true,
+        "zarrBigwigs": true
+      },
+      "arms": {
+        "bigwigs": {
+          "requests": [
+            15048,
+            15048,
+            15048
+          ],
+          "megabytes": [
+            48.39,
+            48.39,
+            48.39
+          ],
+          "seconds": [
+            15.55,
+            15.3,
+            15.57
+          ],
+          "medianSeconds": 15.6
+        },
+        "zarr": {
+          "requests": [
+            4,
+            4,
+            4
+          ],
+          "megabytes": [
+            0.27,
+            0.27,
+            0.27
+          ],
+          "seconds": [
+            0.27,
+            0.2,
+            0.18
+          ],
+          "medianSeconds": 0.2
+        },
+        "bedgraph": {
+          "requests": [
+            3,
+            3,
+            3
+          ],
+          "megabytes": [
+            0.34,
+            0.34,
+            0.34
+          ],
+          "seconds": [
+            0.14,
+            0.12,
+            0.14
+          ],
+          "medianSeconds": 0.1
+        }
+      }
+    }
+  ]
+}

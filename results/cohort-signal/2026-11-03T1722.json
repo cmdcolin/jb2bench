@@ -1,0 +1,227 @@
+{
+  "measured": "2026-11-03T17:22:46.120Z",
+  "host": "laptop-precision-7540",
+  "samples": 2504,
+  "rounds": 3,
+  "warmup": 1,
+  "concurrency": 24,
+  "pixels": 1500,
+  "windows": [
+    {
+      "label": "population_cnv tutorial",
+      "refName": "chr17",
+      "start": 36080000,
+      "end": 36270000,
+      "zarr": "https://jbrowse.org/demos/1000g/qm2_cn_1kb.zarr",
+      "bedgraph": "https://jbrowse.org/demos/1000g/qm2_cn_1kb.bedgraph.gz",
+      "bpPerPx": 126.66666666666667,
+      "firstSampleMaxDifference": {
+        "bedgraph": 2.0599365235796085e-7,
+        "bigwigs": 2.0599365235796085e-7
+      },
+      "arms": {
+        "bigwigs": {
+          "detail": "basesPerSpan 127",
+          "requests": [
+            15048,
+            15048,
+            15048
+          ],
+          "megabytes": [
+            48.39,
+            48.39,
+            48.39
+          ],
+          "seconds": [
+            13.93,
+            13.98,
+            14.11
+          ],
+          "medianSeconds": 14
+        },
+        "zarr": {
+          "detail": "bin1000, 1 arrays x 1 chunks",
+          "requests": [
+            3,
+            3,
+            3
+          ],
+          "megabytes": [
+            0.19,
+            0.19,
+            0.19
+          ],
+          "seconds": [
+            0.07,
+            0.06,
+            0.06
+          ],
+          "medianSeconds": 0.1
+        },
+        "bedgraph": {
+          "detail": "190 rows",
+          "requests": [
+            3,
+            3,
+            3
+          ],
+          "megabytes": [
+            0.31,
+            0.31,
+            0.31
+          ],
+          "seconds": [
+            0.08,
+            0.08,
+            0.09
+          ],
+          "medianSeconds": 0.1
+        }
+      }
+    },
+    {
+      "label": "Figure 2, nested deletion",
+      "refName": "chr3",
+      "start": 162650000,
+      "end": 163050000,
+      "zarr": "https://jbrowse.org/demos/1000g/qm2_cn_1kb.zarr",
+      "bedgraph": "https://jbrowse.org/demos/1000g/qm2_cn_1kb.bedgraph.gz",
+      "bpPerPx": 266.6666666666667,
+      "firstSampleMaxDifference": {
+        "bedgraph": 5.91278075390278e-8,
+        "bigwigs": 5.91278075390278e-8
+      },
+      "arms": {
+        "bigwigs": {
+          "detail": "basesPerSpan 267",
+          "requests": [
+            15048,
+            15048,
+            15048
+          ],
+          "megabytes": [
+            48.39,
+            48.39,
+            48.39
+          ],
+          "seconds": [
+            13.93,
+            14.37,
+            14.42
+          ],
+          "medianSeconds": 14.4
+        },
+        "zarr": {
+          "detail": "bin1000, 1 arrays x 2 chunks",
+          "requests": [
+            4,
+            4,
+            4
+          ],
+          "megabytes": [
+            0.27,
+            0.27,
+            0.27
+          ],
+          "seconds": [
+            0.08,
+            0.07,
+            0.07
+          ],
+          "medianSeconds": 0.1
+        },
+        "bedgraph": {
+          "detail": "400 rows",
+          "requests": [
+            3,
+            3,
+            3
+          ],
+          "megabytes": [
+            0.34,
+            0.34,
+            0.34
+          ],
+          "seconds": [
+            0.12,
+            0.1,
+            0.12
+          ],
+          "medianSeconds": 0.1
+        }
+      }
+    },
+    {
+      "label": "whole chromosome 17",
+      "refName": "chr17",
+      "start": 0,
+      "end": 83257441,
+      "zarr": "https://jbrowse.org/demos/1000g/qm2_cn_wg_10kb.zarr",
+      "bedgraph": "https://jbrowse.org/demos/1000g/qm2_cn_wg_10kb.bedgraph.gz",
+      "bpPerPx": 55504.960666666666,
+      "firstSampleMaxDifference": {
+        "bedgraph": 0.006666752497355155,
+        "bigwigs": 0.007574764402314731
+      },
+      "arms": {
+        "bigwigs": {
+          "detail": "basesPerSpan 55505",
+          "requests": [
+            15048,
+            15048,
+            15048
+          ],
+          "megabytes": [
+            68.91,
+            68.91,
+            68.91
+          ],
+          "seconds": [
+            14.75,
+            14.76,
+            15.23
+          ],
+          "medianSeconds": 14.8
+        },
+        "zarr": {
+          "detail": "bin30000, 3 arrays x 12 chunks",
+          "requests": [
+            40,
+            40,
+            40
+          ],
+          "megabytes": [
+            9.5,
+            9.5,
+            9.5
+          ],
+          "seconds": [
+            0.51,
+            0.45,
+            0.77
+          ],
+          "medianSeconds": 0.5
+        },
+        "bedgraph": {
+          "detail": "8326 rows",
+          "requests": [
+            4,
+            4,
+            4
+          ],
+          "megabytes": [
+            5.89,
+            5.89,
+            5.89
+          ],
+          "seconds": [
+            1.33,
+            0.98,
+            1.11
+          ],
+          "medianSeconds": 1.1
+        }
+      }
+    }
+  ]
+}

@@ -1,8 +1,7 @@
 {
   "comment": [
-    "Transcribed, not measured here — the same arrangement as zarr.json, and for",
-    "the same reason: the harness belongs to someone else and re-running it means",
-    "building ten toolchains.",
+    "Transcribed, not measured here: the harness belongs to someone else and",
+    "re-running it means building ten toolchains.",
     "",
     "brentp/vcf-bench times eleven language bindings on one task: iterate the rows",
     "of a VCF, pull an integer out of the INFO field, accumulate, report the mean.",
