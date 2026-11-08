@@ -26,11 +26,7 @@
 import { execFileSync } from 'node:child_process'
 import fs from 'node:fs'
 
-import {
-  checkHarnessPages,
-  corpusPaths,
-  unreachable,
-} from './crosstool/servedharness.ts'
+import { checkHarnessPages, corpusPaths, unreachable } from './crosstool/servedharness.ts'
 import { SCALES } from './render/cases.ts'
 import { loadavg } from './render/loadavg.ts'
 import { resolveBuild } from './render/servedbuild.ts'
@@ -78,9 +74,7 @@ add({
 
 let agents = 0
 try {
-  agents = Number(
-    execFileSync('pgrep', ['-c', 'claude'], { encoding: 'utf8' }).trim(),
-  )
+  agents = Number(execFileSync('pgrep', ['-c', 'claude'], { encoding: 'utf8' }).trim())
 } catch {
   agents = 0
 }
@@ -275,8 +269,6 @@ if (failed.length === 0) {
       'benchmarks (MODE=count sweep, cohort request counts) still produce results.',
   )
 } else {
-  console.log(
-    `${blockingTimings.length} check(s) mean a timing taken now is not worth keeping.`,
-  )
+  console.log(`${blockingTimings.length} check(s) mean a timing taken now is not worth keeping.`)
 }
 process.exit(failed.length === 0 || WARN_ONLY ? 0 : 1)

@@ -99,12 +99,10 @@ const jbrowseArms = await Promise.all(
 )
 const jbrowseBuild = jbrowseArms[0]!.build
 
-const igvVersion = JSON.parse(
-  fs.readFileSync('node_modules/igv/package.json', 'utf8'),
-).version as string
-const gsVersion = JSON.parse(
-  fs.readFileSync('node_modules/@genome-spy/core/package.json', 'utf8'),
-).version as string
+const igvVersion = JSON.parse(fs.readFileSync('node_modules/igv/package.json', 'utf8'))
+  .version as string
+const gsVersion = JSON.parse(fs.readFileSync('node_modules/@genome-spy/core/package.json', 'utf8'))
+  .version as string
 console.log(`igv.js ${igvVersion}, GenomeSpy ${gsVersion}`)
 
 interface Tool {
@@ -370,7 +368,11 @@ interface Recorded {
   locusMismatch: Record<string, string>
 }
 const isRecordedFile = (x: unknown): x is Partial<Recorded> & Pick<Recorded, 'rows'> =>
-  typeof x === 'object' && x !== null && 'rows' in x && typeof x.rows === 'object' && x.rows !== null
+  typeof x === 'object' &&
+  x !== null &&
+  'rows' in x &&
+  typeof x.rows === 'object' &&
+  x.rows !== null
 const fresh: Recorded = {
   igvVersion,
   gsVersion,
@@ -514,9 +516,7 @@ for (const c of cases) {
       drawClockMedian: drawClock[t.id]!.length ? median(drawClock[t.id]!) : undefined,
       drawClockRuns: drawClock[t.id]!,
       drawMedian: drawMs[t.id]!.length ? median(drawMs[t.id]!) : Number.NaN,
-      fetchedMedian: fetchedRuns[t.id]!.length
-        ? median(fetchedRuns[t.id]!)
-        : Number.NaN,
+      fetchedMedian: fetchedRuns[t.id]!.length ? median(fetchedRuns[t.id]!) : Number.NaN,
       runs: runs[t.id]!,
       fetchedRuns: fetchedRuns[t.id]!,
       drawRuns: drawMs[t.id]!,
@@ -556,9 +556,7 @@ for (const c of cases) {
         if (!(d <= 50)) bad.push(`${t.id} step ${i + 1}: ${jb[i]} vs ${other[i]}`)
       }
       if (jb.length !== other.length) {
-        bad.push(
-          `${t.id} step counts differ: jbrowse ${jb.length}, ${t.id} ${other.length}`,
-        )
+        bad.push(`${t.id} step counts differ: jbrowse ${jb.length}, ${t.id} ${other.length}`)
       }
     }
   }
@@ -640,7 +638,7 @@ const lines: string[] = [
         `the benchmark window \`${LOC}\`.`,
       ]),
   `Each cell is the median over ${RUNS} runs of`,
-  'each run\'s median step; tools are interleaved within a round.',
+  "each run's median step; tools are interleaved within a round.",
   '',
   ...(isZoom
     ? [
@@ -663,7 +661,7 @@ const lines: string[] = [
   'necessary and both were arrived at by getting it wrong first.',
   '',
   'The cold-load matrix uses paint quiescence — poll a screenshot, wait for the',
-  'hash to repeat — because neither tool\'s own loading state is trustworthy: igv',
+  "hash to repeat — because neither tool's own loading state is trustworthy: igv",
   'hides its spinner when features finish *loading*, before drawing them, and',
   "JBrowse's indicator wording moves between releases. That instrument cannot",
   `resolve a ${MOTION}. It needs six samples at best, and one \`page.screenshot()\` on`,
@@ -679,7 +677,7 @@ const lines: string[] = [
   'Draws alone are still not enough: JBrowse re-projects the reads it already',
   'holds within a millisecond or two, then goes quiet while it fetches, then draws',
   'again. A detector watching only draws stops at the first gap — measured that',
-  'way, JBrowse\'s first pan step read **1.4 ms**, the time to re-project stale',
+  "way, JBrowse's first pan step read **1.4 ms**, the time to re-project stale",
   'content. Hence the network gate, taken from CDP rather than from a patched',
   '`fetch`, because JBrowse fetches in a worker and a page-side hook would see',
   "igv's requests and none of JBrowse's — the same asymmetry as the screenshots,",
@@ -689,7 +687,7 @@ const lines: string[] = [
   'and `results/quiescence.md` measures how far apart the two land. Do not assume',
   'a sign for that difference: the natural story — a draw call precedes the',
   'compositor, so draws should read early — is contradicted on a JBrowse cold',
-  'load, where draws read 4792 ms against paint\'s 2346 ms, because the page goes',
+  "load, where draws read 4792 ms against paint's 2346 ms, because the page goes",
   'on issuing draw calls after the visible result has settled.',
   '',
   '**Why an interaction and not a cold load.** Every cross-tool number in',
@@ -786,18 +784,13 @@ for (const c of allCases) {
   if (!row) continue
   const shown = shownTools.map(t => cell(row[t.id]))
   if (shown.some(x => x.text.includes('†'))) anyDaggered = true
-  const pick = (x: Cell | undefined) =>
-    x ? (isZoom ? x.median : x.fetchedMedian) : undefined
+  const pick = (x: Cell | undefined) => (x ? (isZoom ? x.median : x.fetchedMedian) : undefined)
   const jb = pick(row.jbrowse)
   const ig = pick(row.igv)
   const ratio =
-    jb && ig && Number.isFinite(jb) && Number.isFinite(ig)
-      ? `${(ig / jb).toFixed(2)}x`
-      : '—'
+    jb && ig && Number.isFinite(jb) && Number.isFinite(ig) ? `${(ig / jb).toFixed(2)}x` : '—'
   const rowPeak = Math.max(
-    ...(shownTools.map(t => row[t.id]?.load).filter(Boolean) as LoadWindow[]).map(
-      peak,
-    ),
+    ...(shownTools.map(t => row[t.id]?.load).filter(Boolean) as LoadWindow[]).map(peak),
   )
   lines.push(
     `| ${c.id} | ${shown.map(x => x.text).join(' | ')} | ${ratio} | ` +
@@ -849,7 +842,7 @@ const drawTable = isZoom
       '**`‡` is not a fast redraw, it is a blit.** The block renderer paints in a worker',
       'and the main thread only composites the finished tiles, so what is timed there is',
       'a `drawImage` and not the rendering — 0.1 ms sitting underneath a 9.7 s wait.',
-      '`drawclock` patches the page\'s canvas prototypes and cannot reach a worker\'s own',
+      "`drawclock` patches the page's canvas prototypes and cannot reach a worker's own",
       'global scope. **Compare only the un-daggered cells with each other**: the current',
       'renderer draws on the main thread through WebGL and igv draws there through the 2D',
       'API, so for those two this column is the rasterization itself.',
@@ -877,7 +870,7 @@ const drawTable = isZoom
       'waits half a second, so the win is unclaimed and the debounce is what stands',
       "between them and it. igv's redraw is real CPU work and shrinks as the window",
       'narrows and there is less left to draw, which is why its steps fall away',
-      'where the current renderer\'s stay flat.',
+      "where the current renderer's stay flat.",
       '',
       '**No number in this table is a time a user experiences.** The table above is.',
       '',
@@ -993,7 +986,7 @@ lines.push(
   '',
   '### Read the load column carefully here',
   '',
-  "`README.md` warns that a heavy row does not generate its own load — that was",
+  '`README.md` warns that a heavy row does not generate its own load — that was',
   'established for the cold-load matrix, where sampling during a 1000x-longread',
   'render found load already at 35 with `chrome=0`. **It is not true of this',
   `benchmark.** A ${MOTION} run on the heavier cases sits at \`chrome=11\` and drives`,
@@ -1015,10 +1008,7 @@ lines.push(
 // which read as a benchmark reporting its own plumbing.
 const unmeasured = allCases.some(c => {
   const row = prior.rows[c.id]
-  return (
-    row &&
-    shownTools.some(t => row[t.id] && !Number.isFinite(row[t.id]!.median))
-  )
+  return row && shownTools.some(t => row[t.id] && !Number.isFinite(row[t.id]!.median))
 })
 if (unmeasured) {
   lines.push(
@@ -1179,9 +1169,9 @@ const hotRows = allCases
   .map(c => ({
     id: c.id,
     peak: Math.max(
-      ...(shownTools
-        .map(t => prior.rows[c.id]![t.id]?.load)
-        .filter(Boolean) as LoadWindow[]).map(peak),
+      ...(shownTools.map(t => prior.rows[c.id]![t.id]?.load).filter(Boolean) as LoadWindow[]).map(
+        peak,
+      ),
     ),
   }))
   .filter(r => r.peak > LOAD_CEILING)
@@ -1198,10 +1188,7 @@ if (hotRows.length) {
     '',
   )
 } else if (cells.length) {
-  lines.push(
-    `Every row was measured below the ${LOAD_CEILING.toFixed(1)} load ceiling.`,
-    '',
-  )
+  lines.push(`Every row was measured below the ${LOAD_CEILING.toFixed(1)} load ceiling.`, '')
 }
 
 lines.push(

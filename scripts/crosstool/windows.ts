@@ -89,9 +89,7 @@ export const span = (w: Window) => {
 /** `WINDOWS=19kb` narrows to a subset, the way `CASES=` narrows the case axis. */
 export function selectWindows(env = process.env): Window[] {
   const selected = env.WINDOWS?.split(',')
-  const windows = selected
-    ? WINDOWS.filter(w => selected.includes(w.id))
-    : [...DEFAULT_WINDOWS]
+  const windows = selected ? WINDOWS.filter(w => selected.includes(w.id)) : [...DEFAULT_WINDOWS]
   if (!windows.length) {
     throw new Error(`WINDOWS matched nothing; known: ${WINDOWS.map(w => w.id).join(',')}`)
   }
@@ -116,9 +114,7 @@ export const rowKey = (caseId: string, windowId: string) => `${caseId}@${windowI
  * the only one any runner served. Same contract as `migrateCaseKey`: it
  * relabels, never re-values.
  */
-export function migrateRowKeys<T>(
-  byKey: Record<string, T> | undefined,
-): Record<string, T> {
+export function migrateRowKeys<T>(byKey: Record<string, T> | undefined): Record<string, T> {
   const out: Record<string, T> = {}
   for (const [k, v] of Object.entries(byKey ?? {})) {
     const at = k.lastIndexOf('@')

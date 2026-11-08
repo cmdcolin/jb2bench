@@ -18,7 +18,8 @@ import { hierarchicalCluster } from './optimized-hclust.mjs'
 const { clusterData } = await import(`${process.env.HOME}/src/gmod/hclust/src/index.ts`)
 
 const args = process.argv.slice(2)
-const binPath = args.find(a => !a.startsWith('--')) ??
+const binPath =
+  args.find(a => !a.startsWith('--')) ??
   `${process.env.HOME}/src/gmod/hclust/build/matrices/100-kb-window-maf-0-samples.bin`
 const N = Number(args[1] ?? 300)
 
@@ -28,7 +29,9 @@ const cols = buf.readUInt32LE(4)
 const values = new Float32Array(buf.buffer, buf.byteOffset + 8, rows * cols)
 const n = Math.min(N, rows)
 
-const data = Array.from({ length: n }, (_, i) => Array.from(values.subarray(i * cols, (i + 1) * cols)))
+const data = Array.from({ length: n }, (_, i) =>
+  Array.from(values.subarray(i * cols, (i + 1) * cols)),
+)
 
 const js = hierarchicalCluster({ data })
 const wasm = await clusterData({ data, onProgress: () => {} })
@@ -57,8 +60,8 @@ for (let i = 0; i < jsHeights.length; i++) {
   }
 }
 
-const orderMatches = js.order.length === wasm.order.length &&
-  js.order.every((v, i) => v === wasm.order[i])
+const orderMatches =
+  js.order.length === wasm.order.length && js.order.every((v, i) => v === wasm.order[i])
 
 console.log(`matrix ${binPath.split('/').pop()}  N=${n} V=${cols}`)
 console.log(`  merges           ${js.heights.length} vs ${wasmHeights.length}`)
@@ -66,7 +69,9 @@ console.log(`  max rel height diff  ${maxHeightDiff.toExponential(2)}`)
 console.log(`  leaf order        ${orderMatches ? 'identical' : 'DIFFERS'}`)
 if (!orderMatches) {
   const firstDiff = js.order.findIndex((v, i) => v !== wasm.order[i])
-  console.log(`    first difference at position ${firstDiff}: js ${js.order[firstDiff]} vs wasm ${wasm.order[firstDiff]}`)
+  console.log(
+    `    first difference at position ${firstDiff}: js ${js.order[firstDiff]} vs wasm ${wasm.order[firstDiff]}`,
+  )
 }
 const ok = orderMatches && maxHeightDiff < 1e-4
 console.log(ok ? '\nAGREE' : '\nDISAGREE')

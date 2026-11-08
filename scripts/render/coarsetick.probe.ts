@@ -66,9 +66,7 @@ const browser = await launch({
 const page = await browser.newPage()
 await page.setViewport({ width: 1280, height: 900 })
 const errors: string[] = []
-page.on('pageerror', (e: unknown) =>
-  errors.push(e instanceof Error ? e.message : String(e)),
-)
+page.on('pageerror', (e: unknown) => errors.push(e instanceof Error ? e.message : String(e)))
 
 await page.goto(
   `http://localhost:${PORT}/?loc=${LOC}&assembly=hg19mod&tracks=${TRACKS.join(',')}&renderer=webgl`,

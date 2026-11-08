@@ -76,48 +76,43 @@ async function panSeries(browser: Browser, trackId: string) {
   await page.setViewport({ width: 1280, height: 800 })
   try {
     const [s0, e0] = WINDOWS[0]!
-    await page.goto(
-      `${BASE}/?loc=chr22_mask:${s0}-${e0}&assembly=hg19mod&tracks=${trackId}`,
-      { waitUntil: 'domcontentloaded', timeout: 120000 },
-    )
+    await page.goto(`${BASE}/?loc=chr22_mask:${s0}-${e0}&assembly=hg19mod&tracks=${trackId}`, {
+      waitUntil: 'domcontentloaded',
+      timeout: 120000,
+    })
     if (!(await waitReady(page))) {
       throw new Error('initial render never settled')
     }
 
     const times: number[] = []
     for (const [start, end] of WINDOWS.slice(1)) {
-      const ms = await page.evaluate(
-        async (loc: string) => {
-          const w = window as unknown as {
-            JBrowseSession: {
-              views: { navToLocString: (s: string) => void }[]
-            }
+      const ms = await page.evaluate(async (loc: string) => {
+        const w = window as unknown as {
+          JBrowseSession: {
+            views: { navToLocString: (s: string) => void }[]
           }
-          const t0 = performance.now()
-          w.JBrowseSession.views[0]!.navToLocString(loc)
-          // the display goes back to loading, then returns; wait for the return
-          const deadline = t0 + 120000
-          let stable = 0
-          for (;;) {
-            const displays =
-              document.querySelectorAll('[data-display-phase]').length
-            const ready =
-              displays > 0 &&
-              document.querySelector('[data-display-phase="loading"]') ===
-                null &&
-              document.querySelector('[data-display-drawn="false"]') === null
-            stable = ready ? stable + 1 : 0
-            if (stable >= 3) {
-              return performance.now() - t0
-            }
-            if (performance.now() > deadline) {
-              return -1
-            }
-            await new Promise(r => setTimeout(r, 20))
+        }
+        const t0 = performance.now()
+        w.JBrowseSession.views[0]!.navToLocString(loc)
+        // the display goes back to loading, then returns; wait for the return
+        const deadline = t0 + 120000
+        let stable = 0
+        for (;;) {
+          const displays = document.querySelectorAll('[data-display-phase]').length
+          const ready =
+            displays > 0 &&
+            document.querySelector('[data-display-phase="loading"]') === null &&
+            document.querySelector('[data-display-drawn="false"]') === null
+          stable = ready ? stable + 1 : 0
+          if (stable >= 3) {
+            return performance.now() - t0
           }
-        },
-        `chr22_mask:${start}-${end}`,
-      )
+          if (performance.now() > deadline) {
+            return -1
+          }
+          await new Promise(r => setTimeout(r, 20))
+        }
+      }, `chr22_mask:${start}-${end}`)
       times.push(ms)
     }
     return times.filter(t => t > 0)
@@ -143,10 +138,7 @@ for (let rep = 0; rep < REPS; rep++) {
   // box has been drifting all day.
   const order = rep % 2 === 0 ? ['pooled', 'plain'] : ['plain', 'pooled']
   for (const arm of order) {
-    const series = await panSeries(
-      browser,
-      arm === 'pooled' ? TRACK : `${TRACK}.nopool`,
-    )
+    const series = await panSeries(browser, arm === 'pooled' ? TRACK : `${TRACK}.nopool`)
     ;(arm === 'pooled' ? pooled : plain).push(series)
   }
   loads.push(Number((await readFile('/proc/loadavg', 'utf8')).split(' ')[0]))
@@ -155,9 +147,7 @@ await browser.close()
 
 const med = (xs: number[]) => {
   const s = [...xs].toSorted((a, b) => a - b)
-  return s.length % 2
-    ? s[(s.length - 1) / 2]!
-    : (s[s.length / 2 - 1]! + s[s.length / 2]!) / 2
+  return s.length % 2 ? s[(s.length - 1) / 2]! : (s[s.length / 2 - 1]! + s[s.length / 2]!) / 2
 }
 
 // Per-PAIR ratios, not a ratio of aggregates: the two arms of one rep ran
@@ -174,9 +164,7 @@ for (let rep = 0; rep < Math.min(pooled.length, plain.length); rep++) {
 }
 
 const flat = (xss: number[][]) => xss.flat()
-console.log(
-  `\n${TRACK}  ${REPS} reps (ABBA) x ${WINDOWS.length - 1} pans per arm`,
-)
+console.log(`\n${TRACK}  ${REPS} reps (ABBA) x ${WINDOWS.length - 1} pans per arm`)
 console.log(
   `peak 1-min load during the run: ${Math.max(...loads).toFixed(2)}` +
     (Math.max(...loads) > 4 ? '   << above 4.0, treat as unusable' : ''),

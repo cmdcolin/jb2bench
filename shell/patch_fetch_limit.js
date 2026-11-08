@@ -14,11 +14,7 @@
 import fs from 'fs'
 import path from 'path'
 
-const POOLED_ADAPTERS = new Set([
-  'BamAdapter',
-  'VcfTabixAdapter',
-  'Gff3TabixAdapter',
-])
+const POOLED_ADAPTERS = new Set(['BamAdapter', 'VcfTabixAdapter', 'Gff3TabixAdapter'])
 const FETCH_SIZE_LIMIT = 1e10
 
 const build = process.argv[2]

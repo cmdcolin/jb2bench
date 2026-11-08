@@ -54,9 +54,7 @@ function check(line) {
   const probs = ml.slice('ML:B:C,'.length).split(',').map(Number)
   if (deltas.length !== probs.length) {
     bad++
-    examples.push(
-      `${cols[0]}: ${deltas.length} deltas vs ${probs.length} probabilities`,
-    )
+    examples.push(`${cols[0]}: ${deltas.length} deltas vs ${probs.length} probabilities`)
     return
   }
   if (probs.some(p => !Number.isInteger(p) || p < 0 || p > 255)) {

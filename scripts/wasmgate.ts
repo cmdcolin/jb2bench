@@ -133,9 +133,9 @@ interface HtsCodecsModule {
   HEAPU8: Uint8Array
 }
 
-const { unzip } = (await import(
-  path.join(GMOD, 'bgzf-filehandle/src/unzip.ts')
-)) as { unzip: (input: Uint8Array) => Promise<Uint8Array> }
+const { unzip } = (await import(path.join(GMOD, 'bgzf-filehandle/src/unzip.ts'))) as {
+  unzip: (input: Uint8Array) => Promise<Uint8Array>
+}
 const { scanBgzfBlocks } = (await import(
   path.join(GMOD, 'bgzf-filehandle/src/bgzfBlockScan.ts')
 )) as {
@@ -144,9 +144,7 @@ const { scanBgzfBlocks } = (await import(
 const { inflateRaw } = (await import(
   path.join(GMOD, 'bgzf-filehandle/node_modules/pako-esm2/esm/main.js')
 )) as { inflateRaw: (input: Uint8Array) => Uint8Array }
-const { forEachMismatchNumeric } = (await import(
-  path.join(GMOD, 'bam-js/src/mismatches.ts')
-)) as {
+const { forEachMismatchNumeric } = (await import(path.join(GMOD, 'bam-js/src/mismatches.ts'))) as {
   forEachMismatchNumeric: (
     cigar: ArrayLike<number>,
     numericSeq: ArrayLike<number>,
@@ -161,9 +159,7 @@ const { forEachMismatchNumeric } = (await import(
     callback: (code: number, refPos: number, length: number) => void,
   ) => void
 }
-const { default: BamRecord } = (await import(
-  path.join(GMOD, 'bam-js/src/record.ts')
-)) as {
+const { default: BamRecord } = (await import(path.join(GMOD, 'bam-js/src/record.ts'))) as {
   default: new (
     byteArray: Uint8Array,
     start: number,
@@ -403,9 +399,17 @@ const payloadOf = (b: { inputOffset: number; compressedSize: number }) =>
  */
 function walkMismatches(r: BamRecordFields, onEvent: () => void) {
   forEachMismatchNumeric(
-    r.NUMERIC_CIGAR, r.NUMERIC_SEQ, r.seq_length, r.NUMERIC_MD,
-    r.qual, undefined, r.start,
-    Number.NEGATIVE_INFINITY, Number.POSITIVE_INFINITY, r.start, onEvent,
+    r.NUMERIC_CIGAR,
+    r.NUMERIC_SEQ,
+    r.seq_length,
+    r.NUMERIC_MD,
+    r.qual,
+    undefined,
+    r.start,
+    Number.NEGATIVE_INFINITY,
+    Number.POSITIVE_INFINITY,
+    r.start,
+    onEvent,
   )
 }
 
@@ -419,7 +423,7 @@ function bamRecordSpans(plain: Uint8Array) {
     p += 4 + dv.getInt32(p, true) + 4
   }
   const spans: [number, number][] = []
-  for (let q = p; q + 4 < plain.length; ) {
+  for (let q = p; q + 4 < plain.length;) {
     const end = q + 4 + dv.getInt32(q, true) - 1
     if (end <= q || end >= plain.length) {
       break
@@ -454,8 +458,11 @@ for (const file of files) {
     const reps = n < 64 ? REPS * 4 : REPS
 
     record({
-      file: label, candidate: 'BGZF inflate',
-      units: n, inBytes: end, outBytes: plainBytes,
+      file: label,
+      candidate: 'BGZF inflate',
+      units: n,
+      inBytes: end,
+      outBytes: plainBytes,
       js: time(() => {
         for (const b of span) {
           const [s, e] = payloadOf(b)
@@ -468,8 +475,11 @@ for (const file of files) {
     })
 
     record({
-      file: label, candidate: 'BGZF block scan',
-      units: n, inBytes: end, outBytes: n * 32,
+      file: label,
+      candidate: 'BGZF block scan',
+      units: n,
+      inBytes: end,
+      outBytes: n * 32,
       js: time(() => scanBgzfBlocks(buf, 0, end), reps),
       wasm: null,
       floor: timeFloor(buf, n * 32, reps),
@@ -483,9 +493,7 @@ for (const file of files) {
   // Truthiness, which is the test BamAdapter itself makes (`!record.NUMERIC_MD
   // && packedRef`). The getter returns `undefined` for a record with no MD and
   // never null, so `!== null` is true for every record and counts nothing.
-  const withMd = spans.filter(
-    ([s2, e]) => !!new BamRecord(plain, s2, e, 0, dv).NUMERIC_MD,
-  ).length
+  const withMd = spans.filter(([s2, e]) => !!new BamRecord(plain, s2, e, 0, dv).NUMERIC_MD).length
   mdCoverage[label] = { records: spans.length, withMd }
   console.log(
     `  ${spans.length} records in ${(plain.length / 1e6).toFixed(1)} MB decompressed, ` +
@@ -517,8 +525,11 @@ for (const file of files) {
 
     const bam = (candidate: string, outBytes: number, js: () => unknown) => {
       record({
-        file: label, candidate,
-        units: take, inBytes: end - first, outBytes,
+        file: label,
+        candidate,
+        units: take,
+        inBytes: end - first,
+        outBytes,
         js: time(js, reps),
         wasm: null,
         floor: timeFloor(buf, outBytes, reps),
@@ -528,7 +539,7 @@ for (const file of files) {
 
     bam('BAM record walk', take * 8, () => {
       let n = 0
-      for (let q = first; q + 4 < end; ) {
+      for (let q = first; q + 4 < end;) {
         const stop = q + 4 + dv.getInt32(q, true) - 1
         if (stop <= q || stop >= end) {
           break
@@ -576,7 +587,9 @@ const loads = rows.map(r => r.load).toSorted((a, b) => a - b)
 const out = {
   measured: new Date().toISOString().slice(0, 10),
   host: {
-    platform: process.platform, arch: process.arch, node: process.version,
+    platform: process.platform,
+    arch: process.arch,
+    node: process.version,
     cpus: cpus().length,
   },
   load: {

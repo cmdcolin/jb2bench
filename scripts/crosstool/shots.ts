@@ -35,8 +35,14 @@ const arms = [
     url: `http://localhost:${JBROWSE_PORT}/?loc=${LOC}&assembly=hg19mod&tracks=${TRACK}&renderer=webgl`,
   },
   { id: 'igv', url: `http://localhost:${CROSSTOOL_PORT}/index.html?loc=${LOC}&track=${TRACK}` },
-  { id: 'genomespy', url: `http://localhost:${CROSSTOOL_PORT}/genomespy.html?loc=${LOC}&track=${TRACK}` },
-  { id: 'gosling', url: `http://localhost:${CROSSTOOL_PORT}/gosling.html?loc=${LOC}&track=${TRACK}` },
+  {
+    id: 'genomespy',
+    url: `http://localhost:${CROSSTOOL_PORT}/genomespy.html?loc=${LOC}&track=${TRACK}`,
+  },
+  {
+    id: 'gosling',
+    url: `http://localhost:${CROSSTOOL_PORT}/gosling.html?loc=${LOC}&track=${TRACK}`,
+  },
 ]
 
 fs.mkdirSync(OUT, { recursive: true })

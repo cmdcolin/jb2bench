@@ -138,7 +138,11 @@ async function bigwigArm(w: Window): Promise<Measurement> {
     await bw.getHeader()
     const features = await bw.getFeatures(w.refName, w.start, w.end, { basesPerSpan })
     if (index === 0) {
-      firstSample = features.map(f => ({ start: f.start, end: f.end, score: f.score ?? Number.NaN }))
+      firstSample = features.map(f => ({
+        start: f.start,
+        end: f.end,
+        score: f.score ?? Number.NaN,
+      }))
     }
   })
   const ms = performance.now() - t0
@@ -164,7 +168,10 @@ async function zarrArm(w: Window): Promise<Measurement> {
   const finest = levels[0]!
   const level =
     levels.filter(l => l.binSize <= Math.max(bpPerPx(w), finest.binSize)).at(-1) ?? finest
-  const paths = [level.path, ...(level.minPath && level.maxPath ? [level.minPath, level.maxPath] : [])]
+  const paths = [
+    level.path,
+    ...(level.minPath && level.maxPath ? [level.minPath, level.maxPath] : []),
+  ]
   const metas = await Promise.all(
     paths.map(async p => {
       const meta = (await (await wrapped(`${base}/${p}/zarr.json`)).json()) as {

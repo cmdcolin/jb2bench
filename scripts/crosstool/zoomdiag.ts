@@ -70,8 +70,7 @@ if (process.env.TRACE_TIMERS === '1') {
 
 await page.goto(url, { waitUntil: 'domcontentloaded' })
 
-const hash = (b: Uint8Array) =>
-  crypto.createHash('sha1').update(b).digest('hex').slice(0, 12)
+const hash = (b: Uint8Array) => crypto.createHash('sha1').update(b).digest('hex').slice(0, 12)
 
 // settle the initial render the same way zoomprofile.ts does
 {
@@ -110,7 +109,12 @@ const box = await page.evaluate(() => {
   }
   const r = best?.getBoundingClientRect()
   return r
-    ? { x: Math.round(r.x), y: Math.round(r.y), width: Math.round(r.width), height: Math.round(r.height) }
+    ? {
+        x: Math.round(r.x),
+        y: Math.round(r.y),
+        width: Math.round(r.width),
+        height: Math.round(r.height),
+      }
     : undefined
 })
 // A view with no track has no canvas, which is a useful control rather than an
@@ -148,7 +152,7 @@ await page.evaluate(() => {
   // Context loss is dispatched on the canvas and does not bubble, so listen in
   // the capture phase from the document — that reaches an element replaced
   // mid-flight, which per-element listeners would miss.
-  const ctx = (w as unknown as { __ctxEvents: { t: number; type: string }[] })
+  const ctx = w as unknown as { __ctxEvents: { t: number; type: string }[] }
   ctx.__ctxEvents = []
   for (const type of ['webglcontextlost', 'webglcontextrestored', 'webglcontextcreationerror']) {
     document.addEventListener(
@@ -192,7 +196,11 @@ await page.evaluate(() => {
         let target = String(r.target.nodeName)
         if (el) {
           const testid = el.getAttribute('data-testid')
-          const cls = (el.getAttribute('class') ?? '').split(/\s+/).filter(Boolean).slice(0, 2).join('.')
+          const cls = (el.getAttribute('class') ?? '')
+            .split(/\s+/)
+            .filter(Boolean)
+            .slice(0, 2)
+            .join('.')
           target = [
             el.tagName.toLowerCase(),
             testid ? `[${testid}]` : '',
@@ -320,11 +328,7 @@ const ctxEvents = await page.evaluate(() => {
   return w.__ctxEvents.map(e => ({ ...e, t: Math.round(e.t - w.__diag.t0) }))
 })
 console.log('\n--- WebGL context events ---')
-console.log(
-  ctxEvents.length
-    ? ctxEvents.map(e => `${e.t} ms ${e.type}`).join('\n')
-    : 'none',
-)
+console.log(ctxEvents.length ? ctxEvents.map(e => `${e.t} ms ${e.type}`).join('\n') : 'none')
 
 console.log('\n--- GPU draw calls ---')
 console.log(

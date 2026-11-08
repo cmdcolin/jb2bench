@@ -79,11 +79,7 @@ function tagsFor(seq, reverse) {
     deltas.push(skipped)
     skipped = 0
     // bimodal: confident methylated or confident unmethylated
-    probs.push(
-      rnd() < METHYLATED
-        ? 200 + Math.floor(rnd() * 56)
-        : Math.floor(rnd() * 40),
-    )
+    probs.push(rnd() < METHYLATED ? 200 + Math.floor(rnd() * 56) : Math.floor(rnd() * 40))
   }
   if (deltas.length === 0) {
     return undefined
@@ -106,9 +102,7 @@ process.stdin.on('end', () => {
   if (buf !== '') {
     process.stdout.write(`${transform(buf)}\n`)
   }
-  process.stderr.write(
-    `${nTagged}/${nReads} reads tagged, ${nCalls} modification calls\n`,
-  )
+  process.stderr.write(`${nTagged}/${nReads} reads tagged, ${nCalls} modification calls\n`)
 })
 
 function transform(line) {

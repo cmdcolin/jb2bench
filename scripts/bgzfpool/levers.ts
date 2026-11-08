@@ -42,7 +42,12 @@ const libs = {
 const OUT = path.join(fs.mkdtempSync(path.join(os.tmpdir(), 'bgzflevers-')), 'bench.js')
 const versionOf = (file: string) => {
   const pkg: unknown = JSON.parse(fs.readFileSync(file, 'utf8'))
-  if (typeof pkg !== 'object' || pkg === null || !('version' in pkg) || typeof pkg.version !== 'string') {
+  if (
+    typeof pkg !== 'object' ||
+    pkg === null ||
+    !('version' in pkg) ||
+    typeof pkg.version !== 'string'
+  ) {
     throw new Error(`${file} has no version`)
   }
   return pkg.version
@@ -52,12 +57,18 @@ for (const [name, rel] of Object.entries(libs)) {
   versions[name] = versionOf(path.join(JBROWSE, rel, 'package.json'))
 }
 console.log(
-  'bundling ' + Object.entries(versions).map(([n, v]) => `${n}@${v}`).join(' '),
+  'bundling ' +
+    Object.entries(versions)
+      .map(([n, v]) => `${n}@${v}`)
+      .join(' '),
 )
 execFileSync(
   'npx',
   [
-    'esbuild', 'scripts/bgzfpool/page.ts', '--bundle', '--format=esm',
+    'esbuild',
+    'scripts/bgzfpool/page.ts',
+    '--bundle',
+    '--format=esm',
     '--target=es2022',
     ...Object.entries(libs).map(
       ([name, rel]) => `--alias:${name}=${path.join(JBROWSE, rel, 'esm/index.js')}`,
@@ -108,11 +119,7 @@ await new Promise<void>(resolve => {
 
 const browser = await launch({
   headless: true,
-  args: [
-    '--no-sandbox',
-    '--disable-dev-shm-usage',
-    `--js-flags=--max-old-space-size=${HEAP_MB}`,
-  ],
+  args: ['--no-sandbox', '--disable-dev-shm-usage', `--js-flags=--max-old-space-size=${HEAP_MB}`],
 })
 
 const min = (xs: number[]) => Math.min(...xs)
@@ -165,13 +172,15 @@ for (const workers of WORKER_COUNTS) {
               const b = (
                 window as unknown as {
                   bgzfBench: {
-                    round: (u: string, rn: string, w: number[][]) => Promise<{
+                    round: (
+                      u: string,
+                      rn: string,
+                      w: number[][],
+                    ) => Promise<{
                       pooled: { ms: number; count: number }[]
                       plain: { ms: number; count: number }[]
                     }>
-                    roundConcurrent: (
-                      u: string, rn: string, w: number[][],
-                    ) => Promise<Totals>
+                    roundConcurrent: (u: string, rn: string, w: number[][]) => Promise<Totals>
                   }
                 }
               ).bgzfBench

@@ -10,7 +10,13 @@ const rows = parsePs(fs.readFileSync(new URL('fixtures/ps-darwin.txt', import.me
 assert.equal(rows.length, 11)
 const m = psMemory(rows, 4130)
 const mb = (kb: number) => kb / 1024
-assert.deepEqual(Object.keys(m.byType).toSorted(), ['browser', 'gpu-process', 'other', 'renderer', 'utility'])
+assert.deepEqual(Object.keys(m.byType).toSorted(), [
+  'browser',
+  'gpu-process',
+  'other',
+  'renderer',
+  'utility',
+])
 assert.equal(m.byType.browser!.count, 1)
 assert.equal(m.byType.renderer!.count, 2)
 assert.equal(m.byType.renderer!.rssMB, mb(412672 + 102400))

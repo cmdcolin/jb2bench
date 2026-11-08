@@ -38,9 +38,7 @@ for (const c of combos) {
       ...(c.channel ? { channel: c.channel } : {}),
     })
     const page = await browser.newPage()
-    const has = await page.evaluate(
-      () => !!(navigator as unknown as { gpu?: unknown }).gpu,
-    )
+    const has = await page.evaluate(() => !!(navigator as unknown as { gpu?: unknown }).gpu)
     console.log(`\n=== ${c.name}`)
     console.log(`navigator.gpu: ${has}`)
     await page.goto('chrome://gpu', { waitUntil: 'domcontentloaded' })

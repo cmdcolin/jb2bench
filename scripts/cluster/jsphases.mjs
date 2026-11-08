@@ -25,18 +25,19 @@ import { clusterData as greenelab } from './vendor/greenelab-hclust.js'
 import { hierarchicalCluster as optimized } from './optimized-hclust.mjs'
 
 const args = process.argv.slice(2)
-const binPath = args.find(a => !a.startsWith('--')) ??
+const binPath =
+  args.find(a => !a.startsWith('--')) ??
   `${process.env.HOME}/src/gmod/hclust/build/matrices/1-mb-window-maf-0-05-samples.bin`
 const NS = (args.find(a => a.startsWith('--ns='))?.slice(5) ?? '150,300,600,1200')
-  .split(',').map(Number)
+  .split(',')
+  .map(Number)
 const BUDGET_MS = Number(args.find(a => a.startsWith('--budget='))?.slice(9) ?? 240) * 1000
 const IMPL = args.find(a => a.startsWith('--impl='))?.slice(7) ?? 'naive'
 if (IMPL !== 'naive' && IMPL !== 'opt') {
   throw new Error(`--impl must be naive or opt, got ${IMPL}`)
 }
-const run = IMPL === 'naive'
-  ? data => greenelab({ data, onProgress: () => {} })
-  : data => optimized({ data })
+const run =
+  IMPL === 'naive' ? data => greenelab({ data, onProgress: () => {} }) : data => optimized({ data })
 
 // Layout written by hclust's `pnpm bench:real --dump`: uint32 rows, uint32
 // columns, then float32 row-major.
@@ -53,13 +54,17 @@ function subsample(n) {
 
 const results = []
 for (const n of NS) {
-  if (n > rows) { console.log(`skip N=${n}: matrix has ${rows} rows`); continue }
+  if (n > rows) {
+    console.log(`skip N=${n}: matrix has ${rows} rows`)
+    continue
+  }
   const data = subsample(n)
   const t = performance.now()
   const r = run(data)
   const totalMs = performance.now() - t
   const row = {
-    n, v: cols,
+    n,
+    v: cols,
     distanceMs: +r.distanceMs.toFixed(1),
     clusterMs: +r.clusterMs.toFixed(1),
     totalMs: +totalMs.toFixed(1),
@@ -68,9 +73,12 @@ for (const n of NS) {
   results.push(row)
   console.log(
     `N=${String(n).padStart(5)}  distance ${row.distanceMs.toFixed(0).padStart(8)} ms   ` +
-    `merge ${row.clusterMs.toFixed(0).padStart(9)} ms   merge share ${(row.clusterShare * 100).toFixed(1)}%`)
+      `merge ${row.clusterMs.toFixed(0).padStart(9)} ms   merge share ${(row.clusterShare * 100).toFixed(1)}%`,
+  )
   if (totalMs > BUDGET_MS) {
-    console.log(`stopping: N=${n} took ${(totalMs / 1000).toFixed(0)}s, past the ${BUDGET_MS / 1000}s budget`)
+    console.log(
+      `stopping: N=${n} took ${(totalMs / 1000).toFixed(0)}s, past the ${BUDGET_MS / 1000}s budget`,
+    )
     break
   }
 }
@@ -79,11 +87,14 @@ for (const n of NS) {
 // the measured growth rather than an assumed complexity.
 function exponent(key) {
   if (results.length < 2) return null
-  const a = results[0], b = results[results.length - 1]
+  const a = results[0],
+    b = results[results.length - 1]
   return +(Math.log(b[key] / a[key]) / Math.log(b.n / a.n)).toFixed(2)
 }
 const out = {
-  matrix: binPath.split('/').pop(), rows, cols,
+  matrix: binPath.split('/').pop(),
+  rows,
+  cols,
   impl: IMPL,
   // A sweep measures SHAPE, not absolute cost. Every N runs in the one process
   // and subsample() leaves ~62MB of dead JS arrays behind each time, so the
@@ -99,8 +110,13 @@ const out = {
 // fixed filename means the second run silently replaces the first — which is
 // exactly what happened, leaving a figure built from one matrix reading a file
 // written by another.
-const slug = binPath.split('/').pop().replace(/\.bin$/, '')
+const slug = binPath
+  .split('/')
+  .pop()
+  .replace(/\.bin$/, '')
 const outPath = `results/cluster-${IMPL === 'opt' ? 'jsopt' : 'js'}-phases-${slug}.json`
 writeFileSync(outPath, JSON.stringify(out, null, 2))
-console.log(`\nmeasured scaling: distance ~ N^${out.exponents.distance}, merge ~ N^${out.exponents.cluster}`)
+console.log(
+  `\nmeasured scaling: distance ~ N^${out.exponents.distance}, merge ~ N^${out.exponents.cluster}`,
+)
 console.log(`wrote ${outPath}`)

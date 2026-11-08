@@ -13,8 +13,7 @@ export const ownAdv = (op: number, len: number) =>
   op === M || op === EQ || op === X || op === D || op === N ? len : 0
 export const mateAdv = (op: number, len: number) =>
   op === M || op === EQ || op === X || op === I ? len : 0
-export const matchAdv = (op: number, len: number) =>
-  op === M || op === EQ || op === X ? len : 0
+export const matchAdv = (op: number, len: number) => (op === M || op === EQ || op === X ? len : 0)
 
 /** A CIGAR as `[len, opCharCode, len, opCharCode, ...]`. */
 export function parseOps(cigar: string) {
@@ -146,8 +145,7 @@ export function trace(ops: number[], segs: Seg[]) {
   return { xs, ys }
 }
 
-export const peak = (ys: number[]) =>
-  ys.reduce((m, v) => Math.max(m, Math.abs(v)), 0)
+export const peak = (ys: number[]) => ys.reduce((m, v) => Math.max(m, Math.abs(v)), 0)
 
 /** The `cg:Z:` value of a PIF or PAF line, found without splitting a megabyte row. */
 export function cigarOf(line: string) {

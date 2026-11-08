@@ -84,9 +84,7 @@ class Counted implements GenericFilehandle {
 }
 
 function open(src: string) {
-  return new Counted(
-    /^https?:/.test(src) ? new RemoteFile(src) : new LocalFile(src),
-  )
+  return new Counted(/^https?:/.test(src) ? new RemoteFile(src) : new LocalFile(src))
 }
 
 async function sizeOf(src: string) {
@@ -130,7 +128,9 @@ async function bigBedFull(
       basesPerSpan,
     })
     items += feats.length
-    console.error(`${src.split('/').pop()} ${r.refName} ${feats.length} items, ${fh.bytes} bytes so far`)
+    console.error(
+      `${src.split('/').pop()} ${r.refName} ${feats.length} items, ${fh.bytes} bytes so far`,
+    )
   }
   return {
     file: src,
@@ -152,9 +152,7 @@ async function bigBedSummary(
   const fh = open(src)
   const bw = new BigWig({ filehandle: fh })
   const { zoomLevels } = await bw.getHeader()
-  const level = [...zoomLevels]
-    .toReversed()
-    .find(z => z.reductionLevel <= 2 * basesPerSpan)
+  const level = [...zoomLevels].toReversed().find(z => z.reductionLevel <= 2 * basesPerSpan)
   let items = 0
   for (const r of regions) {
     const feats = await bw.getFeatures(r.refName, r.start, r.end, {
@@ -262,12 +260,7 @@ async function main() {
     await pifView(pif, whole, await pifRefs(pif, 'T'), 'coarsened T tier'),
     await bigBedFull(bigchain, win, [window], 1),
     await bigBedFull(biglink, win, [window], 1),
-    await pifView(
-      pif,
-      win,
-      [{ ...window, refName: `t${window.refName}` }],
-      'full-CIGAR t tier',
-    ),
+    await pifView(pif, win, [{ ...window, refName: `t${window.refName}` }], 'full-CIGAR t tier'),
   ]
 
   console.log(

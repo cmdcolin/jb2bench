@@ -36,17 +36,14 @@ const windows: Window[] = process.env.LOC
 // a recorded number, and a preflight that blocks every cross-tool run over an
 // arm nobody times is a preflight that gets deleted. Reach it with
 // `PAGES='gosling.html?bundle=gosling-patched.bundle.js'`.
-const pages = (
-  process.env.PAGES ?? 'index.html,genomespy.html,gosling.html'
-).split(',')
+const pages = (process.env.PAGES ?? 'index.html,genomespy.html,gosling.html').split(',')
 // Default tracks come from the WINDOW's corpus, since a window carries the
 // files it can be a window on: the two narrow ones get 20x and 200x of the
 // 250 kb contig, the 1 Mb one 20x and 100x of its own. `TRACKS=` still names
 // them by hand, and then it applies to every window in the sweep.
 const trackList = process.env.TRACKS?.split(',')
 const tracksFor = (w: Window) =>
-  trackList ??
-  w.scale.coverages.slice(0, 2).map(c => `${w.scale.prefix}${c}.shortread.bam`)
+  trackList ?? w.scale.coverages.slice(0, 2).map(c => `${w.scale.prefix}${c}.shortread.bam`)
 
 const browser = await launch({
   headless: process.env.HEADLESS !== '0',
@@ -84,9 +81,7 @@ for (const harness of pages) {
         `&ref=${w.scale.assembly}&size=${contigSize(w)}`
       const d = await drewCheck(browser, url, SETTLE_MS)
       const ok = drew(d)
-      const expected = EXPECTED_EMPTY.find(
-        e => e.page === harness && e.window === w.id,
-      )
+      const expected = EXPECTED_EMPTY.find(e => e.page === harness && e.window === w.id)
       if (!ok && !expected) {
         bad++
       }

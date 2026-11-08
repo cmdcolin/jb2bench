@@ -61,15 +61,11 @@ if (!build) {
 }
 
 const versionFile = path.join(build, 'version.txt')
-const version = fs.existsSync(versionFile)
-  ? fs.readFileSync(versionFile, 'utf8').trim()
-  : ''
+const version = fs.existsSync(versionFile) ? fs.readFileSync(versionFile, 'utf8').trim() : ''
 
 const configPath = path.join(build, 'config.json')
 const config = JSON.parse(fs.readFileSync(configPath, 'utf8'))
-const tracks = (config.tracks ?? []).filter(t =>
-  ALIGNMENT_ADAPTERS.has(t.adapter?.type),
-)
+const tracks = (config.tracks ?? []).filter(t => ALIGNMENT_ADAPTERS.has(t.adapter?.type))
 if (!tracks.length) {
   process.exit(0)
 }

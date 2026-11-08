@@ -26,14 +26,7 @@
 
 import { writeFileSync } from 'node:fs'
 
-import {
-  inflateBgzf,
-  readAll,
-  readBytes,
-  readTabix,
-  sizeOf,
-  unionBytes,
-} from './tabix.ts'
+import { inflateBgzf, readAll, readBytes, readTabix, sizeOf, unionBytes } from './tabix.ts'
 
 const SAMPLE_BYTES = 1 << 16
 
@@ -73,10 +66,7 @@ async function main() {
   const fileBytes = await sizeOf(src)
   const header = (await linesAt(src, 0)).find(l => l.startsWith('#pif')) ?? null
 
-  const byPrefix = new Map<
-    string,
-    { refNames: number; chunks: [number, number][] }
-  >()
+  const byPrefix = new Map<string, { refNames: number; chunks: [number, number][] }>()
   for (const { refName, chunks } of refs) {
     const prefix = refName[0]!
     const e = byPrefix.get(prefix) ?? { refNames: 0, chunks: [] }
@@ -88,9 +78,7 @@ async function main() {
   const rows: PrefixRow[] = []
   for (const [prefix, e] of [...byPrefix].toSorted(([a], [b]) => a.localeCompare(b))) {
     const first = e.chunks.reduce((m, c) => Math.min(m, c[0]), Infinity)
-    const tags = tagsOn(
-      (await linesAt(src, first)).filter(l => l.startsWith(prefix)),
-    )
+    const tags = tagsOn((await linesAt(src, first)).filter(l => l.startsWith(prefix)))
     rows.push({
       prefix,
       refNames: e.refNames,

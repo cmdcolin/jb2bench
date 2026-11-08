@@ -42,7 +42,12 @@ const libs = {
 const OUT = path.join(fs.mkdtempSync(path.join(os.tmpdir(), 'bgzfpool-')), 'bench.js')
 const versionOf = (file: string) => {
   const pkg: unknown = JSON.parse(fs.readFileSync(file, 'utf8'))
-  if (typeof pkg !== 'object' || pkg === null || !('version' in pkg) || typeof pkg.version !== 'string') {
+  if (
+    typeof pkg !== 'object' ||
+    pkg === null ||
+    !('version' in pkg) ||
+    typeof pkg.version !== 'string'
+  ) {
     throw new Error(`${file} has no version`)
   }
   return pkg.version
@@ -147,11 +152,7 @@ await new Promise<void>(resolve => {
 // not fit, the per-track guard below records that and keeps the run.
 const browser = await launch({
   headless: true,
-  args: [
-    '--no-sandbox',
-    '--disable-dev-shm-usage',
-    `--js-flags=--max-old-space-size=${HEAP_MB}`,
-  ],
+  args: ['--no-sandbox', '--disable-dev-shm-usage', `--js-flags=--max-old-space-size=${HEAP_MB}`],
 })
 const page = await browser.newPage()
 page.on('pageerror', e => {
@@ -178,9 +179,7 @@ interface Timing {
 const min = (xs: number[]) => Math.min(...xs)
 const med = (xs: number[]) => {
   const s = [...xs].toSorted((a, b) => a - b)
-  return s.length % 2
-    ? s[(s.length - 1) / 2]!
-    : (s[s.length / 2 - 1]! + s[s.length / 2]!) / 2
+  return s.length % 2 ? s[(s.length - 1) / 2]! : (s[s.length / 2 - 1]! + s[s.length / 2]!) / 2
 }
 
 // Per window width, because the merge below is keyed by track: a 100 kb run
@@ -222,11 +221,7 @@ const save = () => {
   fs.mkdirSync('results', { recursive: true })
   fs.writeFileSync(
     OUTFILE,
-    JSON.stringify(
-      { windows: TIMED, ref: REF, versions, results },
-      null,
-      2,
-    ),
+    JSON.stringify({ windows: TIMED, ref: REF, versions, results }, null, 2),
   )
 }
 
@@ -276,9 +271,7 @@ for (const track of TRACKS) {
   }
   // Both arms must have found the same records. An arm that silently returned
   // nothing is the fastest arm there is.
-  const counts = new Set(
-    rounds.flatMap(r => [...r.pooled, ...r.plain]).map(t => t.count),
-  )
+  const counts = new Set(rounds.flatMap(r => [...r.pooled, ...r.plain]).map(t => t.count))
   const perWindow = TIMED.map((_, i) => ({
     pooled: min(rounds.map(r => r.pooled[i]!.ms)),
     plain: min(rounds.map(r => r.plain[i]!.ms)),
@@ -286,9 +279,7 @@ for (const track of TRACKS) {
   }))
   const ratios = perWindow.map(w => w.plain / w.pooled)
   const mismatched = TIMED.some(
-    (_, i) =>
-      new Set(rounds.flatMap(r => [r.pooled[i]!.count, r.plain[i]!.count]))
-        .size > 1,
+    (_, i) => new Set(rounds.flatMap(r => [r.pooled[i]!.count, r.plain[i]!.count])).size > 1,
   )
   results[track] = {
     rounds,

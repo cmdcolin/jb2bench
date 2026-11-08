@@ -47,11 +47,7 @@
 // Prints JSON with per-step time-to-content and redraw cost.
 import { launch } from 'puppeteer'
 import { WAIT_TIMEOUT, waitForRenderComplete } from './rendercomplete.ts'
-import {
-  contentReadyProbe,
-  waitForContentReady,
-  QUIET_MS,
-} from './contentready.ts'
+import { contentReadyProbe, waitForContentReady, QUIET_MS } from './contentready.ts'
 import fs from 'fs'
 import path from 'path'
 import { ANGLE_ARGS } from '../angleargs.ts'
@@ -178,8 +174,7 @@ await page.evaluate(() => {
 // 2.4.0's "Loading" blocks visible without letting 4.3.0's permanent match
 // swallow the run, and it degrades safely on a build nobody has tried yet.
 const LOADING_FN = (wide: boolean) => {
-  const overlay =
-    document.querySelectorAll('[data-testid="loading-overlay"]').length > 0
+  const overlay = document.querySelectorAll('[data-testid="loading-overlay"]').length > 0
   const txt = document.body.innerText
   const re = wide
     ? /Downloading|Loading alignments|Rendering|Serializing results|\bLoading\b/i
@@ -232,9 +227,7 @@ console.error(
 // records the locus it ended on, so a run log can be audited for it. A corpus
 // with patchy coverage would need a real painted-content check here.
 const BAILED_FN = () =>
-  /Requested too much|Zoom in to see features|force load/i.test(
-    document.body.innerText,
-  )
+  /Requested too much|Zoom in to see features|force load/i.test(document.body.innerText)
 
 interface StepMetric {
   timeToContentMs: number // how long a loading indicator was shown post-step

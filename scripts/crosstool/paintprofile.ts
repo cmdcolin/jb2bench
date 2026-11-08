@@ -126,11 +126,9 @@ const settled = (r: { url: () => string }) => {
 page.on('response', settled)
 page.on('requestfailed', settled)
 
-const hash = (b: Uint8Array) =>
-  crypto.createHash('sha1').update(b).digest('hex')
+const hash = (b: Uint8Array) => crypto.createHash('sha1').update(b).digest('hex')
 
-const shot = async () =>
-  hash(await page.screenshot({ type: 'png', optimizeForSpeed: true }))
+const shot = async () => hash(await page.screenshot({ type: 'png', optimizeForSpeed: true }))
 
 const t0 = Date.now()
 await page.goto(url, { waitUntil: 'domcontentloaded' })
@@ -166,8 +164,7 @@ try {
     const busy =
       inFlight > 0 ||
       (await page.evaluate(() => {
-        const f = (window as unknown as { __harnessBusy?: () => unknown })
-          .__harnessBusy
+        const f = (window as unknown as { __harnessBusy?: () => unknown }).__harnessBusy
         return typeof f === 'function' ? f() === true : false
       }))
     if (busy) {
@@ -191,13 +188,14 @@ try {
   }
   const memory = await sampleMemory(browser, page, gpuBaselineMB)
   const content = await page.evaluate(() => {
-    const f = (window as unknown as { __harnessContent?: () => unknown })
-      .__harnessContent
+    const f = (window as unknown as { __harnessContent?: () => unknown }).__harnessContent
     return typeof f === 'function' ? f() : null
   })
   console.log(`DETAIL ${JSON.stringify({ memory, content, dataRequests: fetches })}`)
   if (process.env.GPU_PROBE === '1') {
-    console.log(`GPU ${JSON.stringify(await gpuInfo(page).catch((e: unknown) => ({ error: String(e) })))}`)
+    console.log(
+      `GPU ${JSON.stringify(await gpuInfo(page).catch((e: unknown) => ({ error: String(e) })))}`,
+    )
   }
   if (screenshotPath) {
     await page.screenshot({ path: screenshotPath })
@@ -210,9 +208,7 @@ try {
 } catch (e) {
   console.error('profiling error:', e instanceof Error ? e.message : e)
   if (screenshotPath) {
-    await page
-      .screenshot({ path: screenshotPath.replace(/\.png$/, '.error.png') })
-      .catch(() => {})
+    await page.screenshot({ path: screenshotPath.replace(/\.png$/, '.error.png') }).catch(() => {})
   }
   console.log('FAIL')
   process.exitCode = 1

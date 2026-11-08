@@ -16,7 +16,8 @@ import { fileURLToPath } from 'node:url'
 
 const argv = process.argv.slice(2)
 const flag = (n: string) => argv.includes(n)
-const opt = (n: string, d: string) => (argv.includes(n) ? argv[argv.indexOf(n) + 1] : undefined) ?? d
+const opt = (n: string, d: string) =>
+  (argv.includes(n) ? argv[argv.indexOf(n) + 1] : undefined) ?? d
 const dir = argv.find(a => !a.startsWith('--') && a !== opt('--runs', '') && a !== opt('--out', ''))
 if (!dir) {
   console.error('usage: variant.ts <dir> [--runs N] [--evict] [--remote] [--out file]')
@@ -30,12 +31,15 @@ const portal = process.env.VARIANT_PORTAL ?? resolve(homedir(), 'src/variant-rev
 const IMG = '5.0.0-beta.13'
 const remote = flag('--remote')
 
-const sh = (cmd: string, args: string[], cwd = data) => spawnSync(cmd, args, { cwd, encoding: 'utf8', maxBuffer: 1 << 28 })
+const sh = (cmd: string, args: string[], cwd = data) =>
+  spawnSync(cmd, args, { cwd, encoding: 'utf8', maxBuffer: 1 << 28 })
 
 const bin = resolve(data, 'tools/node_modules/.bin/jb2export')
 const imgPackage = resolve(data, 'tools/node_modules/@jbrowse/img/package.json')
 const installed = () => {
-  const pkg: unknown = existsSync(imgPackage) ? JSON.parse(readFileSync(imgPackage, 'utf8')) : undefined
+  const pkg: unknown = existsSync(imgPackage)
+    ? JSON.parse(readFileSync(imgPackage, 'utf8'))
+    : undefined
   return typeof pkg === 'object' && pkg !== null && 'version' in pkg ? pkg.version : undefined
 }
 if (installed() !== IMG) {
@@ -46,7 +50,9 @@ const imgVersion = installed()
 if (!remote && !existsSync(resolve(data, 'config.local.json'))) {
   sh('node', ['--experimental-strip-types', resolve(root, 'scripts/portals/localconfig.ts'), data])
 }
-const config = remote ? 'https://jbrowse.org/demos/cancer_sv/config.json' : resolve(data, 'config.local.json')
+const config = remote
+  ? 'https://jbrowse.org/demos/cancer_sv/config.json'
+  : resolve(data, 'config.local.json')
 const vcf = resolve(data, 'COLO829.wf-somatic-sv.vcf.gz')
 
 const tracks = {
@@ -55,7 +61,11 @@ const tracks = {
 }
 
 const evict = (f: string) =>
-  sh('python3', ['-c', 'import os,sys;fd=os.open(sys.argv[1],os.O_RDONLY);os.posix_fadvise(fd,0,0,os.POSIX_FADV_DONTNEED)', resolve(data, f)])
+  sh('python3', [
+    '-c',
+    'import os,sys;fd=os.open(sys.argv[1],os.O_RDONLY);os.posix_fadvise(fd,0,0,os.POSIX_FADV_DONTNEED)',
+    resolve(data, f),
+  ])
 
 const results: Record<string, unknown>[] = []
 let lastDir = ''
@@ -69,36 +79,77 @@ for (let i = 1; i <= runs; i++) {
   const outDir = resolve(data, `reads${i}`)
   rmSync(outDir, { recursive: true, force: true })
   const t0 = performance.now()
-  const r = sh(bin, ['batch', '--vcf', vcf, '--config', config, '--assembly', 'hg38', ...Object.values(tracks).flatMap(t => ['--track', t.id, 'height:240']), '--outDir', outDir, '--flank', '600', '--width', '1100', '--manifest'])
+  const r = sh(bin, [
+    'batch',
+    '--vcf',
+    vcf,
+    '--config',
+    config,
+    '--assembly',
+    'hg38',
+    ...Object.values(tracks).flatMap(t => ['--track', t.id, 'height:240']),
+    '--outDir',
+    outDir,
+    '--flank',
+    '600',
+    '--width',
+    '1100',
+    '--manifest',
+  ])
   const seconds = (performance.now() - t0) / 1000
   const images = readdirSync(outDir).filter(f => f.endsWith('.png')).length
   const m = /wrote (\d+)\/(\d+) images/.exec(r.stdout + r.stderr)
   const total = m ? Number(m[2]) : images
   lastDir = outDir
-  const row = { tracks: Object.keys(tracks).join('+'), run: i, cache: flag('--evict') ? (cold ? 'cold' : 'warm') : 'unspecified', seconds: +seconds.toFixed(1), images, total, perRecord: +(seconds / total).toFixed(3) }
+  const row = {
+    tracks: Object.keys(tracks).join('+'),
+    run: i,
+    cache: flag('--evict') ? (cold ? 'cold' : 'warm') : 'unspecified',
+    seconds: +seconds.toFixed(1),
+    images,
+    total,
+    perRecord: +(seconds / total).toFixed(3),
+  }
   results.push(row)
-  console.log(`run ${i} (${row.cache}): ${row.seconds} s, ${images}/${total} images, ${row.perRecord} s per record`)
+  console.log(
+    `run ${i} (${row.cache}): ${row.seconds} s, ${images}/${total} images, ${row.perRecord} s per record`,
+  )
 }
 
 const pageDir = resolve(data, 'portal')
 rmSync(pageDir, { recursive: true, force: true })
 const t0 = performance.now()
-const p = sh('node', [resolve(portal, 'bin/make-portal.mjs'), '--vcf', vcf, '--images', `${Object.keys(tracks).join(',')}=${lastDir}`, '--out', pageDir])
+const p = sh('node', [
+  resolve(portal, 'bin/make-portal.mjs'),
+  '--vcf',
+  vcf,
+  '--images',
+  `${Object.keys(tracks).join(',')}=${lastDir}`,
+  '--out',
+  pageDir,
+])
 const pageSeconds = +((performance.now() - t0) / 1000).toFixed(2)
 const cards = Number(/wrote (\d+) cards/.exec(p.stdout + p.stderr)?.[1] ?? 0)
 console.log(`make-portal: ${pageSeconds} s, ${cards} cards`)
 
 const rev = sh('git', ['rev-parse', '--short', 'HEAD'], portal).stdout.trim()
 mkdirSync(dirname(out), { recursive: true })
-writeFileSync(out, JSON.stringify({
-  date: new Date().toISOString().slice(0, 10),
-  host: hostname(),
-  cpu: cpus()[0]?.model,
-  threads: cpus().length,
-  source: remote ? 'remote' : 'local disk',
-  jbrowseImg: imgVersion,
-  variantReviewPortal: rev,
-  runs: results,
-  portalBuild: { seconds: pageSeconds, cards },
-}, null, 2))
+writeFileSync(
+  out,
+  JSON.stringify(
+    {
+      date: new Date().toISOString().slice(0, 10),
+      host: hostname(),
+      cpu: cpus()[0]?.model,
+      threads: cpus().length,
+      source: remote ? 'remote' : 'local disk',
+      jbrowseImg: imgVersion,
+      variantReviewPortal: rev,
+      runs: results,
+      portalBuild: { seconds: pageSeconds, cards },
+    },
+    null,
+    2,
+  ),
+)
 console.log(`→ ${out}`)

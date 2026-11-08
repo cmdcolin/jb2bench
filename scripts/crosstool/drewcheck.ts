@@ -61,14 +61,9 @@ export interface Drew {
  * A page drew the corpus if there are marks on a canvas, it read the data, and
  * it did not itself report zero features.
  */
-export const drew = (d: Drew) =>
-  d.painted > 0 && d.bytes > 0 && d.records !== 0
+export const drew = (d: Drew) => d.painted > 0 && d.bytes > 0 && d.records !== 0
 
-export async function drewCheck(
-  browser: Browser,
-  url: string,
-  settleMs: number,
-): Promise<Drew> {
+export async function drewCheck(browser: Browser, url: string, settleMs: number): Promise<Drew> {
   const page = await browser.newPage()
   await page.setViewport({ width: 1280, height: 800 })
   let bytes = 0
@@ -132,8 +127,7 @@ export async function drewCheck(
       }
       const n = w.__goslingState?.records
       return {
-        declared:
-          w.__igvState?.error ?? w.__gsState?.error ?? w.__goslingState?.error ?? null,
+        declared: w.__igvState?.error ?? w.__gsState?.error ?? w.__goslingState?.error ?? null,
         records: typeof n === 'number' ? n : null,
       }
     })

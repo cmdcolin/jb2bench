@@ -27,13 +27,7 @@
 // <dir> takes the PAF and five PIFs, about 900 MB.
 
 import { spawnSync } from 'node:child_process'
-import {
-  createReadStream,
-  createWriteStream,
-  existsSync,
-  mkdirSync,
-  writeFileSync,
-} from 'node:fs'
+import { createReadStream, createWriteStream, existsSync, mkdirSync, writeFileSync } from 'node:fs'
 import { once } from 'node:events'
 import { basename } from 'node:path'
 import { createInterface } from 'node:readline'
@@ -42,14 +36,7 @@ import { createGunzip } from 'node:zlib'
 import { flipCoarseCigar, swapCoarseCigar } from '@jbrowse/cigar-utils'
 
 import { readAll, readTabix, unionBytes } from './tabix.ts'
-import {
-  cigarOf,
-  coarseSegs,
-  matchAdv,
-  parseOps,
-  peak,
-  trace,
-} from './geometry.ts'
+import { cigarOf, coarseSegs, matchAdv, parseOps, peak, trace } from './geometry.ts'
 
 import type { WriteStream } from 'node:fs'
 
@@ -157,9 +144,10 @@ function tierBytes(pif: string) {
     for (const { refName, chunks: c } of readTabix(buf)) {
       ;(chunks[refName[0]!] ??= []).push(...c)
     }
-    return Object.fromEntries(
-      Object.entries(chunks).map(([p, c]) => [p, unionBytes(c)]),
-    ) as Record<string, number>
+    return Object.fromEntries(Object.entries(chunks).map(([p, c]) => [p, unionBytes(c)])) as Record<
+      string,
+      number
+    >
   })
 }
 
@@ -182,9 +170,7 @@ async function main() {
   const src = args[0]
   const workAt = args.indexOf('--work')
   if (!src || workAt < 0) {
-    throw new Error(
-      'usage: tier-options.ts <file.pif.gz> --work <dir> [--json out.json]',
-    )
+    throw new Error('usage: tier-options.ts <file.pif.gz> --work <dir> [--json out.json]')
   }
   const work = args[workAt + 1]!
   const jsonAt = args.indexOf('--json')
@@ -207,9 +193,7 @@ async function main() {
     }
     const pi = piOf(line)
     const f = line.split('\t', 9)
-    const rest = line
-      .slice(f.join('\t').length + 1)
-      .replace(/\tpi:i:\d+/, '')
+    const rest = line.slice(f.join('\t').length + 1).replace(/\tpi:i:\d+/, '')
     paf[pi] = [f[5], f[6], f[7], f[8], f[4], f[0]!.slice(1), f[1], f[2], f[3], rest].join('\t')
 
     const found = cigarOf(line)
@@ -243,9 +227,7 @@ async function main() {
 
   // Pass 2, the `T`/`Q` rows: where the bytes go, and the rewritten variants
   const variants = ['drop', 'keep-indels'] as const
-  const outs = Object.fromEntries(
-    variants.map(v => [v, createWriteStream(`${work}/${v}.pif`)]),
-  )
+  const outs = Object.fromEntries(variants.map(v => [v, createWriteStream(`${work}/${v}.pif`)]))
   const small = { rows: 0, bytes: 0, matched: 0 }
   const wide = { rows: 0, bytes: 0, foldBytes: 0, matched: 0 }
   const cells = new Set<string>()
@@ -353,8 +335,7 @@ async function main() {
   console.log(`keep-indels worst deviation: ${(altWorst / BOUND).toFixed(4)} px`)
   console.log('variant          T bytes    vs input     Q bytes    vs input')
   for (const [name, r] of Object.entries(results)) {
-    const pct = (p: string) =>
-      `${(((r[p]! - base[p]!) / base[p]!) * 100).toFixed(1)}%`.padStart(9)
+    const pct = (p: string) => `${(((r[p]! - base[p]!) / base[p]!) * 100).toFixed(1)}%`.padStart(9)
     console.log(
       `${name.padEnd(13)} ${String(r.T).padStart(10)} ${pct('T')}  ${String(r.Q).padStart(10)} ${pct('Q')}`,
     )

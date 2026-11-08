@@ -32,7 +32,17 @@ for (const [set, args] of Object.entries(SETS)) {
   if (set === 'configured') {
     configuredHardware = g.glHardware
   }
-  console.log(JSON.stringify({ set, version: await browser.version(), glRenderer: g.glRenderer, glHardware: g.glHardware, webgpuAdapter: g.webgpuAdapter, webgpuHardware: g.webgpuHardware, hardwareConcurrency: g.hardwareConcurrency }))
+  console.log(
+    JSON.stringify({
+      set,
+      version: await browser.version(),
+      glRenderer: g.glRenderer,
+      glHardware: g.glHardware,
+      webgpuAdapter: g.webgpuAdapter,
+      webgpuHardware: g.webgpuHardware,
+      hardwareConcurrency: g.hardwareConcurrency,
+    }),
+  )
   await browser.close()
 }
 server.close()

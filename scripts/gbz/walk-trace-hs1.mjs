@@ -11,15 +11,22 @@ const [haplotypes, refName, start, end, budget, layoutMode] = process.argv.slice
 const trackId = process.env.TRACK_ID ?? 'hprc_v2_1_walks_hs1'
 const dataPrefix = process.env.DATA_PREFIX ?? 'hprc-v2.1-mc-grch38-f5.CHM13.'
 const screenshot = process.env.SCREENSHOT
-const trackJson = process.env.TRACK_JSON ? fs.readFileSync(process.env.TRACK_JSON, 'utf8') : undefined
+const trackJson = process.env.TRACK_JSON
+  ? fs.readFileSync(process.env.TRACK_JSON, 'utf8')
+  : undefined
 const build = 'https://jbrowse.org/code/jb2/main/'
 const config = 'test_data/graphgenomeview/hprc.json'
 const url = `${build}?config=${encodeURIComponent(config)}`
-const browser = await launch({ headless: true, executablePath: '/usr/bin/google-chrome', args: ['--no-sandbox'] })
+const browser = await launch({
+  headless: true,
+  executablePath: '/usr/bin/google-chrome',
+  args: ['--no-sandbox'],
+})
 const page = await browser.newPage()
 await page.setViewport({ width: 1600, height: 1000 })
 const net = { req: 0, bytes: 0, urls: {} }
-const isData = u => u.startsWith(`https://jbrowse.org/demos/hprc/${dataPrefix}`) && /\.bed\.gz(\.tbi)?$/.test(u)
+const isData = u =>
+  u.startsWith(`https://jbrowse.org/demos/hprc/${dataPrefix}`) && /\.bed\.gz(\.tbi)?$/.test(u)
 const watch = c => {
   const ids = new Map()
   c.on('Network.requestWillBeSent', e => {
@@ -38,9 +45,12 @@ const pc = await page.createCDPSession()
 await pc.send('Network.enable')
 watch(pc)
 page.on('workercreated', w => {
-  w.client.send('Network.enable').then(() => {
-    watch(w.client)
-  }).catch(() => {})
+  w.client
+    .send('Network.enable')
+    .then(() => {
+      watch(w.client)
+    })
+    .catch(() => {})
 })
 await page.goto(url, { waitUntil: 'domcontentloaded' })
 await page.waitForFunction(() => !!window.JBrowseSession, { timeout: 120000 })
@@ -51,7 +61,14 @@ await page.waitForFunction(
 const version = (await (await fetch(`${build}version.txt`)).text()).trim()
 const t0 = Date.now()
 const viewId = await page.evaluate(
-  ({ trackId: id, trackJson: json, haplotypes: haps, budget: stepBudget, layoutMode: mode, region }) => {
+  ({
+    trackId: id,
+    trackJson: json,
+    haplotypes: haps,
+    budget: stepBudget,
+    layoutMode: mode,
+    region,
+  }) => {
     const session = window.JBrowseSession
     if (json && !session.tracks.some(t => t.trackId === id)) {
       session.addTrackConf(JSON.parse(json))
@@ -61,7 +78,11 @@ const viewId = await page.evaluate(
     let loadedTrackId = id
     if (stepBudget) {
       loadedTrackId = `${id}_budget`
-      session.addTrackConf({ ...snap, trackId: loadedTrackId, adapter: { ...snap.adapter, walkStepBudget: +stepBudget } })
+      session.addTrackConf({
+        ...snap,
+        trackId: loadedTrackId,
+        adapter: { ...snap.adapter, walkStepBudget: +stepBudget },
+      })
     }
     return session.addView('GraphGenomeView', {
       loadedTrackId,
@@ -70,24 +91,46 @@ const viewId = await page.evaluate(
       ...(mode ? { layoutMode: mode } : {}),
     }).id
   },
-  { trackId, trackJson, haplotypes, budget, layoutMode, region: { assemblyName: 'hs1', refName, start: +start, end: +end } },
+  {
+    trackId,
+    trackJson,
+    haplotypes,
+    budget,
+    layoutMode,
+    region: { assemblyName: 'hs1', refName, start: +start, end: +end },
+  },
 )
 const state = id => {
   const v = window.JBrowseSession.views.find(x => x.id === id)
-  return { cut: !!v?.hasGraph, drawn: !!v?.hasGraph && (!!v.layoutResult || !!v.walkRowBars) && v.geometryPainted, error: v?.error !== undefined }
+  return {
+    cut: !!v?.hasGraph,
+    drawn: !!v?.hasGraph && (!!v.layoutResult || !!v.walkRowBars) && v.geometryPainted,
+    error: v?.error !== undefined,
+  }
 }
-await page.waitForFunction(id => {
-  const v = window.JBrowseSession.views.find(x => x.id === id)
-  return !!v && (!!v.hasGraph || v.error !== undefined)
-}, { timeout: 300000 }, viewId)
+await page.waitForFunction(
+  id => {
+    const v = window.JBrowseSession.views.find(x => x.id === id)
+    return !!v && (!!v.hasGraph || v.error !== undefined)
+  },
+  { timeout: 300000 },
+  viewId,
+)
 const cutMs = Date.now() - t0
 const netAtCut = { requests: net.req, MB: +(net.bytes / 1e6).toFixed(2) }
 let drawnMs = null
 try {
-  await page.waitForFunction(id => {
-    const v = window.JBrowseSession.views.find(x => x.id === id)
-    return (!!v.hasGraph && (!!v.layoutResult || !!v.walkRowBars) && !!v.geometryPainted) || v.error !== undefined
-  }, { timeout: 300000 }, viewId)
+  await page.waitForFunction(
+    id => {
+      const v = window.JBrowseSession.views.find(x => x.id === id)
+      return (
+        (!!v.hasGraph && (!!v.layoutResult || !!v.walkRowBars) && !!v.geometryPainted) ||
+        v.error !== undefined
+      )
+    },
+    { timeout: 300000 },
+    viewId,
+  )
   if ((await page.evaluate(state, viewId)).drawn) drawnMs = Date.now() - t0
 } catch {}
 const view = await page.evaluate(id => {
@@ -104,4 +147,24 @@ const view = await page.evaluate(id => {
 await new Promise(r => setTimeout(r, 3000))
 if (screenshot) await page.screenshot({ path: screenshot })
 await browser.close()
-console.log(JSON.stringify({ layout: 'walks', assembly: 'hs1', trackId, haplotypes, ...(budget ? { walkStepBudget: +budget } : {}), refName, start: +start, end: +end, cutMs, drawnMs, ...view, ...netAtCut, requestsTotal: net.req, MBTotal: +(net.bytes / 1e6).toFixed(2), urls: net.urls, build, version }))
+console.log(
+  JSON.stringify({
+    layout: 'walks',
+    assembly: 'hs1',
+    trackId,
+    haplotypes,
+    ...(budget ? { walkStepBudget: +budget } : {}),
+    refName,
+    start: +start,
+    end: +end,
+    cutMs,
+    drawnMs,
+    ...view,
+    ...netAtCut,
+    requestsTotal: net.req,
+    MBTotal: +(net.bytes / 1e6).toFixed(2),
+    urls: net.urls,
+    build,
+    version,
+  }),
+)

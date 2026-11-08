@@ -87,7 +87,17 @@ const distancePair = (data, ia, ib, ic, vectorSize, out) => {
 // Nearest active neighbour of slot i by (distance, cluster size, slot id).
 // The slot id makes the choice canonical where distance and size both tie,
 // which is the norm on sparse data rather than a corner case.
-const findNearest = (i, distances, numSamples, sizes, activeList, numActive, nn, nnDist, nnSize) => {
+const findNearest = (
+  i,
+  distances,
+  numSamples,
+  sizes,
+  activeList,
+  numActive,
+  nn,
+  nnDist,
+  nnSize,
+) => {
   const rowOffset = i * numSamples
   let bestDist = Infinity
   let bestJ = -1
@@ -116,9 +126,7 @@ const findNearest = (i, distances, numSamples, sizes, activeList, numActive, nn,
 // array-of-arrays of the 5,008 x 22,383 matrix is 900MB of JS heap to build a
 // Float32Array that is 450MB.
 export const flatten = (data, vectorSize) => {
-  const flat = data instanceof Float32Array
-    ? data
-    : new Float32Array(data.length * vectorSize)
+  const flat = data instanceof Float32Array ? data : new Float32Array(data.length * vectorSize)
   if (flat !== data) {
     for (let i = 0; i < data.length; i++) {
       flat.set(data[i], i * vectorSize)
@@ -219,7 +227,17 @@ export const hierarchicalCluster = ({ data, onProgress }) => {
   const nnDist = new Float32Array(numSamples)
   const nnSize = new Int32Array(numSamples)
   for (let ai = 0; ai < numActive; ai++) {
-    findNearest(activeList[ai], distances, numSamples, sizes, activeList, numActive, nn, nnDist, nnSize)
+    findNearest(
+      activeList[ai],
+      distances,
+      numSamples,
+      sizes,
+      activeList,
+      numActive,
+      nn,
+      nnDist,
+      nnSize,
+    )
   }
 
   const heights = new Float32Array(numSamples - 1)
@@ -324,8 +342,7 @@ export const hierarchicalCluster = ({ data, onProgress }) => {
             const d = distances[k * numSamples + minA]
             if (
               d < nnDist[k] ||
-              (d === nnDist[k] &&
-                (newSize < nnSize[k] || (newSize === nnSize[k] && minA < nn[k])))
+              (d === nnDist[k] && (newSize < nnSize[k] || (newSize === nnSize[k] && minA < nn[k])))
             ) {
               nn[k] = minA
               nnDist[k] = d

@@ -107,8 +107,7 @@ export function selectScale(env = process.env): Scale {
  * have a column for every axis and a value for none of them. The deep arm keeps
  * the unsuffixed name it has always had.
  */
-export const resultSuffix = (scale: Scale) =>
-  scale.id === DEFAULT_SCALE.id ? '' : `-${scale.id}`
+export const resultSuffix = (scale: Scale) => (scale.id === DEFAULT_SCALE.id ? '' : `-${scale.id}`)
 
 /**
  * Every (coverage x readtype x format) case of one scale, in the order the
@@ -157,13 +156,10 @@ export function enumerateCases(env = process.env): Case[] {
  * second pass. Anything holding composite keys migrates the case part with this
  * — see `migrateRowKeys` in scripts/crosstool/windows.ts.
  */
-export const migrateCaseKey = (id: string) =>
-  /-(bam|cram)$/.test(id) ? id : `${id}-bam`
+export const migrateCaseKey = (id: string) => (/-(bam|cram)$/.test(id) ? id : `${id}-bam`)
 
 /** `migrateCaseKey` over a record keyed by bare case id. */
-export function migrateCaseKeys<T>(
-  byCase: Record<string, T> | undefined,
-): Record<string, T> {
+export function migrateCaseKeys<T>(byCase: Record<string, T> | undefined): Record<string, T> {
   const out: Record<string, T> = {}
   for (const [k, v] of Object.entries(byCase ?? {})) {
     out[migrateCaseKey(k)] = v

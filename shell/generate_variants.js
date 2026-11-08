@@ -41,9 +41,7 @@ if (
   !Number.isFinite(START) ||
   !Number.isFinite(END)
 ) {
-  console.error(
-    'usage: node generate_variants.js <samples> <gtonly|wide> <out.vcf> [start] [end]',
-  )
+  console.error('usage: node generate_variants.js <samples> <gtonly|wide> <out.vcf> [start] [end]')
   process.exit(1)
 }
 
@@ -68,17 +66,13 @@ header.push('##INFO=<ID=AN,Number=1,Type=Integer,Description="Allele number">')
 header.push('##INFO=<ID=AF,Number=A,Type=Float,Description="Allele frequency">')
 header.push('##FORMAT=<ID=GT,Number=1,Type=String,Description="Genotype">')
 if (shape === 'wide') {
-  header.push(
-    '##FORMAT=<ID=AD,Number=R,Type=Integer,Description="Allelic depths">',
-  )
+  header.push('##FORMAT=<ID=AD,Number=R,Type=Integer,Description="Allelic depths">')
   header.push('##FORMAT=<ID=DP,Number=1,Type=Integer,Description="Depth">')
   header.push('##FORMAT=<ID=GQ,Number=1,Type=Integer,Description="Genotype quality">')
   header.push('##FORMAT=<ID=PL,Number=G,Type=Integer,Description="Phred likelihoods">')
 }
 const sampleNames = Array.from({ length: nSamples }, (_, i) => `HG${String(i).padStart(5, '0')}`)
-header.push(
-  `#CHROM\tPOS\tID\tREF\tALT\tQUAL\tFILTER\tINFO\tFORMAT\t${sampleNames.join('\t')}`,
-)
+header.push(`#CHROM\tPOS\tID\tREF\tALT\tQUAL\tFILTER\tINFO\tFORMAT\t${sampleNames.join('\t')}`)
 
 const format = shape === 'wide' ? 'GT:AD:DP:GQ:PL' : 'GT'
 const lines = [header.join('\n')]
@@ -110,8 +104,7 @@ for (let pos = START; pos < END; pos += SPACING) {
   for (let s = 0; s < nSamples; s++) {
     // 1.5% missing, the rate a real callset carries after filtering
     if (rnd() < 0.015) {
-      cells[s] =
-        shape === 'wide' ? `.${sep}.:0,0:0:0:0,0,0` : `.${sep}.`
+      cells[s] = shape === 'wide' ? `.${sep}.:0,0:0:0:0,0,0` : `.${sep}.`
       continue
     }
     const a1 = rnd() < af ? 1 + Math.floor(rnd() * nAlt) : 0
@@ -136,6 +129,4 @@ for (let pos = START; pos < END; pos += SPACING) {
 }
 
 writeFileSync(out, `${lines.join('\n')}\n`)
-console.log(
-  `${out}: ${lines.length - 1} variants x ${nSamples} samples, FORMAT=${format}`,
-)
+console.log(`${out}: ${lines.length - 1} variants x ${nSamples} samples, FORMAT=${format}`)

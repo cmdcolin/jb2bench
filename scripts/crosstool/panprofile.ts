@@ -214,8 +214,7 @@ await page.setViewport({ width: 1280, height: 800 })
 await page.evaluateOnNewDocument(DRAW_CLOCK_INIT)
 
 const hash = (b: Uint8Array) => crypto.createHash('sha1').update(b).digest('hex')
-const shot = async () =>
-  hash(await page.screenshot({ type: 'png', optimizeForSpeed: true }))
+const shot = async () => hash(await page.screenshot({ type: 'png', optimizeForSpeed: true }))
 
 // In-flight request count, from CDP rather than from a patched `fetch`.
 //
@@ -285,9 +284,7 @@ page.on('response', res => {
 async function drawsSettled(t0: number) {
   for (;;) {
     if (Date.now() - t0 > MAX_WAIT) {
-      throw new Error(
-        `${tool} drew no content within the ${MAX_WAIT / 1000}s interactive ceiling`,
-      )
+      throw new Error(`${tool} drew no content within the ${MAX_WAIT / 1000}s interactive ceiling`)
     }
     const got = (await page.evaluate(DRAW_CLOCK_READ)) as {
       count: number
@@ -422,8 +419,7 @@ async function settle(t0: number, reference: string) {
  * offset; at pan timescales it is a large share of the number, so it is reported
  * with every run rather than left for a reader to derive.
  */
-const floorMs = (shotMs: number) =>
-  (STABLE_POLLS + 1) * (POLL_MS + shotMs) - STABLE_POLLS * POLL_MS
+const floorMs = (shotMs: number) => (STABLE_POLLS + 1) * (POLL_MS + shotMs) - STABLE_POLLS * POLL_MS
 
 interface Step {
   step: number
@@ -488,12 +484,8 @@ try {
     }
   }
   if (tool === 'igv') {
-    await readyOr(
-      'window.__igvState && (window.__igvState.ready || window.__igvState.error)',
-    )
-    const err = await page.evaluate(
-      () => (window as unknown as ToolWindow).__igvState.error,
-    )
+    await readyOr('window.__igvState && (window.__igvState.ready || window.__igvState.error)')
+    const err = await page.evaluate(() => (window as unknown as ToolWindow).__igvState.error)
     if (err) throw new Error(`igv failed to start: ${err}`)
   } else if (tool === 'genomespy') {
     // Every failure on this page is silent -- `embed()` resolves, its promise
@@ -502,12 +494,8 @@ try {
     // for that reason, and `ready` is only set after both. Waiting on anything
     // weaker would let a dead page reach the step loop, where it would draw
     // nothing and settle instantly.
-    await readyOr(
-      'window.__gsState && (window.__gsState.ready || window.__gsState.error)',
-    )
-    const state = await page.evaluate(
-      () => (window as unknown as ToolWindow).__gsState,
-    )
+    await readyOr('window.__gsState && (window.__gsState.ready || window.__gsState.error)')
+    const state = await page.evaluate(() => (window as unknown as ToolWindow).__gsState)
     if (state.error) throw new Error(`genomespy failed to start: ${state.error}`)
     if (state.lazyLoaded !== 'ok') {
       throw new Error(`genomespy lazy data: ${state.lazyLoaded}`)
@@ -536,8 +524,8 @@ try {
   if (tool === 'jbrowse') {
     settlesCoarseBlocks = await page.evaluate(
       () =>
-        typeof (window as unknown as ToolWindow).JBrowseSession.views[0]
-          .settleCoarseBlocks === 'function',
+        typeof (window as unknown as ToolWindow).JBrowseSession.views[0].settleCoarseBlocks ===
+        'function',
     )
   }
 
@@ -690,34 +678,37 @@ try {
       reference = await shot()
     }
 
-    const locus = await page.evaluate(({ tool: arm, ref }) => {
-      const w = window as unknown as ToolWindow
-      if (arm === 'genomespy') {
-        const err = w.__panError
-        if (err) return `error: ${err}`
-        // `getDomain()` is linearized genome coordinates. The corpus is one
-        // contig at offset zero, so those are positions on it -- the same
-        // assumption crosstool/genomespy.html makes when it zooms to the
-        // benchmark window by {chrom, pos}. Nothing here has to trust it: the
-        // runner cross-checks every step's locus against JBrowse's, so a
-        // linearization offset would show up as a mismatch on every step
-        // rather than as a plausible wrong number.
-        const [lo, hi] = w.gsApi.getScaleResolutionByName('pos').getDomain()
-        return `${ref}:${Math.round(lo)}-${Math.round(hi)}`
-      }
-      if (arm === 'igv') {
-        const b = w.igvBrowser
-        const f = b.referenceFrameList?.[0]
-        return f
-          ? `${f.chr}:${Math.round(f.start)}-${Math.round(f.end)}`
-          : (b.currentLoci?.() ?? '')
-      }
-      const v = w.JBrowseSession.views[0]
-      return (
-        v.visibleLocStrings ??
-        `${v.displayedRegions?.[0]?.refName ?? ''}:${Math.round(v.offsetPx * v.bpPerPx)}-${Math.round((v.offsetPx + v.width) * v.bpPerPx)}`
-      )
-    }, { tool, ref: REF })
+    const locus = await page.evaluate(
+      ({ tool: arm, ref }) => {
+        const w = window as unknown as ToolWindow
+        if (arm === 'genomespy') {
+          const err = w.__panError
+          if (err) return `error: ${err}`
+          // `getDomain()` is linearized genome coordinates. The corpus is one
+          // contig at offset zero, so those are positions on it -- the same
+          // assumption crosstool/genomespy.html makes when it zooms to the
+          // benchmark window by {chrom, pos}. Nothing here has to trust it: the
+          // runner cross-checks every step's locus against JBrowse's, so a
+          // linearization offset would show up as a mismatch on every step
+          // rather than as a plausible wrong number.
+          const [lo, hi] = w.gsApi.getScaleResolutionByName('pos').getDomain()
+          return `${ref}:${Math.round(lo)}-${Math.round(hi)}`
+        }
+        if (arm === 'igv') {
+          const b = w.igvBrowser
+          const f = b.referenceFrameList?.[0]
+          return f
+            ? `${f.chr}:${Math.round(f.start)}-${Math.round(f.end)}`
+            : (b.currentLoci?.() ?? '')
+        }
+        const v = w.JBrowseSession.views[0]
+        return (
+          v.visibleLocStrings ??
+          `${v.displayedRegions?.[0]?.refName ?? ''}:${Math.round(v.offsetPx * v.bpPerPx)}-${Math.round((v.offsetPx + v.width) * v.bpPerPx)}`
+        )
+      },
+      { tool, ref: REF },
+    )
 
     steps.push({
       step: i,
@@ -749,9 +740,7 @@ try {
     ? `${tool} blocked past the ${CEILING / 1000}s interactive ceiling (${raw})`
     : raw
   if (shotDir) {
-    await page
-      .screenshot({ path: path.join(shotDir, `${tool}-error.png`) })
-      .catch(() => {})
+    await page.screenshot({ path: path.join(shotDir, `${tool}-error.png`) }).catch(() => {})
   }
 }
 
@@ -764,7 +753,9 @@ const meanShot = shotCosts.length
 const floor = floorMs(meanShot)
 
 if (process.env.GPU_PROBE === '1') {
-  console.log(`GPU ${JSON.stringify(await gpuInfo(page).catch((e: unknown) => ({ error: String(e) })))}`)
+  console.log(
+    `GPU ${JSON.stringify(await gpuInfo(page).catch((e: unknown) => ({ error: String(e) })))}`,
+  )
 }
 
 console.log(
@@ -783,7 +774,9 @@ console.log(
     // discrete drive has brought the wait down to 7-30 ms.
     medianDrawMs: done.length ? median(done.map(s => s.drawMs)) : null,
     medianDrawClockMs:
-      INSTRUMENT === 'frames' && done.length ? median(done.map(s => s.drawClockMs ?? Number.NaN)) : null,
+      INSTRUMENT === 'frames' && done.length
+        ? median(done.map(s => s.drawClockMs ?? Number.NaN))
+        : null,
     // Steps that issued no data request at all. Not a footnote: a step served
     // from cache is not the "both tools must fetch" case this benchmark claims
     // to be, and the report refuses to call such a row a comparison.
@@ -800,18 +793,18 @@ console.log(
       INSTRUMENT === 'frames'
         ? { kind: 'frames', quietMs: QUIET_MS, frameQuietMs: FRAME_QUIET_MS }
         : INSTRUMENT === 'draws'
-        ? { kind: 'draws', quietMs: QUIET_MS }
-        : {
-            kind: 'paint',
-            pollMs: POLL_MS,
-            stablePolls: STABLE_POLLS,
-            meanShotMs: Number(meanShot.toFixed(1)),
-            floorMs: Number(floor.toFixed(1)),
-            // A step resolved in the detector's minimum number of polls was
-            // faster than the detector, and its milliseconds are instrument
-            // rather than measurement.
-            stepsAtFloor: done.filter(s => s.polls <= STABLE_POLLS + 1).length,
-          },
+          ? { kind: 'draws', quietMs: QUIET_MS }
+          : {
+              kind: 'paint',
+              pollMs: POLL_MS,
+              stablePolls: STABLE_POLLS,
+              meanShotMs: Number(meanShot.toFixed(1)),
+              floorMs: Number(floor.toFixed(1)),
+              // A step resolved in the detector's minimum number of polls was
+              // faster than the detector, and its milliseconds are instrument
+              // rather than measurement.
+              stepsAtFloor: done.filter(s => s.polls <= STABLE_POLLS + 1).length,
+            },
     failure,
   }),
 )

@@ -15,7 +15,8 @@ const HCLUST = process.env.HCLUST ?? `${process.env.HOME}/src/gmod/hclust/src/in
 const { clusterData } = await import(HCLUST)
 
 const args = process.argv.slice(2)
-const binPath = args.find(a => !a.startsWith('--')) ??
+const binPath =
+  args.find(a => !a.startsWith('--')) ??
   `${process.env.HOME}/src/gmod/hclust/build/matrices/100-kb-window-maf-0-samples.bin`
 const N = Number(args[1] ?? 2504)
 
@@ -25,7 +26,9 @@ const cols = buf.readUInt32LE(4)
 const values = new Float32Array(buf.buffer, buf.byteOffset + 8, rows * cols)
 const n = Math.min(N, rows)
 
-const data = Array.from({ length: n }, (_, i) => Array.from(values.subarray(i * cols, (i + 1) * cols)))
+const data = Array.from({ length: n }, (_, i) =>
+  Array.from(values.subarray(i * cols, (i + 1) * cols)),
+)
 
 // First call in a fresh process is the one a user waits on: V8 promotes a wasm
 // function out of its baseline tier on call count with no on-stack replacement,
@@ -50,7 +53,9 @@ const firstDistanceEnd = clusteringAt[0]
 const distanceMs = firstDistanceEnd === undefined ? NaN : firstDistanceEnd - t0
 const clusterMs = firstDistanceEnd === undefined ? NaN : t2 - firstDistanceEnd
 const out = {
-  matrix: binPath.split('/').pop(), n, v: cols,
+  matrix: binPath.split('/').pop(),
+  n,
+  v: cols,
   distanceMs: +distanceMs.toFixed(1),
   clusterMs: +clusterMs.toFixed(1),
   totalMs: +(t2 - t0).toFixed(1),
@@ -58,12 +63,17 @@ const out = {
   note: 'first call in a fresh process, the one a user waits on',
   hclust: HCLUST,
 }
-console.log(`N=${n} V=${cols}  distance ${out.distanceMs.toFixed(0)} ms   merge ${out.clusterMs.toFixed(0)} ms   merge share ${(out.clusterShare*100).toFixed(2)}%`)
+console.log(
+  `N=${n} V=${cols}  distance ${out.distanceMs.toFixed(0)} ms   merge ${out.clusterMs.toFixed(0)} ms   merge share ${(out.clusterShare * 100).toFixed(2)}%`,
+)
 // Per matrix, not a single slot: these scripts are run once per window, and a
 // fixed filename means the second run silently replaces the first — which is
 // exactly what happened, leaving a figure built from one matrix reading a file
 // written by another.
-const slug = binPath.split('/').pop().replace(/\.bin$/, '') +
-  (process.env.HCLUST_TAG ? `-${process.env.HCLUST_TAG}` : '')
+const slug =
+  binPath
+    .split('/')
+    .pop()
+    .replace(/\.bin$/, '') + (process.env.HCLUST_TAG ? `-${process.env.HCLUST_TAG}` : '')
 writeFileSync(`results/cluster-wasm-phases-${slug}.json`, JSON.stringify(out, null, 2))
 console.log(`wrote results/cluster-wasm-phases-${slug}.json`)

@@ -41,8 +41,7 @@ if (!Number.isFinite(nGenes) || !out || !['sparse', 'rich'].includes(shape)) {
 
 // mulberry32, seeded so two machines emit the same file. The seed folds in the
 // gene count and shape so the two shapes are not the same coordinates twice.
-let seed =
-  0x9e3779b9 ^ (nGenes * 2654435761) ^ (shape === 'rich' ? 0x5bf03635 : 0)
+let seed = 0x9e3779b9 ^ (nGenes * 2654435761) ^ (shape === 'rich' ? 0x5bf03635 : 0)
 function rnd() {
   seed |= 0
   seed = (seed + 0x6d2b79f5) | 0
@@ -165,10 +164,6 @@ writeFileSync(out, `${lines.join('\n')}\n`)
 
 const featureLines = lines.length - 1
 const attrs =
-  lines
-    .slice(1)
-    .reduce((a, l) => a + l.slice(l.lastIndexOf('\t') + 1).split(';').length, 0) /
+  lines.slice(1).reduce((a, l) => a + l.slice(l.lastIndexOf('\t') + 1).split(';').length, 0) /
   featureLines
-console.log(
-  `${out}: ${featureLines} feature lines, ${attrs.toFixed(1)} attrs/line`,
-)
+console.log(`${out}: ${featureLines} feature lines, ${attrs.toFixed(1)} attrs/line`)

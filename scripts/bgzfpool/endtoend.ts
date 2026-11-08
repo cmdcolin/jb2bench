@@ -74,11 +74,7 @@ interface ArmRun {
   blobWorkers: number
 }
 
-async function panSeries(
-  browser: Browser,
-  base: string,
-  trackId: string,
-): Promise<ArmRun> {
+async function panSeries(browser: Browser, base: string, trackId: string): Promise<ArmRun> {
   // Counted at the browser rather than the page: a pool worker is spawned by
   // the RPC worker, so it is a target nested one level below the page.
   let blobWorkers = 0
@@ -92,46 +88,41 @@ async function panSeries(
   await page.setViewport({ width: 1280, height: 800 })
   try {
     const [s0, e0] = WINDOWS[0]!
-    await page.goto(
-      `${base}/?loc=${REF}:${s0}-${e0}&assembly=hg19mod&tracks=${trackId}`,
-      { waitUntil: 'domcontentloaded', timeout: 120000 },
-    )
+    await page.goto(`${base}/?loc=${REF}:${s0}-${e0}&assembly=hg19mod&tracks=${trackId}`, {
+      waitUntil: 'domcontentloaded',
+      timeout: 120000,
+    })
     if (!(await waitReady(page))) {
       throw new Error(`${trackId}: initial render never settled`)
     }
     const times: number[] = []
     for (const [start, end] of TIMED) {
-      const ms = await page.evaluate(
-        async (loc: string) => {
-          const w = window as unknown as {
-            JBrowseSession: {
-              views: { navToLocString: (s: string) => void }[]
-            }
+      const ms = await page.evaluate(async (loc: string) => {
+        const w = window as unknown as {
+          JBrowseSession: {
+            views: { navToLocString: (s: string) => void }[]
           }
-          const t0 = performance.now()
-          w.JBrowseSession.views[0]!.navToLocString(loc)
-          const deadline = t0 + 120000
-          let stable = 0
-          for (;;) {
-            const displays =
-              document.querySelectorAll('[data-display-phase]').length
-            const ready =
-              displays > 0 &&
-              document.querySelector('[data-display-phase="loading"]') ===
-                null &&
-              document.querySelector('[data-display-drawn="false"]') === null
-            stable = ready ? stable + 1 : 0
-            if (stable >= 3) {
-              return performance.now() - t0
-            }
-            if (performance.now() > deadline) {
-              return -1
-            }
-            await new Promise(r => setTimeout(r, 20))
+        }
+        const t0 = performance.now()
+        w.JBrowseSession.views[0]!.navToLocString(loc)
+        const deadline = t0 + 120000
+        let stable = 0
+        for (;;) {
+          const displays = document.querySelectorAll('[data-display-phase]').length
+          const ready =
+            displays > 0 &&
+            document.querySelector('[data-display-phase="loading"]') === null &&
+            document.querySelector('[data-display-drawn="false"]') === null
+          stable = ready ? stable + 1 : 0
+          if (stable >= 3) {
+            return performance.now() - t0
           }
-        },
-        `${REF}:${start}-${end}`,
-      )
+          if (performance.now() > deadline) {
+            return -1
+          }
+          await new Promise(r => setTimeout(r, 20))
+        }
+      }, `${REF}:${start}-${end}`)
       times.push(ms)
     }
     // A failed pan stays in the series as -1 rather than being filtered out.
@@ -147,9 +138,7 @@ async function panSeries(
 
 const med = (xs: number[]) => {
   const s = [...xs].toSorted((a, b) => a - b)
-  return s.length % 2
-    ? s[(s.length - 1) / 2]!
-    : (s[s.length / 2 - 1]! + s[s.length / 2]!) / 2
+  return s.length % 2 ? s[(s.length - 1) / 2]! : (s[s.length / 2 - 1]! + s[s.length / 2]!) / 2
 }
 const quantile = (xs: number[], q: number) => {
   const s = [...xs].toSorted((a, b) => a - b)
@@ -203,11 +192,7 @@ for (const track of TRACKS) {
     // busier, which biases whichever arm runs second in every pair.
     const order = rep % 2 === 0 ? ['pooled', 'plain'] : ['plain', 'pooled']
     for (const arm of order) {
-      const run = await panSeries(
-        browser,
-        arm === 'pooled' ? BASE_POOL : BASE_NOPOOL,
-        track,
-      )
+      const run = await panSeries(browser, arm === 'pooled' ? BASE_POOL : BASE_NOPOOL, track)
       if (arm === 'pooled') {
         pooled.push(run.times)
         blobWorkers.pooled = Math.max(blobWorkers.pooled, run.blobWorkers)
@@ -280,7 +265,17 @@ await browser.close()
 fs.mkdirSync('results', { recursive: true })
 fs.writeFileSync(
   'results/bgzfpool.json',
-  JSON.stringify({ base: { pool: BASE_POOL, nopool: BASE_NOPOOL }, reps: REPS, windows: WINDOWS, measuredAt, results }, null, 2),
+  JSON.stringify(
+    {
+      base: { pool: BASE_POOL, nopool: BASE_NOPOOL },
+      reps: REPS,
+      windows: WINDOWS,
+      measuredAt,
+      results,
+    },
+    null,
+    2,
+  ),
 )
 
 let md = `# BGZF worker pool, on vs off, end to end in jbrowse\n\n`

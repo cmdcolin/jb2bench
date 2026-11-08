@@ -8,7 +8,13 @@ if (!url) {
 
 const browser = await launch({
   headless: false,
-  args: ['--no-sandbox','--enable-unsafe-webgpu','--ignore-gpu-blocklist','--enable-features=Vulkan','--window-size=1280,900'],
+  args: [
+    '--no-sandbox',
+    '--enable-unsafe-webgpu',
+    '--ignore-gpu-blocklist',
+    '--enable-features=Vulkan',
+    '--window-size=1280,900',
+  ],
 })
 const page = await browser.newPage()
 await page.setViewport({ width: 1280, height: 800 })
@@ -32,7 +38,11 @@ const info = await page.evaluate(() => {
       /pileup|wiggle|snpcov|display|overlay|drawn|loading|done/i.test(k),
     ),
   )
-  return { hasWebGPU: !!(navigator as { gpu?: unknown }).gpu, canvases: document.querySelectorAll('canvas').length, interesting }
+  return {
+    hasWebGPU: !!(navigator as { gpu?: unknown }).gpu,
+    canvases: document.querySelectorAll('canvas').length,
+    interesting,
+  }
 })
 if (shot) {
   await page.screenshot({ path: shot })

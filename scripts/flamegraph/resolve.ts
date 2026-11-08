@@ -48,9 +48,7 @@ for (let i = 0; i < prof.samples.length; i++) {
   }
 }
 
-const top = [...selfUs.entries()]
-  .toSorted((a, b) => b[1] - a[1])
-  .slice(0, topN)
+const top = [...selfUs.entries()].toSorted((a, b) => b[1] - a[1]).slice(0, topN)
 
 const consumers = new Map<string, SourceMapConsumer | null>()
 async function consumerFor(url: string) {
@@ -58,10 +56,7 @@ async function consumerFor(url: string) {
   if (!consumers.has(base)) {
     const mapPath = path.join(jsDir, base + '.map')
     if (fs.existsSync(mapPath)) {
-      consumers.set(
-        base,
-        await new SourceMapConsumer(fs.readFileSync(mapPath, 'utf8')),
-      )
+      consumers.set(base, await new SourceMapConsumer(fs.readFileSync(mapPath, 'utf8')))
     } else {
       consumers.set(base, null)
     }
@@ -69,7 +64,9 @@ async function consumerFor(url: string) {
   return consumers.get(base) ?? null
 }
 
-console.log(`=== ${path.basename(file)}  (self-time top ${topN}, total ${(grand / 1000).toFixed(0)}ms) ===`)
+console.log(
+  `=== ${path.basename(file)}  (self-time top ${topN}, total ${(grand / 1000).toFixed(0)}ms) ===`,
+)
 for (const [id, us] of top) {
   const n = byId.get(id)!
   const cf = n.callFrame

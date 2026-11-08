@@ -73,7 +73,11 @@ const rows = WINDOWS.map(w => {
   // The three arms must have seen the same matrix. They read the same .bin, so
   // a shape mismatch means one of them was measured against a stale dump --
   // which would land on the figure as a curve at the wrong x.
-  for (const [name, r] of [['5.0.0', v500], ['5.1.0', v510], ['gpu', gpu]]) {
+  for (const [name, r] of [
+    ['5.0.0', v500],
+    ['5.1.0', v510],
+    ['gpu', gpu],
+  ]) {
     if (r.n !== gpu.n || r.v !== gpu.v) {
       throw new Error(
         `${w.window}: the ${name} arm is ${r.n} x ${r.v}, the gpu arm ${gpu.n} x ${gpu.v}`,
@@ -103,8 +107,8 @@ const out = {
     repro:
       'wasm columns: HCLUST=<checkout>/src/index.ts node --experimental-strip-types ' +
       'scripts/cluster/wasmphases.mjs <matrix.bin> <N>, once per window per library ' +
-      'version, each the first call in a fresh process, taken as that file\'s totalMs -- ' +
-      'the whole clusterData call, for the reason in this script\'s header. Cross-checked ' +
+      "version, each the first call in a fresh process, taken as that file's totalMs -- " +
+      "the whole clusterData call, for the reason in this script's header. Cross-checked " +
       'against `pnpm bench:real` in the hclust checkout, which agrees within 1% on the ' +
       'windows it shares. GPU column: node scripts/cluster/gpusweep.mjs, ' +
       'which drives jbrowse-web browser-tests/probe-gpu-distance-matrix.ts on the same ' +

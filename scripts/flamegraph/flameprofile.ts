@@ -63,10 +63,7 @@ async function watch(session: CDPSession) {
     const { sessionId, targetInfo } = event
     const child = connection.session(sessionId)
     void (async () => {
-      if (
-        child &&
-        (targetInfo.type === 'worker' || targetInfo.type === 'shared_worker')
-      ) {
+      if (child && (targetInfo.type === 'worker' || targetInfo.type === 'shared_worker')) {
         try {
           await arm(child)
           const tag = (targetInfo.url || 'worker').split('/').pop()
@@ -108,9 +105,7 @@ await page.waitForFunction(
   () => {
     const w = window as unknown as { __stable?: number; __last?: number }
     const displays = document.querySelectorAll('[data-display-drawn]').length
-    const drawn = document.querySelectorAll(
-      '[data-display-drawn="true"]',
-    ).length
+    const drawn = document.querySelectorAll('[data-display-drawn="true"]').length
     const fetching =
       document.querySelectorAll('[data-display-phase="loading"]').length > 0 ||
       document.querySelectorAll('[data-testid="loading-overlay"]').length > 0

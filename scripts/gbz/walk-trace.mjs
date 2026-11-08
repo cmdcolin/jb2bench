@@ -15,11 +15,19 @@ const dataPrefix = process.env.DATA_PREFIX ?? 'hprc-v2.1-mc-grch38.'
 const build = 'https://jbrowse.org/code/jb2/main/'
 const config = 'https://jbrowse.org/demos/hprc/config.json'
 const url = `${build}?config=${encodeURIComponent(config)}`
-const browser = await launch({ headless: true, executablePath: '/usr/bin/google-chrome', args: ['--no-sandbox'] })
+const browser = await launch({
+  headless: true,
+  executablePath: '/usr/bin/google-chrome',
+  args: ['--no-sandbox'],
+})
 const page = await browser.newPage()
 await page.setViewport({ width: 1600, height: 1000 })
 const net = { req: 0, bytes: 0, urls: {} }
-const isData = u => u.startsWith(`https://jbrowse.org/demos/hprc/${dataPrefix}`) && !u.includes('.anchored.') && !u.includes('.tier') && /\.bed\.gz(\.tbi)?$/.test(u)
+const isData = u =>
+  u.startsWith(`https://jbrowse.org/demos/hprc/${dataPrefix}`) &&
+  !u.includes('.anchored.') &&
+  !u.includes('.tier') &&
+  /\.bed\.gz(\.tbi)?$/.test(u)
 const watch = c => {
   const ids = new Map()
   c.on('Network.requestWillBeSent', e => {
@@ -38,9 +46,12 @@ const pc = await page.createCDPSession()
 await pc.send('Network.enable')
 watch(pc)
 page.on('workercreated', w => {
-  w.client.send('Network.enable').then(() => {
-    watch(w.client)
-  }).catch(() => {})
+  w.client
+    .send('Network.enable')
+    .then(() => {
+      watch(w.client)
+    })
+    .catch(() => {})
 })
 await page.goto(url, { waitUntil: 'domcontentloaded' })
 await page.waitForFunction(() => !!window.JBrowseSession, { timeout: 120000 })
@@ -58,7 +69,11 @@ const viewId = await page.evaluate(
     let loadedTrackId = id
     if (stepBudget) {
       loadedTrackId = `${id}_budget`
-      session.addTrackConf({ ...snap, trackId: loadedTrackId, adapter: { ...snap.adapter, walkStepBudget: +stepBudget } })
+      session.addTrackConf({
+        ...snap,
+        trackId: loadedTrackId,
+        adapter: { ...snap.adapter, walkStepBudget: +stepBudget },
+      })
     }
     return session.addView('GraphGenomeView', {
       loadedTrackId,
@@ -68,24 +83,45 @@ const viewId = await page.evaluate(
       ...(mode ? { layoutMode: mode } : {}),
     }).id
   },
-  { trackId, haplotypes, budget, layoutMode, region: { assemblyName: 'hg38', refName, start: +start, end: +end } },
+  {
+    trackId,
+    haplotypes,
+    budget,
+    layoutMode,
+    region: { assemblyName: 'hg38', refName, start: +start, end: +end },
+  },
 )
 const state = id => {
   const v = window.JBrowseSession.views.find(x => x.id === id)
-  return { cut: !!v?.hasGraph, drawn: !!v?.hasGraph && (!!v.layoutResult || !!v.walkRowBars) && v.geometryPainted, error: v?.error !== undefined }
+  return {
+    cut: !!v?.hasGraph,
+    drawn: !!v?.hasGraph && (!!v.layoutResult || !!v.walkRowBars) && v.geometryPainted,
+    error: v?.error !== undefined,
+  }
 }
-await page.waitForFunction(id => {
-  const v = window.JBrowseSession.views.find(x => x.id === id)
-  return !!v && (!!v.hasGraph || v.error !== undefined)
-}, { timeout: 300000 }, viewId)
+await page.waitForFunction(
+  id => {
+    const v = window.JBrowseSession.views.find(x => x.id === id)
+    return !!v && (!!v.hasGraph || v.error !== undefined)
+  },
+  { timeout: 300000 },
+  viewId,
+)
 const cutMs = Date.now() - t0
 const netAtCut = { requests: net.req, MB: +(net.bytes / 1e6).toFixed(2) }
 let drawnMs = null
 try {
-  await page.waitForFunction(id => {
-    const v = window.JBrowseSession.views.find(x => x.id === id)
-    return (!!v.hasGraph && (!!v.layoutResult || !!v.walkRowBars) && !!v.geometryPainted) || v.error !== undefined
-  }, { timeout: 300000 }, viewId)
+  await page.waitForFunction(
+    id => {
+      const v = window.JBrowseSession.views.find(x => x.id === id)
+      return (
+        (!!v.hasGraph && (!!v.layoutResult || !!v.walkRowBars) && !!v.geometryPainted) ||
+        v.error !== undefined
+      )
+    },
+    { timeout: 300000 },
+    viewId,
+  )
   if ((await page.evaluate(state, viewId)).drawn) drawnMs = Date.now() - t0
 } catch {}
 const view = await page.evaluate(id => {
@@ -101,4 +137,22 @@ const view = await page.evaluate(id => {
 }, viewId)
 await new Promise(r => setTimeout(r, 3000))
 await browser.close()
-console.log(JSON.stringify({ layout: 'walks', haplotypes, ...(budget ? { walkStepBudget: +budget } : {}), refName, start: +start, end: +end, cutMs, drawnMs, ...view, ...netAtCut, requestsTotal: net.req, MBTotal: +(net.bytes / 1e6).toFixed(2), urls: net.urls, build, version }))
+console.log(
+  JSON.stringify({
+    layout: 'walks',
+    haplotypes,
+    ...(budget ? { walkStepBudget: +budget } : {}),
+    refName,
+    start: +start,
+    end: +end,
+    cutMs,
+    drawnMs,
+    ...view,
+    ...netAtCut,
+    requestsTotal: net.req,
+    MBTotal: +(net.bytes / 1e6).toFixed(2),
+    urls: net.urls,
+    build,
+    version,
+  }),
+)

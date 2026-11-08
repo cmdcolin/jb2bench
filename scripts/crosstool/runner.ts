@@ -46,11 +46,7 @@ import {
 } from '../render/loadavg.ts'
 import { resolveBuild } from '../render/servedbuild.ts'
 import { procMemory, type MemorySample } from './memory.ts'
-import {
-  checkHarnessPages,
-  corpusPaths,
-  unreachable,
-} from './servedharness.ts'
+import { checkHarnessPages, corpusPaths, unreachable } from './servedharness.ts'
 import {
   contigSize,
   migrateRowKeys,
@@ -101,15 +97,12 @@ const jbrowseBuild = jbrowseArms[0]!.build
 // as of 2026-08-23, so this column is the current release and not a trailing
 // pin; the 2023 paper's igv 2.12.1 is vendored beside the harness and selected
 // by URL when that comparison is the one wanted.
-const igvVersion = JSON.parse(
-  fs.readFileSync('node_modules/igv/package.json', 'utf8'),
-).version as string
-const gsVersion = JSON.parse(
-  fs.readFileSync('node_modules/@genome-spy/core/package.json', 'utf8'),
-).version as string
-const goslingVersion = JSON.parse(
-  fs.readFileSync('node_modules/gosling.js/package.json', 'utf8'),
-).version as string
+const igvVersion = JSON.parse(fs.readFileSync('node_modules/igv/package.json', 'utf8'))
+  .version as string
+const gsVersion = JSON.parse(fs.readFileSync('node_modules/@genome-spy/core/package.json', 'utf8'))
+  .version as string
+const goslingVersion = JSON.parse(fs.readFileSync('node_modules/gosling.js/package.json', 'utf8'))
+  .version as string
 console.log(`igv.js ${igvVersion}, GenomeSpy ${gsVersion}, Gosling ${goslingVersion}`)
 
 interface Tool {
@@ -151,8 +144,7 @@ const allTools: Tool[] = [
   {
     id: 'igv',
     label: `igv.js ${igvVersion}`,
-    url: (t, w) =>
-      `http://localhost:${IGV_PORT}/?loc=${w.loc}&track=${t}&ref=${w.scale.assembly}`,
+    url: (t, w) => `http://localhost:${IGV_PORT}/?loc=${w.loc}&track=${t}&ref=${w.scale.assembly}`,
   },
   {
     id: 'igv-deep',
@@ -190,8 +182,7 @@ const allTools: Tool[] = [
   {
     id: 'igv-h600ctl',
     label: `igv.js ${igvVersion}, 600 px track (control arm)`,
-    url: (t, w) =>
-      `http://localhost:${IGV_PORT}/?loc=${w.loc}&track=${t}&ref=${w.scale.assembly}`,
+    url: (t, w) => `http://localhost:${IGV_PORT}/?loc=${w.loc}&track=${t}&ref=${w.scale.assembly}`,
   },
   {
     // GenomeSpy, on the same BAM through its own lazy BAM source and `pileup`
@@ -631,7 +622,9 @@ async function measureRow(c: Case, w: Window): Promise<Row> {
       const { ms, detail } = attempt(t)
       runs[t.id]!.push(ms)
       details[t.id]!.push(detail)
-      const heap = detail ? ` (js heap ${detail.memory.jsHeap.usedMB.toFixed(0)} MB, pss ${procMemory(detail.memory)?.totalPssMB.toFixed(0) ?? '?'} MB)` : ''
+      const heap = detail
+        ? ` (js heap ${detail.memory.jsHeap.usedMB.toFixed(0)} MB, pss ${procMemory(detail.memory)?.totalPssMB.toFixed(0) ?? '?'} MB)`
+        : ''
       console.log(`${key} ${t.id} run ${r + 1}: ${ms}${heap}`)
     }
   }
@@ -811,17 +804,11 @@ const fmt = (c?: Cell) => {
   if (c?.unsettled) {
     return `>${(c.unsettled / 1000).toFixed(0)}s`
   }
-  return c && Number.isFinite(c.median)
-    ? `${c.median.toFixed(0)} ±${c.stddev.toFixed(0)}`
-    : 'FAIL'
+  return c && Number.isFinite(c.median) ? `${c.median.toFixed(0)} ±${c.stddev.toFixed(0)}` : 'FAIL'
 }
 
 const rowPeak = (row: Row) =>
-  Math.max(
-    ...Object.values(row).map(c =>
-      !c.unsupported && !c.unsettled ? peak(c.load) : 0,
-    ),
-  )
+  Math.max(...Object.values(row).map(c => (!c.unsupported && !c.unsettled ? peak(c.load) : 0)))
 
 // Columns come from what the file holds, not only from what this run served. A
 // re-run of the 8000 arm alone must not silently drop a v2.4.0 column measured
@@ -851,13 +838,17 @@ lines.push(
   `JBrowse against igv.js ${prior.igvVersion}, GenomeSpy ${gsVersion} and Gosling ${goslingVersion} — same files, same windows, same instrument. ` +
     `The JBrowse arms are ${Object.values(prior.jbrowseBuilds ?? { jbrowse: prior.jbrowseBuild })
       .map(b => `\`builds/${b}\``)
-      .join(', ')}; only the build under test is asked for the WebGL2 renderer, since a release that predates the parameter ignores it.`,
+      .join(
+        ', ',
+      )}; only the build under test is asked for the WebGL2 renderer, since a release that predates the parameter ignores it.`,
 )
 lines.push('')
 lines.push(
   `${WINDOWS.length} windows. The two narrow ones sit on the same contig, the wider containing the narrower; the 1 Mb one is a second corpus beside them — its own assembly, its own files, 20x and 100x rather than the 20x-to-1000x ladder — because a 250 kb contig cannot hold a megabase view: ${WINDOWS.map(
     w => `**${w.id}** \`${w.loc}\``,
-  ).join(', ')}. Same reads, more of them, so a row pair says how each tool scales with what is on screen rather than with what is in the file.`,
+  ).join(
+    ', ',
+  )}. Same reads, more of them, so a row pair says how each tool scales with what is on screen rather than with what is in the file.`,
 )
 lines.push('')
 lines.push(
@@ -871,7 +862,7 @@ lines.push(
   '- **`tile cap raised` is that same build with the cap patched out**, which is the only way Gosling reaches the wider window. Read the pair, not the patched column alone: a patched library is not the one anyone installs. It also fetches a whole tile rather than the window — 40002 reads at 100 kb on the 20x file against roughly 16000 in view — so it is an upper bound on what an unpatched Gosling would cost at this width even if it could draw it.',
 )
 lines.push(
-  "- **Neither GenomeSpy nor Gosling reads CRAM**, so the format axis stops at BAM for both columns. igv.js and JBrowse carry the CRAM rows.",
+  '- **Neither GenomeSpy nor Gosling reads CRAM**, so the format axis stops at BAM for both columns. igv.js and JBrowse carry the CRAM rows.',
 )
 lines.push('')
 lines.push(
@@ -919,39 +910,34 @@ lines.push(`|${header.map((_, i) => (i === 0 ? '---' : '---:')).join('|')}|`)
 for (const sc of SCALES) {
   const scaleWindows = WINDOWS.filter(w => w.scale.id === sc.id)
   for (const c of enumerateCases({ ...process.env, SCALE: sc.id })) {
-  for (const w of scaleWindows) {
-  const key = rowKey(c.id, w.id)
-  const row = prior.rows[key]
-  if (!row) {
-    continue
-  }
-  const jb = row.jbrowse?.median
-  const ratio = (id: string) => {
-    const v = row[id]?.median
-    return jb && v && Number.isFinite(v) && Number.isFinite(jb)
-      ? `${(v / jb).toFixed(2)}×`
-      : '—'
-  }
-  const load = rowPeak(row)
-  const foreigns = Object.values(row)
-    .filter(cell => !cell.unsupported && !cell.unsettled)
-    .map(cell => foreign(cell.load))
-    .filter(Number.isFinite)
-  const peakForeign = foreigns.length ? Math.max(...foreigns) : Number.NaN
-  // Name what burned it. A bare 0.55 cannot be acted on; "tsc" can.
-  const by = Object.values(row)
-    .filter(
-      cell =>
-        !cell.unsupported &&
-        !cell.unsettled &&
-        foreign(cell.load) === peakForeign,
-    )
-    .map(cell => cell.load.foreignTop)
-    .find(Boolean)
-  lines.push(
-    `| ${c.id} | ${w.id} | ${shownTools.map(t => (row[t.id] ? fmt(row[t.id]) : '')).join(' | ')} | ${ratio('igv')} | ${prior.dates[key] ?? '?'} | ${Number.isFinite(peakForeign) ? peakForeign.toFixed(2) : '?'} | ${by ?? '—'} | ${load ? load.toFixed(1) : '?'} |`,
-  )
-  }
+    for (const w of scaleWindows) {
+      const key = rowKey(c.id, w.id)
+      const row = prior.rows[key]
+      if (!row) {
+        continue
+      }
+      const jb = row.jbrowse?.median
+      const ratio = (id: string) => {
+        const v = row[id]?.median
+        return jb && v && Number.isFinite(v) && Number.isFinite(jb)
+          ? `${(v / jb).toFixed(2)}×`
+          : '—'
+      }
+      const load = rowPeak(row)
+      const foreigns = Object.values(row)
+        .filter(cell => !cell.unsupported && !cell.unsettled)
+        .map(cell => foreign(cell.load))
+        .filter(Number.isFinite)
+      const peakForeign = foreigns.length ? Math.max(...foreigns) : Number.NaN
+      // Name what burned it. A bare 0.55 cannot be acted on; "tsc" can.
+      const by = Object.values(row)
+        .filter(cell => !cell.unsupported && !cell.unsettled && foreign(cell.load) === peakForeign)
+        .map(cell => cell.load.foreignTop)
+        .find(Boolean)
+      lines.push(
+        `| ${c.id} | ${w.id} | ${shownTools.map(t => (row[t.id] ? fmt(row[t.id]) : '')).join(' | ')} | ${ratio('igv')} | ${prior.dates[key] ?? '?'} | ${Number.isFinite(peakForeign) ? peakForeign.toFixed(2) : '?'} | ${by ?? '—'} | ${load ? load.toFixed(1) : '?'} |`,
+      )
+    }
   }
 }
 lines.push('')
@@ -967,9 +953,7 @@ lines.push(
 )
 lines.push('')
 const mb = (v: number | null | undefined) => (typeof v === 'number' ? v.toFixed(0) : '—')
-const memTools = shownTools.filter(t =>
-  Object.values(prior.rows).some(r => r[t.id]?.memoryMedian),
-)
+const memTools = shownTools.filter(t => Object.values(prior.rows).some(r => r[t.id]?.memoryMedian))
 if (memTools.length) {
   lines.push('## Memory at the end of the cold load')
   lines.push('')
@@ -987,7 +971,9 @@ if (memTools.length) {
         `| ${id} | ${win} | ${memTools
           .map(t => {
             const m = row[t.id]?.memoryMedian
-            return m ? `${mb(m.jsHeapUsedMB)} / ${mb(m.totalPssMB)} / ${mb(m.gpuDeviceDeltaMB)}` : ''
+            return m
+              ? `${mb(m.jsHeapUsedMB)} / ${mb(m.totalPssMB)} / ${mb(m.gpuDeviceDeltaMB)}`
+              : ''
           })
           .join(' | ')} |`,
       )

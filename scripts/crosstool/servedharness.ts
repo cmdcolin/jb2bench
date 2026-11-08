@@ -72,10 +72,7 @@ export const corpusPaths = (assembly: string, tracks: string[]) => [
 ]
 
 /** The paths of `paths` that `port` will not serve. */
-export async function unreachable(
-  port: number,
-  paths: string[],
-): Promise<string[]> {
+export async function unreachable(port: number, paths: string[]): Promise<string[]> {
   const missing: string[] = []
   for (const p of paths) {
     // One byte, not a HEAD: the corpus runs to 215 MB a file, and asking for the

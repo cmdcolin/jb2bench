@@ -115,13 +115,9 @@ for (const read of ['shortread', 'longread']) {
   }
 }
 const selected = process.env.CASES?.split(',')
-const cases = selected
-  ? allCases.filter(c => selected.includes(c.id))
-  : allCases
+const cases = selected ? allCases.filter(c => selected.includes(c.id)) : allCases
 if (!cases.length) {
-  throw new Error(
-    `CASES matched nothing; known: ${allCases.map(c => c.id).join(',')}`,
-  )
+  throw new Error(`CASES matched nothing; known: ${allCases.map(c => c.id).join(',')}`)
 }
 
 const median = (a: number[]) => {
@@ -181,8 +177,7 @@ const waitReady = (page: Page) =>
   page.waitForFunction(
     ({ stableNeeded }: { stableNeeded: number }) => {
       const w = window as unknown as { __stable?: number; __last?: number }
-      const loading =
-        document.querySelectorAll('[data-testid="loading-overlay"]').length > 0
+      const loading = document.querySelectorAll('[data-testid="loading-overlay"]').length > 0
       const phaseNodes = document.querySelectorAll('[data-display-phase]').length
       let done: number
       let ready: boolean
@@ -193,9 +188,7 @@ const waitReady = (page: Page) =>
         done = phaseNodes
         ready = outstanding === 0 && !loading
       } else {
-        done = document.querySelectorAll(
-          '[data-testid$="-done"],[data-testid$="_done"]',
-        ).length
+        done = document.querySelectorAll('[data-testid$="-done"],[data-testid$="_done"]').length
         ready = done > 0 && !loading
       }
       if (ready && done === w.__last) {
@@ -246,11 +239,7 @@ interface RunResult {
 // that is not hypothetical here — it is what Chrome's WebGPU does on this box.
 // So every run also reports how much of the track area is non-background, and
 // the report refuses to print a ratio for a cell that painted an empty track.
-async function measure(
-  track: string,
-  extra: string,
-  shot?: string,
-): Promise<RunResult> {
+async function measure(track: string, extra: string, shot?: string): Promise<RunResult> {
   const browser = await launchBrowser()
   try {
     const page = await browser.newPage()

@@ -45,12 +45,7 @@ const DATA = /\.(bam|bai|cram|crai)(\?|$)/
 
 const browser = await launch({
   headless: process.env.HEADLESS !== '0',
-  args: [
-    '--no-sandbox',
-    '--ignore-gpu-blocklist',
-    ...ANGLE_ARGS,
-    '--window-size=1280,900',
-  ],
+  args: ['--no-sandbox', '--ignore-gpu-blocklist', ...ANGLE_ARGS, '--window-size=1280,900'],
 })
 
 let refused = 0

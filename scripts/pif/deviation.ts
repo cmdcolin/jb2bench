@@ -43,14 +43,7 @@ import { createGunzip } from 'node:zlib'
 
 import { coarsenCigar } from '@jbrowse/cigar-utils'
 
-import {
-  cigarOf,
-  coarseSegs,
-  parseOps,
-  peak,
-  splitSegs,
-  trace,
-} from './geometry.ts'
+import { cigarOf, coarseSegs, parseOps, peak, splitSegs, trace } from './geometry.ts'
 
 const BOUND = 10_000 // make-pif's default --coarse, in bp
 const BP_PER_PX = 10_000 // the adapter's default coarseBpPerPxThreshold

@@ -27,7 +27,8 @@ import { fork } from 'node:child_process'
 import { fileURLToPath } from 'node:url'
 
 const args = process.argv.slice(2)
-const binPath = args.find(a => !a.startsWith('--')) ??
+const binPath =
+  args.find(a => !a.startsWith('--')) ??
   `${process.env.HOME}/src/gmod/hclust/build/matrices/100-kb-window-maf-0-samples.bin`
 const N = Number(args.find(a => a.startsWith('--n='))?.slice(4) ?? 2504)
 const child = args.find(a => a.startsWith('--child='))?.slice(8)
@@ -39,7 +40,9 @@ const loadMatrix = () => {
   const cols = buf.readUInt32LE(4)
   const values = new Float32Array(buf.buffer, buf.byteOffset + 8, rows * cols)
   const n = Math.min(N, rows)
-  const data = Array.from({ length: n }, (_, i) => Array.from(values.subarray(i * cols, (i + 1) * cols)))
+  const data = Array.from({ length: n }, (_, i) =>
+    Array.from(values.subarray(i * cols, (i + 1) * cols)),
+  )
   return { rows, cols, n, data }
 }
 
@@ -86,9 +89,10 @@ if (child) {
     const t2 = performance.now()
     totalMs = t2 - t0
     const boundary = clusteringAt[0]
-    phases = boundary === undefined
-      ? { distanceMs: null, clusterMs: null }
-      : { distanceMs: boundary - t0, clusterMs: t2 - boundary }
+    phases =
+      boundary === undefined
+        ? { distanceMs: null, clusterMs: null }
+        : { distanceMs: boundary - t0, clusterMs: t2 - boundary }
   }
   if (!phases) {
     throw new Error(`unknown impl ${child}`)
@@ -97,23 +101,26 @@ if (child) {
 } else {
   const IMPLS = (args.find(a => a.startsWith('--impls='))?.slice(8) ?? 'naive,opt,wasm').split(',')
   const self = fileURLToPath(import.meta.url)
-  const runChild = impl => new Promise((resolve, reject) => {
-    // --experimental-strip-types for the wasm child, which imports hclust's
-    // TypeScript source directly; harmless for the other two.
-    const proc = fork(self, [binPath, `--n=${N}`, `--child=${impl}`], {
-      execArgv: ['--experimental-strip-types', '--no-warnings'],
+  const runChild = impl =>
+    new Promise((resolve, reject) => {
+      // --experimental-strip-types for the wasm child, which imports hclust's
+      // TypeScript source directly; harmless for the other two.
+      const proc = fork(self, [binPath, `--n=${N}`, `--child=${impl}`], {
+        execArgv: ['--experimental-strip-types', '--no-warnings'],
+      })
+      let payload
+      proc.on('message', m => {
+        payload = m
+      })
+      proc.on('error', reject)
+      proc.on('exit', code => {
+        if (code === 0 && payload) {
+          resolve(payload)
+        } else {
+          reject(new Error(`${impl} child exited ${code}`))
+        }
+      })
     })
-    let payload
-    proc.on('message', m => { payload = m })
-    proc.on('error', reject)
-    proc.on('exit', code => {
-      if (code === 0 && payload) {
-        resolve(payload)
-      } else {
-        reject(new Error(`${impl} child exited ${code}`))
-      }
-    })
-  })
 
   const results = []
   for (const impl of IMPLS) {
@@ -129,7 +136,8 @@ if (child) {
     results.push(row)
     console.log(
       `${row.impl.padEnd(6)} distance ${ms(row.distanceMs)} ms   ` +
-      `merge ${ms(row.clusterMs)} ms   total ${row.totalMs.toFixed(0).padStart(10)} ms`)
+        `merge ${ms(row.clusterMs)} ms   total ${row.totalMs.toFixed(0).padStart(10)} ms`,
+    )
   }
 
   const by = impl => results.find(r => r.impl === impl)
@@ -150,7 +158,10 @@ if (child) {
       combined: speedup('naive', 'wasm'),
     },
   }
-  const slug = binPath.split('/').pop().replace(/\.bin$/, '')
+  const slug = binPath
+    .split('/')
+    .pop()
+    .replace(/\.bin$/, '')
   const outPath = `results/cluster-compare-${slug}-n${N}.json`
   writeFileSync(outPath, JSON.stringify(out, null, 2))
   console.log(`\nalgorithm (naive -> opt)  ${out.speedups.algorithm}x`)

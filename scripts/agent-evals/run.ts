@@ -17,7 +17,9 @@ const argv = process.argv.slice(2)
 const opt = (n: string, d?: string) => (argv.includes(n) ? argv[argv.indexOf(n) + 1] : d)
 const set = argv[0]
 if (!set || !['dev', 'heldout', 'tutorials'].includes(set)) {
-  console.error('usage: run.ts <dev|heldout|tutorials> [--config-dir dir] [--runs N] [--model name]')
+  console.error(
+    'usage: run.ts <dev|heldout|tutorials> [--config-dir dir] [--runs N] [--model name]',
+  )
   process.exit(2)
 }
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '../..')
@@ -33,12 +35,29 @@ const configDir = opt('--config-dir')
 if (configDir) {
   const real = spawnSync('which', ['claude'], { encoding: 'utf8' }).stdout.trim()
   const bin = mkdtempSync(resolve(tmpdir(), 'claude-wrapper-'))
-  writeFileSync(resolve(bin, 'claude'), `#!/bin/sh\nCLAUDE_CONFIG_DIR=${resolve(configDir)} exec ${real} "$@"\n`)
+  writeFileSync(
+    resolve(bin, 'claude'),
+    `#!/bin/sh\nCLAUDE_CONFIG_DIR=${resolve(configDir)} exec ${real} "$@"\n`,
+  )
   chmodSync(resolve(bin, 'claude'), 0o755)
   env.PATH = `${bin}:${env.PATH}`
 }
 
-const r = spawnSync('xvfb-run', ['--auto-servernum', 'node', 'test/mcpAgentEval.ts', '--model', opt('--model', 'sonnet')!, '--runs', opt('--runs', '3')!, '--set', set], { cwd: desktop, env, encoding: 'utf8', maxBuffer: 1 << 28 })
+const r = spawnSync(
+  'xvfb-run',
+  [
+    '--auto-servernum',
+    'node',
+    'test/mcpAgentEval.ts',
+    '--model',
+    opt('--model', 'sonnet')!,
+    '--runs',
+    opt('--runs', '3')!,
+    '--set',
+    set,
+  ],
+  { cwd: desktop, env, encoding: 'utf8', maxBuffer: 1 << 28 },
+)
 process.stdout.write(r.stdout)
 process.stderr.write(r.stderr)
 const dirOut = /^results: (.+)$/m.exec(r.stdout)?.[1]

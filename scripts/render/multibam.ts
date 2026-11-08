@@ -34,9 +34,7 @@ import { ANGLE_ARGS } from '../angleargs.ts'
 // the load moves by more between two consecutive runs than most optimizations
 // are worth, so a before/after taken minutes apart is not evidence. Same
 // reasoning as runner.ts, which measures every build inside each case.
-const PORTS = (process.env.PORTS ?? process.env.PORT ?? '8020')
-  .split(',')
-  .map(Number)
+const PORTS = (process.env.PORTS ?? process.env.PORT ?? '8020').split(',').map(Number)
 const LOC = process.env.LOC ?? 'chr22_mask:124000-143000'
 const MODE = process.env.MODE ?? 'pan'
 const FRAMES = Number(process.env.FRAMES ?? 240)
@@ -103,9 +101,8 @@ const median = (a: number[]) => {
 async function waitForRender(page: Page, expected: number) {
   await page.waitForFunction(
     () => {
-      const session = (
-        globalThis as { JBrowseSession?: { views?: { initialized?: boolean }[] } }
-      ).JBrowseSession
+      const session = (globalThis as { JBrowseSession?: { views?: { initialized?: boolean }[] } })
+        .JBrowseSession
       const views = session?.views
       return !!views?.length && !views.some(v => v.initialized === false)
     },
@@ -143,9 +140,7 @@ async function waitForRender(page: Page, expected: number) {
         w.__last = count
         return false
       }
-      ready =
-        ready &&
-        document.querySelectorAll('[data-testid="loading-overlay"]').length === 0
+      ready = ready && document.querySelectorAll('[data-testid="loading-overlay"]').length === 0
       if (ready && count === w.__last) {
         w.__stable = (w.__stable ?? 0) + 1
       } else {
@@ -249,10 +244,7 @@ async function armProfilers(page: Page) {
     const { sessionId, targetInfo } = event
     const session = connection.session(sessionId)
     void (async () => {
-      if (
-        session &&
-        (targetInfo.type === 'worker' || targetInfo.type === 'shared_worker')
-      ) {
+      if (session && (targetInfo.type === 'worker' || targetInfo.type === 'shared_worker')) {
         try {
           await session.send('Profiler.enable')
           await session.send('Profiler.setSamplingInterval', { interval: 200 })
@@ -273,12 +265,7 @@ async function armProfilers(page: Page) {
   return { client, profilers }
 }
 
-async function measure(
-  browser: Browser,
-  n: number,
-  port: number,
-  profileLabel?: string,
-) {
+async function measure(browser: Browser, n: number, port: number, profileLabel?: string) {
   const tracks = TRACKS.slice(0, n)
   const url =
     `http://localhost:${port}/?loc=${LOC}&assembly=hg19mod` +
@@ -286,9 +273,7 @@ async function measure(
   const page = await browser.newPage()
   await page.setViewport({ width: 1280, height: 900 })
   const errors: string[] = []
-  page.on('pageerror', (e: unknown) =>
-    errors.push(e instanceof Error ? e.message : String(e)),
-  )
+  page.on('pageerror', (e: unknown) => errors.push(e instanceof Error ? e.message : String(e)))
 
   const armed = profileLabel ? await armProfilers(page) : undefined
 
@@ -315,10 +300,7 @@ async function measure(
           profile: { samples?: unknown[] }
         }
         fs.mkdirSync('flame', { recursive: true })
-        fs.writeFileSync(
-          `flame/${profileLabel}.load.${p.id}.cpuprofile`,
-          JSON.stringify(profile),
-        )
+        fs.writeFileSync(`flame/${profileLabel}.load.${p.id}.cpuprofile`, JSON.stringify(profile))
         await p.session.send('Profiler.start')
       } catch {
         // a worker that finished its work and exited has nothing to restart
@@ -359,9 +341,7 @@ async function measure(
 // user see" once the cost is already over budget. rowsweep.ts made the same
 // choice for the same reason.
 const vsyncArgs =
-  process.env.VSYNC === '1'
-    ? ['--vsync=on']
-    : ['--disable-gpu-vsync', '--disable-frame-rate-limit']
+  process.env.VSYNC === '1' ? ['--vsync=on'] : ['--disable-gpu-vsync', '--disable-frame-rate-limit']
 
 const browser = await launch({
   headless: process.env.HEADLESS !== '0',
@@ -445,9 +425,7 @@ for (const { n, port } of order) {
   const before = loadavg()
   process.stdout.write(`${buildOf.get(port)} n=${n}: `)
   const label =
-    profileLabel && step >= lastPassStart
-      ? `${profileLabel}-${buildOf.get(port)}-n${n}`
-      : undefined
+    profileLabel && step >= lastPassStart ? `${profileLabel}-${buildOf.get(port)}-n${n}` : undefined
   step++
   const r = await measure(browser, n, port, label)
   slot.readyMs.push(r.readyMs)
@@ -506,24 +484,21 @@ const out = {
 }
 fs.mkdirSync('results', { recursive: true })
 const suffix = MODE + (THROTTLE > 1 ? `-t${THROTTLE}` : '')
-fs.writeFileSync(
-  `results/multibam-${suffix}.json`,
-  JSON.stringify(out, null, 2),
-)
+fs.writeFileSync(`results/multibam-${suffix}.json`, JSON.stringify(out, null, 2))
 
 const base = rows[0]
 let md = `# Multi-track interaction cost (${MODE}${THROTTLE > 1 ? `, ${THROTTLE}x CPU throttle` : ''})\n\n`
 md += `Region \`${LOC}\`, ${FRAMES} rAF-paced frames x ${PASSES} passes per row, `
 md += `viewport 1280x900. The gesture stays inside already-loaded data, so no row refetches: `
 md += `this is re-render cost, not network. \`over budget\` is the share of frames whose gap exceeded 20 ms.\n\n`
-md += process.env.VSYNC === '1'
-  ? `Frames are **vsync-paced**, so the gap floors at 16.7 ms and any row at or near it is reporting the display, not the app.\n\n`
-  : `Frames are **unpaced** (\`--disable-gpu-vsync --disable-frame-rate-limit\`), so a gap below 16.7 ms is real and the light rows are not floored.\n\n`
+md +=
+  process.env.VSYNC === '1'
+    ? `Frames are **vsync-paced**, so the gap floors at 16.7 ms and any row at or near it is reporting the display, not the app.\n\n`
+    : `Frames are **unpaced** (\`--disable-gpu-vsync --disable-frame-rate-limit\`), so a gap below 16.7 ms is real and the light rows are not floored.\n\n`
 if (profileLabel) {
   md += `> **This run was profiled** (\`PROFILE=${profileLabel}\`): the last pass of each row ran with the V8 sampling profiler attached to the page and its workers, which inflates that pass. Take the timings from an unprofiled run and this one only for the traces.\n\n`
 }
-const rowFor = (n: number, port: number) =>
-  rows.find(r => r.n === n && r.port === port)
+const rowFor = (n: number, port: number) => rows.find(r => r.n === n && r.port === port)
 
 if (PORTS.length > 1) {
   // A/B: one row per track count, one frame-median column per build. The arms

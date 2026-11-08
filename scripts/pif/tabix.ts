@@ -26,9 +26,7 @@ export interface RefSpan {
 export function readTabix(tbi: Buffer): RefSpan[] {
   const buf = gunzipSync(tbi)
   if (buf.readUInt32LE(0) !== 0x01494254) {
-    throw new Error(
-      'not a TBI (a .csi is a different layout; this reads TBI only)',
-    )
+    throw new Error('not a TBI (a .csi is a different layout; this reads TBI only)')
   }
   let p = 4
   const i32 = () => {
@@ -41,7 +39,10 @@ export function readTabix(tbi: Buffer): RefSpan[] {
     i32() // format, col_seq, col_beg, col_end, meta, skip
   }
   const lNm = i32()
-  const names = buf.toString('latin1', p, p + lNm).split('\0').slice(0, nRef)
+  const names = buf
+    .toString('latin1', p, p + lNm)
+    .split('\0')
+    .slice(0, nRef)
   p += lNm
 
   return names.map(refName => {
@@ -116,19 +117,13 @@ export async function sizeOf(src: string): Promise<number> {
 }
 
 /** Bytes `[start, start+length)` of a local path or an http(s) URL. */
-export async function readBytes(
-  src: string,
-  start: number,
-  length: number,
-): Promise<Buffer> {
+export async function readBytes(src: string, start: number, length: number): Promise<Buffer> {
   if (/^https?:/.test(src)) {
     const res = await fetch(src, {
       headers: { Range: `bytes=${start}-${start + length - 1}` },
     })
     if (res.status !== 206) {
-      throw new Error(
-        `${src} answered ${res.status} to a Range request; byte ranges are required`,
-      )
+      throw new Error(`${src} answered ${res.status} to a Range request; byte ranges are required`)
     }
     return Buffer.from(await res.arrayBuffer())
   }

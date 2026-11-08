@@ -71,7 +71,8 @@ function kbField(text: string, name: string) {
 }
 
 function processMemory(root: number) {
-  const byType: Record<string, { count: number; pssMB: number; rssMB: number; peakRssMB: number }> = {}
+  const byType: Record<string, { count: number; pssMB: number; rssMB: number; peakRssMB: number }> =
+    {}
   for (const pid of descendants(root)) {
     try {
       const cmd = fs.readFileSync(`/proc/${pid}/cmdline`, 'utf8')
@@ -136,10 +137,7 @@ function darwinProcessMemory(root: number) {
 }
 
 async function jsHeap(page: Page) {
-  const sessions = [
-    await page.createCDPSession(),
-    ...page.workers().map(w => w.client),
-  ]
+  const sessions = [await page.createCDPSession(), ...page.workers().map(w => w.client)]
   const usage = await Promise.all(
     sessions.map(s =>
       s
@@ -161,7 +159,11 @@ export async function sampleMemory(browser: Browser, page: Page, gpuBaselineMB: 
   const gpuNow = gpuDeviceUsedMB()
   return {
     jsHeap: await jsHeap(page),
-    process: pid ? (process.platform === 'darwin' ? darwinProcessMemory(pid) : processMemory(pid)) : null,
+    process: pid
+      ? process.platform === 'darwin'
+        ? darwinProcessMemory(pid)
+        : processMemory(pid)
+      : null,
     gpuDevice:
       gpuNow !== null && gpuBaselineMB !== null
         ? { usedMB: gpuNow, baselineMB: gpuBaselineMB, deltaMB: gpuNow - gpuBaselineMB }
@@ -171,4 +173,5 @@ export async function sampleMemory(browser: Browser, page: Page, gpuBaselineMB: 
 
 export type MemorySample = Awaited<ReturnType<typeof sampleMemory>>
 
-export const procMemory = (m: MemorySample) => (m.process?.source === 'proc' ? m.process : undefined)
+export const procMemory = (m: MemorySample) =>
+  m.process?.source === 'proc' ? m.process : undefined

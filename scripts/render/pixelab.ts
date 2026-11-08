@@ -48,9 +48,7 @@ async function shoot(browser: Browser, port: number, name: string) {
   const page = await browser.newPage()
   await page.setViewport({ width: 1280, height: 900 })
   const errors: string[] = []
-  page.on('pageerror', (e: unknown) =>
-    errors.push(e instanceof Error ? e.message : String(e)),
-  )
+  page.on('pageerror', (e: unknown) => errors.push(e instanceof Error ? e.message : String(e)))
   await page.goto(
     `http://localhost:${port}/?loc=${LOC}&assembly=hg19mod&tracks=${TRACKS.join(',')}&renderer=webgl`,
     { waitUntil: 'load' },
@@ -85,12 +83,7 @@ async function shoot(browser: Browser, port: number, name: string) {
 
 const browser = await launch({
   headless: process.env.HEADLESS !== '0',
-  args: [
-    '--no-sandbox',
-    '--ignore-gpu-blocklist',
-    ...ANGLE_ARGS,
-    '--window-size=1280,900',
-  ],
+  args: ['--no-sandbox', '--ignore-gpu-blocklist', ...ANGLE_ARGS, '--window-size=1280,900'],
 })
 
 const a = await shoot(browser, PORTS[0]!, `pixelab-${PORTS[0]}`)
@@ -100,9 +93,7 @@ await browser.close()
 const pa = PNG.sync.read(fs.readFileSync(a.path))
 const pb = PNG.sync.read(fs.readFileSync(b.path))
 if (pa.width !== pb.width || pa.height !== pb.height) {
-  throw new Error(
-    `size mismatch ${pa.width}x${pa.height} vs ${pb.width}x${pb.height}`,
-  )
+  throw new Error(`size mismatch ${pa.width}x${pa.height} vs ${pb.width}x${pb.height}`)
 }
 // Rectangles to ignore, as `x,y,w,h` separated by `;`. The default masks the
 // header CLOCK: the two shots are taken seconds apart, so its digits differ on
@@ -167,9 +158,7 @@ console.log(
       maxChannelDelta: maxDelta,
       // Where the differences are, because "0.007% of pixels" is not a finding
       // and "a 9x11 block at y=17" is — that one turned out to be the clock.
-      bbox: differing
-        ? { x: [minX, maxX], y: [minY, maxY] }
-        : null,
+      bbox: differing ? { x: [minX, maxX], y: [minY, maxY] } : null,
       masked: MASK,
       errorsA: a.errors,
       errorsB: b.errors,

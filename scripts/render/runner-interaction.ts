@@ -61,9 +61,7 @@ const resolved = await Promise.all(
       }
     } catch (e) {
       if (OPTIONAL_ROLES.includes(role)) {
-        console.log(
-          `${role}: port ${ports[role].port} not served, skipping (optional)`,
-        )
+        console.log(`${role}: port ${ports[role].port} not served, skipping (optional)`)
         return undefined
       }
       throw e
@@ -148,11 +146,7 @@ interface Result {
   load?: LoadWindow
 }
 
-function run(
-  build: (typeof builds)[number],
-  track: string,
-  mode: Mode,
-): Result {
+function run(build: (typeof builds)[number], track: string, mode: Mode): Result {
   const url = `http://localhost:${build.port}/?loc=${LOC}&assembly=hg19mod&tracks=${track}${build.extra}`
   // stderr is CAPTURED, not discarded. The child prints which render-complete
   // contract and which loading detector it chose there, and those are the two
@@ -217,8 +211,7 @@ const cell = (r: Result | undefined) => {
 // builder below reads them, so each one would otherwise need its own check.
 const gapCell = (r: Result | undefined) =>
   r && Number.isFinite(r.zoomRedrawGapMs) ? `${r.zoomRedrawGapMs.toFixed(0)}ms` : 'n/a'
-const stepsCell = (r: Result | undefined) =>
-  r ? `${r.stepsMeasured}/${r.stepsAttempted}` : '—'
+const stepsCell = (r: Result | undefined) => (r ? `${r.stepsMeasured}/${r.stepsAttempted}` : '—')
 
 // Modes not selected this time keep whatever the last run recorded, so a
 // filtered re-run does not blank out the rest of the report.
@@ -355,9 +348,7 @@ fs.writeFileSync(
       // servedbuild.ts was written to prevent, arriving from the other side.
       builds: {
         ...prior.builds,
-        ...(MODES.length
-          ? Object.fromEntries(builds.map(b => [b.role, b.name]))
-          : {}),
+        ...(MODES.length ? Object.fromEntries(builds.map(b => [b.role, b.name])) : {}),
       },
       measuredAt,
       detector,
@@ -416,9 +407,7 @@ md += `redraw = longest frame (ms) of the GPU redraw. A \`≥\` prefix marks a c
 // numbers from different runs. Say when each one was taken rather than letting
 // the page imply they are one sitting.
 const when = ALL_MODES.map(
-  m =>
-    `${m}: ${measuredAt[m] ?? 'unknown'}` +
-    ` (${detector[m] ?? 'text, pre-2026-08-25'})`,
+  m => `${m}: ${measuredAt[m] ?? 'unknown'} (${detector[m] ?? 'text, pre-2026-08-25'})`,
 ).join(', ')
 md += `Measured — ${when}. Comparisons *within* a section are same-run; comparisons across sections may not be.\n\n`
 
@@ -497,9 +486,7 @@ for (const c of allCases) {
     Number.isFinite(w.zoomTimeToContentMs) &&
     Number.isFinite(r.zoomTimeToContentMs) &&
     w.zoomTimeToContentMs > 0
-  const ratio = comparable
-    ? `${(r.zoomTimeToContentMs / w.zoomTimeToContentMs).toFixed(2)}×`
-    : '—'
+  const ratio = comparable ? `${(r.zoomTimeToContentMs / w.zoomTimeToContentMs).toFixed(2)}×` : '—'
   md += `| ${c.id} | ${cell(w)} | ${cell(r)} | ${ratio} |${pubCell(results[c.id]!.pan)}${canCell(results[c.id]!.pan)} ${gapCell(w)} | ${stepsCell(w)} |\n`
 }
 fs.writeFileSync('results/interaction.md', md)

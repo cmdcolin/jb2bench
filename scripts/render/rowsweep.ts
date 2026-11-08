@@ -38,9 +38,7 @@ const FRAMES = Number(arg('frames', '240'))
 const LOC = arg('loc', 'chr22_mask:124000-143000')
 const ASSEMBLY = arg('assembly', 'hg19mod')
 const VSYNC = arg('vsync', 'off') === 'on'
-const ROWS = arg('rows', '100,250,500,1000,2000,2504')
-  .split(',')
-  .map(Number)
+const ROWS = arg('rows', '100,250,500,1000,2000,2504').split(',').map(Number)
 
 const median = (a: number[]) => {
   const s = [...a].toSorted((x, y) => x - y)
@@ -69,11 +67,8 @@ async function waitReady(page: Page) {
   await page.waitForFunction(
     () => {
       const w = window as unknown as { __stable?: number; __last?: number }
-      const done = document.querySelectorAll(
-        '[data-testid$="-done"],[data-testid$="_done"]',
-      ).length
-      const loading =
-        document.querySelectorAll('[data-testid="loading-overlay"]').length > 0
+      const done = document.querySelectorAll('[data-testid$="-done"],[data-testid$="_done"]').length
+      const loading = document.querySelectorAll('[data-testid="loading-overlay"]').length > 0
       const ready = done > 0 && !loading
       if (ready && done === w.__last) {
         w.__stable = (w.__stable ?? 0) + 1
@@ -141,10 +136,7 @@ interface Row {
   load: LoadWindow[]
 }
 const out = new Map<number, Row>(
-  ROWS.map(n => [
-    n,
-    { rows: n, ready: [], frameMedian: [], framesOver20: [], gaps: [], load: [] },
-  ]),
+  ROWS.map(n => [n, { rows: n, ready: [], frameMedian: [], framesOver20: [], gaps: [], load: [] }]),
 )
 
 // Interleaved by design: one pass over every row count, then the next pass,
@@ -209,7 +201,8 @@ md += `${FRAMES}-frame pan that stays within loaded data (no refetch). `
 md += VSYNC
   ? `The instrument is vsync-paced, so 16.7 ms is its floor on a 60 Hz display.\n\n`
   : `vsync and the frame-rate cap are disabled, so the interval is the frame's own work.\n\n`
-md += '| rows | ready (ms) | frame median (ms) | frame p90 | frame p99 | frames >20 ms | peak load |\n'
+md +=
+  '| rows | ready (ms) | frame median (ms) | frame p90 | frame p99 | frames >20 ms | peak load |\n'
 md += '|---:|---:|---:|---:|---:|---:|---:|\n'
 for (const r of out.values()) {
   if (!r.ready.length) {

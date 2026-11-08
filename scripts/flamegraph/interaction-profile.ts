@@ -60,10 +60,7 @@ client.on('Target.attachedToTarget', event => {
   const { sessionId, targetInfo } = event
   const session = connection.session(sessionId)
   void (async () => {
-    if (
-      session &&
-      (targetInfo.type === 'worker' || targetInfo.type === 'shared_worker')
-    ) {
+    if (session && (targetInfo.type === 'worker' || targetInfo.type === 'shared_worker')) {
       try {
         await session.send('Profiler.enable')
         await session.send('Profiler.setSamplingInterval', { interval: 200 })
@@ -83,11 +80,8 @@ await page.goto(url, { waitUntil: 'load' })
 await page.waitForFunction(
   () => {
     const w = window as unknown as { __stable?: number; __last?: number }
-    const done = document.querySelectorAll(
-      '[data-testid$="-done"],[data-testid$="_done"]',
-    ).length
-    const loading =
-      document.querySelectorAll('[data-testid="loading-overlay"]').length > 0
+    const done = document.querySelectorAll('[data-testid$="-done"],[data-testid$="_done"]').length
+    const loading = document.querySelectorAll('[data-testid="loading-overlay"]').length > 0
     const ready = done > 0 && !loading
     if (ready && done === w.__last) {
       w.__stable = (w.__stable ?? 0) + 1
@@ -132,7 +126,9 @@ if (process.env.HOVER === '1') {
       await new Promise(r => setTimeout(r, 60))
       set = await modelHasHover()
       if (set) {
-        console.error(`hover set at ${Math.round(rect.x)},${Math.round(y)} (frac ${frac.toFixed(1)})`)
+        console.error(
+          `hover set at ${Math.round(rect.x)},${Math.round(y)} (frac ${frac.toFixed(1)})`,
+        )
       }
     }
   }

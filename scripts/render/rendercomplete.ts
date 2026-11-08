@@ -88,10 +88,7 @@ export async function waitForRenderComplete(
   // render, a ceiling, or a browser that has stopped doing anything at all.
   const watch = watchdog(page, () => responses)
   try {
-    return await Promise.race([
-      poll(page, timeout, stableNeeded, () => responses),
-      watch.stalled,
-    ])
+    return await Promise.race([poll(page, timeout, stableNeeded, () => responses), watch.stalled])
   } finally {
     watch.stop()
     page.off('response', seen)
@@ -166,9 +163,8 @@ function watchdog(page: Page, responses: () => number) {
  * `waitForSession(page, { timeout: WAIT_TIMEOUT })` and take its other stages.
  */
 function sessionReady() {
-  const session = (
-    globalThis as { JBrowseSession?: { views?: { initialized?: boolean }[] } }
-  ).JBrowseSession
+  const session = (globalThis as { JBrowseSession?: { views?: { initialized?: boolean }[] } })
+    .JBrowseSession
   const views = session?.views
   if (!views?.length) {
     return false
@@ -203,10 +199,7 @@ async function poll(
     if (now !== mark) {
       mark = now
       changed = Date.now()
-    } else if (
-      Date.now() - changed > STALL_MS &&
-      answeredIn < RESPONSIVE_MS
-    ) {
+    } else if (Date.now() - changed > STALL_MS && answeredIn < RESPONSIVE_MS) {
       // Not a timeout: a timeout says the ceiling ran out, and this says the
       // page stopped. The distinction is the whole point — one is a slow render
       // worth waiting for and the other is minutes of nothing.

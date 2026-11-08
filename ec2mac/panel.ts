@@ -31,7 +31,11 @@ const OUT = env.OUT ?? `results/ec2mac/${LABEL}-${STAMP}`
 
 const BACKENDS = ['webgpu', 'webgl', 'canvas2d'] as const
 type Backend = (typeof BACKENDS)[number]
-const expectedRung: Record<Backend, string> = { webgpu: 'webgpu', webgl: 'webgl2', canvas2d: 'canvas2d' }
+const expectedRung: Record<Backend, string> = {
+  webgpu: 'webgpu',
+  webgl: 'webgl2',
+  canvas2d: 'canvas2d',
+}
 
 interface CellDef {
   id: string
@@ -41,9 +45,27 @@ interface CellDef {
   ceilingMs: number
 }
 const CELLS: CellDef[] = [
-  { id: 'cold-20x', kind: 'cold', track: '20x.shortread.bam', loc: 'chr22_mask:75000-175000', ceilingMs: 600000 },
-  { id: 'cold-1000x', kind: 'cold', track: '1000x.shortread.bam', loc: 'chr22_mask:75000-175000', ceilingMs: 600000 },
-  { id: 'zoom-200x', kind: 'zoom', track: '200x.shortread.bam', loc: 'chr22_mask:124000-143000', ceilingMs: 120000 },
+  {
+    id: 'cold-20x',
+    kind: 'cold',
+    track: '20x.shortread.bam',
+    loc: 'chr22_mask:75000-175000',
+    ceilingMs: 600000,
+  },
+  {
+    id: 'cold-1000x',
+    kind: 'cold',
+    track: '1000x.shortread.bam',
+    loc: 'chr22_mask:75000-175000',
+    ceilingMs: 600000,
+  },
+  {
+    id: 'zoom-200x',
+    kind: 'zoom',
+    track: '200x.shortread.bam',
+    loc: 'chr22_mask:124000-143000',
+    ceilingMs: 120000,
+  },
 ]
 
 const pick = <T extends string>(name: string, known: readonly T[], value: string | undefined) => {
@@ -55,7 +77,11 @@ const pick = <T extends string>(name: string, known: readonly T[], value: string
   return got
 }
 const backends = pick('BACKENDS', BACKENDS, env.BACKENDS)
-const cellIds = pick('CELLS', CELLS.map(c => c.id), env.CELLS)
+const cellIds = pick(
+  'CELLS',
+  CELLS.map(c => c.id),
+  env.CELLS,
+)
 const cells = CELLS.filter(c => cellIds.includes(c.id))
 const cpuSets = env.CPUS ? env.CPUS.split(',').map(Number) : [0]
 if (cpuSets.some(n => n > 0) && process.platform !== 'linux') {
@@ -83,11 +109,18 @@ const lineAfter = (lines: string[], prefix: string) => {
 }
 
 function runOnce(c: CellDef, b: Backend, cpus: number): Run {
-  const script = c.kind === 'cold' ? 'scripts/crosstool/paintprofile.ts' : 'scripts/crosstool/panprofile.ts'
-  const args = ['--experimental-strip-types', script, urlFor(c, b), ...(c.kind === 'zoom' ? ['jbrowse'] : [])]
-  const [cmd, argv] = cpus > 0
-    ? ['taskset', ['-c', `0-${cpus - 1}`, process.execPath, ...args]]
-    : [process.execPath, args]
+  const script =
+    c.kind === 'cold' ? 'scripts/crosstool/paintprofile.ts' : 'scripts/crosstool/panprofile.ts'
+  const args = [
+    '--experimental-strip-types',
+    script,
+    urlFor(c, b),
+    ...(c.kind === 'zoom' ? ['jbrowse'] : []),
+  ]
+  const [cmd, argv] =
+    cpus > 0
+      ? ['taskset', ['-c', `0-${cpus - 1}`, process.execPath, ...args]]
+      : [process.execPath, args]
   const before = os.loadavg()[0]!
   let out = ''
   try {
@@ -111,9 +144,14 @@ function runOnce(c: CellDef, b: Backend, cpus: number): Run {
   const lines = out.trim().split('\n')
   const gpu = lineAfter(lines, 'GPU ') as Run['gpu']
   const last = lines.at(-1) ?? ''
-  const zoom = c.kind === 'zoom' && last.startsWith('{')
-    ? (JSON.parse(last) as { medianMs: number | null; medianDrawClockMs?: number | null; steps: { ms: number; applied: boolean }[] })
-    : null
+  const zoom =
+    c.kind === 'zoom' && last.startsWith('{')
+      ? (JSON.parse(last) as {
+          medianMs: number | null
+          medianDrawClockMs?: number | null
+          steps: { ms: number; applied: boolean }[]
+        })
+      : null
   const ms = c.kind === 'cold' ? Number.parseFloat(last) : (zoom?.medianMs ?? Number.NaN)
   const rung = gpu && 'rung' in gpu ? gpu.rung : 'unprobed'
   const hardware = gpu && 'rung' in gpu ? gpu.hardware : null
@@ -129,7 +167,10 @@ function runOnce(c: CellDef, b: Backend, cpus: number): Run {
     counted: why === undefined,
     why,
     gpu,
-    memory: c.kind === 'cold' ? (lineAfter(lines, 'DETAIL ') as { memory: MemorySample } | null)?.memory : undefined,
+    memory:
+      c.kind === 'cold'
+        ? (lineAfter(lines, 'DETAIL ') as { memory: MemorySample } | null)?.memory
+        : undefined,
     steps: zoom?.steps.filter(s => s.applied).map(s => s.ms),
     drawClockMs: zoom?.medianDrawClockMs,
     load,
@@ -155,9 +196,19 @@ function memorySummary(runs: Run[]) {
     ? {
         source: got[0]!.process?.source ?? null,
         jsHeapUsedMB: med(m => m.jsHeap.usedMB),
-        totalMB: med(m => (m.process?.source === 'proc' ? m.process.totalPssMB : m.process?.totalRssMB)),
-        rendererMB: med(m => (m.process?.source === 'proc' ? m.process.byType.renderer?.pssMB : m.process?.byType.renderer?.rssMB)),
-        gpuProcessMB: med(m => (m.process?.source === 'proc' ? m.process.byType['gpu-process']?.pssMB : m.process?.byType['gpu-process']?.rssMB)),
+        totalMB: med(m =>
+          m.process?.source === 'proc' ? m.process.totalPssMB : m.process?.totalRssMB,
+        ),
+        rendererMB: med(m =>
+          m.process?.source === 'proc'
+            ? m.process.byType.renderer?.pssMB
+            : m.process?.byType.renderer?.rssMB,
+        ),
+        gpuProcessMB: med(m =>
+          m.process?.source === 'proc'
+            ? m.process.byType['gpu-process']?.pssMB
+            : m.process?.byType['gpu-process']?.rssMB,
+        ),
         gpuDeviceDeltaMB: med(m => m.gpuDevice?.deltaMB),
       }
     : null
@@ -210,24 +261,34 @@ const host = {
   cpuModel: os.cpus()[0]?.model ?? null,
   logicalCpus: os.cpus().length,
   memGB: round(os.totalmem() / 2 ** 30),
-  gpu: process.platform === 'darwin'
-    ? sh('system_profiler', ['SPDisplaysDataType'])?.match(/Chipset Model: (.*)/)?.[1] ?? null
-    : sh('nvidia-smi', ['-L']),
+  gpu:
+    process.platform === 'darwin'
+      ? (sh('system_profiler', ['SPDisplaysDataType'])?.match(/Chipset Model: (.*)/)?.[1] ?? null)
+      : sh('nvidia-smi', ['-L']),
   chrome: await chromeVersion(),
   chromeAngle: ANGLE_ARGS.join(' '),
   node: process.version,
 }
-console.log(`builds/${build} on port ${PORT}; ${host.cpuModel} x${host.logicalCpus}, ${host.gpu}; ${host.chrome}`)
-console.log(`cells ${cellIds.join(',')}; backends ${backends.join(',')}; ${WARMUP} warm-up + ${RUNS} runs${env.CPUS ? `; cpus ${env.CPUS}` : ''}`)
+console.log(
+  `builds/${build} on port ${PORT}; ${host.cpuModel} x${host.logicalCpus}, ${host.gpu}; ${host.chrome}`,
+)
+console.log(
+  `cells ${cellIds.join(',')}; backends ${backends.join(',')}; ${WARMUP} warm-up + ${RUNS} runs${env.CPUS ? `; cpus ${env.CPUS}` : ''}`,
+)
 
 fs.mkdirSync(OUT, { recursive: true })
-const key = (c: CellDef, b: Backend, cpus: number) => `${c.id}/${b}${cpus > 0 ? `/cpus${cpus}` : ''}`
+const key = (c: CellDef, b: Backend, cpus: number) =>
+  `${c.id}/${b}${cpus > 0 ? `/cpus${cpus}` : ''}`
 const raw: Record<string, Run[]> = {}
 const write = () => {
   const summary = Object.fromEntries(Object.entries(raw).map(([k, runs]) => [k, summarize(runs)]))
   fs.writeFileSync(
     `${OUT}/panel.json`,
-    JSON.stringify({ build, port: PORT, runs: RUNS, warmup: WARMUP, stamp: STAMP, host, summary, raw }, null, 2),
+    JSON.stringify(
+      { build, port: PORT, runs: RUNS, warmup: WARMUP, stamp: STAMP, host, summary, raw },
+      null,
+      2,
+    ),
   )
   return summary
 }
@@ -245,8 +306,13 @@ for (const cpus of cpuSets) {
       for (const b of backends) {
         const r = runOnce(c, b, cpus)
         raw[key(c, b, cpus)]!.push(r)
-        const g = r.gpu && 'rung' in r.gpu ? `${r.gpu.rung} on ${r.gpu.rung === 'webgpu' ? r.gpu.webgpuAdapter : r.gpu.glRenderer}` : 'unprobed'
-        console.log(`${key(c, b, cpus)} run ${i + 1}: ${r.ms.toFixed(0)} ms, ${g}${r.why ? ` -- NOT COUNTED: ${r.why}` : ''}`)
+        const g =
+          r.gpu && 'rung' in r.gpu
+            ? `${r.gpu.rung} on ${r.gpu.rung === 'webgpu' ? r.gpu.webgpuAdapter : r.gpu.glRenderer}`
+            : 'unprobed'
+        console.log(
+          `${key(c, b, cpus)} run ${i + 1}: ${r.ms.toFixed(0)} ms, ${g}${r.why ? ` -- NOT COUNTED: ${r.why}` : ''}`,
+        )
         write()
       }
     }

@@ -8,7 +8,11 @@ const [trackId, refName, start, end] = process.argv.slice(2)
 const load = loadavg()[0]
 const config = 'https://jbrowse.org/demos/hprc/config.json'
 const url = `https://jbrowse.org/code/jb2/main/?config=${encodeURIComponent(config)}`
-const browser = await launch({ headless: true, executablePath: '/usr/bin/google-chrome', args: ['--no-sandbox'] })
+const browser = await launch({
+  headless: true,
+  executablePath: '/usr/bin/google-chrome',
+  args: ['--no-sandbox'],
+})
 const page = await browser.newPage()
 await page.setViewport({ width: 1600, height: 1000 })
 const net = { req: 0, bytes: 0, urls: {} }
@@ -31,9 +35,12 @@ const pc = await page.createCDPSession()
 await pc.send('Network.enable')
 watch(pc)
 page.on('workercreated', w => {
-  w.client.send('Network.enable').then(() => {
-    watch(w.client)
-  }).catch(() => {})
+  w.client
+    .send('Network.enable')
+    .then(() => {
+      watch(w.client)
+    })
+    .catch(() => {})
 })
 await page.goto(url, { waitUntil: 'domcontentloaded' })
 await page.waitForFunction(() => !!window.JBrowseSession, { timeout: 120000 })
@@ -44,7 +51,8 @@ await page.waitForFunction(
 const t0 = Date.now()
 const viewId = await page.evaluate(
   ({ trackId: id, region }) =>
-    window.JBrowseSession.addView('GraphGenomeView', { loadedTrackId: id, loadedRegion: region }).id,
+    window.JBrowseSession.addView('GraphGenomeView', { loadedTrackId: id, loadedRegion: region })
+      .id,
   { trackId, region: { assemblyName: 'hg38', refName, start: +start, end: +end } },
 )
 await page.waitForFunction(
@@ -58,9 +66,25 @@ await page.waitForFunction(
 const cutMs = Date.now() - t0
 const view = await page.evaluate(id => {
   const v = window.JBrowseSession.views.find(x => x.id === id)
-  const plugin = window.JBrowseRootModel.pluginManager.plugins.find(p => p.name === 'GraphGenomeView')
+  const plugin = window.JBrowseRootModel.pluginManager.plugins.find(
+    p => p.name === 'GraphGenomeView',
+  )
   return { nodes: v.nodeCount, error: v.error && String(v.error), plugin: plugin?.version }
 }, viewId)
 await new Promise(r => setTimeout(r, +(process.env.SETTLE_MS ?? 3000)))
 await browser.close()
-console.log(JSON.stringify({ date: new Date().toISOString(), load, trackId, refName, start: +start, end: +end, cutMs, ...view, requests: net.req, MB: +(net.bytes / 1e6).toFixed(2), urls: net.urls }))
+console.log(
+  JSON.stringify({
+    date: new Date().toISOString(),
+    load,
+    trackId,
+    refName,
+    start: +start,
+    end: +end,
+    cutMs,
+    ...view,
+    requests: net.req,
+    MB: +(net.bytes / 1e6).toFixed(2),
+    urls: net.urls,
+  }),
+)

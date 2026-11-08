@@ -59,8 +59,7 @@ interface PanFile {
   locusMismatch?: Record<string, string>
 }
 
-const isObject = (x: unknown): x is Record<string, unknown> =>
-  typeof x === 'object' && x !== null
+const isObject = (x: unknown): x is Record<string, unknown> => typeof x === 'object' && x !== null
 const isColdFile = (x: unknown): x is ColdFile => isObject(x) && isObject(x.results)
 const isInterFile = (x: unknown): x is InterFile => isObject(x) && isObject(x.builds)
 const isCrosstoolFile = (x: unknown): x is CrosstoolFile => isObject(x)
@@ -104,7 +103,11 @@ const pm = (m: number | undefined, s: number | undefined) =>
     ? `${Math.round(m)} $\\pm$ ${Math.round(s ?? 0)}`
     : '---'
 const ratio = (a: number | undefined, b: number | undefined) =>
-  typeof a === 'number' && typeof b === 'number' && Number.isFinite(a) && Number.isFinite(b) && b > 0
+  typeof a === 'number' &&
+  typeof b === 'number' &&
+  Number.isFinite(a) &&
+  Number.isFinite(b) &&
+  b > 0
     ? `${(a / b).toFixed(2)}$\\times$`
     : '---'
 
@@ -115,12 +118,7 @@ const ratio = (a: number | undefined, b: number | undefined) =>
  * and a table that differs from its neighbours by a rule or a header is a
  * diff nobody wants to read.
  */
-function longtable(opts: {
-  align: string
-  caption: string
-  header: string[]
-  rows: string[][]
-}) {
+function longtable(opts: { align: string; caption: string; header: string[]; rows: string[][] }) {
   const head = opts.header.join(' & ') + ' \\\\'
   return [
     HEAD.trimEnd(),
@@ -156,9 +154,7 @@ const BUILD_LABEL: Record<string, string> = {
 // arm on 2026-08-24 because it sat within about 1% of 4.3.0 in every one of the
 // twelve cells; the column stays for as long as a run carries it and disappears
 // on its own when one does not, rather than becoming a row of dashes.
-const coldBuilds = BUILDS.filter(b =>
-  CASES.some(c => cold.results[c]?.[b]?.median != null),
-)
+const coldBuilds = BUILDS.filter(b => CASES.some(c => cold.results[c]?.[b]?.median != null))
 
 let worstForeign = 0
 const coldRows = CASES.map((c, i) => {
@@ -207,13 +203,11 @@ fs.writeFileSync(
 
 const inter = read('interaction.json', isInterFile)
 const roles = inter.builds
-const roleOf = (name: string) =>
-  Object.keys(roles).find(r => roles[r] === name)!
+const roleOf = (name: string) => Object.keys(roles).find(r => roles[r] === name)!
 const NEW = roleOf('current')
 const BASE = roleOf('release-4.3.0')
 
-const cell = (c: string, mode: string, role: string) =>
-  inter.results?.[c]?.[mode]?.[role]
+const cell = (c: string, mode: string, role: string) => inter.results?.[c]?.[mode]?.[role]
 
 const zoomRows = CASES.map((c, i) => {
   const n = cell(c, 'in', NEW)
@@ -278,9 +272,7 @@ const ct = read('crosstool.json', isCrosstoolFile)
 // results/crosstool.md and are not in the paper. The `?? ct.rows?.[c]` reads a
 // file written before the migration ran.
 const ctKey = (c: string) => `${c}@19kb`
-const ctDates = [
-  ...new Set(CASES.map(c => ct.dates?.[ctKey(c)] ?? ct.dates?.[c]).filter(Boolean)),
-]
+const ctDates = [...new Set(CASES.map(c => ct.dates?.[ctKey(c)] ?? ct.dates?.[c]).filter(Boolean))]
 // The same contention rule the cold table above applies, and for the same
 // reason. It was missing here: this table asserted "on an idle box, every cell
 // within the foreign-CPU ceiling" as a fixed sentence and marked no row,
@@ -293,8 +285,9 @@ const ctDates = [
 const CT_ARMS = ['jbrowse', 'igv', 'igv-deep']
 const ctForeign = (c: string) => {
   const row = ct.rows?.[ctKey(c)] ?? ct.rows?.[c] ?? {}
-  const seen = CT_ARMS.map(a => foreign(row[a]?.load ?? { before: 0, after: 0 }))
-    .filter(f => Number.isFinite(f))
+  const seen = CT_ARMS.map(a => foreign(row[a]?.load ?? { before: 0, after: 0 })).filter(f =>
+    Number.isFinite(f),
+  )
   return seen.length ? Math.max(...seen) : Number.NaN
 }
 const ctDirty = CASES.filter(c => ctForeign(c) > FOREIGN_CORE_CEILING)
@@ -302,9 +295,7 @@ const ctWorst = Math.max(0, ...CASES.map(ctForeign).filter(f => Number.isFinite(
 // An arm abandoned at the paint ceiling records what it was abandoned at and no
 // median, so "igv completed every case" is read off the run rather than
 // asserted: the sentence was a fixed one naming a duration two runs out of date.
-const ctIncomplete = CASES.filter(
-  c => (ct.rows?.[ctKey(c)] ?? ct.rows?.[c])?.igv?.median == null,
-)
+const ctIncomplete = CASES.filter(c => (ct.rows?.[ctKey(c)] ?? ct.rows?.[c])?.igv?.median == null)
 const ctRows = CASES.map((c, i) => {
   const row = ct.rows?.[ctKey(c)] ?? ct.rows?.[c] ?? {}
   const dirty = ctForeign(c) > FOREIGN_CORE_CEILING

@@ -63,6 +63,4 @@ for (const n of ROWS) {
 }
 
 fs.writeFileSync(cfgPath, JSON.stringify(cfg, null, 2))
-console.log(
-  `${build}: ${ROWS.length} row-sweep tracks registered (${ROWS.join(', ')} samples)`,
-)
+console.log(`${build}: ${ROWS.length} row-sweep tracks registered (${ROWS.join(', ')} samples)`)

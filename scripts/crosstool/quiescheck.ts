@@ -55,8 +55,7 @@ const allHarnesses: Harness[] = [
     url: `http://localhost:${JBROWSE_PORT}/?loc=${LOC}&assembly=hg19mod&tracks=${TRACK}&renderer=webgl`,
     ready:
       'window.JBrowseSession && window.JBrowseSession.views && window.JBrowseSession.views.length > 0',
-    pan: () =>
-      'const v = window.JBrowseSession.views[0]; v.horizontalScroll(-v.width); true',
+    pan: () => 'const v = window.JBrowseSession.views[0]; v.horizontalScroll(-v.width); true',
   },
   {
     id: 'igv',
@@ -254,7 +253,7 @@ for (const h of harnesses) {
 
 md.push(
   '',
-  '`\\*` marks a `paint` figure that resolved in the detector\'s minimum number of',
+  "`\\*` marks a `paint` figure that resolved in the detector's minimum number of",
   'polls. Those are not measurements of the page; they are measurements of the',
   'detector, and the pan rows are where that shows up.',
   '',
@@ -267,8 +266,8 @@ md.push(
   '',
   peakLoad > 4
     ? `> Peak 1-minute load during this run was ${peakLoad.toFixed(1)}, above the 4.0 ` +
-      'ceiling. The screenshot-cost column and the *direction* of the gap survive ' +
-      'that; the individual milliseconds do not.'
+        'ceiling. The screenshot-cost column and the *direction* of the gap survive ' +
+        'that; the individual milliseconds do not.'
     : `Peak 1-minute load during this run: ${peakLoad.toFixed(1)}.`,
   '',
   '## What follows for the rest of this repository',
@@ -280,7 +279,7 @@ md.push(
   '  `draws` plus a network gate for this reason.',
   '- Anything measuring an interaction by screenshot polling inherits the bias.',
   '  The cross-tool zoom was the standing example: polled at 100 ms, it could not',
-  '  see inside JBrowse\'s 500 ms navigation debounce and published the debounce as',
+  "  see inside JBrowse's 500 ms navigation debounce and published the debounce as",
   '  a render time, which the README retracted. It is measured on the draws clock',
   '  now, so `results/crosstool-zoom.md` is no longer that example -- it is what',
   '  the replacement produced, and the retraction lives in the README.',

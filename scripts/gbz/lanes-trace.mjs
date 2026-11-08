@@ -16,7 +16,11 @@ const match = {
 }[trackId]
 const build = 'https://jbrowse.org/code/jb2/main/'
 const config = 'https://jbrowse.org/demos/hprc/config.json'
-const browser = await launch({ headless: true, executablePath: '/usr/bin/google-chrome', args: ['--no-sandbox'] })
+const browser = await launch({
+  headless: true,
+  executablePath: '/usr/bin/google-chrome',
+  args: ['--no-sandbox'],
+})
 const page = await browser.newPage()
 await page.setViewport({ width: 1600, height: 1000 })
 const net = { req: 0, bytes: 0, last: 0, first: 0, urls: {} }
@@ -42,16 +46,22 @@ const pc = await page.createCDPSession()
 await pc.send('Network.enable')
 watch(pc)
 page.on('workercreated', w => {
-  w.client.send('Network.enable').then(() => {
-    watch(w.client)
-  }).catch(() => {})
+  w.client
+    .send('Network.enable')
+    .then(() => {
+      watch(w.client)
+    })
+    .catch(() => {})
 })
 await page.goto(`${build}?config=${encodeURIComponent(config)}`, { waitUntil: 'domcontentloaded' })
 await page.waitForFunction(() => !!window.JBrowseSession, { timeout: 120000 })
-await page.waitForFunction(
-  () => window.JBrowseRootModel.pluginManager.displayTypes?.has?.('MultiWaySyntenyDisplay') ?? true,
-  { timeout: 120000 },
-).catch(() => {})
+await page
+  .waitForFunction(
+    () =>
+      window.JBrowseRootModel.pluginManager.displayTypes?.has?.('MultiWaySyntenyDisplay') ?? true,
+    { timeout: 120000 },
+  )
+  .catch(() => {})
 await new Promise(r => setTimeout(r, 3000))
 const t0 = Date.now()
 await page.evaluate(
@@ -69,7 +79,25 @@ while (net.req === 0 || Date.now() - net.last < 8000) {
   if (Date.now() - t0 > 180000) break
   await new Promise(r => setTimeout(r, 250))
 }
-const version = await page.evaluate(async b => (await (await fetch(`${b}version.txt`)).text()).trim(), build).catch(() => null)
-const plugin = await page.evaluate(() => window.JBrowseRootModel.pluginManager.plugins.find(p => p.name === 'GraphGenomeView')?.version)
+const version = await page
+  .evaluate(async b => (await (await fetch(`${b}version.txt`)).text()).trim(), build)
+  .catch(() => null)
+const plugin = await page.evaluate(
+  () =>
+    window.JBrowseRootModel.pluginManager.plugins.find(p => p.name === 'GraphGenomeView')?.version,
+)
 await browser.close()
-console.log(JSON.stringify({ date: new Date().toISOString(), load, plugin, trackId, loc, requests: net.req, MB: +(net.bytes / 1e6).toFixed(2), lastMs: net.last - t0, urls: net.urls, version }))
+console.log(
+  JSON.stringify({
+    date: new Date().toISOString(),
+    load,
+    plugin,
+    trackId,
+    loc,
+    requests: net.req,
+    MB: +(net.bytes / 1e6).toFixed(2),
+    lastMs: net.last - t0,
+    urls: net.urls,
+    version,
+  }),
+)

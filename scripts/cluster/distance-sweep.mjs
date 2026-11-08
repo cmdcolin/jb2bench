@@ -43,7 +43,8 @@ import { fileURLToPath } from 'node:url'
 import { loadavg, cpus, platform, release } from 'node:os'
 
 const args = process.argv.slice(2)
-const MATRIX_DIR = args.find(a => a.startsWith('--matrices='))?.slice(11) ??
+const MATRIX_DIR =
+  args.find(a => a.startsWith('--matrices='))?.slice(11) ??
   `${process.env.HOME}/src/gmod/hclust/build/matrices`
 const child = args.find(a => a.startsWith('--child='))?.slice(8)
 
@@ -73,7 +74,9 @@ if (child) {
     // The nested map clusterData() runs, kept verbatim: it is a full N x N,
     // both triangles, over arrays of arrays. Computing one triangle and
     // mirroring it is one of the things the optimized arm is measuring.
-    const data = Array.from({ length: rows }, (_, i) => Array.from(values.subarray(i * cols, (i + 1) * cols)))
+    const data = Array.from({ length: rows }, (_, i) =>
+      Array.from(values.subarray(i * cols, (i + 1) * cols)),
+    )
     const t = performance.now()
     data.map(datum => data.map(otherDatum => euclideanDistance(datum, otherDatum)))
     ms = performance.now() - t
@@ -96,24 +99,27 @@ if (child) {
 } else {
   const IMPLS = (args.find(a => a.startsWith('--impls='))?.slice(8) ?? 'naive,opt').split(',')
   const self = fileURLToPath(import.meta.url)
-  const runChild = (impl, file) => new Promise((resolve, reject) => {
-    // The reference arm builds an array-of-arrays of the widest matrix, which
-    // is ~900MB of JS heap, over the 4.5GB default limit once the N x N result
-    // is beside it.
-    const proc = fork(self, [`--matrices=${MATRIX_DIR}`, `--child=${impl}:${file}`], {
-      execArgv: ['--max-old-space-size=12288'],
+  const runChild = (impl, file) =>
+    new Promise((resolve, reject) => {
+      // The reference arm builds an array-of-arrays of the widest matrix, which
+      // is ~900MB of JS heap, over the 4.5GB default limit once the N x N result
+      // is beside it.
+      const proc = fork(self, [`--matrices=${MATRIX_DIR}`, `--child=${impl}:${file}`], {
+        execArgv: ['--max-old-space-size=12288'],
+      })
+      let payload
+      proc.on('message', m => {
+        payload = m
+      })
+      proc.on('error', reject)
+      proc.on('exit', code => {
+        if (code === 0 && payload) {
+          resolve(payload)
+        } else {
+          reject(new Error(`${impl} on ${file} exited ${code}`))
+        }
+      })
     })
-    let payload
-    proc.on('message', m => { payload = m })
-    proc.on('error', reject)
-    proc.on('exit', code => {
-      if (code === 0 && payload) {
-        resolve(payload)
-      } else {
-        reject(new Error(`${impl} on ${file} exited ${code}`))
-      }
-    })
-  })
 
   // One competing single-threaded job is tolerable on 16 hardware threads;
   // these kernels are memory-bound, so what actually hurts is many of them at
@@ -125,14 +131,19 @@ if (child) {
     for (const impl of IMPLS) {
       const r = await runChild(impl, w.file)
       const row = {
-        window: w.window, impl, n: r.n, v: r.v,
-        s: +(r.ms / 1000).toFixed(2), load: r.load,
+        window: w.window,
+        impl,
+        n: r.n,
+        v: r.v,
+        s: +(r.ms / 1000).toFixed(2),
+        load: r.load,
       }
       results.push(row)
       console.log(
         `${w.window.padEnd(28)} ${impl.padEnd(6)} ${String(r.n).padStart(5)} x ` +
-        `${String(r.v).padStart(6)}   ${row.s.toFixed(2).padStart(8)} s` +
-        `   load ${row.load.toFixed(1).padStart(5)}${row.load > BUSY ? '  BUSY' : ''}`)
+          `${String(r.v).padStart(6)}   ${row.s.toFixed(2).padStart(8)} s` +
+          `   load ${row.load.toFixed(1).padStart(5)}${row.load > BUSY ? '  BUSY' : ''}`,
+      )
     }
   }
 
@@ -150,8 +161,10 @@ if (child) {
   }
   writeFileSync('results/cluster-distance-sweep.json', JSON.stringify(out, null, 2))
   if (busy.length) {
-    console.log(`\n${busy.length} of ${results.length} cells ran over load ${BUSY} ` +
-      'and are not comparable to an idle-machine number; re-run them.')
+    console.log(
+      `\n${busy.length} of ${results.length} cells ran over load ${BUSY} ` +
+        'and are not comparable to an idle-machine number; re-run them.',
+    )
   }
   console.log('\nwrote results/cluster-distance-sweep.json')
 }

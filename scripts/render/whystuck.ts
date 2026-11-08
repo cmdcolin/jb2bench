@@ -55,7 +55,9 @@ const state = await page.evaluate(() => {
         w: c.width,
         h: c.height,
       })),
-      divs: document.getElementById('igv')?.children.length ?? document.getElementById('gs')?.children.length,
+      divs:
+        document.getElementById('igv')?.children.length ??
+        document.getElementById('gs')?.children.length,
       text: (document.body.innerText || '').replace(/\s+/g, ' ').slice(0, 500),
     }
   }

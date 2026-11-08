@@ -80,8 +80,7 @@ const state = await page.evaluate(() => {
     phases: [...document.querySelectorAll('[data-display-phase]')].map(n =>
       n.getAttribute('data-display-phase'),
     ),
-    legacy: document.querySelectorAll('[data-testid$="-done"],[data-testid$="_done"]')
-      .length,
+    legacy: document.querySelectorAll('[data-testid$="-done"],[data-testid$="_done"]').length,
     loadingOverlays: document.querySelectorAll('[data-testid="loading-overlay"]').length,
     bodyText: txt.slice(0, 1200),
   }

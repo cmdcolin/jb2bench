@@ -40,9 +40,7 @@ async function openTabix(url: string, pool: BgzfWorkerPool | undefined) {
 // inside a timed region. `?workers=` overrides it for the lever sweep —
 // getSharedWorkerPool memoizes per JS context, so a different size means a
 // different page load rather than a second pool.
-const WORKERS = Number(
-  new URLSearchParams(location.search).get('workers') ?? 4,
-)
+const WORKERS = Number(new URLSearchParams(location.search).get('workers') ?? 4)
 const pool = await getSharedWorkerPool(WORKERS, 0)
 
 const open = (url: string, withPool: boolean): Promise<Reader> =>
@@ -81,11 +79,7 @@ Object.assign(window, {
      * chunk; several can keep more of it busy, so if the pool is
      * under-fed rather than saturated this is where it shows.
      */
-    roundConcurrent: async (
-      url: string,
-      refName: string,
-      windows: number[][],
-    ) => {
+    roundConcurrent: async (url: string, refName: string, windows: number[][]) => {
       const out: Record<string, number> = {}
       for (const arm of ['pooled', 'plain']) {
         const reader = await open(url, arm === 'pooled')

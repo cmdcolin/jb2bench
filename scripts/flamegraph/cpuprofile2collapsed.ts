@@ -43,7 +43,12 @@ function label(n: Node): string {
   const name = f.functionName || '(anonymous)'
   // strip query/hash and keep just the bundle file basename for readability
   const base = (f.url || '').split('/').pop()?.split('?')[0] ?? ''
-  if (name === '(root)' || name === '(program)' || name === '(idle)' || name === '(garbage collector)') {
+  if (
+    name === '(root)' ||
+    name === '(program)' ||
+    name === '(idle)' ||
+    name === '(garbage collector)'
+  ) {
     return name
   }
   return base ? `${name} (${base}:${f.lineNumber + 1})` : name

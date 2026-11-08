@@ -62,15 +62,12 @@ interface Tool {
   url: (track: string) => string
 }
 
-const igvVersion = JSON.parse(
-  fs.readFileSync('node_modules/igv/package.json', 'utf8'),
-).version as string
-const gsVersion = JSON.parse(
-  fs.readFileSync('node_modules/@genome-spy/core/package.json', 'utf8'),
-).version as string
-const goslingVersion = JSON.parse(
-  fs.readFileSync('node_modules/gosling.js/package.json', 'utf8'),
-).version as string
+const igvVersion = JSON.parse(fs.readFileSync('node_modules/igv/package.json', 'utf8'))
+  .version as string
+const gsVersion = JSON.parse(fs.readFileSync('node_modules/@genome-spy/core/package.json', 'utf8'))
+  .version as string
+const goslingVersion = JSON.parse(fs.readFileSync('node_modules/gosling.js/package.json', 'utf8'))
+  .version as string
 
 const TOOLS: Tool[] = [
   {
@@ -79,8 +76,7 @@ const TOOLS: Tool[] = [
     // The real application, not a harness page: its tracks come out of the
     // generated config, so a format missing here means the config pass never
     // added it rather than that JBrowse cannot read it.
-    url: t =>
-      `http://localhost:${JBROWSE_PORT}/?loc=${LOC}&assembly=hg19mod&tracks=${t}`,
+    url: t => `http://localhost:${JBROWSE_PORT}/?loc=${LOC}&assembly=hg19mod&tracks=${t}`,
   },
   {
     id: 'igv',
@@ -90,14 +86,12 @@ const TOOLS: Tool[] = [
   {
     id: 'genomespy',
     label: `GenomeSpy ${gsVersion}`,
-    url: t =>
-      `http://localhost:${CROSSTOOL_PORT}/genomespy.html?loc=${LOC}&track=${t}`,
+    url: t => `http://localhost:${CROSSTOOL_PORT}/genomespy.html?loc=${LOC}&track=${t}`,
   },
   {
     id: 'gosling',
     label: `Gosling ${goslingVersion}`,
-    url: t =>
-      `http://localhost:${CROSSTOOL_PORT}/gosling.html?loc=${LOC}&track=${t}`,
+    url: t => `http://localhost:${CROSSTOOL_PORT}/gosling.html?loc=${LOC}&track=${t}`,
   },
 ]
 

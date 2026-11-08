@@ -25,8 +25,7 @@ const args = process.argv.slice(2)
 const MATRIX_DIR =
   args.find(a => a.startsWith('--matrices='))?.slice(11) ??
   `${process.env.HOME}/src/gmod/hclust/build/matrices`
-const JBWEB =
-  process.env.JB2 ?? `${process.env.HOME}/src/jbrowse-components`
+const JBWEB = process.env.JB2 ?? `${process.env.HOME}/src/jbrowse-components`
 
 const WINDOWS = [
   { window: '100 kb, MAF 0, samples', file: '100-kb-window-maf-0-samples.bin' },
@@ -51,7 +50,10 @@ const SOFTWARE_MARKERS = [
   'microsoft basic',
 ]
 
-const only = args.find(a => a.startsWith('--windows='))?.slice(10).split(',')
+const only = args
+  .find(a => a.startsWith('--windows='))
+  ?.slice(10)
+  .split(',')
 const selected = only ? WINDOWS.filter(w => only.includes(w.file)) : WINDOWS
 
 for (const w of selected) {
@@ -71,7 +73,9 @@ for (const w of selected) {
   // which reads on the figure as a shorter curve rather than as a broken run.
   const shape = /N=(\d+) V=(\d+)/.exec(out)
   const timing =
-    /gpu (.+?): distance matrix ([\d.]+) ms \(upload, dispatch, readback, spot check\), max rel err (\S+) over (\d+) pairs/.exec(out)
+    /gpu (.+?): distance matrix ([\d.]+) ms \(upload, dispatch, readback, spot check\), max rel err (\S+) over (\d+) pairs/.exec(
+      out,
+    )
   const merge = /merge on the gpu matrix \(hclust wasm\): ([\d.]+) ms/.exec(out)
   if (!shape || !timing || !merge) {
     throw new Error(`could not parse the probe's output for ${w.file}:\n${out}`)

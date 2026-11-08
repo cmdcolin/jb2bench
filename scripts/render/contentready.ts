@@ -81,9 +81,7 @@ export interface Readiness {
  */
 export function contentReadyProbe(): Readiness {
   // A loading overlay is authoritative wherever a build draws one, and cheap.
-  const overlays = document.querySelectorAll(
-    '[data-testid="loading-overlay"]',
-  ).length
+  const overlays = document.querySelectorAll('[data-testid="loading-overlay"]').length
 
   // Where the view is now, in bp. Read from the same three view fields
   // `interaction.ts` drives, which every build in the matrix exposes. Used to
@@ -93,16 +91,18 @@ export function contentReadyProbe(): Readiness {
   let viewStart = Number.NaN
   let viewEnd = Number.NaN
   try {
-    const v = (globalThis as unknown as {
-      JBrowseSession?: {
-        views?: {
-          bpPerPx: number
-          width: number
-          offsetPx: number
-          displayedRegionsTotalPx: number
-        }[]
+    const v = (
+      globalThis as unknown as {
+        JBrowseSession?: {
+          views?: {
+            bpPerPx: number
+            width: number
+            offsetPx: number
+            displayedRegionsTotalPx: number
+          }[]
+        }
       }
-    }).JBrowseSession?.views?.[0]
+    ).JBrowseSession?.views?.[0]
     if (v) {
       // Clamped to the displayed regions: at either end of the contig the view
       // runs past the sequence, and no block will ever cover the overhang.
@@ -117,9 +117,8 @@ export function contentReadyProbe(): Readiness {
   const phaseNodes = document.querySelectorAll('[data-display-phase]')
   if (phaseNodes.length > 0) {
     const outstanding =
-      document.querySelectorAll(
-        '[data-display-phase="loading"],[data-display-drawn="false"]',
-      ).length + overlays
+      document.querySelectorAll('[data-display-phase="loading"],[data-display-drawn="false"]')
+        .length + overlays
     return {
       contract: 'phase',
       ready: outstanding === 0,
@@ -164,10 +163,7 @@ export function contentReadyProbe(): Readiness {
     for (const id of markers) {
       const m = /:(\d[\d,]*)\.\.(\d[\d,]*)/.exec(id)
       if (m) {
-        spans.push([
-          Number(m[1]!.replace(/,/g, '')),
-          Number(m[2]!.replace(/,/g, '')),
-        ])
+        spans.push([Number(m[1]!.replace(/,/g, '')), Number(m[2]!.replace(/,/g, ''))])
       } else {
         unparseable++
       }
@@ -211,14 +207,10 @@ export function contentReadyProbe(): Readiness {
     const SLACK_BP = 2
     const covered = canMeasureCoverage && uncovered <= SLACK_BP
     const done = markers.length - unparseable
-    const outstanding = canMeasureCoverage
-      ? (covered ? 0 : 1) + overlays
-      : units - done + overlays
+    const outstanding = canMeasureCoverage ? (covered ? 0 : 1) + overlays : units - done + overlays
     return {
       contract: 'blockset',
-      ready: canMeasureCoverage
-        ? covered && overlays === 0
-        : units > 0 && outstanding === 0,
+      ready: canMeasureCoverage ? covered && overlays === 0 : units > 0 && outstanding === 0,
       outstanding,
       units,
       doneKeys: [...markers].toSorted().join(','),

@@ -47,12 +47,7 @@ import { launch } from 'puppeteer'
 // correction below subtracts the settle window, and a local copy that drifted
 // from the real one would quietly bias every timing in the table.
 import { watchPeakRss } from './proctree.ts'
-import {
-  POLL_MS,
-  STABLE_POLLS,
-  WAIT_TIMEOUT,
-  waitForRenderComplete,
-} from './rendercomplete.ts'
+import { POLL_MS, STABLE_POLLS, WAIT_TIMEOUT, waitForRenderComplete } from './rendercomplete.ts'
 import fs from 'fs'
 import path from 'path'
 import { ANGLE_ARGS } from '../angleargs.ts'
@@ -123,9 +118,7 @@ try {
   console.error(`render-complete contract: ${mode}`)
   // The positive content check. A readiness contract can only say the
   // application stopped working; this says it produced something.
-  const canvases = await page.evaluate(
-    () => document.querySelectorAll('canvas').length,
-  )
+  const canvases = await page.evaluate(() => document.querySelectorAll('canvas').length)
   if (canvases === 0) {
     throw new Error(
       `render reported complete with no canvas — nothing was drawn ` +
@@ -157,8 +150,7 @@ try {
     .evaluate(
       () =>
         document.querySelectorAll('[data-display-phase]').length +
-        document.querySelectorAll('[data-testid$="-done"],[data-testid$="_done"]')
-          .length,
+        document.querySelectorAll('[data-testid$="-done"],[data-testid$="_done"]').length,
     )
     .catch(() => -1)
   if (displays === 0) {
@@ -169,9 +161,7 @@ try {
   }
   console.error('profiling error:', e instanceof Error ? e.message : e)
   if (screenshotPath) {
-    await page
-      .screenshot({ path: screenshotPath.replace(/\.png$/, '.error.png') })
-      .catch(() => {})
+    await page.screenshot({ path: screenshotPath.replace(/\.png$/, '.error.png') }).catch(() => {})
   }
   console.log('FAIL')
   process.exitCode = 1

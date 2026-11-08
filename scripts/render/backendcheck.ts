@@ -82,8 +82,7 @@ for (const r of rungs) {
         const done = document.querySelectorAll(
           '[data-testid$="-done"],[data-testid$="_done"]',
         ).length
-        const loading =
-          document.querySelectorAll('[data-testid="loading-overlay"]').length > 0
+        const loading = document.querySelectorAll('[data-testid="loading-overlay"]').length > 0
         const ready = done > 0 && !loading
         if (ready && done === w.__last) {
           w.__stable = (w.__stable ?? 0) + 1
@@ -126,12 +125,7 @@ for (const r of rungs) {
   await page.screenshot({ path: shot })
   reports.push({
     id: r.id,
-    rung:
-      canvases.webgpu > 0
-        ? 'WebGPU'
-        : canvases.webgl2 > 0
-          ? 'WebGL2'
-          : 'Canvas2D',
+    rung: canvases.webgpu > 0 ? 'WebGPU' : canvases.webgl2 > 0 ? 'WebGL2' : 'Canvas2D',
     canvases,
     gpuMessages,
     shot,
@@ -139,8 +133,7 @@ for (const r of rungs) {
   await page.close()
 }
 
-const toUri = (p: string) =>
-  `data:image/png;base64,${fs.readFileSync(p).toString('base64')}`
+const toUri = (p: string) => `data:image/png;base64,${fs.readFileSync(p).toString('base64')}`
 
 // Pixel comparison, decoded by the browser. Two backends never agree bit for
 // bit -- different rasterizers round edges differently -- so report the share of

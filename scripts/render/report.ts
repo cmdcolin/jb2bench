@@ -38,12 +38,8 @@ interface Interaction {
   results: Record<string, Record<string, Record<string, Inter>>>
 }
 
-const cold = JSON.parse(
-  fs.readFileSync('results/alignments.json', 'utf8'),
-) as Cold
-const inter = JSON.parse(
-  fs.readFileSync('results/interaction.json', 'utf8'),
-) as Interaction
+const cold = JSON.parse(fs.readFileSync('results/alignments.json', 'utf8')) as Cold
+const inter = JSON.parse(fs.readFileSync('results/interaction.json', 'utf8')) as Interaction
 
 // The cold-load runner measures both formats and keys its rows `<cov>-<read>-<fmt>`;
 // the interaction runner is BAM-only and keys its rows `<cov>-<read>`. Two lists
@@ -66,16 +62,11 @@ const NEW = 'current'
 const PUB = 'release-2.4.0'
 const BASE = 'release-4.3.0'
 
-const peak = (l?: { before: number; after: number }) =>
-  l ? Math.max(l.before, l.after) : 0
+const peak = (l?: { before: number; after: number }) => (l ? Math.max(l.before, l.after) : 0)
 const rowLoad = (id: string) =>
-  Math.max(
-    0,
-    ...Object.values(cold.results[id] ?? {}).map(c => peak(c.load)),
-  )
+  Math.max(0, ...Object.values(cold.results[id] ?? {}).map(c => peak(c.load)))
 const cellOf = (id: string, build: string) => cold.results[id]?.[build]
-const ms = (v?: number) =>
-  v === undefined || !Number.isFinite(v) ? '—' : v.toFixed(0)
+const ms = (v?: number) => (v === undefined || !Number.isFinite(v) ? '—' : v.toFixed(0))
 
 // Speedups are only quoted where both halves exist. A missing published cell is
 // a case that has not been re-measured since that column was added, not a zero.
@@ -85,8 +76,7 @@ function speedup(id: string, from: string) {
   return a && b && b.median > 0 ? a.median / b.median : Number.NaN
 }
 
-const esc = (s: string) =>
-  s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+const esc = (s: string) => s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
 
 // Figures are inlined rather than linked: a published artifact is served under a
 // CSP that blocks every external host, so a <img src="figures/..."> renders as a
@@ -189,10 +179,7 @@ const techniqueBlocks = TECHNIQUES.map(
   <div class="scroll"><table class="tech">
     <thead><tr><th scope="col">Technique</th><th scope="col">Replaces</th><th scope="col">What it buys</th></tr></thead>
     <tbody>${g.rows
-      .map(
-        r =>
-          `<tr><th scope="row">${r[0]}</th><td>${r[1]}</td><td class="eff">${r[2]}</td></tr>`,
-      )
+      .map(r => `<tr><th scope="row">${r[0]}</th><td>${r[1]}</td><td class="eff">${r[2]}</td></tr>`)
       .join('')}</tbody>
   </table></div>`,
 ).join('\n')
@@ -219,8 +206,7 @@ for (const id of COLD_CASES) {
 }
 
 // -------------------------------------------------------- interaction table
-const icell = (id: string, mode: string, role: string) =>
-  inter.results[id]?.[mode]?.[role]
+const icell = (id: string, mode: string, role: string) => inter.results[id]?.[mode]?.[role]
 function ifmt(r?: Inter) {
   if (!r) {
     return '—'
@@ -255,9 +241,7 @@ for (const id of INTER_CASES) {
   const b = icell(id, 'pan', 'baseline')
   const p = icell(id, 'pan', 'published')
   const r =
-    n && b && n.zoomTimeToContentMs > 0
-      ? b.zoomTimeToContentMs / n.zoomTimeToContentMs
-      : Number.NaN
+    n && b && n.zoomTimeToContentMs > 0 ? b.zoomTimeToContentMs / n.zoomTimeToContentMs : Number.NaN
   panRows += `<tr>
     <th scope="row">${id}</th>
     <td class="num strong">${ifmt(n)}</td>
@@ -271,9 +255,7 @@ for (const id of INTER_CASES) {
 const measurable = COLD_CASES.map(id => speedup(id, PUB)).filter(Number.isFinite)
 const lo = measurable.length ? Math.min(...measurable) : Number.NaN
 const hi = measurable.length ? Math.max(...measurable) : Number.NaN
-const measuredToday = COLD_CASES.filter(
-  id => cellOf(id, PUB) !== undefined,
-).length
+const measuredToday = COLD_CASES.filter(id => cellOf(id, PUB) !== undefined).length
 
 const html = `<title>JBrowse 2 Since v2.4.0</title>
 <style>

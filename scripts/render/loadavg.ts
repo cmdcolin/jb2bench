@@ -303,10 +303,7 @@ export function watchForeignCpu() {
  * peak against the median cell's, so the threshold adapts to the machine rather
  * than being a constant that is wrong on a quieter or busier box.
  */
-export function outliers<T>(
-  cells: { key: string; load: LoadWindow; value: T }[],
-  factor = 2,
-) {
+export function outliers<T>(cells: { key: string; load: LoadWindow; value: T }[], factor = 2) {
   const peaks = cells.map(c => peak(c.load)).toSorted((a, b) => a - b)
   const med = peaks[Math.floor(peaks.length / 2)] ?? Number.NaN
   return {

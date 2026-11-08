@@ -44,9 +44,7 @@ const tile = (kb: number) => {
   return out
 }
 
-export const WINDOW_KB = process.env.WINDOW_KB
-  ? Number(process.env.WINDOW_KB)
-  : undefined
+export const WINDOW_KB = process.env.WINDOW_KB ? Number(process.env.WINDOW_KB) : undefined
 
 export const WINDOWS = WINDOW_KB ? tile(WINDOW_KB) : DEFAULT_WINDOWS
 

@@ -174,9 +174,7 @@ export async function attachQuiescence(page: Page, opts: QuiescenceOptions = {})
       requests = 0
       bytes = 0
       lastNetwork = Date.now()
-      await page
-        .evaluate(DRAW_CLOCK_RESET)
-        .catch(() => undefined /* no document yet */)
+      await page.evaluate(DRAW_CLOCK_RESET).catch(() => undefined /* no document yet */)
       return Date.now()
     },
 

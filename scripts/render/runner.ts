@@ -75,23 +75,18 @@ const ALL_PORTS = [
   { port: 8001, extra: '' },
   { port: 8004, extra: '' },
 ]
-const DEFAULT_PORTS =
-  scale.id === DEFAULT_SCALE.id ? [8000, 8001, 8004] : [8000, 8004]
+const DEFAULT_PORTS = scale.id === DEFAULT_SCALE.id ? [8000, 8001, 8004] : [8000, 8004]
 const wanted = process.env.PORTS?.split(',').map(Number) ?? DEFAULT_PORTS
 for (const w of wanted) {
   if (!ALL_PORTS.some(p => p.port === w)) {
-    throw new Error(
-      `PORTS entry ${w} is not one of ${ALL_PORTS.map(p => p.port).join(',')}`,
-    )
+    throw new Error(`PORTS entry ${w} is not one of ${ALL_PORTS.map(p => p.port).join(',')}`)
   }
 }
 const ports = ALL_PORTS.filter(p => wanted.includes(p.port))
 if (ports.length < 2) {
   throw new Error('a matrix of one build is not a comparison; name two ports')
 }
-const builds = await Promise.all(
-  ports.map(async p => ({ ...p, name: await resolveBuild(p.port) })),
-)
+const builds = await Promise.all(ports.map(async p => ({ ...p, name: await resolveBuild(p.port) })))
 for (const b of builds) {
   console.log(`port ${b.port} is serving builds/${b.name}`)
 }
@@ -181,9 +176,7 @@ function runOnceRaw(build: (typeof builds)[number], c: Case): Attempt {
   const val = Number.parseFloat(lines.pop() ?? 'NaN')
   // profile.ts prints `peak-rss-mb=N` before the timing. Absent on a run that
   // failed, and absent from every run recorded before 2026-09-06.
-  const rss = Number(
-    lines.find(l => l.startsWith('peak-rss-mb='))?.slice('peak-rss-mb='.length),
-  )
+  const rss = Number(lines.find(l => l.startsWith('peak-rss-mb='))?.slice('peak-rss-mb='.length))
   return {
     ms: Number.isFinite(val) ? val : Number.NaN,
     peakRssMb: Number.isFinite(rss) ? rss : Number.NaN,
