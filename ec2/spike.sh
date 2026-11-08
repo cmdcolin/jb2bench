@@ -56,13 +56,13 @@ if [ "${EC2_SPIKE:-fast}" = slow ]; then
 
   # 100 kb at the ceiling Methods states, on the cells that reach it.
   WINDOWS=100kb CASES=1000x-longread-bam,200x-longread-cram MAX_WAIT=600000 \
-    \$ARMS RUNS=1 WARMUP=0 node --experimental-strip-types scripts/crosstool/runner.ts
+    env \$ARMS RUNS=1 WARMUP=0 node --experimental-strip-types scripts/crosstool/runner.ts
 
   # The width axis, where 2.4.0 stopped settling at all in the 2026-09-06 run.
   WINDOWS=1mb CASES=100x-longread-bam MAX_WAIT=120000 \
-    \$ARMS RUNS=1 WARMUP=0 node --experimental-strip-types scripts/crosstool/runner.ts
+    env \$ARMS RUNS=1 WARMUP=0 node --experimental-strip-types scripts/crosstool/runner.ts
 
-  MOTION=pan CASES=1000x-longread-bam \$ARMS \
+  MOTION=pan CASES=1000x-longread-bam env \$ARMS \
     node --experimental-strip-types scripts/crosstool/panrunner.ts
 else
   WINDOWS=19kb,100kb CASES=20x-shortread-bam,200x-shortread-bam \
