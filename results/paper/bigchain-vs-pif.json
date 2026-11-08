@@ -1,0 +1,84 @@
+{
+  "date": "2026-11-08T12:26:20.286Z",
+  "px": 2000,
+  "sizes": {
+    "bigchain": 2403714,
+    "biglink": 260780372,
+    "pif": 135158383,
+    "pifIndex": 816271
+  },
+  "rows": [
+    {
+      "file": "/tmp/claude-1001/-home-cdiesh-src-gfa-to-tabix/84eafea8-f82f-491a-a409-fd4638cf60c0/scratchpad/build/hs1ToMm39.bigChain.bb",
+      "view": "whole genome, 25 sequences, 2000 px, 1558646 bp/px",
+      "route": "full items",
+      "requests": 30,
+      "bytes": 2056784,
+      "items": 75076,
+      "note": "BigBed reads unzoomed items at every scale"
+    },
+    {
+      "file": "/tmp/claude-1001/-home-cdiesh-src-gfa-to-tabix/84eafea8-f82f-491a-a409-fd4638cf60c0/scratchpad/build/hs1ToMm39.bigChain.bb",
+      "view": "whole genome, 25 sequences, 2000 px, 1558646 bp/px",
+      "route": "summary bins",
+      "requests": 30,
+      "bytes": 208785,
+      "items": 1103,
+      "note": "zoom level 2830848 bp per bin of 176928, 707712, 2830848, 11323392, 45293568, 181174272, 724697088"
+    },
+    {
+      "file": "/tmp/claude-1001/-home-cdiesh-src-gfa-to-tabix/84eafea8-f82f-491a-a409-fd4638cf60c0/scratchpad/build/hs1ToMm39.bigLink.bb",
+      "view": "whole genome, 25 sequences, 2000 px, 1558646 bp/px",
+      "route": "full items",
+      "requests": 55,
+      "bytes": 217383949,
+      "items": 30985873,
+      "note": "BigBed reads unzoomed items at every scale"
+    },
+    {
+      "file": "/tmp/claude-1001/-home-cdiesh-src-gfa-to-tabix/84eafea8-f82f-491a-a409-fd4638cf60c0/scratchpad/build/hs1ToMm39.bigLink.bb",
+      "view": "whole genome, 25 sequences, 2000 px, 1558646 bp/px",
+      "route": "summary bins",
+      "requests": 30,
+      "bytes": 241881,
+      "items": 1629,
+      "note": "zoom level 1966080 bp per bin of 480, 1920, 7680, 30720, 122880, 491520, 1966080, 7864320, 31457280, 125829120"
+    },
+    {
+      "file": "https://jbrowse.org/genomes/hs1_vs_mm39/hs1ToMm39.over.chain.pif.gz",
+      "view": "whole genome, 25 sequences, 2000 px, 1558646 bp/px",
+      "route": "coarsened T tier",
+      "requests": 26,
+      "bytes": 5562543,
+      "items": 75076,
+      "note": "index 816271 bytes in 1 request, data 4746272 in 25"
+    },
+    {
+      "file": "/tmp/claude-1001/-home-cdiesh-src-gfa-to-tabix/84eafea8-f82f-491a-a409-fd4638cf60c0/scratchpad/build/hs1ToMm39.bigChain.bb",
+      "view": "chr1:195700000-196700000 (1.00 Mb)",
+      "route": "full items",
+      "requests": 6,
+      "bytes": 38969,
+      "items": 44,
+      "note": "BigBed reads unzoomed items at every scale"
+    },
+    {
+      "file": "/tmp/claude-1001/-home-cdiesh-src-gfa-to-tabix/84eafea8-f82f-491a-a409-fd4638cf60c0/scratchpad/build/hs1ToMm39.bigLink.bb",
+      "view": "chr1:195700000-196700000 (1.00 Mb)",
+      "route": "full items",
+      "requests": 7,
+      "bytes": 89673,
+      "items": 9790,
+      "note": "BigBed reads unzoomed items at every scale"
+    },
+    {
+      "file": "https://jbrowse.org/genomes/hs1_vs_mm39/hs1ToMm39.over.chain.pif.gz",
+      "view": "chr1:195700000-196700000 (1.00 Mb)",
+      "route": "full-CIGAR t tier",
+      "requests": 2,
+      "bytes": 2045272,
+      "items": 44,
+      "note": "index 816271 bytes in 1 request, data 1229001 in 1"
+    }
+  ]
+}
