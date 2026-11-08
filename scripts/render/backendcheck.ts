@@ -14,7 +14,7 @@
 // Usage: node scripts/render/backendcheck.ts [--port=8000] [--case=1000x-shortread]
 import fs from 'fs'
 
-import puppeteer from 'puppeteer'
+import { launch } from 'puppeteer'
 import { ANGLE_ARGS } from '../angleargs.ts'
 
 const arg = (name: string, fallback: string) =>
@@ -40,7 +40,7 @@ const url = (extra: string) =>
 
 fs.mkdirSync(OUT, { recursive: true })
 
-const browser = await puppeteer.launch({
+const browser = await launch({
   headless: process.env.HEADLESS !== '0',
   args: [
     '--no-sandbox',
@@ -107,7 +107,7 @@ for (const r of rungs) {
     let webgpu = 0
     let webgl2 = 0
     let other = 0
-    for (const c of [...document.querySelectorAll('canvas')]) {
+    for (const c of document.querySelectorAll('canvas')) {
       if (c.width === 0 || c.height === 0) {
         continue
       }
@@ -139,39 +139,43 @@ for (const r of rungs) {
   await page.close()
 }
 
+const toUri = (p: string) =>
+  `data:image/png;base64,${fs.readFileSync(p).toString('base64')}`
+
 // Pixel comparison, decoded by the browser. Two backends never agree bit for
 // bit -- different rasterizers round edges differently -- so report the share of
 // pixels that differ at all and the share that differ by more than a quarter of
 // the range, which is the difference between antialiasing and a missing mark.
 async function compare(a: string, b: string) {
   const page = await browser.newPage()
-  const toUri = (p: string) =>
-    `data:image/png;base64,${fs.readFileSync(p).toString('base64')}`
   const res = await page.evaluate(
     async ([ua, ub]) => {
-      const load = (src: string) =>
-        new Promise<HTMLImageElement>((resolve, reject) => {
-          const img = new Image()
-          img.onload = () => {
-            resolve(img)
-          }
-          img.onerror = reject
-          img.src = src
+      const c = document.createElement('canvas')
+      const ctx = c.getContext('2d')!
+      const pixels = async (src: string) => {
+        const img = await new Promise<HTMLImageElement>((resolve, reject) => {
+          const i = new Image()
+          i.addEventListener('load', () => {
+            resolve(i)
+          })
+          i.addEventListener('error', reject)
+          i.src = src
         })
-      const [ia, ib] = await Promise.all([load(ua!), load(ub!)])
-      if (ia.width !== ib.width || ia.height !== ib.height) {
-        return { sizeMismatch: true, any: 1, gross: 1 }
-      }
-      const draw = (img: HTMLImageElement) => {
-        const c = document.createElement('canvas')
         c.width = img.width
         c.height = img.height
-        const ctx = c.getContext('2d')!
         ctx.drawImage(img, 0, 0)
-        return ctx.getImageData(0, 0, img.width, img.height).data
+        return {
+          width: img.width,
+          height: img.height,
+          data: ctx.getImageData(0, 0, img.width, img.height).data,
+        }
       }
-      const da = draw(ia)
-      const db = draw(ib)
+      const [pa, pb] = await Promise.all([pixels(ua!), pixels(ub!)])
+      if (pa.width !== pb.width || pa.height !== pb.height) {
+        return { sizeMismatch: true, any: 1, gross: 1 }
+      }
+      const da = pa.data
+      const db = pb.data
       let any = 0
       let gross = 0
       for (let i = 0; i < da.length; i += 4) {

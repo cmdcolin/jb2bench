@@ -14,7 +14,7 @@
 //
 // Usage: interaction-profile.ts <url> <label> [mode=pan|scroll|both]
 // Writes flame/<label>.<target>.cpuprofile and prints frame-gap stats.
-import puppeteer from 'puppeteer'
+import { launch } from 'puppeteer'
 import type { CDPSession } from 'puppeteer'
 import fs from 'fs'
 import { ANGLE_ARGS } from '../angleargs.ts'
@@ -26,7 +26,7 @@ if (!url) {
   throw new Error('usage: interaction-profile.ts <url> <label> [pan|scroll|both]')
 }
 
-const browser = await puppeteer.launch({
+const browser = await launch({
   headless: process.env.HEADLESS !== '0',
   args: [
     '--no-sandbox',
@@ -157,7 +157,7 @@ profilers.push({ id: 'main', session: client })
 // Drive the interaction in-page across animation frames. Oscillate so we stay
 // within loaded data (no refetch). Returns rAF frame timestamps for jank stats.
 const frameGaps = await page.evaluate(
-  async ({ mode, frames }) => {
+  async ({ mode: interaction, frames }) => {
     const w = window as unknown as {
       JBrowseSession: {
         views: {
@@ -174,7 +174,7 @@ const frameGaps = await page.evaluate(
       zoomTo: (n: number) => void
       tracks?: { displays: { setScrollTop?: (n: number) => void }[] }[]
     }
-    const display = model.tracks?.[0]?.displays?.[0]
+    const display = model.tracks?.[0]?.displays[0]
     const ts: number[] = []
     const PAN_PX = 10 // per-frame horizontal pan
     const SCROLL_PX = 12 // per-frame vertical scroll
@@ -189,16 +189,16 @@ const frameGaps = await page.evaluate(
       const step = () => {
         ts.push(performance.now())
         const dir = Math.floor(i / 30) % 2 === 0 ? 1 : -1
-        if (mode === 'pan' || mode === 'both') {
+        if (interaction === 'pan' || interaction === 'both') {
           model.horizontalScroll(dir * PAN_PX)
         }
-        if (mode === 'zoom') {
+        if (interaction === 'zoom') {
           // triangle wave in [0,1]: 0 = start zoom, 1 = 4x zoomed in
           const phase = (i % ZOOM_PERIOD) / ZOOM_PERIOD
           const tri = phase < 0.5 ? phase * 2 : 2 - phase * 2
           model.zoomTo(bp0 * (1 - 0.75 * tri))
         }
-        if ((mode === 'scroll' || mode === 'both') && display?.setScrollTop) {
+        if ((interaction === 'scroll' || interaction === 'both') && display?.setScrollTop) {
           scrollTop = Math.max(0, scrollTop + dir * SCROLL_PX)
           display.setScrollTop(scrollTop)
         }
@@ -234,7 +234,7 @@ for (const p of profilers) {
   }
 }
 
-const sorted = [...frameGaps].sort((a, b) => a - b)
+const sorted = [...frameGaps].toSorted((a, b) => a - b)
 const pct = (q: number) => sorted[Math.floor((sorted.length - 1) * q)] ?? NaN
 const dropped = frameGaps.filter(g => g > 20).length // > ~1.2 frames @60fps
 console.log(

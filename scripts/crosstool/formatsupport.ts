@@ -23,7 +23,7 @@
 //
 // Usage: node --experimental-strip-types scripts/crosstool/formatsupport.ts
 import fs from 'fs'
-import puppeteer from 'puppeteer'
+import { launch } from 'puppeteer'
 import { drew, drewCheck, type Drew } from './drewcheck.ts'
 import { ANGLE_ARGS } from '../angleargs.ts'
 
@@ -116,7 +116,7 @@ for (const f of formats) {
   }
 }
 
-const browser = await puppeteer.launch({
+const browser = await launch({
   headless: process.env.HEADLESS !== '0',
   args: ['--no-sandbox', '--ignore-gpu-blocklist', ...ANGLE_ARGS],
 })

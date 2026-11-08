@@ -6,7 +6,7 @@
 // prompt instead of a display, and looks identical from outside.
 //
 // Usage: whystuck.ts <url>
-import puppeteer from 'puppeteer'
+import { launch } from 'puppeteer'
 import { ANGLE_ARGS } from '../angleargs.ts'
 
 const url = process.argv[2]
@@ -15,7 +15,7 @@ if (!url) {
 }
 const WAIT = Number(process.env.WAIT ?? 20000)
 
-const browser = await puppeteer.launch({
+const browser = await launch({
   headless: true,
   args: ['--no-sandbox', ...ANGLE_ARGS],
 })
@@ -33,45 +33,56 @@ page.on('console', m => {
 await page.goto(url, { waitUntil: 'load' })
 await new Promise(r => setTimeout(r, WAIT))
 
+type InspectedWindow = {
+  __igvState?: unknown
+  __gsState?: unknown
+  JBrowseSession?: {
+    views?: {
+      tracks?: {
+        configuration?: { trackId?: unknown }
+        displays?: Record<string, unknown>[]
+      }[]
+    }[]
+  }
+}
+
 const state = await page.evaluate(() => {
-  const w = globalThis as Record<string, any>
+  const w = globalThis as unknown as InspectedWindow
   if (w.__igvState || w.__gsState) {
     return {
       toolState: w.__igvState ?? w.__gsState,
       canvases: [...document.querySelectorAll('canvas')].map(c => ({
-        w: (c as HTMLCanvasElement).width,
-        h: (c as HTMLCanvasElement).height,
+        w: c.width,
+        h: c.height,
       })),
       divs: document.getElementById('igv')?.children.length ?? document.getElementById('gs')?.children.length,
       text: (document.body.innerText || '').replace(/\s+/g, ' ').slice(0, 500),
-    } as any
+    }
   }
   const session = w.JBrowseSession
   const track = session?.views?.[0]?.tracks?.[0]
   const display = track?.displays?.[0]
-  const pick = (o: unknown, keys: string[]) =>
-    Object.fromEntries(
-      keys.map(k => {
+  return {
+    trackId: track?.configuration?.trackId,
+    displayType: display?.type,
+    display: Object.fromEntries(
+      [
+        'error',
+        'statusMessage',
+        'byteEstimate',
+        'forceLoadTrack',
+        'canvasDrawn',
+        'renderError',
+        'currentRenderingBackend',
+      ].map(k => {
         try {
-          const v = (o as Record<string, unknown>)?.[k]
+          const v = display?.[k]
           return [k, typeof v === 'function' ? '<fn>' : v]
         } catch (e) {
           return [k, `throw: ${(e as Error).message.slice(0, 60)}`]
         }
       }),
-    )
-  return {
-    trackId: track?.configuration?.trackId,
-    displayType: display?.type,
-    display: pick(display, [
-      'error',
-      'statusMessage',
-      'byteEstimate',
-      'forceLoadTrack',
-      'canvasDrawn',
-      'renderError',
-      'currentRenderingBackend',
-    ]),
+    ),
     canvases: document.querySelectorAll('canvas').length,
     phases: [...document.querySelectorAll('[data-display-phase]')].map(n =>
       n.getAttribute('data-display-phase'),

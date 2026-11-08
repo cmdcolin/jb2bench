@@ -14,7 +14,7 @@
 import { execFileSync } from 'child_process'
 import fs from 'fs'
 import os from 'os'
-import puppeteer from 'puppeteer'
+import { launch } from 'puppeteer'
 
 import type { GpuInfo } from '../scripts/crosstool/gpuinfo.ts'
 import type { MemorySample } from '../scripts/crosstool/memory.ts'
@@ -78,7 +78,8 @@ interface Run {
 
 const lineAfter = (lines: string[], prefix: string) => {
   const l = lines.find(x => x.startsWith(prefix))
-  return l ? JSON.parse(l.slice(prefix.length)) : null
+  const parsed: unknown = l ? JSON.parse(l.slice(prefix.length)) : null
+  return parsed
 }
 
 function runOnce(c: CellDef, b: Backend, cpus: number): Run {
@@ -136,7 +137,7 @@ function runOnce(c: CellDef, b: Backend, cpus: number): Run {
 }
 
 const median = (a: number[]) => {
-  const s = [...a].sort((x, y) => x - y)
+  const s = [...a].toSorted((x, y) => x - y)
   const m = s.length >> 1
   return s.length % 2 ? s[m]! : (s[m - 1]! + s[m]!) / 2
 }
@@ -190,7 +191,7 @@ function sh(cmd: string, args: string[]) {
 }
 
 async function chromeVersion() {
-  const browser = await puppeteer.launch({ headless: true, args: ['--no-sandbox', ...ANGLE_ARGS] })
+  const browser = await launch({ headless: true, args: ['--no-sandbox', ...ANGLE_ARGS] })
   const v = await browser.version()
   await browser.close()
   return v

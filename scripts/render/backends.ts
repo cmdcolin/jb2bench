@@ -125,7 +125,7 @@ if (!cases.length) {
 }
 
 const median = (a: number[]) => {
-  const s = [...a].sort((x, y) => x - y)
+  const s = [...a].toSorted((x, y) => x - y)
   const m = Math.floor(s.length / 2)
   return s.length % 2 ? s[m]! : (s[m - 1]! + s[m]!) / 2
 }
@@ -221,7 +221,7 @@ const probeRung = (page: Page) =>
     let webgpu = 0
     let webgl2 = 0
     let other = 0
-    for (const c of [...document.querySelectorAll('canvas')]) {
+    for (const c of document.querySelectorAll('canvas')) {
       if (c.width === 0 || c.height === 0) {
         continue
       }
@@ -273,10 +273,10 @@ async function measure(
     const drawn = await page.evaluate(async (b64: string) => {
       const img = await new Promise<HTMLImageElement>((resolve, reject) => {
         const i = new Image()
-        i.onload = () => {
+        i.addEventListener('load', () => {
           resolve(i)
-        }
-        i.onerror = reject
+        })
+        i.addEventListener('error', reject)
         i.src = `data:image/png;base64,${b64}`
       })
       const off = document.createElement('canvas')
@@ -295,7 +295,7 @@ async function measure(
         }
       }
       return ink / (off.width * off.height)
-    }, band as string)
+    }, band)
     if (shot) {
       fs.mkdirSync(shot.replace(/\/[^/]+$/, ''), { recursive: true })
       await page.screenshot({ path: shot })

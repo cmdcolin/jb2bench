@@ -73,10 +73,7 @@ if (child) {
     // The nested map clusterData() runs, kept verbatim: it is a full N x N,
     // both triangles, over arrays of arrays. Computing one triangle and
     // mirroring it is one of the things the optimized arm is measuring.
-    const data = new Array(rows)
-    for (let i = 0; i < rows; i++) {
-      data[i] = Array.from(values.subarray(i * cols, (i + 1) * cols))
-    }
+    const data = Array.from({ length: rows }, (_, i) => Array.from(values.subarray(i * cols, (i + 1) * cols)))
     const t = performance.now()
     data.map(datum => data.map(otherDatum => euclideanDistance(datum, otherDatum)))
     ms = performance.now() - t

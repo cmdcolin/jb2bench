@@ -73,7 +73,7 @@ mkdirSync(dirname(out), { recursive: true })
 writeFileSync(out, JSON.stringify({
   date: new Date().toISOString().slice(0, 10),
   host: hostname(),
-  cpu: cpus()[0].model,
+  cpu: cpus()[0]?.model,
   threads: cpus().length,
   source: local ? 'local disk' : 'remote',
   geneReviewPortal: rev,

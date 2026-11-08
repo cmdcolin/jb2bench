@@ -70,7 +70,7 @@
 import crypto from 'crypto'
 import fs from 'fs'
 import path from 'path'
-import puppeteer from 'puppeteer'
+import { launch } from 'puppeteer'
 
 import {
   DEFAULT_QUIET_MS,
@@ -81,6 +81,37 @@ import {
 } from './drawclock.ts'
 import { ANGLE_ARGS } from '../angleargs.ts'
 import { gpuInfo } from './gpuinfo.ts'
+
+interface JBrowseView {
+  bpPerPx: number
+  offsetPx: number
+  width: number
+  zoomTo(bpPerPx: number): void
+  horizontalScroll(px: number): void
+  settleCoarseBlocks?: () => void
+  visibleLocStrings?: string
+  displayedRegions?: { refName?: string }[]
+}
+
+interface ToolWindow {
+  JBrowseSession: { views: [JBrowseView, ...JBrowseView[]] }
+  igvBrowser: {
+    zoomIn(): void
+    search(locus: string): Promise<unknown>
+    referenceFrameList?: { chr: string; start: number; end: number }[]
+    currentLoci?: () => string
+  }
+  gsApi: {
+    getScaleResolutionByName(name: string): {
+      zoomTo(interval: { chrom: string; pos: number }[]): Promise<unknown>
+      getDomain(): [number, number]
+    }
+  }
+  __igvState: { error?: string | null }
+  __gsState: { error?: string | null; lazyLoaded?: string }
+  __panPromise?: Promise<unknown>
+  __panError?: string
+}
 
 const TOOLS = ['jbrowse', 'igv', 'genomespy'] as const
 type ToolKind = (typeof TOOLS)[number]
@@ -153,7 +184,7 @@ const END = Number(process.env.END ?? 143000)
 const WIDTH = END - START
 const CONTIG_LENGTH = Number(process.env.CONTIG_LENGTH ?? 250001)
 
-const browser = await puppeteer.launch({
+const browser = await launch({
   headless: process.env.HEADLESS !== '0',
   // Puppeteer's protocolTimeout applies to a single `evaluate` round trip, and
   // igv.js parses alignments on the main thread — at 1000x-longread it blocks
@@ -202,9 +233,15 @@ const netEvent = (delta: number) => {
   inFlight += delta
   lastNetworkAt = Date.now()
 }
-page.on('request', () => netEvent(1))
-page.on('requestfinished', () => netEvent(-1))
-page.on('requestfailed', () => netEvent(-1))
+page.on('request', () => {
+  netEvent(1)
+})
+page.on('requestfinished', () => {
+  netEvent(-1)
+})
+page.on('requestfailed', () => {
+  netEvent(-1)
+})
 
 // Per-step network accounting, because "a pan is the case where BOTH tools must
 // fetch" is a claim and not a definition.
@@ -454,7 +491,9 @@ try {
     await readyOr(
       'window.__igvState && (window.__igvState.ready || window.__igvState.error)',
     )
-    const err = await page.evaluate(() => (window as any).__igvState.error)
+    const err = await page.evaluate(
+      () => (window as unknown as ToolWindow).__igvState.error,
+    )
     if (err) throw new Error(`igv failed to start: ${err}`)
   } else if (tool === 'genomespy') {
     // Every failure on this page is silent -- `embed()` resolves, its promise
@@ -466,7 +505,9 @@ try {
     await readyOr(
       'window.__gsState && (window.__gsState.ready || window.__gsState.error)',
     )
-    const state = await page.evaluate(() => (window as any).__gsState)
+    const state = await page.evaluate(
+      () => (window as unknown as ToolWindow).__gsState,
+    )
     if (state.error) throw new Error(`genomespy failed to start: ${state.error}`)
     if (state.lazyLoaded !== 'ok') {
       throw new Error(`genomespy lazy data: ${state.lazyLoaded}`)
@@ -495,8 +536,8 @@ try {
   if (tool === 'jbrowse') {
     settlesCoarseBlocks = await page.evaluate(
       () =>
-        typeof (window as any).JBrowseSession.views[0].settleCoarseBlocks ===
-        'function',
+        typeof (window as unknown as ToolWindow).JBrowseSession.views[0]
+          .settleCoarseBlocks === 'function',
     )
   }
 
@@ -528,23 +569,24 @@ try {
     lastNetworkAt = Date.now()
     const tStep = Date.now()
     const applied = await page.evaluate(
-      ({ tool, sign, locus, motion, ref, from, to }) => {
-        if (tool === 'genomespy') {
-          const res = (window as any).gsApi.getScaleResolutionByName('pos')
+      ({ tool: arm, sign, locus, motion, ref, from, to }) => {
+        const w = window as unknown as ToolWindow
+        if (arm === 'genomespy') {
+          const res = w.gsApi.getScaleResolutionByName('pos')
           // Deliberately NOT awaited, for igv's reason below: the instrument
           // must not ask a tool when it has finished.
-          ;(window as any).__panPromise = res
+          w.__panPromise = res
             .zoomTo([
               { chrom: ref, pos: from },
               { chrom: ref, pos: to },
             ])
             .catch((e: unknown) => {
-              ;(window as any).__panError = String(e)
+              w.__panError = String(e)
             })
           return true
         }
-        if (tool === 'igv') {
-          const b = (window as any).igvBrowser
+        if (arm === 'igv') {
+          const b = w.igvBrowser
           // Deliberately NOT awaited: neither call resolves on anything this
           // instrument should trust — the whole point is not to ask a tool when
           // it has finished.
@@ -555,12 +597,12 @@ try {
             b.zoomIn()
             return true
           }
-          ;(window as any).__panPromise = b.search(locus).catch((e: unknown) => {
-            ;(window as any).__panError = String(e)
+          w.__panPromise = b.search(locus).catch((e: unknown) => {
+            w.__panError = String(e)
           })
           return true
         }
-        const v = (window as any).JBrowseSession.views[0]
+        const v = w.JBrowseSession.views[0]
         // `zoomTo` and `horizontalScroll` are the per-frame chokepoints a
         // gesture writes through, and they deliberately leave the coarse blocks
         // on their 500ms throttle -- flushing them sixty times a second is the
@@ -580,17 +622,19 @@ try {
         // Optional because the older builds may not have the action; whether
         // each did is recorded per run rather than assumed, so a build that
         // cannot flush shows its throttle as the real difference it is.
-        const settle = () => v.settleCoarseBlocks?.()
+        const flush = () => {
+          v.settleCoarseBlocks?.()
+        }
         if (motion === 'zoom') {
           const before = v.bpPerPx
           // Second argument defaults to width/2, so this zooms about the centre.
           v.zoomTo(v.bpPerPx / 2)
-          settle()
+          flush()
           return v.bpPerPx !== before
         }
         const before = v.offsetPx
         v.horizontalScroll(sign * v.width)
-        settle()
+        flush()
         return v.offsetPx !== before
       },
       {
@@ -646,9 +690,10 @@ try {
       reference = await shot()
     }
 
-    const locus = await page.evaluate(({ tool, ref }) => {
-      if (tool === 'genomespy') {
-        const err = (window as any).__panError
+    const locus = await page.evaluate(({ tool: arm, ref }) => {
+      const w = window as unknown as ToolWindow
+      if (arm === 'genomespy') {
+        const err = w.__panError
         if (err) return `error: ${err}`
         // `getDomain()` is linearized genome coordinates. The corpus is one
         // contig at offset zero, so those are positions on it -- the same
@@ -657,19 +702,17 @@ try {
         // runner cross-checks every step's locus against JBrowse's, so a
         // linearization offset would show up as a mismatch on every step
         // rather than as a plausible wrong number.
-        const [lo, hi] = (window as any).gsApi
-          .getScaleResolutionByName('pos')
-          .getDomain()
+        const [lo, hi] = w.gsApi.getScaleResolutionByName('pos').getDomain()
         return `${ref}:${Math.round(lo)}-${Math.round(hi)}`
       }
-      if (tool === 'igv') {
-        const b = (window as any).igvBrowser
+      if (arm === 'igv') {
+        const b = w.igvBrowser
         const f = b.referenceFrameList?.[0]
         return f
           ? `${f.chr}:${Math.round(f.start)}-${Math.round(f.end)}`
           : (b.currentLoci?.() ?? '')
       }
-      const v = (window as any).JBrowseSession.views[0]
+      const v = w.JBrowseSession.views[0]
       return (
         v.visibleLocStrings ??
         `${v.displayedRegions?.[0]?.refName ?? ''}:${Math.round(v.offsetPx * v.bpPerPx)}-${Math.round((v.offsetPx + v.width) * v.bpPerPx)}`
@@ -713,7 +756,7 @@ try {
 }
 
 const done = steps.filter(s => s.applied)
-const median = (xs: number[]) => [...xs].sort((a, b) => a - b)[xs.length >> 1]
+const median = (xs: number[]) => [...xs].toSorted((a, b) => a - b)[xs.length >> 1]
 
 const meanShot = shotCosts.length
   ? shotCosts.reduce((a, b) => a + b, 0) / shotCosts.length

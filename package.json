@@ -3,7 +3,10 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "typecheck": "tsc --noEmit -p tsconfig.json"
+    "typecheck": "tsrs --noEmit -p tsconfig.json",
+    "lint": "oxlint",
+    "format": "oxfmt",
+    "format:check": "oxfmt --check"
   },
   "dependencies": {
     "@genome-spy/core": "1.0.0",
@@ -25,7 +28,10 @@
     "@types/node": "^25.9.3",
     "@webgpu/types": "^0.1.71",
     "esbuild": "^0.28.2",
+    "oxfmt": "^0.77.0",
+    "oxlint": "^1.92.0",
     "source-map": "^0.7.6",
+    "tsrs": "0.23.0-ts7.1.0-beta",
     "typescript": "^5.9.3"
   }
 }

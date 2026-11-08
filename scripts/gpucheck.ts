@@ -4,13 +4,13 @@
 // fallback (would make the GPU-branch benchmark unfair).
 //
 // Usage: gpucheck.ts [headless|headful]
-import puppeteer from 'puppeteer'
+import { launch } from 'puppeteer'
 import { ANGLE_ARGS } from './angleargs.ts'
 
 const mode = process.argv[2] ?? 'headless'
 const headless = mode !== 'headful'
 
-const browser = await puppeteer.launch({
+const browser = await launch({
   headless,
   args: [
     '--no-sandbox',
@@ -35,7 +35,7 @@ const info = await page.evaluate(() => {
       ? (gl.getParameter(ext.UNMASKED_VENDOR_WEBGL) as string)
       : (gl.getParameter(gl.VENDOR) as string)
   }
-  return { renderer, vendor, hasWebGPU: !!(navigator as any).gpu }
+  return { renderer, vendor, hasWebGPU: !!(navigator as { gpu?: unknown }).gpu }
 })
 console.log(`mode: ${headless ? 'headless' : 'headful'}`)
 console.log(`webgl vendor:   ${info.vendor}`)

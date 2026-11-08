@@ -86,7 +86,7 @@ async function main() {
   }
 
   const rows: PrefixRow[] = []
-  for (const [prefix, e] of [...byPrefix].sort()) {
+  for (const [prefix, e] of [...byPrefix].toSorted(([a], [b]) => a.localeCompare(b))) {
     const first = e.chunks.reduce((m, c) => Math.min(m, c[0]), Infinity)
     const tags = tagsOn(
       (await linesAt(src, first)).filter(l => l.startsWith(prefix)),
@@ -95,7 +95,7 @@ async function main() {
       prefix,
       refNames: e.refNames,
       bytes: unionBytes(e.chunks),
-      tagsSampled: tags.size === 0 ? 'none' : [...tags].sort().join('+'),
+      tagsSampled: tags.size === 0 ? 'none' : [...tags].toSorted().join('+'),
     })
   }
 

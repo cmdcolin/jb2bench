@@ -6,7 +6,7 @@
 //
 // Usage: node --experimental-strip-types ec2mac/gpuprobe.ts
 import http from 'node:http'
-import puppeteer from 'puppeteer'
+import { launch } from 'puppeteer'
 import { ANGLE_ARGS } from '../scripts/angleargs.ts'
 import { gpuInfo } from '../scripts/crosstool/gpuinfo.ts'
 
@@ -25,7 +25,7 @@ const url = `http://localhost:${(server.address() as { port: number }).port}/`
 
 let configuredHardware = false
 for (const [set, args] of Object.entries(SETS)) {
-  const browser = await puppeteer.launch({ headless: true, args })
+  const browser = await launch({ headless: true, args })
   const page = await browser.newPage()
   await page.goto(url)
   const g = await gpuInfo(page)

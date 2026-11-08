@@ -58,7 +58,7 @@ const TRACE_POINTS = 2000 // columns of the featured record's trace
 
 /** Worst |deviation| per bucket, so a downsampled trace keeps its peaks. */
 function downsample(xs: number[], ys: number[], span: number, buckets: number) {
-  const best = new Array<number>(buckets).fill(0)
+  const best = Array.from({ length: buckets }, () => 0)
   for (let k = 0; k < xs.length; k++) {
     const b = Math.min(buckets - 1, Math.floor((xs[k]! / span) * buckets))
     if (Math.abs(ys[k]!) > Math.abs(best[b]!)) {
@@ -67,6 +67,8 @@ function downsample(xs: number[], ys: number[], span: number, buckets: number) {
   }
   return best
 }
+
+const q = (a: number[], p: number) => a[Math.min(a.length - 1, Math.floor(a.length * p))]!
 
 interface Featured {
   ownSpan: number
@@ -116,7 +118,7 @@ async function main() {
       const t = trace(ops, segs)
       traces[name] = t
       peaks[name] = peak(t.ys)
-      worst[name]!.push(peaks[name]!)
+      worst[name]!.push(peaks[name])
     }
 
     // The record the figure draws is the one where OUR encoding is at its worst.
@@ -153,10 +155,9 @@ async function main() {
   }
   writeFileSync(`${outDir}/pif-deviation.csv`, `${traceCsv.join('\n')}\n`)
 
-  const q = (a: number[], p: number) => a[Math.min(a.length - 1, Math.floor(a.length * p))]!
   const summary = ['encoding,records,bound_bp,bp_per_px,p50_px,p99_px,max_px,over_bound']
   for (const [name, list] of Object.entries(worst)) {
-    const sorted = [...list].sort((a, b) => a - b)
+    const sorted = [...list].toSorted((a, b) => a - b)
     summary.push(
       [
         name,

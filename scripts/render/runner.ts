@@ -133,7 +133,7 @@ const cases = selectCases(allCases)
 const LOAD_CEILING = 4.0
 
 const median = (a: number[]) => {
-  const s = [...a].sort((x, y) => x - y)
+  const s = [...a].toSorted((x, y) => x - y)
   const m = Math.floor(s.length / 2)
   return s.length % 2 ? s[m]! : (s[m - 1]! + s[m]!) / 2
 }
@@ -159,7 +159,7 @@ function runOnceRaw(build: (typeof builds)[number], c: Case): Attempt {
     out = execFileSync('node', ['scripts/render/profile.ts', url], {
       encoding: 'utf8',
       stdio: ['ignore', 'pipe', 'pipe'],
-      env: { ...process.env, DISPLAY: process.env.DISPLAY || ':0' },
+      env: { ...process.env, DISPLAY: (process.env.DISPLAY ?? '') || ':0' },
     })
   } catch (e) {
     out = (e as { stdout?: string }).stdout ?? ''
@@ -178,7 +178,7 @@ function runOnceRaw(build: (typeof builds)[number], c: Case): Attempt {
     }
   }
   const lines = out.trim().split('\n')
-  const val = Number.parseFloat(lines.pop() || 'NaN')
+  const val = Number.parseFloat(lines.pop() ?? 'NaN')
   // profile.ts prints `peak-rss-mb=N` before the timing. Absent on a run that
   // failed, and absent from every run recorded before 2026-09-06.
   const rss = Number(

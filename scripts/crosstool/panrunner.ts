@@ -210,7 +210,7 @@ function unsupported(tool: Tool, c: { track: string }): string | null {
 }
 
 const median = (a: number[]) => {
-  const s = [...a].sort((x, y) => x - y)
+  const s = [...a].toSorted((x, y) => x - y)
   const m = Math.floor(s.length / 2)
   return s.length % 2 ? s[m]! : (s[m - 1]! + s[m]!) / 2
 }
@@ -266,7 +266,7 @@ function runOnce(url: string, kind: string): PanResult | undefined {
         encoding: 'utf8',
         stdio: ['ignore', 'pipe', 'pipe'],
         maxBuffer: 1 << 22,
-        env: { ...process.env, DISPLAY: process.env.DISPLAY || ':0', MOTION },
+        env: { ...process.env, DISPLAY: (process.env.DISPLAY ?? '') || ':0', MOTION },
       },
     )
   } catch (e) {
@@ -369,20 +369,27 @@ interface Recorded {
   /** cases where the two tools did not visit the same regions */
   locusMismatch: Record<string, string>
 }
-const prior: Recorded = fs.existsSync(RESULTS)
+const isRecordedFile = (x: unknown): x is Partial<Recorded> & Pick<Recorded, 'rows'> =>
+  typeof x === 'object' && x !== null && 'rows' in x && typeof x.rows === 'object' && x.rows !== null
+const fresh: Recorded = {
+  igvVersion,
+  gsVersion,
+  jbrowseBuild,
+  jbrowseBuilds: {},
+  panDir: process.env.PAN_DIR ?? 'left',
+  motion: MOTION,
+  steps: Number(process.env.STEPS ?? 5),
+  rows: {},
+  dates: {},
+  locusMismatch: {},
+}
+const loaded: unknown = fs.existsSync(RESULTS)
   ? JSON.parse(fs.readFileSync(RESULTS, 'utf8'))
-  : {
-      igvVersion,
-      gsVersion,
-      jbrowseBuild,
-      jbrowseBuilds: {},
-      panDir: process.env.PAN_DIR ?? 'left',
-      motion: MOTION,
-      steps: Number(process.env.STEPS ?? 5),
-      rows: {},
-      dates: {},
-      locusMismatch: {},
-    }
+  : fresh
+if (!isRecordedFile(loaded)) {
+  throw new Error(`${RESULTS} holds no rows`)
+}
+const prior: Recorded = { ...fresh, ...loaded }
 // A TOOLS= subset merges into the recorded cells, so a file holding GenomeSpy
 // cells from one version and new ones from another would carry a single label
 // over both.
@@ -539,7 +546,7 @@ for (const c of cases) {
   const jb = row.jbrowse?.loci ?? []
   const bad: string[] = []
   let compared = 0
-  for (const t of measurable.filter(t => t.kind !== 'jbrowse')) {
+  for (const t of measurable.filter(m => m.kind !== 'jbrowse')) {
     const other = row[t.id]?.loci ?? []
     if (jb.length && other.length) {
       compared++
@@ -597,7 +604,7 @@ const hot = outliers(cells)
 // last week — the data is still in the JSON, and a table that omits it is a
 // narrower claim than the one on disk. A recorded arm nobody served this time is
 // presentation-only: it has a label, and asking it for a URL is a bug.
-const recordedArms: Tool[] = Object.entries(prior.jbrowseBuilds ?? {})
+const recordedArms: Tool[] = Object.entries(prior.jbrowseBuilds)
   .filter(([id]) => !allTools.some(t => t.id === id))
   .map(([id, build]) => ({
     id,
@@ -777,10 +784,10 @@ let anyDaggered = false
 for (const c of allCases) {
   const row = prior.rows[c.id]
   if (!row) continue
-  const cells = shownTools.map(t => cell(row[t.id]))
-  if (cells.some(x => x.text.includes('†'))) anyDaggered = true
-  const pick = (c: Cell | undefined) =>
-    c ? (isZoom ? c.median : c.fetchedMedian) : undefined
+  const shown = shownTools.map(t => cell(row[t.id]))
+  if (shown.some(x => x.text.includes('†'))) anyDaggered = true
+  const pick = (x: Cell | undefined) =>
+    x ? (isZoom ? x.median : x.fetchedMedian) : undefined
   const jb = pick(row.jbrowse)
   const ig = pick(row.igv)
   const ratio =
@@ -793,7 +800,7 @@ for (const c of allCases) {
     ),
   )
   lines.push(
-    `| ${c.id} | ${cells.map(x => x.text).join(' | ')} | ${ratio} | ` +
+    `| ${c.id} | ${shown.map(x => x.text).join(' | ')} | ${ratio} | ` +
       `${rowPeak.toFixed(1)} | ${prior.dates[c.id] ?? '—'} |`,
   )
 }
@@ -961,18 +968,18 @@ for (const c of allCases) {
   const row = prior.rows[c.id]
   if (!row) continue
   for (const t of shownTools) {
-    const cell = row[t.id]
-    if (!cell) continue
-    const d = cell.drawsPerStep ?? []
+    const recorded = row[t.id]
+    if (!recorded) continue
+    const d = recorded.drawsPerStep
     const drawRange = d.length
       ? d.length > 1
         ? `${Math.min(...d)}–${Math.max(...d)}`
         : String(d[0])
       : '—'
     lines.push(
-      `| ${c.id} | ${t.id} | ${cell.appliedSteps?.at(-1) ?? '—'} | ` +
-        `${cell.cachedSteps ?? '—'} | ${cell.requests ?? '—'} | ` +
-        `${cell.bytes ? `${(cell.bytes / 1024).toFixed(0)} KB` : '—'} | ${drawRange} |`,
+      `| ${c.id} | ${t.id} | ${recorded.appliedSteps.at(-1) ?? '—'} | ` +
+        `${recorded.cachedSteps} | ${recorded.requests} | ` +
+        `${recorded.bytes ? `${(recorded.bytes / 1024).toFixed(0)} KB` : '—'} | ${drawRange} |`,
     )
   }
 }
@@ -1090,7 +1097,7 @@ if (pairs.length) {
       if (!comparable.length) return []
       const worst = comparable
         .filter(p => p.bBytes && p.cBytes)
-        .sort((a, b) => b.bBytes / b.cBytes - a.bBytes / a.cBytes)[0]
+        .toSorted((a, b) => b.bBytes / b.cBytes - a.bBytes / a.cBytes)[0]
       const grew = comparable.filter(p => p.bBytes && p.cBytes && p.cBytes > p.bBytes)
       const ratios = comparable.map(p => p.cMs / p.bMs)
       const spread = `${Math.min(...ratios).toFixed(2)}x-${Math.max(...ratios).toFixed(2)}x`
@@ -1128,7 +1135,7 @@ if (pairs.length) {
   )
 }
 
-const mismatches = Object.entries(prior.locusMismatch ?? {})
+const mismatches = Object.entries(prior.locusMismatch)
 if (mismatches.length) {
   lines.push(
     '## Locus mismatches — these rows are not comparisons',

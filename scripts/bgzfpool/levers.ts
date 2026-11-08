@@ -21,7 +21,7 @@ import fs from 'fs'
 import http from 'http'
 import os from 'os'
 import path from 'path'
-import puppeteer from 'puppeteer'
+import { launch } from 'puppeteer'
 import { REF, TIMED } from './windows.ts'
 
 const ROUNDS = Number(process.argv[2] ?? process.env.ROUNDS ?? 5)
@@ -40,11 +40,16 @@ const libs = {
   '@gmod/bgzf-filehandle': 'packages/core/node_modules/@gmod/bgzf-filehandle',
 }
 const OUT = path.join(fs.mkdtempSync(path.join(os.tmpdir(), 'bgzflevers-')), 'bench.js')
+const versionOf = (file: string) => {
+  const pkg: unknown = JSON.parse(fs.readFileSync(file, 'utf8'))
+  if (typeof pkg !== 'object' || pkg === null || !('version' in pkg) || typeof pkg.version !== 'string') {
+    throw new Error(`${file} has no version`)
+  }
+  return pkg.version
+}
 const versions: Record<string, string> = {}
 for (const [name, rel] of Object.entries(libs)) {
-  versions[name] = JSON.parse(
-    fs.readFileSync(path.join(JBROWSE, rel, 'package.json'), 'utf8'),
-  ).version
+  versions[name] = versionOf(path.join(JBROWSE, rel, 'package.json'))
 }
 console.log(
   'bundling ' + Object.entries(versions).map(([n, v]) => `${n}@${v}`).join(' '),
@@ -101,7 +106,7 @@ await new Promise<void>(resolve => {
   server.listen(PORT, resolve)
 })
 
-const browser = await puppeteer.launch({
+const browser = await launch({
   headless: true,
   args: [
     '--no-sandbox',
@@ -122,6 +127,13 @@ interface Row {
   counts: string
 }
 const rows: Row[] = []
+
+interface Totals {
+  pooled: number
+  plain: number
+  pooledCount: number
+  plainCount: number
+}
 
 for (const workers of WORKER_COUNTS) {
   const page = await browser.newPage()
@@ -146,8 +158,9 @@ for (const workers of WORKER_COUNTS) {
       const counts = new Set<number>()
       let failed = ''
       for (let r = 0; r < ROUNDS && !failed; r++) {
-        const out = await page
-          .evaluate(
+        let out
+        try {
+          out = await page.evaluate(
             (url: string, refName: string, windows: number[][], seq: boolean) => {
               const b = (
                 window as unknown as {
@@ -158,7 +171,7 @@ for (const workers of WORKER_COUNTS) {
                     }>
                     roundConcurrent: (
                       u: string, rn: string, w: number[][],
-                    ) => Promise<Record<string, number>>
+                    ) => Promise<Totals>
                   }
                 }
               ).bgzfBench
@@ -176,15 +189,14 @@ for (const workers of WORKER_COUNTS) {
             TIMED,
             mode === 'sequential',
           )
-          .catch((e: unknown) => {
-            failed = String(e).split('\n')[0]!
-            return undefined
-          })
+        } catch (e) {
+          failed = String(e).split('\n')[0]!
+        }
         if (out) {
-          pooled.push(out.pooled!)
-          plain.push(out.plain!)
-          counts.add(out.pooledCount!)
-          counts.add(out.plainCount!)
+          pooled.push(out.pooled)
+          plain.push(out.plain)
+          counts.add(out.pooledCount)
+          counts.add(out.plainCount)
         }
       }
       if (failed) {

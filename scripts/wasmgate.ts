@@ -515,7 +515,7 @@ for (const file of files) {
     }
     const reps = fraction < 0.5 ? REPS * 2 : REPS
 
-    const bam = (candidate: string, outBytes: number, js: () => unknown) =>
+    const bam = (candidate: string, outBytes: number, js: () => unknown) => {
       record({
         file: label, candidate,
         units: take, inBytes: end - first, outBytes,
@@ -524,6 +524,7 @@ for (const file of files) {
         floor: timeFloor(buf, outBytes, reps),
         load: loadavg()[0]!,
       })
+    }
 
     bam('BAM record walk', take * 8, () => {
       let n = 0
@@ -571,7 +572,7 @@ for (const file of files) {
   }
 }
 
-const loads = rows.map(r => r.load).sort((a, b) => a - b)
+const loads = rows.map(r => r.load).toSorted((a, b) => a - b)
 const out = {
   measured: new Date().toISOString().slice(0, 10),
   host: {

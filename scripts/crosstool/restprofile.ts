@@ -10,7 +10,7 @@
 // hotfns.ts the same way as the other profiles.
 import crypto from 'crypto'
 import fs from 'fs'
-import puppeteer from 'puppeteer'
+import { launch } from 'puppeteer'
 import { ANGLE_ARGS } from '../angleargs.ts'
 
 const url = process.argv[2]
@@ -20,7 +20,7 @@ if (!url) {
   throw new Error('usage: restprofile.ts <url> <label> [idleMs]')
 }
 
-const browser = await puppeteer.launch({
+const browser = await launch({
   headless: process.env.HEADLESS !== '0',
   args: [
     '--no-sandbox',

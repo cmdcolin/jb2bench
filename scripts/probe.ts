@@ -1,4 +1,4 @@
-import puppeteer from 'puppeteer'
+import { launch } from 'puppeteer'
 
 const url = process.argv[2]
 const shot = process.argv[3]
@@ -6,7 +6,7 @@ if (!url) {
   throw new Error('usage: probe.ts <url> [screenshot]')
 }
 
-const browser = await puppeteer.launch({
+const browser = await launch({
   headless: false,
   args: ['--no-sandbox','--enable-unsafe-webgpu','--ignore-gpu-blocklist','--enable-features=Vulkan','--window-size=1280,900'],
 })
@@ -25,14 +25,14 @@ const info = await page.evaluate(() => {
   const counts: Record<string, number> = {}
   for (const e of document.querySelectorAll('[data-testid]')) {
     const id = e.getAttribute('data-testid')!
-    counts[id] = (counts[id] || 0) + 1
+    counts[id] = (counts[id] ?? 0) + 1
   }
   const interesting = Object.fromEntries(
     Object.entries(counts).filter(([k]) =>
       /pileup|wiggle|snpcov|display|overlay|drawn|loading|done/i.test(k),
     ),
   )
-  return { hasWebGPU: !!(navigator as any).gpu, canvases: document.querySelectorAll('canvas').length, interesting }
+  return { hasWebGPU: !!(navigator as { gpu?: unknown }).gpu, canvases: document.querySelectorAll('canvas').length, interesting }
 })
 if (shot) {
   await page.screenshot({ path: shot })

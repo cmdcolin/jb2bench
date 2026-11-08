@@ -25,7 +25,7 @@ import fs from 'fs'
 import http from 'http'
 import os from 'os'
 import path from 'path'
-import puppeteer from 'puppeteer'
+import { launch } from 'puppeteer'
 import { DEFAULT_TRACKS, REF, TIMED, WINDOW_KB } from './windows.ts'
 
 const ROUNDS = Number(process.argv[2] ?? process.env.ROUNDS ?? 9)
@@ -40,6 +40,13 @@ const libs = {
   '@gmod/bgzf-filehandle': 'packages/core/node_modules/@gmod/bgzf-filehandle',
 }
 const OUT = path.join(fs.mkdtempSync(path.join(os.tmpdir(), 'bgzfpool-')), 'bench.js')
+const versionOf = (file: string) => {
+  const pkg: unknown = JSON.parse(fs.readFileSync(file, 'utf8'))
+  if (typeof pkg !== 'object' || pkg === null || !('version' in pkg) || typeof pkg.version !== 'string') {
+    throw new Error(`${file} has no version`)
+  }
+  return pkg.version
+}
 const versions: Record<string, string> = {}
 for (const [name, rel] of Object.entries(libs)) {
   const pkg = path.join(JBROWSE, rel, 'package.json')
@@ -49,7 +56,7 @@ for (const [name, rel] of Object.entries(libs)) {
         `dependencies installed, so this measures the same libraries the build does`,
     )
   }
-  versions[name] = JSON.parse(fs.readFileSync(pkg, 'utf8')).version
+  versions[name] = versionOf(pkg)
 }
 console.log(
   'bundling ' +
@@ -138,7 +145,7 @@ await new Promise<void>(resolve => {
 // allocation failed" from inside the page rather than as a slow cell. The
 // heap is raised here so the largest cell is measurable; when it still does
 // not fit, the per-track guard below records that and keeps the run.
-const browser = await puppeteer.launch({
+const browser = await launch({
   headless: true,
   args: [
     '--no-sandbox',
@@ -170,7 +177,7 @@ interface Timing {
 
 const min = (xs: number[]) => Math.min(...xs)
 const med = (xs: number[]) => {
-  const s = [...xs].sort((a, b) => a - b)
+  const s = [...xs].toSorted((a, b) => a - b)
   return s.length % 2
     ? s[(s.length - 1) / 2]!
     : (s[s.length / 2 - 1]! + s[s.length / 2]!) / 2
@@ -190,15 +197,21 @@ const OUTFILE = WINDOW_KB
 //
 // Not across library versions though: those cells are not the same benchmark,
 // so a version change starts a new file rather than interleaving with the old.
-const prior = fs.existsSync(OUTFILE)
+interface Prior {
+  versions?: unknown
+  results?: Record<string, unknown>
+}
+const isPrior = (x: unknown): x is Prior => typeof x === 'object' && x !== null
+const loaded: unknown = fs.existsSync(OUTFILE)
   ? JSON.parse(fs.readFileSync(OUTFILE, 'utf8'))
   : undefined
+const prior = isPrior(loaded) ? loaded : undefined
 const sameLibraries =
-  prior && JSON.stringify(prior.versions) === JSON.stringify(versions)
+  prior !== undefined && JSON.stringify(prior.versions) === JSON.stringify(versions)
 if (prior && !sameLibraries) {
   console.log('library versions differ from the file on disk — starting fresh')
 }
-const results: Record<string, unknown> = sameLibraries ? prior.results : {}
+const results: Record<string, unknown> = { ...(sameLibraries ? prior.results : {}) }
 
 const measuredAt = new Date().toISOString().slice(0, 10)
 
@@ -222,26 +235,28 @@ for (const track of TRACKS) {
   const rounds: { pooled: Timing[]; plain: Timing[] }[] = []
   let failure = ''
   for (let r = 0; r < ROUNDS && !failure; r++) {
-    const out = await page.evaluate(
-      (url: string, refName: string, windows: number[][]) =>
-        (
-          window as unknown as {
-            bgzfBench: {
-              round: (
-                u: string,
-                rn: string,
-                w: number[][],
-              ) => Promise<{ pooled: Timing[]; plain: Timing[] }>
+    let out
+    try {
+      out = await page.evaluate(
+        (url: string, refName: string, windows: number[][]) =>
+          (
+            window as unknown as {
+              bgzfBench: {
+                round: (
+                  u: string,
+                  rn: string,
+                  w: number[][],
+                ) => Promise<{ pooled: Timing[]; plain: Timing[] }>
+              }
             }
-          }
-        ).bgzfBench.round(url, refName, windows),
-      `http://localhost:${PORT}/${track}`,
-      REF,
-      TIMED,
-    ).catch((e: unknown) => {
+          ).bgzfBench.round(url, refName, windows),
+        `http://localhost:${PORT}/${track}`,
+        REF,
+        TIMED,
+      )
+    } catch (e) {
       failure = String(e)
-      return undefined
-    })
+    }
     if (out) {
       rounds.push(out)
       process.stdout.write('.')
@@ -287,7 +302,7 @@ for (const track of TRACKS) {
   save()
   process.stdout.write(
     ` => ${med(ratios).toFixed(2)}x  (per window ${ratios.map(r => r.toFixed(2)).join(' ')})` +
-      `  records ${[...counts].sort((a, b) => a - b).join('/')}\n`,
+      `  records ${[...counts].toSorted((a, b) => a - b).join('/')}\n`,
   )
   if (mismatched) {
     console.log(`  !! ${track}: the two arms did not return the same record count`)

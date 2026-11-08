@@ -28,10 +28,10 @@
 //   TOOLS=igv node scripts/crosstool/quiescheck.ts
 //   RUNS=3 node scripts/crosstool/quiescheck.ts
 import fs from 'fs'
-import puppeteer from 'puppeteer'
+import { launch } from 'puppeteer'
 
 import { loadavg } from '../render/loadavg.ts'
-import { attachQuiescence, paintFloorMs, type Settled } from './quiescence.ts'
+import { attachQuiescence, paintFloorMs } from './quiescence.ts'
 import { ANGLE_ARGS } from '../angleargs.ts'
 
 const RUNS = Number(process.env.RUNS ?? 2)
@@ -90,7 +90,7 @@ const shotCosts: Record<string, number[]> = {}
  * simultaneously and diffed.
  */
 async function measure(h: Harness, strategy: 'draws' | 'paint') {
-  const browser = await puppeteer.launch({
+  const browser = await launch({
     headless: process.env.HEADLESS !== '0',
     args: [
       '--no-sandbox',
@@ -160,7 +160,7 @@ for (let r = 0; r < RUNS; r++) {
 }
 
 const median = (xs: number[]) =>
-  xs.length ? [...xs].sort((a, b) => a - b)[xs.length >> 1]! : Number.NaN
+  xs.length ? [...xs].toSorted((a, b) => a - b)[xs.length >> 1]! : Number.NaN
 
 const pick = (harness: string, phase: string, strategy: string) =>
   median(

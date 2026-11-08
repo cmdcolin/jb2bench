@@ -138,7 +138,7 @@ async function bigwigArm(w: Window): Promise<Measurement> {
     await bw.getHeader()
     const features = await bw.getFeatures(w.refName, w.start, w.end, { basesPerSpan })
     if (index === 0) {
-      firstSample = features
+      firstSample = features.map(f => ({ start: f.start, end: f.end, score: f.score ?? Number.NaN }))
     }
   })
   const ms = performance.now() - t0
@@ -244,7 +244,7 @@ const ARMS = [
   { name: 'bedgraph', run: bedgraphArm },
 ] as const
 
-const median = (xs: number[]) => [...xs].sort((a, b) => a - b)[xs.length >> 1]!
+const median = (xs: number[]) => [...xs].toSorted((a, b) => a - b)[xs.length >> 1]!
 
 // The length-weighted mean of a sample's intervals over each of the given bins.
 // BigWig segments, bedGraph rows and Zarr bins all reduce to this, so the check

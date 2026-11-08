@@ -221,7 +221,7 @@ export function contentReadyProbe(): Readiness {
         : units > 0 && outstanding === 0,
       outstanding,
       units,
-      doneKeys: [...markers].sort().join(','),
+      doneKeys: [...markers].toSorted().join(','),
       uncoveredBp: uncovered,
     }
   }

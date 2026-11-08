@@ -31,7 +31,7 @@
 // therefore WARRANTED work rather than redundant work, so anything that wants to
 // make the tick cheaper has to stagger it or make the repaint cheaper, not
 // suppress it.
-import puppeteer from 'puppeteer'
+import { launch } from 'puppeteer'
 import { ANGLE_ARGS } from '../angleargs.ts'
 
 const PORT = Number(process.env.PORT ?? 8020)
@@ -51,7 +51,7 @@ const TRACKS = (
 
 // Same launch options multibam.ts uses — the GPU flags are not optional here,
 // a bare launch crashes on this box.
-const browser = await puppeteer.launch({
+const browser = await launch({
   headless: process.env.HEADLESS !== '0',
   args: [
     '--no-sandbox',
@@ -75,9 +75,30 @@ await page.goto(
   { waitUntil: 'load' },
 )
 
+type CoverageStats = {
+  scoreMin: number
+  scoreMax: number
+  scoreMean: number
+  scoreStdDev: number
+}
+type ProbeDisplay = {
+  rpcDataMap?: { size: number }
+  error?: unknown
+  coverageStats?: CoverageStats
+}
+type ProbeView = {
+  tracks: { displays?: ProbeDisplay[] }[]
+  horizontalScroll: (px: number) => void
+  coarseDynamicBlocks?: { refName: string; start: number; end: number }[]
+}
+
 await page.waitForFunction(
   (n: number) => {
-    const s = (globalThis as any).JBrowseSession
+    const s = (
+      globalThis as unknown as {
+        JBrowseSession?: { views?: Partial<ProbeView>[] }
+      }
+    ).JBrowseSession
     if (!s) {
       return false
     }
@@ -85,9 +106,9 @@ await page.waitForFunction(
     if (!v?.tracks || v.tracks.length < n) {
       return false
     }
-    return v.tracks.every((t: any) => {
+    return v.tracks.every(t => {
       const d = t.displays?.[0]
-      return d && (d.rpcDataMap?.size > 0 || d.error)
+      return d && ((d.rpcDataMap?.size ?? 0) > 0 || d.error)
     })
   },
   { timeout: 180000, polling: 200 },
@@ -95,11 +116,11 @@ await page.waitForFunction(
 )
 
 const samples = await page.evaluate(async (frames: number) => {
-  const w = globalThis as any
+  const w = globalThis as unknown as { JBrowseSession: { views: [ProbeView] } }
   const v = w.JBrowseSession.views[0]
   const displays = v.tracks
-    .map((t: any) => t.displays?.[0])
-    .filter((d: any) => d && 'coverageStats' in d)
+    .map(t => t.displays?.[0])
+    .filter((d): d is ProbeDisplay => d !== undefined && 'coverageStats' in d)
 
   const out: { coarse: string; stats: string[] }[] = []
   const PAN_PX = 10
@@ -111,9 +132,9 @@ const samples = await page.evaluate(async (frames: number) => {
       // The coarse block set the stats getter reads. Recorded as a value so a
       // tick is detectable without hooking MobX.
       const coarse = (v.coarseDynamicBlocks ?? [])
-        .map((b: any) => `${b.refName}:${b.start}-${b.end}`)
+        .map(b => `${b.refName}:${b.start}-${b.end}`)
         .join('|')
-      const stats = displays.map((d: any) => {
+      const stats = displays.map(d => {
         const s = d.coverageStats
         return s
           ? `${s.scoreMin},${s.scoreMax},${s.scoreMean.toFixed(6)},${s.scoreStdDev.toFixed(6)}`
@@ -145,25 +166,25 @@ for (let i = 1; i < out.length; i++) {
 
 let equalAtTick = 0
 let changedAtTick = 0
-const perDisplayEqual = new Array(nDisplays).fill(0)
-const perDisplayChanged = new Array(nDisplays).fill(0)
+const perDisplayEqual = Array.from({ length: nDisplays }, () => 0)
+const perDisplayChanged = Array.from({ length: nDisplays }, () => 0)
 for (const f of tickFrames) {
   for (let d = 0; d < nDisplays; d++) {
     const before = out[f - 1]!.stats[d]
     const after = out[f]!.stats[d]
     if (before === after) {
       equalAtTick++
-      perDisplayEqual[d]++
+      perDisplayEqual[d] = (perDisplayEqual[d] ?? 0) + 1
     } else {
       changedAtTick++
-      perDisplayChanged[d]++
+      perDisplayChanged[d] = (perDisplayChanged[d] ?? 0) + 1
     }
   }
 }
 
 // How many DISTINCT stat values each display took across the whole gesture —
 // the ceiling on how much a memo could ever suppress.
-const distinct = new Array(nDisplays).fill(0).map((_, d) => {
+const distinct = Array.from({ length: nDisplays }, (_, d) => {
   const seen = new Set(out.map(o => o.stats[d]))
   return seen.size
 })

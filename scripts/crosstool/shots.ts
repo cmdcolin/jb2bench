@@ -19,7 +19,7 @@
 //   make shots
 //   TRACK=200x.shortread.bam LOC=chr22_mask:75000-175000 node ... shots.ts
 import fs from 'node:fs'
-import puppeteer from 'puppeteer'
+import { launch } from 'puppeteer'
 import { ANGLE_ARGS } from '../angleargs.ts'
 
 const LOC = process.env.LOC ?? 'chr22_mask:124000-143000'
@@ -41,7 +41,7 @@ const arms = [
 
 fs.mkdirSync(OUT, { recursive: true })
 
-const browser = await puppeteer.launch({
+const browser = await launch({
   headless: process.env.HEADLESS !== '0',
   args: ['--no-sandbox', '--ignore-gpu-blocklist', ...ANGLE_ARGS],
 })
@@ -65,7 +65,11 @@ for (const arm of arms) {
   await page.screenshot({ path })
   const state = await page
     .evaluate(() => {
-      const w = window as any
+      const w = window as unknown as {
+        __harnessBusy?: () => unknown
+        __gsState?: unknown
+        __goslingState?: unknown
+      }
       return {
         busy: typeof w.__harnessBusy === 'function' ? w.__harnessBusy() : null,
         gs: w.__gsState ?? null,
@@ -76,7 +80,7 @@ for (const arm of arms) {
   console.log(`${arm.id.padEnd(10)} -> ${path}`)
   if (state?.gs) console.log(`           gs ${JSON.stringify(state.gs)}`)
   if (state?.gos) console.log(`           gosling ${JSON.stringify(state.gos)}`)
-  for (const m of [...new Set(missing)]) console.log(`           MISSING ${m}`)
+  for (const m of new Set(missing)) console.log(`           MISSING ${m}`)
   await page.close()
 }
 await browser.close()

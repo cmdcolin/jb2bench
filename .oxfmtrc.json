@@ -1,0 +1,27 @@
+{
+  "$schema": "./node_modules/oxfmt/configuration_schema.json",
+  "semi": false,
+  "singleQuote": true,
+  "trailingComma": "all",
+  "arrowParens": "avoid",
+  "printWidth": 100,
+  "sortPackageJson": false,
+  "ignorePatterns": [
+    "pnpm-lock.yaml",
+    "ecosystem",
+    "results",
+    "**/results",
+    "data",
+    "builds",
+    "generated",
+    "crosstool/igv*.esm.js",
+    "crosstool/data",
+    "crosstool/genomespy",
+    "scripts/cluster/vendor",
+    "*.json",
+    "*.jsonl",
+    "*.md",
+    "*.html",
+    "*.yaml"
+  ]
+}

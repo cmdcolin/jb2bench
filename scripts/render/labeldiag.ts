@@ -15,7 +15,7 @@
 // empty `byType` is work that cannot produce anything at this zoom.
 //
 // Usage: node scripts/render/labeldiag.ts   (PORT/LOC/TRACKS override)
-import puppeteer from 'puppeteer'
+import { launch } from 'puppeteer'
 import { ANGLE_ARGS } from '../angleargs.ts'
 
 const PORT = Number(process.env.PORT ?? 8020)
@@ -32,7 +32,7 @@ const TRACKS = (
   ].join(',')
 ).split(',')
 
-const browser = await puppeteer.launch({
+const browser = await launch({
   headless: process.env.HEADLESS !== '0',
   args: [
     '--no-sandbox',
@@ -49,10 +49,14 @@ await page.goto(
 )
 await page.waitForFunction(
   (expected: number) => {
-    const s = (globalThis as any).JBrowseSession
+    const s = (
+      globalThis as unknown as {
+        JBrowseSession?: { views?: { initialized?: boolean }[] }
+      }
+    ).JBrowseSession
     return (
       s?.views?.length &&
-      !s.views.some((v: any) => v.initialized === false) &&
+      !s.views.some(v => v.initialized === false) &&
       document.querySelectorAll('[data-display-phase]').length >= expected &&
       !document.querySelector('[data-display-phase="loading"]') &&
       !document.querySelector('[data-display-drawn="false"]')
@@ -63,15 +67,57 @@ await page.waitForFunction(
 )
 await new Promise(r => setTimeout(r, 1500))
 
-const out = await page.evaluate(() => {
-  const s = (globalThis as any).JBrowseSession
+type NumberArray = ArrayLike<number> & Iterable<number>
+type PileupRpc = {
+  gapPositions?: NumberArray
+  interbasePositions?: NumberArray
+  mismatchPositions?: NumberArray
+  softclipBasePositions?: NumberArray
+  gapLengths: NumberArray
+  gapTypes: NumberArray
+  interbaseLengths: NumberArray
+}
+type LabelSession = {
+  views: [
+    {
+      tracks: {
+        configuration: { trackId: string }
+        displays: {
+          renderSections?: { laidOutPileupMap?: Iterable<[unknown, PileupRpc]> }[]
+          visibleLabels: { type: string }[]
+          featureHeight: number
+          height: number
+        }[]
+      }[]
+      horizontalScroll: (px: number) => void
+      bpPerPx: number
+      width: number
+    },
+  ]
+}
+type LabelRow = {
+  track: string
+  sections: number
+  entries: { gaps: number; interbase: number; mismatch: number; softclipBases: number }
+  deletionLengths: number[]
+  interbaseLengths: number[]
+  labels: number
+  byType: Record<string, number>
+  msPerRecompute: number
+  featureHeight: number
+  height: number
+}
+
+const quant = (lengths: number[]) => {
+  const a = lengths.toSorted((x, y) => x - y)
+  const q = (p: number) => a[Math.floor((a.length - 1) * p)]
+  return { n: a.length, p50: q(0.5), p99: q(0.99), max: a[a.length - 1] }
+}
+
+const raw = await page.evaluate(() => {
+  const s = (globalThis as unknown as { JBrowseSession: LabelSession }).JBrowseSession
   const view = s.views[0]
-  const quant = (a: number[]) => {
-    a.sort((x, y) => x - y)
-    const q = (p: number) => a[Math.floor((a.length - 1) * p)]
-    return { n: a.length, p50: q(0.5), p99: q(0.99), max: a[a.length - 1] }
-  }
-  const rows: any[] = []
+  const rows: LabelRow[] = []
   for (const track of view.tracks) {
     const d = track.displays[0]
     if (!d) {
@@ -91,12 +137,13 @@ const out = await page.evaluate(() => {
         mismatch += rpc.mismatchPositions?.length ?? 0
         softclipBases += rpc.softclipBasePositions?.length ?? 0
         for (let i = 0; i < rpc.gapLengths.length; i++) {
-          if (rpc.gapTypes[i] === 0) {
-            deletionLengths.push(rpc.gapLengths[i])
+          const len = rpc.gapLengths[i]
+          if (rpc.gapTypes[i] === 0 && len !== undefined) {
+            deletionLengths.push(len)
           }
         }
-        for (let i = 0; i < rpc.interbaseLengths.length; i++) {
-          interbaseLengths.push(rpc.interbaseLengths[i])
+        for (const len of rpc.interbaseLengths) {
+          interbaseLengths.push(len)
         }
       }
     }
@@ -104,7 +151,7 @@ const out = await page.evaluate(() => {
     // than returning MobX's cached value — which would time nothing.
     const N = 20
     const t0 = performance.now()
-    let labels: any[] = []
+    let labels: { type: string }[] = []
     for (let i = 0; i < N; i++) {
       view.horizontalScroll(i % 2 === 0 ? 1 : -1)
       labels = d.visibleLabels
@@ -118,8 +165,8 @@ const out = await page.evaluate(() => {
       track: track.configuration.trackId,
       sections: sections.length,
       entries: { gaps, interbase, mismatch, softclipBases },
-      deletionLengths: quant(deletionLengths),
-      interbaseLengths: quant(interbaseLengths),
+      deletionLengths,
+      interbaseLengths,
       labels: labels.length,
       byType,
       msPerRecompute: +ms.toFixed(2),
@@ -138,5 +185,13 @@ const out = await page.evaluate(() => {
   }
 })
 
+const out = {
+  ...raw,
+  rows: raw.rows.map(r => ({
+    ...r,
+    deletionLengths: quant(r.deletionLengths),
+    interbaseLengths: quant(r.interbaseLengths),
+  })),
+}
 console.log(JSON.stringify(out, null, 2))
 await browser.close()

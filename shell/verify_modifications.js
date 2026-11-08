@@ -100,7 +100,7 @@ function check(line) {
 let buf = ''
 process.stdin.setEncoding('utf8')
 process.stdin.on('data', c => {
-  buf += c
+  buf += String(c)
   const lines = buf.split('\n')
   buf = lines.pop() ?? ''
   for (const l of lines) {

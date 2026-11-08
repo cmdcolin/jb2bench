@@ -1,7 +1,7 @@
 // Why does this box have no WebGPU? scripts/gpucheck.ts reports
 // navigator.gpu: false under every flag set tried, headless and headful alike,
 // so read Chrome's own answer out of chrome://gpu rather than guessing.
-import puppeteer from 'puppeteer'
+import { launch } from 'puppeteer'
 
 const BASE = ['--no-sandbox', '--ignore-gpu-blocklist', '--window-size=1280,900']
 
@@ -32,7 +32,7 @@ const combos: {
 for (const c of combos) {
   let browser
   try {
-    browser = await puppeteer.launch({
+    browser = await launch({
       headless: c.headless,
       args: c.args,
       ...(c.channel ? { channel: c.channel } : {}),

@@ -25,7 +25,7 @@
 //   PORT=8000 node --experimental-strip-types scripts/render/bailcheck.ts
 //
 // Exits non-zero if any track refused, so it can gate a run.
-import puppeteer from 'puppeteer'
+import { launch } from 'puppeteer'
 import { ANGLE_ARGS } from '../angleargs.ts'
 
 const PORT = Number(process.env.PORT ?? 8000)
@@ -43,7 +43,7 @@ const tracks =
 const REFUSAL = /too much data|Zoom in to see features|force load/i
 const DATA = /\.(bam|bai|cram|crai)(\?|$)/
 
-const browser = await puppeteer.launch({
+const browser = await launch({
   headless: process.env.HEADLESS !== '0',
   args: [
     '--no-sandbox',

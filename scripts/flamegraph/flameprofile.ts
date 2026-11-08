@@ -9,7 +9,7 @@
 //
 // Usage: flameprofile.ts <url> <label>
 // Writes flame/<label>.<target>.cpuprofile for each thread.
-import puppeteer from 'puppeteer'
+import { launch } from 'puppeteer'
 import type { CDPSession } from 'puppeteer'
 import fs from 'fs'
 import { ANGLE_ARGS } from '../angleargs.ts'
@@ -20,7 +20,7 @@ if (!url) {
   throw new Error('usage: flameprofile.ts <url> <label>')
 }
 
-const browser = await puppeteer.launch({
+const browser = await launch({
   headless: process.env.HEADLESS !== '0',
   args: [
     '--no-sandbox',

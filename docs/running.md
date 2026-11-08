@@ -199,9 +199,11 @@ These are CPU benchmarks on the same box as everything else, so the idleness
 warnings above apply to them too — `make time` and `make scan` will both report
 whatever the machine was doing at the time.
 
-`pnpm typecheck` typechecks everything under `scripts/`. It is clean; keep it
-that way, since these scripts are run straight from source with
-`--experimental-strip-types` and so get no other compile-time check.
+`pnpm typecheck` typechecks everything under `scripts/` and `ec2/` with tsrs,
+and `pnpm lint` runs oxlint's type-aware rules over everything but `ecosystem/`.
+Both are clean; keep them that way, since these scripts are run straight from
+source with `--experimental-strip-types` and so get no other compile-time check.
+`pnpm format` formats with oxfmt.
 
 ## Targets outside `make all`
 

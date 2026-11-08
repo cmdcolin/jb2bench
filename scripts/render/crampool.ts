@@ -29,7 +29,7 @@
  * measures a cache hit rather than a decode.
  */
 import { readFile } from 'fs/promises'
-import puppeteer from 'puppeteer'
+import { launch } from 'puppeteer'
 
 import type { Browser, Page } from 'puppeteer'
 
@@ -118,7 +118,7 @@ async function panSeries(browser: Browser, trackId: string) {
         },
         `chr22_mask:${start}-${end}`,
       )
-      times.push(ms as number)
+      times.push(ms)
     }
     return times.filter(t => t > 0)
   } finally {
@@ -126,7 +126,7 @@ async function panSeries(browser: Browser, trackId: string) {
   }
 }
 
-const browser = await puppeteer.launch({
+const browser = await launch({
   headless: true,
   args: ['--no-sandbox', '--window-size=1280,900'],
 })
@@ -154,7 +154,7 @@ for (let rep = 0; rep < REPS; rep++) {
 await browser.close()
 
 const med = (xs: number[]) => {
-  const s = [...xs].sort((a, b) => a - b)
+  const s = [...xs].toSorted((a, b) => a - b)
   return s.length % 2
     ? s[(s.length - 1) / 2]!
     : (s[s.length / 2 - 1]! + s[s.length / 2]!) / 2
@@ -187,7 +187,7 @@ console.log(
 console.log(
   `in-process  best ${Math.min(...flat(plain)).toFixed(0)}ms  median ${med(flat(plain)).toFixed(0)}ms  n=${flat(plain).length}`,
 )
-const sorted = [...ratios].sort((a, b) => a - b)
+const sorted = [...ratios].toSorted((a, b) => a - b)
 console.log(
   `\npaired speedup  median ${med(ratios).toFixed(2)}x  ` +
     `[p25 ${sorted[Math.floor(sorted.length * 0.25)]!.toFixed(2)}x, ` +

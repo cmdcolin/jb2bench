@@ -351,10 +351,7 @@ export const hierarchicalCluster = ({ data, onProgress }) => {
 // same convention rebuildTree uses on the wasm side so the orders are
 // comparable.
 const leafOrder = (numSamples, mergeA, mergeB) => {
-  const leaves = new Array(numSamples)
-  for (let i = 0; i < numSamples; i++) {
-    leaves[i] = [i]
-  }
+  const leaves = Array.from({ length: numSamples }, (_, i) => [i])
   for (let i = 0; i < numSamples - 1; i++) {
     const dst = mergeA[i]
     const other = mergeB[i]

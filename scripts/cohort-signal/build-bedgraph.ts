@@ -114,13 +114,19 @@ mkdirSync(dirname(outPath), { recursive: true })
 const bgzip = spawn('bgzip', ['-c', '-@', '4'], { stdio: ['pipe', 'pipe', 'inherit'] })
 bgzip.stdout.pipe(createWriteStream(outPath))
 const finished = new Promise<void>((resolve, reject) => {
-  bgzip.on('close', code => (code === 0 ? resolve() : reject(new Error(`bgzip exited ${code}`))))
+  bgzip.on('close', code => {
+    if (code === 0) {
+      resolve()
+    } else {
+      reject(new Error(`bgzip exited ${code}`))
+    }
+  })
 })
 const write = (text: string) =>
-  bgzip.stdin.write(text) ? Promise.resolve() : new Promise<void>(r => bgzip.stdin.once('drain', () => r()))
+  bgzip.stdin.write(text) ? Promise.resolve() : new Promise<void>(r => bgzip.stdin.once('drain', r))
 
 await write(`#chrom\tstart\tend\t${samples.map(s => s.name).join('\t')}\n`)
-const refs = Object.entries(level.refs).sort(([, a], [, b]) => a.binOffset - b.binOffset)
+const refs = Object.entries(level.refs).toSorted(([, a], [, b]) => a.binOffset - b.binOffset)
 let rows = 0
 let nanCells = 0
 for (const [refName, ref] of refs) {
@@ -129,7 +135,7 @@ for (const [refName, ref] of refs) {
     const bin = ref.binOffset + i
     const chunk = await chunkAt(Math.floor(bin / chunkBins))
     const within = bin % chunkBins
-    const cells = new Array<string>(nSamples)
+    const cells: string[] = []
     for (let s = 0; s < nSamples; s++) {
       cells[s] = shortestFloat32(chunk[s * chunkBins + within]!)
       if (cells[s] === 'NaN') {

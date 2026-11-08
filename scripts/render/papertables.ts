@@ -15,13 +15,64 @@
 import fs from 'fs'
 import path from 'path'
 
-import { FOREIGN_CORE_CEILING, foreign, peak, type LoadWindow } from './loadavg.ts'
+import { FOREIGN_CORE_CEILING, foreign, type LoadWindow } from './loadavg.ts'
 
 const OUT = 'results/paper'
 fs.mkdirSync(OUT, { recursive: true })
 
-const read = (f: string) =>
-  JSON.parse(fs.readFileSync(path.join('results', f), 'utf8'))
+interface ColdCell {
+  median?: number
+  stddev?: number
+  load?: LoadWindow
+}
+interface ColdFile {
+  results: Record<string, Record<string, ColdCell>>
+  measuredAt?: Record<string, string>
+  runs?: number
+}
+interface InterCell {
+  zoomTimeToContentMs?: number
+  zoomRedrawGapMs?: number
+}
+interface InterFile {
+  builds: Record<string, string>
+  results?: Record<string, Record<string, Record<string, InterCell>>>
+}
+interface CrosstoolArm {
+  median?: number
+  load?: LoadWindow
+}
+interface CrosstoolFile {
+  igvVersion?: string
+  rows?: Record<string, Record<string, CrosstoolArm>>
+  dates?: Record<string, string>
+}
+interface PanArm {
+  fetchedMedian?: unknown
+  drawsPerStep?: number[]
+  runs?: unknown[]
+}
+interface PanFile {
+  igvVersion?: string
+  rows?: Record<string, Record<string, PanArm>>
+  dates?: Record<string, string>
+  locusMismatch?: Record<string, string>
+}
+
+const isObject = (x: unknown): x is Record<string, unknown> =>
+  typeof x === 'object' && x !== null
+const isColdFile = (x: unknown): x is ColdFile => isObject(x) && isObject(x.results)
+const isInterFile = (x: unknown): x is InterFile => isObject(x) && isObject(x.builds)
+const isCrosstoolFile = (x: unknown): x is CrosstoolFile => isObject(x)
+const isPanFile = (x: unknown): x is PanFile => isObject(x)
+
+function read<T>(f: string, is: (x: unknown) => x is T) {
+  const parsed: unknown = JSON.parse(fs.readFileSync(path.join('results', f), 'utf8'))
+  if (!is(parsed)) {
+    throw new Error(`results/${f} is not in the shape this script reads`)
+  }
+  return parsed
+}
 
 // The paper plots BAM in these panels and names the format explicitly, so a
 // missing key is an error rather than a quiet substitution into CRAM.
@@ -93,7 +144,7 @@ function longtable(opts: {
 
 // ------------------------------------------------------ tab:initial-render
 
-const cold = read('alignments.json')
+const cold = read('alignments.json', isColdFile)
 const BUILDS = ['current', 'release-4.3.0', 'release-4.1.15', 'release-2.4.0']
 const BUILD_LABEL: Record<string, string> = {
   current: 'This work',
@@ -113,7 +164,7 @@ let worstForeign = 0
 const coldRows = CASES.map((c, i) => {
   const per = cold.results[c] ?? {}
   for (const b of coldBuilds) {
-    const f = foreign(per[b]?.load ?? ({ before: 0, after: 0 } as LoadWindow))
+    const f = foreign(per[b]?.load ?? { before: 0, after: 0 })
     if (Number.isFinite(f)) worstForeign = Math.max(worstForeign, f)
   }
   // Judged by foreign CPU, matching jb2bench's own verdict. The load average
@@ -122,7 +173,7 @@ const coldRows = CASES.map((c, i) => {
   // load rule reported the largest speedup in the table as unusable because of
   // work the benchmark did itself.
   const dirty = coldBuilds.some(b => {
-    const f = foreign(per[b]?.load ?? ({ before: 0, after: 0 } as LoadWindow))
+    const f = foreign(per[b]?.load ?? { before: 0, after: 0 })
     return Number.isFinite(f) && f > FOREIGN_CORE_CEILING
   })
   return [
@@ -154,8 +205,8 @@ fs.writeFileSync(
 
 // ------------------------------------- tab:zoom-interaction, tab:pan-time
 
-const inter = read('interaction.json')
-const roles = inter.builds as Record<string, string>
+const inter = read('interaction.json', isInterFile)
+const roles = inter.builds
 const roleOf = (name: string) =>
   Object.keys(roles).find(r => roles[r] === name)!
 const NEW = roleOf('current')
@@ -220,7 +271,7 @@ fs.writeFileSync(
 
 // ------------------------------------------------------------ tab:crosstool
 
-const ct = read('crosstool.json')
+const ct = read('crosstool.json', isCrosstoolFile)
 // The cross-tool matrix gained a window axis on 2026-08-28 and keys its rows
 // `<case>@<window>`. The paper's table is the 19 kb window, which is the one
 // every figure and every earlier row was measured at; the 100 kb rows are in
@@ -242,7 +293,7 @@ const ctDates = [
 const CT_ARMS = ['jbrowse', 'igv', 'igv-deep']
 const ctForeign = (c: string) => {
   const row = ct.rows?.[ctKey(c)] ?? ct.rows?.[c] ?? {}
-  const seen = CT_ARMS.map(a => foreign(row[a]?.load ?? ({ before: 0, after: 0 } as LoadWindow)))
+  const seen = CT_ARMS.map(a => foreign(row[a]?.load ?? { before: 0, after: 0 }))
     .filter(f => Number.isFinite(f))
   return seen.length ? Math.max(...seen) : Number.NaN
 }
@@ -252,7 +303,7 @@ const ctWorst = Math.max(0, ...CASES.map(ctForeign).filter(f => Number.isFinite(
 // median, so "igv completed every case" is read off the run rather than
 // asserted: the sentence was a fixed one naming a duration two runs out of date.
 const ctIncomplete = CASES.filter(
-  c => (ct.rows?.[ctKey(c)] ?? ct.rows?.[c] ?? {}).igv?.median == null,
+  c => (ct.rows?.[ctKey(c)] ?? ct.rows?.[c])?.igv?.median == null,
 )
 const ctRows = CASES.map((c, i) => {
   const row = ct.rows?.[ctKey(c)] ?? ct.rows?.[c] ?? {}
@@ -278,7 +329,7 @@ fs.writeFileSync(
       `default divided by this work. Measured ${ctDates.join(', ')}. ` +
       (ctDirty.length
         ? `${ctDirty.length} row${ctDirty.length === 1 ? '' : 's'} ` +
-          `(${ctDirty.map((c, i) => LABELS[CASES.indexOf(c)]!.toLowerCase()).join(', ')}) ` +
+          `(${ctDirty.map(c => LABELS[CASES.indexOf(c)]!.toLowerCase()).join(', ')}) ` +
           `sat above the ${FOREIGN_CORE_CEILING}-core foreign-CPU ceiling, worst ` +
           `${ctWorst.toFixed(2)}, and their ratios are withheld rather than quoted. `
         : `Every cell sat within the ${FOREIGN_CORE_CEILING}-core foreign-CPU ceiling, ` +
@@ -295,7 +346,7 @@ fs.writeFileSync(
 
 // -------------------------------------------------------- tab:crosstool-pan
 
-const pan = read('crosstool-pan.json')
+const pan = read('crosstool-pan.json', isPanFile)
 
 // A row is a comparison only where both tools went to the network on at least
 // one step. panrunner leaves fetchedMedian null for an arm that served every
@@ -318,14 +369,14 @@ const draws = (steps: number[] | undefined) => {
 }
 
 const xtPanRows = panCases.map(c => {
-  const row = pan.rows[c]
+  const row = pan.rows?.[c]
   return [
     LABELS[CASES.indexOf(c)]!,
     ms(fetched(c, 'jbrowse')),
     ms(fetched(c, 'igv')),
     ratio(fetched(c, 'igv'), fetched(c, 'jbrowse')),
-    draws(row.jbrowse?.drawsPerStep),
-    draws(row.igv?.drawsPerStep),
+    draws(row?.jbrowse?.drawsPerStep),
+    draws(row?.igv?.drawsPerStep),
   ]
 })
 
@@ -334,7 +385,7 @@ const xtPanRows = panCases.map(c => {
 // shared. Saying so in the caption is the alternative to dropping the row.
 const mismatched = panCases
   .filter(c => pan.locusMismatch?.[c])
-  .map(c => `${LABELS[CASES.indexOf(c)]} (${pan.locusMismatch[c]})`)
+  .map(c => `${LABELS[CASES.indexOf(c)]} (${pan.locusMismatch?.[c]})`)
 const rounds = pan.rows?.[panCases[0]!]?.jbrowse?.runs?.length ?? 3
 const numeral = ['zero', 'one', 'two', 'three', 'four', 'five', 'six'][rounds] ?? `${rounds}`
 const panDates = [...new Set(panCases.map(c => pan.dates?.[c]).filter(Boolean))]

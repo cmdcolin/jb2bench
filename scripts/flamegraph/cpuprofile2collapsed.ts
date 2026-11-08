@@ -59,7 +59,7 @@ function stackFor(id: number): string {
     }
     cur = parent.get(cur)
   }
-  return frames.reverse().join(';')
+  return frames.toReversed().join(';')
 }
 
 const folded = new Map<string, number>()

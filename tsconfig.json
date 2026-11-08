@@ -6,6 +6,8 @@
     "lib": ["ES2023", "DOM", "DOM.Iterable"],
     "types": ["node"],
     "strict": true,
+    "noUncheckedIndexedAccess": true,
+    "allowJs": true,
     "noEmit": true,
     "allowImportingTsExtensions": true,
     "skipLibCheck": true,
@@ -21,5 +23,6 @@
       "@gmod/bgzf-filehandle": ["../jbrowse-components/packages/core/node_modules/@gmod/bgzf-filehandle/esm/index.d.ts"]
     }
   },
-  "include": ["scripts/**/*.ts"]
+  "include": ["scripts/**/*.ts", "scripts/**/*.mjs", "shell/*.js", "ec2/*.ts"],
+  "exclude": ["scripts/cluster/vendor"]
 }

@@ -117,7 +117,7 @@ export function psMemory(rows: PsRow[], root: number) {
     }
   }
   const byType: Record<string, { count: number; rssMB: number }> = {}
-  for (const r of rows.filter(r => tree.includes(r.pid))) {
+  for (const r of rows.filter(row => tree.includes(row.pid))) {
     const type = /--type=([\w-]+)/.exec(r.command)?.[1] ?? (r.pid === root ? 'browser' : 'other')
     const t = (byType[type] ??= { count: 0, rssMB: 0 })
     t.count++

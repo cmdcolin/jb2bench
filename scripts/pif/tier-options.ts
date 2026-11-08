@@ -193,7 +193,7 @@ async function main() {
   // Pass 1, the `t` rows: the PAF, what each alignment aligns, and the
   // keep-indels fold with its deviation
   const paf: string[] = []
-  const matched: number[] = []
+  const matched: (number | undefined)[] = []
   const altFold = new Map<number, string>()
   let altWorst = 0
   let header = ''

@@ -30,7 +30,7 @@
  * Linux only, through scripts/render/loadavg.ts, which reads /proc.
  */
 import fs from 'fs'
-import puppeteer from 'puppeteer'
+import { launch } from 'puppeteer'
 import {
   FOREIGN_CORE_CEILING,
   loadavg,
@@ -132,7 +132,7 @@ async function panSeries(
         },
         `${REF}:${start}-${end}`,
       )
-      times.push(ms as number)
+      times.push(ms)
     }
     // A failed pan stays in the series as -1 rather than being filtered out.
     // Dropping it shortens one arm and every later window then pairs with its
@@ -146,13 +146,13 @@ async function panSeries(
 }
 
 const med = (xs: number[]) => {
-  const s = [...xs].sort((a, b) => a - b)
+  const s = [...xs].toSorted((a, b) => a - b)
   return s.length % 2
     ? s[(s.length - 1) / 2]!
     : (s[s.length / 2 - 1]! + s[s.length / 2]!) / 2
 }
 const quantile = (xs: number[], q: number) => {
-  const s = [...xs].sort((a, b) => a - b)
+  const s = [...xs].toSorted((a, b) => a - b)
   return s[Math.min(s.length - 1, Math.floor(s.length * q))]!
 }
 
@@ -167,16 +167,21 @@ interface TrackResult {
   load: LoadWindow
 }
 
-const prior: { results?: Record<string, TrackResult>; measuredAt?: Record<string, string> } =
-  fs.existsSync('results/bgzfpool.json')
-    ? JSON.parse(fs.readFileSync('results/bgzfpool.json', 'utf8'))
-    : {}
+interface Prior {
+  results?: Record<string, TrackResult>
+  measuredAt?: Record<string, string>
+}
+const isPrior = (x: unknown): x is Prior => typeof x === 'object' && x !== null
+const loaded: unknown = fs.existsSync('results/bgzfpool.json')
+  ? JSON.parse(fs.readFileSync('results/bgzfpool.json', 'utf8'))
+  : {}
+const prior: Prior = isPrior(loaded) ? loaded : {}
 
 const results: Record<string, TrackResult> = { ...prior.results }
 const measuredAt: Record<string, string> = { ...prior.measuredAt }
 const stamp = new Date().toISOString().slice(0, 10)
 
-const browser = await puppeteer.launch({
+const browser = await launch({
   headless: true,
   args: ['--no-sandbox', '--window-size=1280,900'],
 })
@@ -296,9 +301,9 @@ md += `windows with nothing above it. That is the ceiling this table is read `
 md += `against; \`scripts/paperfigs/bgzfpool.R\` draws the two together.\n\n`
 md += `| track | pooled median | in-process median | paired speedup | blob workers P/p | foreign cores |\n`
 md += `| --- | ---: | ---: | --- | ---: | ---: |\n`
+const flat = (xss: number[][]) => xss.flat().filter(t => t > 0)
 for (const track of Object.keys(results)) {
   const r = results[track]!
-  const flat = (xss: number[][]) => xss.flat().filter(t => t > 0)
   const dirty = (r.load.foreignCores ?? Number.NaN) > FOREIGN_CORE_CEILING
   const sp = dirty
     ? '**unusable**'

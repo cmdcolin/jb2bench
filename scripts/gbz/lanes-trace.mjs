@@ -1,6 +1,6 @@
 import { readFileSync } from 'node:fs'
 import { loadavg } from 'node:os'
-import puppeteer from 'puppeteer'
+import { launch } from 'puppeteer'
 // node lanes-trace.mjs <trackId> <loc> [trackConf.json]
 // Opens a linear genome view on the HPRC demo with one lanes track as a
 // MultiWaySyntenyDisplay, from a cold cache, and counts the requests and bytes
@@ -11,12 +11,12 @@ const trackConf = confPath ? JSON.parse(readFileSync(confPath, 'utf8')) : undefi
 const load = loadavg()[0]
 const match = {
   hprc_v2_1_walk_lanes: u => u.includes('/demos/hprc/hprc-v2.1-mc-grch38-f5s.GRCh38'),
-  hprc_v2_1_gbz_lanes: u => u.includes('gbz.db') || u.includes('haplotype-index'),
+  hprc_v2_1_gbz_lanes: u => /gbz\.db|haplotype-index/.test(u),
   hprc_v2_1_pif_lanes: u => u.includes('hprc_multiway_gfa.pif.gz'),
 }[trackId]
 const build = 'https://jbrowse.org/code/jb2/main/'
 const config = 'https://jbrowse.org/demos/hprc/config.json'
-const browser = await puppeteer.launch({ headless: true, executablePath: '/usr/bin/google-chrome', args: ['--no-sandbox'] })
+const browser = await launch({ headless: true, executablePath: '/usr/bin/google-chrome', args: ['--no-sandbox'] })
 const page = await browser.newPage()
 await page.setViewport({ width: 1600, height: 1000 })
 const net = { req: 0, bytes: 0, last: 0, first: 0, urls: {} }
@@ -41,11 +41,10 @@ const watch = c => {
 const pc = await page.createCDPSession()
 await pc.send('Network.enable')
 watch(pc)
-page.on('workercreated', async w => {
-  try {
-    await w.client.send('Network.enable')
+page.on('workercreated', w => {
+  w.client.send('Network.enable').then(() => {
     watch(w.client)
-  } catch {}
+  }).catch(() => {})
 })
 await page.goto(`${build}?config=${encodeURIComponent(config)}`, { waitUntil: 'domcontentloaded' })
 await page.waitForFunction(() => !!window.JBrowseSession, { timeout: 120000 })
@@ -56,13 +55,13 @@ await page.waitForFunction(
 await new Promise(r => setTimeout(r, 3000))
 const t0 = Date.now()
 await page.evaluate(
-  async ({ trackId, loc, trackConf }) => {
-    if (trackConf) {
-      window.JBrowseSession.addTrackConf(trackConf)
+  async ({ trackId: id, loc: locString, trackConf: conf }) => {
+    if (conf) {
+      window.JBrowseSession.addTrackConf(conf)
     }
     const view = window.JBrowseSession.addView('LinearGenomeView', {})
-    await view.navToLocString(loc, 'hg38')
-    view.showTrack(trackId, {}, { type: 'MultiWaySyntenyDisplay' })
+    await view.navToLocString(locString, 'hg38')
+    view.showTrack(id, {}, { type: 'MultiWaySyntenyDisplay' })
   },
   { trackId, loc, trackConf },
 )

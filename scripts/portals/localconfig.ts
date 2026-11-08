@@ -41,9 +41,10 @@ const walk = (node: unknown): unknown => {
   if (node && typeof node === 'object') {
     const o = node as Record<string, unknown>
     const uri = typeof o.uri === 'string' && /^https?:/.test(o.uri) ? o.uri : undefined
-    if (uri && typeof o.type === 'string' && adapterOf[o.type]) {
+    const adapt = typeof o.type === 'string' ? adapterOf[o.type] : undefined
+    if (uri && adapt) {
       delete o.uri
-      adapterOf[o.type](o, uri)
+      adapt(o, uri)
     } else if (uri && local(uri)) {
       return local(uri)
     }

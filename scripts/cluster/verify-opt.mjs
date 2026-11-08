@@ -28,10 +28,7 @@ const cols = buf.readUInt32LE(4)
 const values = new Float32Array(buf.buffer, buf.byteOffset + 8, rows * cols)
 const n = Math.min(N, rows)
 
-const data = new Array(n)
-for (let i = 0; i < n; i++) {
-  data[i] = Array.from(values.subarray(i * cols, (i + 1) * cols))
-}
+const data = Array.from({ length: n }, (_, i) => Array.from(values.subarray(i * cols, (i + 1) * cols)))
 
 const js = hierarchicalCluster({ data })
 const wasm = await clusterData({ data, onProgress: () => {} })
@@ -49,7 +46,7 @@ const collectHeights = node => {
 }
 collectHeights(wasm.tree)
 wasmHeights.sort((a, b) => a - b)
-const jsHeights = Array.from(js.heights).sort((a, b) => a - b)
+const jsHeights = Array.from(js.heights).toSorted((a, b) => a - b)
 
 let maxHeightDiff = 0
 for (let i = 0; i < jsHeights.length; i++) {

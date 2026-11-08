@@ -22,7 +22,7 @@
 //   node scripts/render/multibam.ts
 //   MODE=zoom node scripts/render/multibam.ts
 //   COUNTS=1,4 TRACKS=... node scripts/render/multibam.ts
-import puppeteer from 'puppeteer'
+import { launch } from 'puppeteer'
 import type { Browser, CDPSession, Page } from 'puppeteer'
 import fs from 'fs'
 import { loadavg, peak } from './loadavg.ts'
@@ -37,7 +37,6 @@ import { ANGLE_ARGS } from '../angleargs.ts'
 const PORTS = (process.env.PORTS ?? process.env.PORT ?? '8020')
   .split(',')
   .map(Number)
-const PORT = PORTS[0]!
 const LOC = process.env.LOC ?? 'chr22_mask:124000-143000'
 const MODE = process.env.MODE ?? 'pan'
 const FRAMES = Number(process.env.FRAMES ?? 240)
@@ -78,7 +77,7 @@ interface FrameStats {
 }
 
 function stats(gaps: number[]): FrameStats {
-  const sorted = [...gaps].sort((a, b) => a - b)
+  const sorted = [...gaps].toSorted((a, b) => a - b)
   const pct = (q: number) => sorted[Math.floor((sorted.length - 1) * q)] ?? NaN
   const over = gaps.filter(g => g > 20).length
   return {
@@ -92,7 +91,7 @@ function stats(gaps: number[]): FrameStats {
 }
 
 const median = (a: number[]) => {
-  const s = [...a].sort((x, y) => x - y)
+  const s = [...a].toSorted((x, y) => x - y)
   const m = Math.floor(s.length / 2)
   return s.length % 2 ? s[m]! : (s[m - 1]! + s[m]!) / 2
 }
@@ -113,7 +112,7 @@ async function waitForRender(page: Page, expected: number) {
     { timeout: WAIT_TIMEOUT, polling: 100 },
   )
   await page.waitForFunction(
-    ({ stableNeeded, expected }: { stableNeeded: number; expected: number }) => {
+    ({ stableNeeded, expected: want }: { stableNeeded: number; expected: number }) => {
       const w = window as unknown as { __stable?: number; __last?: number }
       const phaseNodes = document.querySelectorAll('[data-display-phase]').length
       const legacyNodes = document.querySelectorAll(
@@ -139,7 +138,7 @@ async function waitForRender(page: Page, expected: number) {
       // otherwise satisfy a bare "nothing is loading" check while the rest are
       // still between phases, and the gesture would then be measured against a
       // partly-empty stack.
-      if (count < expected) {
+      if (count < want) {
         w.__stable = 0
         w.__last = count
         return false
@@ -166,7 +165,7 @@ async function waitForRender(page: Page, expected: number) {
 // runner-interaction.ts measures and this deliberately does not.
 async function gesture(page: Page, mode: string, frames: number) {
   return page.evaluate(
-    async ({ mode, frames }) => {
+    async ({ mode: m, frames: total }) => {
       const w = window as unknown as {
         JBrowseSession: {
           views: {
@@ -189,15 +188,15 @@ async function gesture(page: Page, mode: string, frames: number) {
         const step = () => {
           ts.push(performance.now())
           const dir = Math.floor(i / 30) % 2 === 0 ? 1 : -1
-          if (mode === 'pan' || mode === 'both') {
+          if (m === 'pan' || m === 'both') {
             v.horizontalScroll(dir * PAN_PX)
           }
-          if (mode === 'zoom') {
+          if (m === 'zoom') {
             const phase = (i % ZOOM_PERIOD) / ZOOM_PERIOD
             const tri = phase < 0.5 ? phase * 2 : 2 - phase * 2
             v.zoomTo(bp0 * (1 - 0.75 * tri))
           }
-          if (mode === 'scroll' || mode === 'both') {
+          if (m === 'scroll' || m === 'both') {
             // scroll EVERY open display, not just the first: a user dragging
             // the pileup scrollbar moves one, but the point of this benchmark
             // is what N tracks cost, and only touching track 0 would make the
@@ -212,7 +211,7 @@ async function gesture(page: Page, mode: string, frames: number) {
             })
           }
           i++
-          if (i >= frames) {
+          if (i >= total) {
             resolve()
           } else {
             requestAnimationFrame(step)
@@ -364,7 +363,7 @@ const vsyncArgs =
     ? ['--vsync=on']
     : ['--disable-gpu-vsync', '--disable-frame-rate-limit']
 
-const browser = await puppeteer.launch({
+const browser = await launch({
   headless: process.env.HEADLESS !== '0',
   args: [
     '--no-sandbox',
@@ -409,7 +408,7 @@ for (const port of PORTS) {
 // number measured here.
 const order: { n: number; port: number }[] = []
 for (let p = 0; p < PASSES; p++) {
-  for (const n of p % 2 === 0 ? COUNTS : [...COUNTS].reverse()) {
+  for (const n of p % 2 === 0 ? COUNTS : [...COUNTS].toReversed()) {
     for (const port of PORTS) {
       order.push({ n, port })
     }
@@ -560,7 +559,7 @@ if (PORTS.length > 1) {
   md += `| tracks open | ${rows[0]?.passes.map((_, i) => `pass ${i + 1}`).join(' | ') ?? ''} | load |\n`
   md += `|---|${rows[0]?.passes.map(() => '---:').join('|') ?? ''}|---:|\n`
   for (const r of rows) {
-    md += `| ${r.n} | ${r.passes.map(p => `${p.median.toFixed(1)}`).join(' | ')} | ${peak(r.load).toFixed(1)} |\n`
+    md += `| ${r.n} | ${r.passes.map(p => p.median.toFixed(1)).join(' | ')} | ${peak(r.load).toFixed(1)} |\n`
   }
 }
 const withErrors = rows.filter(r => r.errors.length)

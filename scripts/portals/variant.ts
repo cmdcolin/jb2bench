@@ -16,7 +16,7 @@ import { fileURLToPath } from 'node:url'
 
 const argv = process.argv.slice(2)
 const flag = (n: string) => argv.includes(n)
-const opt = (n: string, d: string) => (argv.includes(n) ? argv[argv.indexOf(n) + 1] : d)
+const opt = (n: string, d: string) => (argv.includes(n) ? argv[argv.indexOf(n) + 1] : undefined) ?? d
 const dir = argv.find(a => !a.startsWith('--') && a !== opt('--runs', '') && a !== opt('--out', ''))
 if (!dir) {
   console.error('usage: variant.ts <dir> [--runs N] [--evict] [--remote] [--out file]')
@@ -34,7 +34,10 @@ const sh = (cmd: string, args: string[], cwd = data) => spawnSync(cmd, args, { c
 
 const bin = resolve(data, 'tools/node_modules/.bin/jb2export')
 const imgPackage = resolve(data, 'tools/node_modules/@jbrowse/img/package.json')
-const installed = () => (existsSync(imgPackage) ? JSON.parse(readFileSync(imgPackage, 'utf8')).version : undefined)
+const installed = () => {
+  const pkg: unknown = existsSync(imgPackage) ? JSON.parse(readFileSync(imgPackage, 'utf8')) : undefined
+  return typeof pkg === 'object' && pkg !== null && 'version' in pkg ? pkg.version : undefined
+}
 if (installed() !== IMG) {
   mkdirSync(resolve(data, 'tools'), { recursive: true })
   sh('npm', ['install', '--prefix', resolve(data, 'tools'), `@jbrowse/img@${IMG}`])
@@ -90,7 +93,7 @@ mkdirSync(dirname(out), { recursive: true })
 writeFileSync(out, JSON.stringify({
   date: new Date().toISOString().slice(0, 10),
   host: hostname(),
-  cpu: cpus()[0].model,
+  cpu: cpus()[0]?.model,
   threads: cpus().length,
   source: remote ? 'remote' : 'local disk',
   jbrowseImg: imgVersion,

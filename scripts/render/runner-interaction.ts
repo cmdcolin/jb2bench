@@ -164,7 +164,7 @@ function run(
     const out = execFileSync('node', ['scripts/render/interaction.ts', url], {
       encoding: 'utf8',
       stdio: ['ignore', 'pipe', 'pipe'],
-      env: { ...process.env, DISPLAY: process.env.DISPLAY || ':0', MODE: mode },
+      env: { ...process.env, DISPLAY: (process.env.DISPLAY ?? '') || ':0', MODE: mode },
     })
     return JSON.parse(out.trim().split('\n').pop()!) as Result
   } catch (e) {
@@ -180,6 +180,7 @@ function run(
         `  url: ${url}\n` +
         (why.length ? why.map(l => `  child: ${l.trim()}`).join('\n') : '  child said nothing') +
         (stdout?.trim() ? `\n  stdout: ${stdout.trim().slice(-200)}` : ''),
+      { cause: e },
     )
   }
 }
@@ -304,7 +305,7 @@ for (const c of cases) {
       measured.push({ key: `${c.id} / ${b.name} / ${what}`, load, value: r })
       process.stdout.write(
         `time-to-content ${cell(r)} (loading=${r.loadingEverSeen}, steps=${r.stepsMeasured}` +
-          `${r.stepsCensored ? `, censored=${r.stepsCensored}` : ''}` +
+          (r.stepsCensored ? `, censored=${r.stepsCensored}` : '') +
           `, load=${load.before.toFixed(1)}→${load.after.toFixed(1)}` +
           `, foreign ${cores.toFixed(2)}${top ? `: ${top}` : ''})` +
           // the loci are the audit trail that a pan actually moved into ground
@@ -388,7 +389,7 @@ const optSep = `${hasPublished ? '---:|' : ''}${hasCanvas ? '---:|' : ''}`
 const MAX_WAIT_NOTE = `${
   Object.values(results)
     .flatMap(byMode => Object.values(byMode).flatMap(byRole => Object.values(byRole)))
-    .find(r => r?.maxWaitMs)?.maxWaitMs ?? 120000
+    .find(r => r.maxWaitMs)?.maxWaitMs ?? 120000
 } ms`
 
 let md = `# Zoom interaction benchmark\n\n`
@@ -406,7 +407,7 @@ md += `redraw = longest frame (ms) of the GPU redraw. A \`≥\` prefix marks a c
       (b.load.foreignCores ?? -1) > (a.load.foreignCores ?? -1) ? b : a,
     )
     md += `Contamination, over the cells measured this run: worst **${Math.max(...fresh).toFixed(2)} foreign cores** `
-    md += `(\`${worst.key}\`${worst.load.foreignTop ? ` — ${worst.load.foreignTop}` : ''}), median ${fresh.sort((a, b) => a - b)[Math.floor(fresh.length / 2)]!.toFixed(2)}. `
+    md += `(\`${worst.key}\`${worst.load.foreignTop ? ` — ${worst.load.foreignTop}` : ''}), median ${fresh.toSorted((a, b) => a - b)[Math.floor(fresh.length / 2)]!.toFixed(2)}. `
     md += `That is CPU burned by processes outside this benchmark — its own tree and the corpus servers excluded. This box floors near 0.28 with nobody using it, so read the ceiling as a budget over that floor. Cells not measured this run keep their recorded figure and are absent from these two numbers.\n\n`
   }
 }
@@ -429,9 +430,9 @@ md += `Measured — ${when}. Comparisons *within* a section are same-run; compar
   const flush = new Map<Role, boolean>()
   for (const r of Object.values(results)) {
     for (const mode of ALL_MODES) {
-      for (const [role, cell] of Object.entries(r[mode]) as [Role, Result][]) {
-        if (typeof cell.settlesCoarseBlocks === 'boolean') {
-          flush.set(role, cell.settlesCoarseBlocks)
+      for (const [role, res] of Object.entries(r[mode]) as [Role, Result][]) {
+        if (typeof res.settlesCoarseBlocks === 'boolean') {
+          flush.set(role, res.settlesCoarseBlocks)
         }
       }
     }

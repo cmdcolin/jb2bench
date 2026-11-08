@@ -391,7 +391,7 @@ for (const { w, tracks } of toMeasure) {
 }
 
 const median = (a: number[]) => {
-  const s = [...a].sort((x, y) => x - y)
+  const s = [...a].toSorted((x, y) => x - y)
   const m = Math.floor(s.length / 2)
   return s.length % 2 ? s[m]! : (s[m - 1]! + s[m]!) / 2
 }
@@ -449,7 +449,7 @@ function runOnce(url: string, ceiling: number) {
       stdio: ['ignore', 'pipe', 'pipe'],
       env: {
         ...process.env,
-        DISPLAY: process.env.DISPLAY || ':0',
+        DISPLAY: (process.env.DISPLAY ?? '') || ':0',
         MAX_WAIT: String(ceiling),
       },
     })
@@ -516,13 +516,26 @@ interface Recorded {
   gsVersion?: string
   jbrowseBuild: string
   /** every JBrowse arm this file holds, tool id → build directory */
-  jbrowseBuilds: Record<string, string>
+  jbrowseBuilds?: Record<string, string>
   rows: Record<string, Row>
   dates: Record<string, string>
 }
-const prior: Recorded = fs.existsSync(RESULTS)
+const isRecorded = (x: unknown): x is Recorded =>
+  typeof x === 'object' &&
+  x !== null &&
+  'rows' in x &&
+  typeof x.rows === 'object' &&
+  x.rows !== null &&
+  'dates' in x &&
+  typeof x.dates === 'object' &&
+  x.dates !== null
+const loaded: unknown = fs.existsSync(RESULTS)
   ? JSON.parse(fs.readFileSync(RESULTS, 'utf8'))
   : { igvVersion, gsVersion, jbrowseBuild, jbrowseBuilds: {}, rows: {}, dates: {} }
+if (!isRecorded(loaded)) {
+  throw new Error(`${RESULTS} holds no rows or dates`)
+}
+const prior = loaded
 // A TOOLS= subset merges into the recorded cells, so a file holding GenomeSpy
 // cells from one version and new ones from another would carry a single label
 // over both.
@@ -784,7 +797,7 @@ for (const [id, row] of Object.entries(prior.rows)) {
   for (const [tool, cell] of Object.entries(row)) {
     // An unsupported cell carries a zeroed load window and no timing, so it
     // would drag the median load down and read as the quietest cell in the run.
-    if (cell.load && !cell.unsupported && !cell.unsettled) {
+    if (!cell.unsupported && !cell.unsettled) {
       cells.push({ key: `${id}/${tool}`, load: cell.load, value: cell.median })
     }
   }
@@ -806,7 +819,7 @@ const fmt = (c?: Cell) => {
 const rowPeak = (row: Row) =>
   Math.max(
     ...Object.values(row).map(c =>
-      c.load && !c.unsupported && !c.unsettled ? peak(c.load) : 0,
+      !c.unsupported && !c.unsettled ? peak(c.load) : 0,
     ),
   )
 
@@ -922,21 +935,21 @@ for (const sc of SCALES) {
   const load = rowPeak(row)
   const foreigns = Object.values(row)
     .filter(cell => !cell.unsupported && !cell.unsettled)
-    .map(cell => foreign(cell.load ?? { before: 0, after: 0 }))
+    .map(cell => foreign(cell.load))
     .filter(Number.isFinite)
-  const rowForeign = foreigns.length ? Math.max(...foreigns) : Number.NaN
+  const peakForeign = foreigns.length ? Math.max(...foreigns) : Number.NaN
   // Name what burned it. A bare 0.55 cannot be acted on; "tsc" can.
   const by = Object.values(row)
     .filter(
       cell =>
         !cell.unsupported &&
         !cell.unsettled &&
-        foreign(cell.load ?? { before: 0, after: 0 }) === rowForeign,
+        foreign(cell.load) === peakForeign,
     )
-    .map(cell => cell.load?.foreignTop)
+    .map(cell => cell.load.foreignTop)
     .find(Boolean)
   lines.push(
-    `| ${c.id} | ${w.id} | ${shownTools.map(t => (row[t.id] ? fmt(row[t.id]) : '')).join(' | ')} | ${ratio('igv')} | ${prior.dates[key] ?? '?'} | ${Number.isFinite(rowForeign) ? rowForeign.toFixed(2) : '?'} | ${by ?? '—'} | ${load ? load.toFixed(1) : '?'} |`,
+    `| ${c.id} | ${w.id} | ${shownTools.map(t => (row[t.id] ? fmt(row[t.id]) : '')).join(' | ')} | ${ratio('igv')} | ${prior.dates[key] ?? '?'} | ${Number.isFinite(peakForeign) ? peakForeign.toFixed(2) : '?'} | ${by ?? '—'} | ${load ? load.toFixed(1) : '?'} |`,
   )
   }
   }
@@ -953,6 +966,7 @@ lines.push(
   'A ratio above 1 means igv.js took longer. Read the ratios, not the absolutes: every column of a row is measured within seconds of the others, so a ratio survives load the absolutes do not.',
 )
 lines.push('')
+const mb = (v: number | null | undefined) => (typeof v === 'number' ? v.toFixed(0) : '—')
 const memTools = shownTools.filter(t =>
   Object.values(prior.rows).some(r => r[t.id]?.memoryMedian),
 )
@@ -966,7 +980,6 @@ if (memTools.length) {
   const memHeader = ['case', 'window', ...memTools.map(t => t.label)]
   lines.push(`| ${memHeader.join(' | ')} |`)
   lines.push(`|${memHeader.map((_, i) => (i === 0 ? '---' : '---:')).join('|')}|`)
-  const mb = (v: number | null | undefined) => (typeof v === 'number' ? v.toFixed(0) : '—')
   for (const [key, row] of Object.entries(prior.rows)) {
     if (memTools.some(t => row[t.id]?.memoryMedian)) {
       const [id, win] = key.split('@')

@@ -10,7 +10,7 @@
 // share of differing pixels plus the largest per-channel difference.
 //
 // Usage: PORTS=8021,8020 TRACKS=200x.longread.mod.bam node scripts/render/pixelab.ts
-import puppeteer from 'puppeteer'
+import { launch } from 'puppeteer'
 import type { Browser } from 'puppeteer'
 import fs from 'fs'
 import { createRequire } from 'node:module'
@@ -57,10 +57,14 @@ async function shoot(browser: Browser, port: number, name: string) {
   )
   await page.waitForFunction(
     (expected: number) => {
-      const s = (globalThis as any).JBrowseSession
+      const s = (
+        globalThis as unknown as {
+          JBrowseSession?: { views?: { initialized?: boolean }[] }
+        }
+      ).JBrowseSession
       return (
         s?.views?.length &&
-        !s.views.some((v: any) => v.initialized === false) &&
+        !s.views.some(v => v.initialized === false) &&
         document.querySelectorAll('[data-display-phase]').length >= expected &&
         !document.querySelector('[data-display-phase="loading"]') &&
         !document.querySelector('[data-display-drawn="false"]')
@@ -79,7 +83,7 @@ async function shoot(browser: Browser, port: number, name: string) {
   return { path, errors }
 }
 
-const browser = await puppeteer.launch({
+const browser = await launch({
   headless: process.env.HEADLESS !== '0',
   args: [
     '--no-sandbox',

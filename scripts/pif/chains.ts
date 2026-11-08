@@ -136,7 +136,7 @@ async function main() {
   const report = {
     input: basename(src),
     rows: n,
-    cigar_ops: [...alphabet].sort().join(''),
+    cigar_ops: [...alphabet].toSorted().join(''),
     aligned_bp: aligned,
     indel_bp: inIndels,
     rows_with_indel_over: Object.fromEntries(THRESHOLDS.map((t, i) => [t, over[i]])),

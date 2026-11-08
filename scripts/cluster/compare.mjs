@@ -31,6 +31,7 @@ const binPath = args.find(a => !a.startsWith('--')) ??
   `${process.env.HOME}/src/gmod/hclust/build/matrices/100-kb-window-maf-0-samples.bin`
 const N = Number(args.find(a => a.startsWith('--n='))?.slice(4) ?? 2504)
 const child = args.find(a => a.startsWith('--child='))?.slice(8)
+const ms = value => (value === null ? 'unreported' : value.toFixed(0)).padStart(10)
 
 const loadMatrix = () => {
   const buf = readFileSync(binPath)
@@ -38,10 +39,7 @@ const loadMatrix = () => {
   const cols = buf.readUInt32LE(4)
   const values = new Float32Array(buf.buffer, buf.byteOffset + 8, rows * cols)
   const n = Math.min(N, rows)
-  const data = new Array(n)
-  for (let i = 0; i < n; i++) {
-    data[i] = Array.from(values.subarray(i * cols, (i + 1) * cols))
-  }
+  const data = Array.from({ length: n }, (_, i) => Array.from(values.subarray(i * cols, (i + 1) * cols)))
   return { rows, cols, n, data }
 }
 
@@ -75,19 +73,20 @@ if (child) {
     // no boundary is ever reported. Left ungated that reads as a NEGATIVE
     // distance time (boundary 0 minus t0), which is what this script printed
     // first. The total is always real; the split is null when unobserved.
-    let boundary = null
+    const clusteringAt = []
     const t0 = performance.now()
     await clusterData({
       data,
       onProgress: p => {
-        if (p.phase === 'clustering' && boundary === null) {
-          boundary = performance.now()
+        if (p.phase === 'clustering' && clusteringAt.length === 0) {
+          clusteringAt.push(performance.now())
         }
       },
     })
     const t2 = performance.now()
     totalMs = t2 - t0
-    phases = boundary === null
+    const boundary = clusteringAt[0]
+    phases = boundary === undefined
       ? { distanceMs: null, clusterMs: null }
       : { distanceMs: boundary - t0, clusterMs: t2 - boundary }
   }
@@ -128,7 +127,6 @@ if (child) {
       totalMs: +r.totalMs.toFixed(1),
     }
     results.push(row)
-    const ms = value => (value === null ? 'unreported' : value.toFixed(0)).padStart(10)
     console.log(
       `${row.impl.padEnd(6)} distance ${ms(row.distanceMs)} ms   ` +
       `merge ${ms(row.clusterMs)} ms   total ${row.totalMs.toFixed(0).padStart(10)} ms`)

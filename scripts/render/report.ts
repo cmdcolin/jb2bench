@@ -75,7 +75,7 @@ const rowLoad = (id: string) =>
   )
 const cellOf = (id: string, build: string) => cold.results[id]?.[build]
 const ms = (v?: number) =>
-  v === undefined || !Number.isFinite(v) ? '—' : `${v.toFixed(0)}`
+  v === undefined || !Number.isFinite(v) ? '—' : v.toFixed(0)
 
 // Speedups are only quoted where both halves exist. A missing published cell is
 // a case that has not been re-measured since that column was added, not a zero.

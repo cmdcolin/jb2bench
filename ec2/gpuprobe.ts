@@ -9,7 +9,7 @@
 //
 // Usage: node --experimental-strip-types ec2/gpuprobe.ts
 import http from 'node:http'
-import puppeteer from 'puppeteer'
+import { launch } from 'puppeteer'
 import { ANGLE_ARGS } from '../scripts/angleargs.ts'
 
 const SETS: Record<string, string[]> = {
@@ -26,13 +26,13 @@ await new Promise<void>(r => server.listen(0, '127.0.0.1', r))
 const url = `http://localhost:${(server.address() as { port: number }).port}/`
 
 for (const [name, flags] of Object.entries(SETS)) {
-  const browser = await puppeteer.launch({ headless: true, args: ['--no-sandbox', ...flags] })
+  const browser = await launch({ headless: true, args: ['--no-sandbox', ...flags] })
   const page = await browser.newPage()
   await page.goto(url)
   const info = await page.evaluate(async () => {
     const gl = document.createElement('canvas').getContext('webgl2')
     const ext = gl?.getExtension('WEBGL_debug_renderer_info')
-    const renderer = gl ? (ext ? gl.getParameter(ext.UNMASKED_RENDERER_WEBGL) : gl.getParameter(gl.RENDERER)) : 'no-webgl2'
+    const renderer: unknown = gl ? (ext ? gl.getParameter(ext.UNMASKED_RENDERER_WEBGL) : gl.getParameter(gl.RENDERER)) : 'no-webgl2'
     let webgpu = 'no navigator.gpu'
     const gpu = (navigator as { gpu?: { requestAdapter(): Promise<{ info?: { vendor: string; architecture: string } } | null> } }).gpu
     if (gpu) {

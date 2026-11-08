@@ -1,4 +1,4 @@
-import puppeteer from 'puppeteer'
+import { launch } from 'puppeteer'
 import { loadavg } from 'node:os'
 // node graph-trace.mjs <trackId> <refName> <start> <end>
 // Opens a GraphGenomeView on a graph track of the hosted HPRC config from a cold
@@ -8,7 +8,7 @@ const [trackId, refName, start, end] = process.argv.slice(2)
 const load = loadavg()[0]
 const config = 'https://jbrowse.org/demos/hprc/config.json'
 const url = `https://jbrowse.org/code/jb2/main/?config=${encodeURIComponent(config)}`
-const browser = await puppeteer.launch({ headless: true, executablePath: '/usr/bin/google-chrome', args: ['--no-sandbox'] })
+const browser = await launch({ headless: true, executablePath: '/usr/bin/google-chrome', args: ['--no-sandbox'] })
 const page = await browser.newPage()
 await page.setViewport({ width: 1600, height: 1000 })
 const net = { req: 0, bytes: 0, urls: {} }
@@ -30,11 +30,10 @@ const watch = c => {
 const pc = await page.createCDPSession()
 await pc.send('Network.enable')
 watch(pc)
-page.on('workercreated', async w => {
-  try {
-    await w.client.send('Network.enable')
+page.on('workercreated', w => {
+  w.client.send('Network.enable').then(() => {
     watch(w.client)
-  } catch {}
+  }).catch(() => {})
 })
 await page.goto(url, { waitUntil: 'domcontentloaded' })
 await page.waitForFunction(() => !!window.JBrowseSession, { timeout: 120000 })
@@ -44,21 +43,21 @@ await page.waitForFunction(
 )
 const t0 = Date.now()
 const viewId = await page.evaluate(
-  ({ trackId, region }) =>
-    window.JBrowseSession.addView('GraphGenomeView', { loadedTrackId: trackId, loadedRegion: region }).id,
+  ({ trackId: id, region }) =>
+    window.JBrowseSession.addView('GraphGenomeView', { loadedTrackId: id, loadedRegion: region }).id,
   { trackId, region: { assemblyName: 'hg38', refName, start: +start, end: +end } },
 )
 await page.waitForFunction(
   id => {
-    const v = window.JBrowseSession.views.find(v => v.id === id)
-    return !!v && (v.hasGraph || v.error !== undefined)
+    const v = window.JBrowseSession.views.find(x => x.id === id)
+    return !!v && (!!v.hasGraph || v.error !== undefined)
   },
   { timeout: 300000 },
   viewId,
 )
 const cutMs = Date.now() - t0
 const view = await page.evaluate(id => {
-  const v = window.JBrowseSession.views.find(v => v.id === id)
+  const v = window.JBrowseSession.views.find(x => x.id === id)
   const plugin = window.JBrowseRootModel.pluginManager.plugins.find(p => p.name === 'GraphGenomeView')
   return { nodes: v.nodeCount, error: v.error && String(v.error), plugin: plugin?.version }
 }, viewId)

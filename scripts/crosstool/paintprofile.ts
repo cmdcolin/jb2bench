@@ -69,7 +69,7 @@
 import crypto from 'crypto'
 import fs from 'fs'
 import path from 'path'
-import puppeteer from 'puppeteer'
+import { launch } from 'puppeteer'
 import { isData } from './drewcheck.ts'
 import { ANGLE_ARGS } from '../angleargs.ts'
 import { gpuDeviceUsedMB, sampleMemory } from './memory.ts'
@@ -89,7 +89,7 @@ if (screenshotPath) {
 }
 
 const gpuBaselineMB = gpuDeviceUsedMB()
-const browser = await puppeteer.launch({
+const browser = await launch({
   headless: process.env.HEADLESS !== '0',
   // Above MAX_WAIT, or a cell that blocks the main thread longer than
   // puppeteer's 180 s default dies with a protocol error instead of either
@@ -166,7 +166,7 @@ try {
     const busy =
       inFlight > 0 ||
       (await page.evaluate(() => {
-        const f = (window as unknown as { __harnessBusy?: () => boolean })
+        const f = (window as unknown as { __harnessBusy?: () => unknown })
           .__harnessBusy
         return typeof f === 'function' ? f() === true : false
       }))

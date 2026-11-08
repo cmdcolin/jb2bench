@@ -110,7 +110,7 @@ export async function waitForRenderComplete(
  */
 function watchdog(page: Page, responses: () => number) {
   const pid = page.browser().process()?.pid
-  let stop = () => {}
+  let timer: NodeJS.Timeout | undefined
   const stalled = new Promise<never>((_, reject) => {
     if (!pid) {
       return // a browser we did not spawn is one we cannot watch
@@ -118,7 +118,7 @@ function watchdog(page: Page, responses: () => number) {
     let lastCpu = treeStats(pid).cpuSeconds
     let lastResponses = responses()
     let idleSince = Date.now()
-    const timer = setInterval(() => {
+    timer = setInterval(() => {
       const cpu = treeStats(pid).cpuSeconds
       const busy = cpu - lastCpu > BUSY_CPU_S || responses() !== lastResponses
       lastCpu = cpu
@@ -140,12 +140,16 @@ function watchdog(page: Page, responses: () => number) {
       }
     }, WATCH_MS)
     timer.unref()
-    stop = () => clearInterval(timer)
   })
   // Nothing may ever settle this promise, and an unhandled rejection on the
   // losing side of a race is still an unhandled rejection.
   stalled.catch(() => {})
-  return { stalled, stop: () => stop() }
+  return {
+    stalled,
+    stop: () => {
+      clearInterval(timer)
+    },
+  }
 }
 
 /**

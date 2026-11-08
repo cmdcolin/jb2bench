@@ -1,0 +1,127 @@
+{
+  "$schema": "./node_modules/oxlint/configuration_schema.json",
+  "plugins": [
+    "typescript",
+    "unicorn",
+    "oxc",
+    "import",
+    "node",
+    "vitest"
+  ],
+  "categories": {
+    "correctness": "error",
+    "suspicious": "error"
+  },
+  "options": {
+    "typeAware": true
+  },
+  "env": {
+    "builtin": true,
+    "browser": true,
+    "node": true,
+    "es2026": true
+  },
+  "rules": {
+    "eslint/no-unused-vars": [
+      "error",
+      {
+        "argsIgnorePattern": "^_",
+        "varsIgnorePattern": "^_",
+        "caughtErrors": "none",
+        "ignoreRestSiblings": true
+      }
+    ],
+    "oxc/no-accumulating-spread": "error",
+    "eslint/preserve-caught-error": "error",
+    "vitest/no-focused-tests": "error",
+    "vitest/no-identical-title": "error",
+    "vitest/no-disabled-tests": "error",
+    "typescript/no-confusing-non-null-assertion": "error",
+    "typescript/no-unnecessary-condition": "error",
+    "typescript/switch-exhaustiveness-check": [
+      "error",
+      {
+        "considerDefaultExhaustiveForUnions": true
+      }
+    ],
+    "typescript/require-array-sort-compare": "error",
+    "typescript/consistent-type-imports": "error",
+    "typescript/consistent-type-exports": "error",
+    "typescript/dot-notation": "error",
+    "typescript/no-confusing-void-expression": "error",
+    "typescript/no-mixed-enums": "error",
+    "typescript/no-unnecessary-boolean-literal-compare": "error",
+    "typescript/no-unnecessary-template-expression": "error",
+    "typescript/no-unnecessary-type-arguments": "error",
+    "typescript/no-unnecessary-type-assertion": "error",
+    "typescript/no-unsafe-enum-comparison": "error",
+    "typescript/non-nullable-type-assertion-style": "error",
+    "typescript/only-throw-error": "error",
+    "typescript/prefer-find": "error",
+    "typescript/prefer-includes": "error",
+    "typescript/prefer-promise-reject-errors": "error",
+    "typescript/prefer-reduce-type-parameter": "error",
+    "typescript/prefer-regexp-exec": "error",
+    "typescript/prefer-return-this-type": "error",
+    "typescript/prefer-string-starts-ends-with": "error",
+    "typescript/related-getter-setter-pairs": "error",
+    "typescript/use-unknown-in-catch-callback-variable": "error",
+    "typescript/restrict-template-expressions": "error",
+    "typescript/no-base-to-string": "error",
+    "typescript/unbound-method": "error",
+    "typescript/no-misused-promises": "error",
+    "typescript/no-unsafe-member-access": "off",
+    "typescript/no-unsafe-argument": "error",
+    "typescript/no-unsafe-assignment": "error",
+    "typescript/no-unsafe-call": "error",
+    "typescript/no-unsafe-return": "error",
+    "typescript/restrict-plus-operands": "error",
+    "typescript/require-await": "error",
+    "typescript/prefer-nullish-coalescing": "error",
+    "typescript/no-unnecessary-type-parameters": "off",
+    "typescript/no-unnecessary-type-conversion": "off",
+    "typescript/prefer-optional-chain": "error",
+    "typescript/return-await": "off",
+    "typescript/no-floating-promises": "error",
+    "typescript/strict-boolean-expressions": "off",
+    "typescript/no-explicit-any": "error",
+    "typescript/no-unsafe-type-assertion": "off",
+    "typescript/await-thenable": "error",
+    "no-underscore-dangle": "off"
+  },
+  "ignorePatterns": [
+    "results",
+    "**/results",
+    "data",
+    "builds",
+    "generated",
+    "crosstool/igv*.esm.js",
+    "crosstool/genomespy",
+    "scripts/cluster/vendor",
+    "ecosystem",
+    ".claude"
+  ],
+  "overrides": [
+    {
+      "files": [
+        "**/*.js",
+        "**/*.mjs"
+      ],
+      "rules": {
+        "typescript/no-unsafe-assignment": "off",
+        "typescript/no-unsafe-call": "off",
+        "typescript/no-unsafe-argument": "off",
+        "typescript/no-unsafe-return": "off"
+      }
+    },
+    {
+      "files": [
+        "scripts/render/foreignsampler.ts",
+        "scripts/render/loadavg.ts"
+      ],
+      "rules": {
+        "unicorn/require-post-message-target-origin": "off"
+      }
+    }
+  ]
+}

@@ -110,7 +110,7 @@ Every target that can reach AWS refuses without `CONFIRM=1`. `DRY_RUN=1`
 prints the allocate, launch, terminate and release calls without making them.
 
 ```sh
-make mac-test                                   # shellcheck, tsc, the ps parser fixture; no AWS
+make mac-test                                   # shellcheck, tsrs, the ps parser fixture; no AWS
 make mac-up HOST=mac1 DRY_RUN=1                 # what would be allocated and launched
 
 make stage-release TAG=v5.0.0-beta.20           # once, if builds/release-5.0.0-beta.20 is missing

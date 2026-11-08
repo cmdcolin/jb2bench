@@ -153,7 +153,7 @@ async function bigBedSummary(
   const bw = new BigWig({ filehandle: fh })
   const { zoomLevels } = await bw.getHeader()
   const level = [...zoomLevels]
-    .reverse()
+    .toReversed()
     .find(z => z.reductionLevel <= 2 * basesPerSpan)
   let items = 0
   for (const r of regions) {

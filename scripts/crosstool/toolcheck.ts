@@ -20,7 +20,7 @@
 //   node --experimental-strip-types scripts/crosstool/toolcheck.ts
 //   PAGES=genomespy.html TRACKS=200x.shortread.bam ... toolcheck.ts
 //   LOC=chr22_mask:1-1000 overrides the window sweep with one window
-import puppeteer from 'puppeteer'
+import { launch } from 'puppeteer'
 import { drew, drewCheck } from './drewcheck.ts'
 import { contigSize, selectWindows, WINDOWS, type Window } from './windows.ts'
 import { ANGLE_ARGS } from '../angleargs.ts'
@@ -48,7 +48,7 @@ const tracksFor = (w: Window) =>
   trackList ??
   w.scale.coverages.slice(0, 2).map(c => `${w.scale.prefix}${c}.shortread.bam`)
 
-const browser = await puppeteer.launch({
+const browser = await launch({
   headless: process.env.HEADLESS !== '0',
   args: ['--no-sandbox', '--ignore-gpu-blocklist', ...ANGLE_ARGS],
 })

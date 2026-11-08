@@ -104,7 +104,7 @@ for (let pos = START; pos < END; pos += SPACING) {
   // through a phasing pass but leaves some sites unphased.
   const sep = rnd() < 0.67 ? '|' : '/'
 
-  const cells = new Array(nSamples)
+  const cells = []
   let ac = 0
   let an = 0
   for (let s = 0; s < nSamples; s++) {

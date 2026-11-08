@@ -24,7 +24,7 @@
 //                                        [--vsync=off|on] [--rows=100,...]
 import fs from 'node:fs'
 
-import { launch } from 'puppeteer'
+import { launch, type Page } from 'puppeteer'
 
 import { loadavg, type LoadWindow } from './loadavg.ts'
 import { ANGLE_ARGS } from '../angleargs.ts'
@@ -43,12 +43,12 @@ const ROWS = arg('rows', '100,250,500,1000,2000,2504')
   .map(Number)
 
 const median = (a: number[]) => {
-  const s = [...a].sort((x, y) => x - y)
+  const s = [...a].toSorted((x, y) => x - y)
   const m = Math.floor(s.length / 2)
   return s.length % 2 ? s[m]! : (s[m - 1]! + s[m]!) / 2
 }
 const pct = (a: number[], p: number) => {
-  const s = [...a].sort((x, y) => x - y)
+  const s = [...a].toSorted((x, y) => x - y)
   return s[Math.min(s.length - 1, Math.floor((p / 100) * s.length))]!
 }
 
@@ -65,7 +65,7 @@ function urlFor(n: number) {
 // quiescence detector, identical to profile.ts: a render-complete marker, no
 // loading overlay, and a stable marker count across several polls. Renderer-
 // agnostic on purpose — the two architectures produce different DOM.
-async function waitReady(page: import('puppeteer').Page) {
+async function waitReady(page: Page) {
   await page.waitForFunction(
     () => {
       const w = window as unknown as { __stable?: number; __last?: number }
@@ -89,7 +89,7 @@ async function waitReady(page: import('puppeteer').Page) {
 
 // Oscillating pan: offsetPx changes every animation frame, but the view never
 // walks off the loaded region, so nothing refetches.
-async function panFrames(page: import('puppeteer').Page, frames: number) {
+async function panFrames(page: Page, frames: number) {
   return page.evaluate(async n => {
     const w = window as unknown as {
       JBrowseSession: { views: { horizontalScroll: (n: number) => void }[] }
@@ -157,7 +157,7 @@ const out = new Map<number, Row>(
 // Alternate the direction each pass so a monotone drift cannot align with the
 // row order either.
 for (let r = 0; r < RUNS; r++) {
-  const order = r % 2 ? [...ROWS].reverse() : ROWS
+  const order = r % 2 ? [...ROWS].toReversed() : ROWS
   process.stdout.write(`pass ${r + 1}: `)
   for (const n of order) {
     const row = out.get(n)!

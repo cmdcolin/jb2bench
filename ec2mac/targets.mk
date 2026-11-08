@@ -36,7 +36,7 @@ cpu-sweep:
 # No AWS: the parser fixture, and the panel against this box's port 8000.
 mac-test:
 	shellcheck -x -P SCRIPTDIR ec2mac/*.sh
-	npx tsc --noEmit -p ec2mac
+	npx tsrs --noEmit -p ec2mac
 	$(NODE) ec2mac/memtest.ts
 mac-panel-local:
 	RUNS=$(or $(RUNS),1) WARMUP=$(or $(WARMUP),0) $(NODE) ec2mac/panel.ts

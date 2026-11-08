@@ -78,6 +78,6 @@ parentPort!.on('message', (m: string) => {
         [pid, Math.max(0, cpu - (first.get(pid) ?? cpu)), comm.get(pid) ?? '?'] as const,
     )
     .filter(([, secs]) => secs > 0)
-    .sort((a, b) => b[1] - a[1])
+    .toSorted((a, b) => b[1] - a[1])
   parentPort!.postMessage(spent)
 })

@@ -45,7 +45,7 @@
 //
 // Usage: interaction.ts <url> [screenshotPath]     (MODE=in|out|pan, MAX_WAIT=ms)
 // Prints JSON with per-step time-to-content and redraw cost.
-import puppeteer from 'puppeteer'
+import { launch } from 'puppeteer'
 import { WAIT_TIMEOUT, waitForRenderComplete } from './rendercomplete.ts'
 import {
   contentReadyProbe,
@@ -90,7 +90,7 @@ const STEPS = 5 // attempted; out and pan stop early when they run out of contig
 // PAN_DIR=right restores the old path.
 const PAN_SIGN = process.env.PAN_DIR === 'right' ? 1 : -1
 
-const browser = await puppeteer.launch({
+const browser = await launch({
   // The cache holds whatever `puppeteer browsers install` last fetched, which is
   // not always the version this puppeteer pins. CHROME= names one explicitly.
   executablePath: process.env.CHROME,
@@ -127,7 +127,7 @@ const settleIn = await waitForContentReady(page, { timeoutMs: 120000 })
 console.error(
   `initial render: ${settleIn.contract} contract, a further ` +
     `${settleIn.notReadyUntilMs}ms to finish every block` +
-    `${settleIn.censored ? ' (CENSORED: still unfinished)' : ''}`,
+    (settleIn.censored ? ' (CENSORED: still unfinished)' : ''),
 )
 
 // Recorded per run rather than assumed. The older releases predate the action,
@@ -362,7 +362,7 @@ async function interactStep(): Promise<StepMetric> {
     console.error(
       `  step: ${settle.notReadyUntilMs}ms busy=${settle.wasBusy} ` +
         `peakOutstanding=${settle.peakOutstanding} ack=${settle.acknowledged}` +
-        `${settle.censored ? ' CENSORED' : ''}`,
+        (settle.censored ? ' CENSORED' : ''),
     )
   } else {
     // sample loading state until it has been false for QUIET ms (or timeout)
@@ -411,7 +411,7 @@ async function interactStep(): Promise<StepMetric> {
 }
 
 const median = (a: number[]) => {
-  const s = [...a].sort((x, y) => x - y)
+  const s = [...a].toSorted((x, y) => x - y)
   const m = Math.floor(s.length / 2)
   return s.length ? (s.length % 2 ? s[m]! : (s[m - 1]! + s[m]!) / 2) : Number.NaN
 }
@@ -431,9 +431,9 @@ const steps: StepMetric[] = []
 // a message about the instrument, describing something the build did. Recorded
 // as `crashed` so the table can say so, for the same reason a refusal to fetch
 // is recorded rather than averaged in: neither is a render time.
-let crashed = false
+const tab = { crashed: false }
 page.on('error', e => {
-  crashed = true
+  tab.crashed = true
   console.error(`page crashed: ${String(e).split('\n')[0]}`)
 })
 const detached = (e: unknown) => /detached Frame|Target closed|Session closed/i.test(String(e))
@@ -442,8 +442,8 @@ for (let i = 0; i < STEPS; i++) {
   try {
     s = await interactStep()
   } catch (e) {
-    if (crashed || detached(e)) {
-      crashed = true
+    if (tab.crashed || detached(e)) {
+      tab.crashed = true
       break
     }
     throw e
@@ -454,7 +454,7 @@ for (let i = 0; i < STEPS; i++) {
   steps.push(s)
 }
 
-if (screenshotPath && !crashed) {
+if (screenshotPath && !tab.crashed) {
   await page.screenshot({ path: screenshotPath })
 }
 
@@ -476,7 +476,7 @@ const summary = {
   allBailed: steps.length > 0 && drew.length === 0,
   // the renderer process died partway through; whatever steps completed are
   // not comparable with a cell that survived
-  crashed,
+  crashed: tab.crashed,
   zoomTimeToContentMs: median(drew.map(s => s.timeToContentMs)),
   zoomRedrawGapMs: median(drew.map(s => s.redrawGapMs)),
   loadingEverSeen: drew.some(s => s.loadingSeen),

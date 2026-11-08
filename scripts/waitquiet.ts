@@ -38,7 +38,7 @@ function gate() {
   })
   return {
     ok: r.status === 0,
-    fails: (r.stdout ?? '')
+    fails: (typeof r.stdout === 'string' ? r.stdout : '')
       .split('\n')
       .filter(l => l.startsWith('FAIL'))
       .map(l => l.replace(/\s+/g, ' ').trim()),

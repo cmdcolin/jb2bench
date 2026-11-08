@@ -66,7 +66,7 @@ export async function gpuInfo(page: Page) {
           : 'unknown'
   const glHardware = seen.glRenderer !== 'no-webgl2' && !SOFTWARE.test(seen.glRenderer)
   const webgpuHardware =
-    !/^no /.test(seen.webgpuAdapter) &&
+    !seen.webgpuAdapter.startsWith('no ') &&
     seen.webgpuFallback !== true &&
     !SOFTWARE.test(seen.webgpuAdapter)
   return {

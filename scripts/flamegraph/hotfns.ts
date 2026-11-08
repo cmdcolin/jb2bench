@@ -37,7 +37,7 @@ for (const line of fs.readFileSync(file, 'utf8').split('\n')) {
 
 const fmt = (m: Map<string, number>) =>
   [...m.entries()]
-    .sort((a, b) => b[1] - a[1])
+    .toSorted((a, b) => b[1] - a[1])
     .slice(0, topN)
     .map(
       ([k, v]) =>

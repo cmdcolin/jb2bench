@@ -17,7 +17,7 @@
 //
 // Usage: zoomdiag.ts <url>
 import crypto from 'crypto'
-import puppeteer from 'puppeteer'
+import { launch } from 'puppeteer'
 import { ANGLE_ARGS } from '../angleargs.ts'
 
 const url = process.argv[2]
@@ -27,7 +27,7 @@ if (!url) {
 const WATCH_MS = Number(process.env.WATCH_MS ?? 2500)
 const POLL_MS = Number(process.env.POLL_MS ?? 100)
 
-const browser = await puppeteer.launch({
+const browser = await launch({
   headless: process.env.HEADLESS !== '0',
   args: [
     '--no-sandbox',
@@ -129,7 +129,6 @@ await page.evaluate(() => {
   const w = window as unknown as {
     __diag: { t0: number; draws: number[]; muts: Mutation[] }
   }
-  type Mutation = { t: number; type: string; target: string; attr: string | null }
   w.__diag = { t0: 0, draws: [], muts: [] }
 
   for (const name of ['drawArraysInstanced', 'drawElementsInstanced', 'drawArrays'] as const) {
@@ -161,20 +160,6 @@ await page.evaluate(() => {
     )
   }
 
-  const describe = (n: Node) => {
-    const el = n.nodeType === 1 ? (n as Element) : n.parentElement
-    if (!el) {
-      return String(n.nodeName)
-    }
-    const testid = el.getAttribute('data-testid')
-    const cls = (el.getAttribute('class') ?? '').split(/\s+/).filter(Boolean).slice(0, 2).join('.')
-    return [
-      el.tagName.toLowerCase(),
-      testid ? `[${testid}]` : '',
-      cls ? `.${cls}` : '',
-    ].join('')
-  }
-
   new MutationObserver(records => {
     const t = performance.now()
     for (const r of records) {
@@ -191,22 +176,33 @@ await page.evaluate(() => {
         // difference between a remount loop and a re-render that clears the
         // bitmap, and only childList records can tell them apart.
         if (r.type === 'childList') {
-          const names = (list: NodeList, sign: string) =>
-            [...list]
-              .filter(n => n.nodeType === 1)
-              .map(n => `${sign}${(n as Element).tagName.toLowerCase()}`)
           const moved = [
-            ...names(r.addedNodes, '+'),
-            ...names(r.removedNodes, '-'),
+            ...[...r.addedNodes]
+              .filter(n => n.nodeType === 1)
+              .map(n => `+${(n as Element).tagName.toLowerCase()}`),
+            ...[...r.removedNodes]
+              .filter(n => n.nodeType === 1)
+              .map(n => `-${(n as Element).tagName.toLowerCase()}`),
           ]
           if (moved.length) {
             attr = moved.join(' ')
           }
         }
+        const el = r.target.nodeType === 1 ? (r.target as Element) : r.target.parentElement
+        let target = String(r.target.nodeName)
+        if (el) {
+          const testid = el.getAttribute('data-testid')
+          const cls = (el.getAttribute('class') ?? '').split(/\s+/).filter(Boolean).slice(0, 2).join('.')
+          target = [
+            el.tagName.toLowerCase(),
+            testid ? `[${testid}]` : '',
+            cls ? `.${cls}` : '',
+          ].join('')
+        }
         w.__diag.muts.push({
           t,
           type: r.type,
-          target: describe(r.target),
+          target,
           attr,
         })
       }
@@ -248,14 +244,12 @@ await page.evaluate(() => {
   const w = window as unknown as {
     __state: { t: number; v: string }[]
     __diag: { t0: number }
-    JBrowseSession: { views: Record<string, unknown>[] }
+    JBrowseSession?: { views?: Record<string, unknown>[] }
   }
   w.__state = []
   let last = ''
   setInterval(() => {
-    const v = w.JBrowseSession?.views?.[0] as
-      | Record<string, unknown>
-      | undefined
+    const v = w.JBrowseSession?.views?.[0]
     if (!v) {
       return
     }
@@ -300,7 +294,6 @@ const diag = await page.evaluate(() => {
   const w = window as unknown as {
     __diag: { t0: number; draws: number[]; muts: Mutation[] }
   }
-  type Mutation = { t: number; type: string; target: string; attr: string | null }
   const d = w.__diag
   return {
     draws: d.draws.map(t => Math.round(t - d.t0)),
@@ -346,7 +339,7 @@ for (const m of diag.muts) {
   const b = Math.floor(m.t / 100) * 100
   buckets.set(b, (buckets.get(b) ?? 0) + 1)
 }
-for (const [b, n] of [...buckets].sort((a, x) => a[0] - x[0])) {
+for (const [b, n] of [...buckets].toSorted((a, x) => a[0] - x[0])) {
   console.log(`${String(b).padStart(5)} ms  ${'#'.repeat(Math.min(60, n))} ${n}`)
 }
 
@@ -384,7 +377,7 @@ for (const m of diag.muts) {
   }
   late.set(key, e)
 }
-for (const [k, e] of [...late].sort((a, x) => x[1].n - a[1].n).slice(0, 20)) {
+for (const [k, e] of [...late].toSorted((a, x) => x[1].n - a[1].n).slice(0, 20)) {
   console.log(
     `${String(e.n).padStart(5)}x  ${e.first}-${e.last} ms  ${k}${e.attrs.size ? ` {${[...e.attrs].join(',')}}` : ''}`,
   )
@@ -398,7 +391,7 @@ if (process.env.TRACE_TIMERS === '1') {
     return Object.values(w.__timers).filter(t => t.fired > 0)
   })
   console.log('\n--- setInterval handlers that fired ---')
-  for (const t of timers.sort((a, b) => b.fired - a.fired).slice(0, 12)) {
+  for (const t of timers.toSorted((a, b) => b.fired - a.fired).slice(0, 12)) {
     console.log(`${String(t.fired).padStart(4)}x  every ${t.delay} ms  ${t.stack}`)
   }
 }

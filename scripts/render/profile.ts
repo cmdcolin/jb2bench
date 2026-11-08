@@ -42,7 +42,7 @@
 //
 // Usage: profile.ts <url> [screenshotPath]
 // Prints: a single floating-point millisecond value on stdout (or "FAIL").
-import puppeteer from 'puppeteer'
+import { launch } from 'puppeteer'
 // POLL_MS and STABLE_POLLS come from the detector that uses them: the elapsed
 // correction below subtracts the settle window, and a local copy that drifted
 // from the real one would quietly bias every timing in the table.
@@ -66,7 +66,7 @@ if (screenshotPath) {
   fs.mkdirSync(path.dirname(screenshotPath), { recursive: true })
 }
 
-const browser = await puppeteer.launch({
+const browser = await launch({
   headless: process.env.HEADLESS !== '0',
   // Every readiness poll is a CDP round trip now that the detector asks the
   // shared probe rather than a predicate serialized into the page, and puppeteer

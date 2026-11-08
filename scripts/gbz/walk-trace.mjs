@@ -1,4 +1,4 @@
-import puppeteer from 'puppeteer'
+import { launch } from 'puppeteer'
 // node walk-trace.mjs <8|all> <refName> <start> <end> [walkStepBudget|''] [layoutMode]
 // Opens a GraphGenomeView on the HPRC demo's walk-indexed track from a
 // cold cache, with the track's eight haplotypes or every one, and counts the
@@ -15,7 +15,7 @@ const dataPrefix = process.env.DATA_PREFIX ?? 'hprc-v2.1-mc-grch38.'
 const build = 'https://jbrowse.org/code/jb2/main/'
 const config = 'https://jbrowse.org/demos/hprc/config.json'
 const url = `${build}?config=${encodeURIComponent(config)}`
-const browser = await puppeteer.launch({ headless: true, executablePath: '/usr/bin/google-chrome', args: ['--no-sandbox'] })
+const browser = await launch({ headless: true, executablePath: '/usr/bin/google-chrome', args: ['--no-sandbox'] })
 const page = await browser.newPage()
 await page.setViewport({ width: 1600, height: 1000 })
 const net = { req: 0, bytes: 0, urls: {} }
@@ -37,11 +37,10 @@ const watch = c => {
 const pc = await page.createCDPSession()
 await pc.send('Network.enable')
 watch(pc)
-page.on('workercreated', async w => {
-  try {
-    await w.client.send('Network.enable')
+page.on('workercreated', w => {
+  w.client.send('Network.enable').then(() => {
     watch(w.client)
-  } catch {}
+  }).catch(() => {})
 })
 await page.goto(url, { waitUntil: 'domcontentloaded' })
 await page.waitForFunction(() => !!window.JBrowseSession, { timeout: 120000 })
@@ -52,45 +51,45 @@ await page.waitForFunction(
 const version = (await (await fetch(`${build}version.txt`)).text()).trim()
 const t0 = Date.now()
 const viewId = await page.evaluate(
-  ({ trackId, haplotypes, budget, layoutMode, region }) => {
+  ({ trackId: id, haplotypes: haps, budget: stepBudget, layoutMode: mode, region }) => {
     const session = window.JBrowseSession
-    const snap = JSON.parse(JSON.stringify(session.tracks.find(t => t.trackId === trackId)))
+    const snap = JSON.parse(JSON.stringify(session.tracks.find(t => t.trackId === id)))
     const lanes = snap.adapter.defaultHaplotypes ?? snap.assemblyNames.slice(1)
-    let loadedTrackId = trackId
-    if (budget) {
-      loadedTrackId = `${trackId}_budget`
-      session.addTrackConf({ ...snap, trackId: loadedTrackId, adapter: { ...snap.adapter, walkStepBudget: +budget } })
+    let loadedTrackId = id
+    if (stepBudget) {
+      loadedTrackId = `${id}_budget`
+      session.addTrackConf({ ...snap, trackId: loadedTrackId, adapter: { ...snap.adapter, walkStepBudget: +stepBudget } })
     }
     return session.addView('GraphGenomeView', {
       loadedTrackId,
       loadedRegion: region,
       // [] is the display's "every haplotype" state; unset would follow defaultHaplotypes
-      subgraphHaplotypes: haplotypes === 'all' ? [] : lanes,
-      ...(layoutMode ? { layoutMode } : {}),
+      subgraphHaplotypes: haps === 'all' ? [] : lanes,
+      ...(mode ? { layoutMode: mode } : {}),
     }).id
   },
   { trackId, haplotypes, budget, layoutMode, region: { assemblyName: 'hg38', refName, start: +start, end: +end } },
 )
 const state = id => {
-  const v = window.JBrowseSession.views.find(v => v.id === id)
-  return { cut: !!v?.hasGraph, drawn: !!v?.hasGraph && !!(v.layoutResult || v.walkRowBars) && v.geometryPainted, error: v?.error !== undefined }
+  const v = window.JBrowseSession.views.find(x => x.id === id)
+  return { cut: !!v?.hasGraph, drawn: !!v?.hasGraph && (!!v.layoutResult || !!v.walkRowBars) && v.geometryPainted, error: v?.error !== undefined }
 }
 await page.waitForFunction(id => {
-  const v = window.JBrowseSession.views.find(v => v.id === id)
-  return !!v && (v.hasGraph || v.error !== undefined)
+  const v = window.JBrowseSession.views.find(x => x.id === id)
+  return !!v && (!!v.hasGraph || v.error !== undefined)
 }, { timeout: 300000 }, viewId)
 const cutMs = Date.now() - t0
 const netAtCut = { requests: net.req, MB: +(net.bytes / 1e6).toFixed(2) }
 let drawnMs = null
 try {
   await page.waitForFunction(id => {
-    const v = window.JBrowseSession.views.find(v => v.id === id)
-    return (v.hasGraph && (v.layoutResult || v.walkRowBars) && v.geometryPainted) || v.error !== undefined
+    const v = window.JBrowseSession.views.find(x => x.id === id)
+    return (!!v.hasGraph && (!!v.layoutResult || !!v.walkRowBars) && !!v.geometryPainted) || v.error !== undefined
   }, { timeout: 300000 }, viewId)
   if ((await page.evaluate(state, viewId)).drawn) drawnMs = Date.now() - t0
 } catch {}
 const view = await page.evaluate(id => {
-  const v = window.JBrowseSession.views.find(v => v.id === id)
+  const v = window.JBrowseSession.views.find(x => x.id === id)
   return {
     layoutMode: v.chosenLayoutMode,
     nodes: v.nodeCount,

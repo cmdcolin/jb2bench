@@ -48,11 +48,7 @@ console.log(`matrix ${binPath.split('/').pop()}: ${rows} x ${cols}   impl ${IMPL
 
 // A prefix of the rows, as plain arrays — the shape greenelab's API takes.
 function subsample(n) {
-  const out = new Array(n)
-  for (let i = 0; i < n; i++) {
-    out[i] = Array.from(values.subarray(i * cols, (i + 1) * cols))
-  }
-  return out
+  return Array.from({ length: n }, (_, i) => Array.from(values.subarray(i * cols, (i + 1) * cols)))
 }
 
 const results = []

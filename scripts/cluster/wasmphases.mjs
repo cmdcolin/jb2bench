@@ -25,16 +25,12 @@ const cols = buf.readUInt32LE(4)
 const values = new Float32Array(buf.buffer, buf.byteOffset + 8, rows * cols)
 const n = Math.min(N, rows)
 
-const data = new Array(n)
-for (let i = 0; i < n; i++) {
-  data[i] = Array.from(values.subarray(i * cols, (i + 1) * cols))
-}
+const data = Array.from({ length: n }, (_, i) => Array.from(values.subarray(i * cols, (i + 1) * cols)))
 
 // First call in a fresh process is the one a user waits on: V8 promotes a wasm
 // function out of its baseline tier on call count with no on-stack replacement,
 // so a best-of-N in one process hides it (CLUSTERING_WORKFLOW.md).
-let firstDistanceEnd = 0
-let seenClustering = false
+const clusteringAt = []
 const t0 = performance.now()
 // AWAITED: clusterData is async (the wasm module is instantiated inside it).
 // Left un-awaited it returns a pending promise in ~2 ms having emitted only
@@ -43,16 +39,16 @@ const t0 = performance.now()
 await clusterData({
   data,
   onProgress: p => {
-    if (p.phase === 'clustering' && !seenClustering) {
-      seenClustering = true
-      firstDistanceEnd = performance.now()
+    if (p.phase === 'clustering' && clusteringAt.length === 0) {
+      clusteringAt.push(performance.now())
     }
   },
 })
 const t2 = performance.now()
 
-const distanceMs = seenClustering ? firstDistanceEnd - t0 : NaN
-const clusterMs = seenClustering ? t2 - firstDistanceEnd : NaN
+const firstDistanceEnd = clusteringAt[0]
+const distanceMs = firstDistanceEnd === undefined ? NaN : firstDistanceEnd - t0
+const clusterMs = firstDistanceEnd === undefined ? NaN : t2 - firstDistanceEnd
 const out = {
   matrix: binPath.split('/').pop(), n, v: cols,
   distanceMs: +distanceMs.toFixed(1),

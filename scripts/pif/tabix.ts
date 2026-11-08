@@ -73,7 +73,7 @@ export function readTabix(tbi: Buffer): RefSpan[] {
  * makes the prefixes sum to more than the file.
  */
 export function unionBytes(chunks: [number, number][]): number {
-  const sorted = [...chunks].sort((a, b) => a[0] - b[0])
+  const sorted = [...chunks].toSorted((a, b) => a[0] - b[0])
   let total = 0
   let lo = -1
   let hi = -1

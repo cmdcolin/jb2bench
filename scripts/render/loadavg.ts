@@ -203,7 +203,7 @@ export function foreignNow(windowMs = 1000) {
   const spent = [...b]
     .map(([pid, cpu]) => [pid, Math.max(0, cpu - (a.get(pid) ?? 0)) / wall] as const)
     .filter(([, cores]) => cores > 0.01)
-    .sort((x, y) => y[1] - x[1])
+    .toSorted((x, y) => y[1] - x[1])
   return {
     cores: spent.reduce((t, [, c]) => t + c, 0),
     top: spent
@@ -271,7 +271,9 @@ export function watchForeignCpu() {
         // A sampler that has died must not hang the run: report zero
         // contamination rather than blocking, and let the cell stand on the
         // load average beside it.
-        const bail = setTimeout(() => resolve([]), 5000)
+        const bail = setTimeout(() => {
+          resolve([])
+        }, 5000)
         worker.once('message', (m: [number, number, string][]) => {
           clearTimeout(bail)
           resolve(m)
@@ -305,7 +307,7 @@ export function outliers<T>(
   cells: { key: string; load: LoadWindow; value: T }[],
   factor = 2,
 ) {
-  const peaks = [...cells.map(c => peak(c.load))].sort((a, b) => a - b)
+  const peaks = cells.map(c => peak(c.load)).toSorted((a, b) => a - b)
   const med = peaks[Math.floor(peaks.length / 2)] ?? Number.NaN
   return {
     medianLoad: med,

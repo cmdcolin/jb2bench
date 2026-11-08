@@ -125,7 +125,11 @@ export async function drewCheck(
       return { canvases: canvases.length, painted }
     })
     const { declared, records } = await page.evaluate(() => {
-      const w = window as Record<string, any>
+      const w = window as unknown as {
+        __igvState?: { error?: string | null }
+        __gsState?: { error?: string | null }
+        __goslingState?: { error?: string | null; records?: unknown }
+      }
       const n = w.__goslingState?.records
       return {
         declared:

@@ -9,7 +9,7 @@ import path from 'path'
 import { SourceMapConsumer } from 'source-map'
 
 const file = process.argv[2]
-const jsDir = process.argv[3]
+const jsDir = process.argv[3] ?? ''
 const topN = Number.parseInt(process.argv[4] ?? '15', 10)
 if (!file || !jsDir) {
   throw new Error('usage: resolve.ts <file.cpuprofile> <static/js dir> [topN]')
@@ -49,7 +49,7 @@ for (let i = 0; i < prof.samples.length; i++) {
 }
 
 const top = [...selfUs.entries()]
-  .sort((a, b) => b[1] - a[1])
+  .toSorted((a, b) => b[1] - a[1])
   .slice(0, topN)
 
 const consumers = new Map<string, SourceMapConsumer | null>()
