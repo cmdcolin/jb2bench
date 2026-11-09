@@ -407,28 +407,28 @@ const stddev = (a: number[]) => {
 }
 
 /**
- * The paint ceiling, in ms: two minutes, at every window.
+ * The paint ceiling, in ms: ten minutes at the 100 kb window and two minutes at
+ * the others.
  *
- * It was proportional to the window until 2026-09-06 — 120 s at 19 kb rising to
- * a capped 900 s at 1 Mb — on the reasoning that a wider window holds more reads
- * and a flat ceiling would redefine what a FAIL means between rows. What that
- * actually bought was hours of waiting for arms that were never going to settle:
- * two failures at 900 s is half an hour spent on one cell of one arm to learn
- * one bit. Two minutes is above every number this benchmark has ever recorded
- * except the censored ones, so nothing that settles is lost, and an arm that
- * needs longer is reported as needing longer.
+ * It was proportional to the window until 2026-09-06, rising to a capped 900 s at
+ * 1 Mb, and then two minutes everywhere, because two failures at 900 s is half an
+ * hour spent on one cell of one arm to learn one bit. Two minutes turned out to
+ * sit inside the paper's own figure at 100 kb: on 2026-11-09 igv.js took 114-118 s
+ * at 1000x short read and GenomeSpy more than 120 s at 200x long read, both of
+ * which the submitted paper plotted as times under its ten-minute ceiling. So
+ * 100 kb gets ten minutes back, and 19 kb and 1 Mb keep two.
  *
- * Each cell stores the ceiling it was judged against, so rows recorded under the
- * old scaling still print their own `>632s` or `>900s` rather than being
- * relabelled by this constant.
+ * Each cell stores the ceiling it was judged against, so rows recorded under an
+ * older ceiling still print their own `>632s` or `>900s`.
  *
  * It is a ceiling and not a cost: a cell that settles in two seconds still takes
  * two seconds. Only a cell that cannot settle pays it, which is why `FAIL_LIMIT`
- * exists. MAX_WAIT in the environment overrides, for a run that wants to give a
- * slow arm its head.
+ * exists. MAX_WAIT in the environment overrides at every window.
  */
 const CEILING_MS = 120000
-const ceilingFor = (_w: Window) => Number(process.env.MAX_WAIT ?? CEILING_MS)
+const CEILING_100KB_MS = 600000
+const ceilingFor = (w: Window) =>
+  Number(process.env.MAX_WAIT ?? (w.id === '100kb' ? CEILING_100KB_MS : CEILING_MS))
 
 /**
  * How many times an arm may fail a cell before the runner stops asking.
@@ -910,7 +910,7 @@ lines.push(
 )
 lines.push('')
 lines.push(
-  `Median of ${RUNS} runs after ${WARMUP} warmup, tools interleaved within each round. A blank cell was not measured in the run that produced its row; \`n/a\` is a capability limit named in the list above, and an arm holding one is dropped from the interleaving rather than timed on a page it cannot draw. \`>Ns\` is an arm that failed to settle within the paint ceiling ${FAIL_LIMIT} times and was abandoned for that cell — a result about the tool at that width, not a gap in the run. The ceiling is ${(CEILING_MS / 1000).toFixed(0)}s at every window, and each cell carries the ceiling it was judged against, so a row recorded under the older per-window ceilings still prints the one it actually got.`,
+  `Median of ${RUNS} runs after ${WARMUP} warmup, tools interleaved within each round. A blank cell was not measured in the run that produced its row; \`n/a\` is a capability limit named in the list above, and an arm holding one is dropped from the interleaving rather than timed on a page it cannot draw. \`>Ns\` is an arm that failed to settle within the paint ceiling ${FAIL_LIMIT} times and was abandoned for that cell — a result about the tool at that width, not a gap in the run. The ceiling is ${(CEILING_100KB_MS / 1000).toFixed(0)}s at 100 kb and ${(CEILING_MS / 1000).toFixed(0)}s at the other windows, and each cell carries the ceiling it was judged against, so a row recorded under the older per-window ceilings still prints the one it actually got.`,
 )
 lines.push('')
 lines.push(
