@@ -109,15 +109,17 @@ time_scale_x <- function(name = "time", breaks = TIME_BREAKS, ...) {
 # release to newest and then the other tools, which is the order a reader walks
 # them in. Shared because the cold-load and interaction figures are separate
 # scripts that both draw "This work" and must agree on its colour.
-GENOMESPY <- local({
-  g <- unique(grep("^GenomeSpy [0-9]", read.csv("results/paper/perf.csv")$series,
-                   value = TRUE))
-  stopifnot(length(g) == 1)
-  g
-})
+newest_series <- function(pattern) {
+  s <- unique(grep(pattern, read.csv("results/paper/perf.csv")$series, value = TRUE))
+  stopifnot(length(s) >= 1)
+  v <- package_version(sub("^\\S+ ", "", s))
+  s[as.character(v) == as.character(max(v))]
+}
+GENOMESPY <- newest_series("^GenomeSpy [0-9.]+$")
+IGV <- newest_series("^igv\\.js [0-9.]+$")
 PERF_SERIES <- c("Release 2.4.0", "Release 4.1.15", "Release 4.3.0",
                  "This work", "This work, canvas backend",
-                 "igv.js 3.8.5", GENOMESPY)
+                 IGV, GENOMESPY)
 # Named, because ggplot's default hue palette is spaced by level count: a
 # seventh series moved every colour after it on every figure. The six original
 # series keep hue_pal()(6); a series added later takes a colour of its own.

@@ -155,9 +155,11 @@
   <body>
     <div id="gs"></div>
     <script type="module">
-      import { embed } from './genomespy/index.es.js'
-
       const params = new URLSearchParams(location.search)
+      const gsVersion = params.get('gs')
+      const { embed } = await import(
+        gsVersion ? `./genomespy-${gsVersion}/index.es.js` : './genomespy/index.es.js'
+      )
       const track = params.get('track') ?? '20x.shortread.bam'
       const locus = params.get('loc') ?? 'chr22_mask:124000-143000'
 

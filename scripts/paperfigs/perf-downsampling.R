@@ -37,17 +37,16 @@ suppressPackageStartupMessages({
 })
 source("scripts/paperfigs/common.R")
 
-DRAWN <- c("igv.js 3.8.5", "igv.js 3.8.5, no downsampling")
+DRAWN <- c(IGV, paste0(IGV, ", no downsampling"))
 
 # A local palette rather than PERF_SERIES: that list is sized to the series
 # every headline figure shares, and ggplot's default hue palette is spaced by
 # level COUNT, not by name -- adding this control arm as a seventh level shifted
 # every colour after it (Release 4.3.0 on down) on every figure that still
-# shares the list. "igv.js 3.8.5" keeps the blue it has everywhere else
+# shares the list. igv.js keeps the blue it has everywhere else
 # (hue_pal()(6)[5], the colour PERF_SERIES already gives it); the control gets
 # its own colour because it is never drawn beside anything PERF_SERIES orders.
-DOWNSAMPLING_COLOURS <- c("igv.js 3.8.5" = "#619CFF",
-                         "igv.js 3.8.5, no downsampling" = "#D55E00")
+DOWNSAMPLING_COLOURS <- setNames(c("#619CFF", "#D55E00"), DRAWN)
 
 all <- read.csv("results/paper/perf.csv", stringsAsFactors = FALSE)
 all <- subset(all, panel == "Cold load" & session == "cross-tool" &
@@ -72,7 +71,7 @@ CELL <- c("reads", "window")
 # answers is whether turning downsampling off moves igv, not how either compares
 # to this build. A ratio near 1x is the answer "no"; nothing on
 # perf-coldload.pdf changes because of what this figure shows either way.
-labels <- coldload_labels(d, meas, CELL, reference = "igv.js 3.8.5")
+labels <- coldload_labels(d, meas, CELL, reference = IGV)
 
 note <- if (nrow(dropped)) {
   geom_text(data = dropped, label = "gap: cell measured under external load",

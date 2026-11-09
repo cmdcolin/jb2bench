@@ -16,7 +16,7 @@ suppressPackageStartupMessages({
 })
 source("scripts/paperfigs/common.R")
 
-DRAWN <- c("Release 2.4.0", "This work", "igv.js 3.8.5", GENOMESPY)
+DRAWN <- c("Release 2.4.0", "This work", IGV, GENOMESPY)
 WINDOWS <- c("19kb" = "19 kb", "100kb" = "100 kb", "1mb" = "1 Mb")
 
 cells <- read.csv("results/paper/perf.csv", stringsAsFactors = FALSE)
@@ -96,8 +96,8 @@ rows <- rows[order(match(rows$window, names(WINDOWS)),
                    rows$coverage, rows$format), ]
 series_cols <- intersect(PERF_SERIES, DRAWN)
 
-COLUMN <- c("Release 2.4.0" = "v2.4.0", "This work" = "v5.0.0",
-            "igv.js 3.8.5" = "igv.js")
+COLUMN <- c("Release 2.4.0" = "v2.4.0", "This work" = "v5.0.0")
+COLUMN[[IGV]] <- "igv.js"
 COLUMN[[GENOMESPY]] <- "GenomeSpy"
 
 line_for <- function(i) {

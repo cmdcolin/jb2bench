@@ -252,19 +252,30 @@ if (length(gs_versions) != 1) {
   stop("the cross-tool results record GenomeSpy ", paste(gs_versions, collapse = " and "),
        "; one figure set cannot carry both")
 }
+igv_versions <- unique(c(
+  read_results("crosstool.json")$igvVersion %||% "3.8.5",
+  read_results("crosstool-zoom.json")$igvVersion %||% "3.8.5",
+  read_results("crosstool-pan.json")$igvVersion %||% "3.8.5"))
+if (length(igv_versions) != 1) {
+  stop("the cross-tool results record igv.js ", paste(igv_versions, collapse = " and "),
+       "; one figure set cannot carry both")
+}
+IGV <- paste("igv.js", igv_versions)
 xt_builds <- c("jbrowse" = "This work",
                "jbrowse-release-4.3.0" = "Release 4.3.0",
                "jbrowse-release-2.4.0" = "Release 2.4.0",
-               "igv" = "igv.js 3.8.5",
+               "igv" = IGV,
+               "igv-3.8.5" = "igv.js 3.8.5",
                "genomespy" = paste("GenomeSpy", gs_versions),
+               "genomespy-0.85.0" = "GenomeSpy 0.85.0",
                "gosling" = "Gosling 1.0.7")
 # The downsampling control, added to the cold-load extraction only. It is not a
 # comparator -- it exists to check whether igv's default samplingDepth is what
 # makes it fast -- and the zoom/pan motion loop below shares `xt_builds` with no
 # DRAWN filter of its own, so folding it into the shared vector put a seventh,
 # uncaptioned line on perf-crosstool-zoom.pdf the first time this was tried.
-xt_builds_cold <- c(xt_builds, "igv-deep" = "igv.js 3.8.5, no downsampling",
-                    "igv-tall" = "igv.js 3.8.5, every row")
+xt_builds_cold <- c(xt_builds, "igv-deep" = paste0(IGV, ", no downsampling"),
+                    "igv-tall" = paste0(IGV, ", every row"))
 # Both formats: the version sweep above is BAM-only because that reader has
 # always meant BAM, but cross-tool's own JSON keys every case by format
 # already, so the only change here is not throwing CRAM's half away.

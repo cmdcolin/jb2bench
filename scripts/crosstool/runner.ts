@@ -147,6 +147,12 @@ const allTools: Tool[] = [
     url: (t, w) => `http://localhost:${IGV_PORT}/?loc=${w.loc}&track=${t}&ref=${w.scale.assembly}`,
   },
   {
+    id: 'igv-3.8.5',
+    label: 'igv.js 3.8.5',
+    url: (t, w) =>
+      `http://localhost:${IGV_PORT}/?loc=${w.loc}&track=${t}&ref=${w.scale.assembly}&igv=3.8.5`,
+  },
+  {
     id: 'igv-deep',
     label: `igv.js ${igvVersion}, no downsampling`,
     url: (t, w) =>
@@ -206,6 +212,14 @@ const allTools: Tool[] = [
     url: (t, w) =>
       `http://localhost:${CROSSTOOL_PORT}/genomespy.html?loc=${w.loc}&track=${t}` +
       `&ref=${w.scale.assembly}&size=${contigSize(w)}`,
+  },
+  {
+    id: 'genomespy-0.85.0',
+    label: 'GenomeSpy 0.85.0',
+    formats: ['bam'],
+    url: (t, w) =>
+      `http://localhost:${CROSSTOOL_PORT}/genomespy.html?loc=${w.loc}&track=${t}` +
+      `&ref=${w.scale.assembly}&size=${contigSize(w)}&gs=0.85.0`,
   },
   {
     // Gosling, on the same BAM through its own `bam` fetcher and its
@@ -534,6 +548,17 @@ const recordedGs = prior.gsVersion ?? '0.85.0'
 if (Object.values(prior.rows).some(r => r.genomespy) && recordedGs !== gsVersion) {
   console.error(
     `${RESULTS} holds GenomeSpy ${recordedGs} cells and ${gsVersion} is installed; ` +
+      'archive the results files before measuring a new version',
+  )
+  process.exit(1)
+}
+const igvArms = ['igv', 'igv-deep', 'igv-tall', 'igv-h300', 'igv-h600ctl'] as const
+if (
+  Object.values(prior.rows).some(r => igvArms.some(a => a in r)) &&
+  prior.igvVersion !== igvVersion
+) {
+  console.error(
+    `${RESULTS} holds igv.js ${prior.igvVersion} cells and ${igvVersion} is installed; ` +
       'archive the results files before measuring a new version',
   )
   process.exit(1)

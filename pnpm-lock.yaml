@@ -9,8 +9,11 @@ importers:
   .:
     dependencies:
       '@genome-spy/core':
-        specifier: 1.0.0
-        version: 1.0.0(buffer@6.0.3)
+        specifier: 1.3.0
+        version: 1.3.0(buffer@6.0.3)
+      '@genome-spy/core-0.85.0':
+        specifier: npm:@genome-spy/core@0.85.0
+        version: '@genome-spy/core@0.85.0(buffer@6.0.3)'
       '@gmod/bbi':
         specifier: ^12.2.0
         version: 12.2.0
@@ -27,8 +30,8 @@ importers:
         specifier: ^14.1.0
         version: 14.1.1(debug@4.4.3(supports-color@7.2.0))(supports-color@7.2.0)
       igv:
-        specifier: 3.8.5
-        version: 3.8.5
+        specifier: 3.8.10
+        version: 3.8.10
       pixi.js:
         specifier: ^6.5.10
         version: 6.5.10
@@ -246,8 +249,15 @@ packages:
     cpu: [x64]
     os: [win32]
 
-  '@genome-spy/core@1.0.0':
-    resolution: {integrity: sha512-wu3V609y6PT9aX7XiQ15jXYiHiZ9xfhfnIq7y6vVqFvepARdexdXzpAeOGwrjcFN2S4V9qf25Fd5el6kQPER1A==}
+  '@genome-spy/core@0.85.0':
+    resolution: {integrity: sha512-1V9oSpq5JNauHMZp/DqczJTPcoBwCwaxfc2hSX4EM9oz9S0aH8FsT6MvyWTGr6KQvu24vxQzVATXB7lLpRLG/Q==}
+
+  '@genome-spy/core@1.3.0':
+    resolution: {integrity: sha512-Sq6EOhvkduxbMEV1gT9qy2GV9X8c6yauvPN67qpQ/8MA1sQUArRDuZ1ZI7NtKSgDAwN7Dq6pqRss/ET9GCpK2A==}
+
+  '@genome-spy/figwig@0.3.0':
+    resolution: {integrity: sha512-8xCrLGj2677PM7rZVD7H1cZ8TRGAFvxUEf1nWHN2Qg+qgKCs+JmWT+i2cWDWIn44mWfBt3KRigm1r8e50Qh5Tg==}
+    engines: {node: '>=22'}
 
   '@gmod/abortable-promise-cache@2.0.1':
     resolution: {integrity: sha512-6PQTJv+uxAb8XE/oL2Uh4EmFJpn65YOTSqGn8HLNXrWRlW1Clp1Oze6biHeRCMonLwEx4oH4bPeyjdcMnNP8pw==}
@@ -279,9 +289,6 @@ packages:
     resolution: {integrity: sha512-3f4mvW0ov7rFip2TQneZJsYiQN6Be0M3ET+k4DS0Mc4GIJJblKARbY4lFt2pT5fpgOmrL55/8A0qwGawKwQN+Q==}
     engines: {node: '>=6'}
 
-  '@gmod/bgzf-filehandle@6.3.2':
-    resolution: {integrity: sha512-ZgVK7PGUMOByRQn5inARjcz2fSOH1hyIidPj1TBmPZVwVrIXeigHW6rAIs/U8UkxV0c8Xez2D14HGnF3uiq4UQ==}
-
   '@gmod/bgzf-filehandle@6.8.4':
     resolution: {integrity: sha512-eN3yOAfij5xTKARWFSAn61byFyRWjU5XQSvpm0+C7tptxHOGi/t0xMZt5V1/Lf4VxRT2By5yUu3RtBiG+oP0LA==}
 
@@ -291,6 +298,9 @@ packages:
 
   '@gmod/indexedfasta@5.0.9':
     resolution: {integrity: sha512-VQfHmZQ/K2nJKKQPLzAQFYV/BaXpXVlMhayi4UMlVRMdtsuQdlbMsz0sXZiWy+kE0Liqu7i44L/SvhI+gDZBdw==}
+
+  '@gmod/shared-read-cache@1.7.2':
+    resolution: {integrity: sha512-N71dzJHYYSEAZYQCl38QGZ8cx468lFZE9VdS29N2DhRbKMf/X7Qb+cJsuIt1MeVDmpvKui5wDiNILgkQREpwlw==}
 
   '@gmod/shared-read-cache@2.1.0':
     resolution: {integrity: sha512-AyiUt0hiEGl7lWc1fuigbXR/RToIw3h72dalaRoSNau9WL9ux9rEfkcsXDYTgSDudehfAEQac1jTvn2zrfnELQ==}
@@ -305,6 +315,9 @@ packages:
   '@gmod/tabix@3.2.2':
     resolution: {integrity: sha512-lQQCuanjsnVNzH9n21LTMGykvRbpLbEQk3AL+aKnjf72gfV07mLZ116gtvDFu5huxbxWialOHGGC7iJAQDEi5Q==}
     engines: {node: '>=6'}
+
+  '@gmod/tabix@3.9.1':
+    resolution: {integrity: sha512-RaiSL3O4eclLOYaoHkkqdpr0EfhwmmGPj5xdbmsNNItdVlpnEM4lJ1dRzl26nFYVodEJSv+Krqr/5hWxMy1Q6w==}
 
   '@gmod/vcf@5.0.10':
     resolution: {integrity: sha512-o7QuPcOeXlJpzwQaFmgojhNvJE4yB9fhrfVEDKpkDjV27pAqwMy89367vtXu4JfBFE9t4zZ6sQRkqYaJ+cIheg==}
@@ -1543,6 +1556,7 @@ packages:
 
   gff-nostream@3.0.11:
     resolution: {integrity: sha512-2JjwPuWJOsUcYh+aNMVDNrbF3+Nikb6zMNpDXx9Rtg+pxc6tl5MBp2q5Oomjcc+hDvANNJlmFgcqcQYP5oXYMA==}
+    deprecated: Renamed to @gmod/gff-nostream
 
   gopd@1.2.0:
     resolution: {integrity: sha512-ZUKRh6/kUFoAiTAtTYPZJ3hw9wNxx+BIBOijnlG9PnrJsCcSjs1wyyD6vJpaYtgnzDrKYRSqf3OO6Rfa93xsRg==}
@@ -1624,8 +1638,8 @@ packages:
   ieee754@1.2.1:
     resolution: {integrity: sha512-dcyqhDvX1C46lXZcVqCpK+FtMRQVdIMN6/Df5js2zouUsqG7I6sFxitIC+7KYK29KdXOLHdu9zL4sFnoVQnqaA==}
 
-  igv@3.8.5:
-    resolution: {integrity: sha512-Tdt0+z0DlQULSPByZG4wm3CeF4VzI+WehEKUyPTsT8W+EhRVV8VVlIZA5U+OXl9mVRMOL444qvN7w4IZJaW9Xw==}
+  igv@3.8.10:
+    resolution: {integrity: sha512-foqT9SJHoKvVXl7euYUsOy7XMs1nTrPeJMQbGRp7qWU7a6HzF345FER/nHUTdsL5cumaoAe19gDmJYsEHO08rw==}
 
   import-fresh@3.3.1:
     resolution: {integrity: sha512-TR3KfrTZTYLPB6jUjfx6MF9WcWrHL9su5TObK4ZkYgBdWKPOFoSoQIdEuTuR82pmtxH2spWG9h6etwfr1pLBqQ==}
@@ -2474,7 +2488,7 @@ snapshots:
   '@esbuild/win32-x64@0.28.2':
     optional: true
 
-  '@genome-spy/core@1.0.0(buffer@6.0.3)':
+  '@genome-spy/core@0.85.0(buffer@6.0.3)':
     dependencies:
       '@gmod/bam': 7.9.1(buffer@6.0.3)
       '@gmod/bbi': 9.3.3
@@ -2509,6 +2523,48 @@ snapshots:
     transitivePeerDependencies:
       - buffer
 
+  '@genome-spy/core@1.3.0(buffer@6.0.3)':
+    dependencies:
+      '@genome-spy/figwig': 0.3.0
+      '@gmod/bam': 7.9.1(buffer@6.0.3)
+      '@gmod/bbi': 9.3.3
+      '@gmod/bed': 2.2.9
+      '@gmod/indexedfasta': 5.0.9
+      '@gmod/tabix': 3.9.1
+      '@gmod/vcf': 7.1.0
+      '@types/d3-array': 3.2.2
+      '@types/d3-dsv': 3.0.7
+      '@types/d3-ease': 3.0.2
+      '@types/d3-format': 3.0.4
+      '@types/d3-interpolate': 3.0.4
+      '@types/d3-scale': 4.0.9
+      '@uwdata/flechette': 2.5.0
+      d3-array: 3.2.4
+      d3-color: 3.1.0
+      d3-dsv: 3.0.1
+      d3-ease: 3.0.1
+      d3-format: 3.1.2
+      events: 3.3.0
+      flatqueue: 3.1.0
+      generic-filehandle2: 2.5.1
+      gff-nostream: 3.0.11
+      hyparquet: 1.28.1
+      internmap: 2.0.3
+      lit: 3.3.3
+      twgl.js: 4.24.0
+      vega-expression: 6.2.1
+      vega-loader: 5.1.2
+      vega-scale: 8.1.2
+      vega-util: 2.1.0
+    transitivePeerDependencies:
+      - buffer
+
+  '@genome-spy/figwig@0.3.0':
+    dependencies:
+      '@gmod/shared-read-cache': 1.7.2
+      generic-filehandle2: 2.5.1
+      pako-esm2: 2.0.2
+
   '@gmod/abortable-promise-cache@2.0.1': {}
 
   '@gmod/abortable-promise-cache@3.0.4': {}
@@ -2528,7 +2584,7 @@ snapshots:
 
   '@gmod/bam@7.9.1(buffer@6.0.3)':
     dependencies:
-      '@gmod/bgzf-filehandle': 6.3.2
+      '@gmod/bgzf-filehandle': 6.8.4
       '@jbrowse/quick-lru': 7.3.5
       crc: 4.3.2(buffer@6.0.3)
       generic-filehandle2: 2.5.1
@@ -2564,11 +2620,6 @@ snapshots:
       long: 4.0.0
       pako: 1.0.11
 
-  '@gmod/bgzf-filehandle@6.3.2':
-    dependencies:
-      generic-filehandle2: 2.5.1
-      pako-esm2: 2.0.2
-
   '@gmod/bgzf-filehandle@6.8.4':
     dependencies:
       generic-filehandle2: 2.5.1
@@ -2580,9 +2631,11 @@ snapshots:
 
   '@gmod/indexedfasta@5.0.9':
     dependencies:
-      '@gmod/bgzf-filehandle': 6.3.2
+      '@gmod/bgzf-filehandle': 6.8.4
       '@jbrowse/quick-lru': 7.3.5
       generic-filehandle2: 2.5.1
+
+  '@gmod/shared-read-cache@1.7.2': {}
 
   '@gmod/shared-read-cache@2.1.0': {}
 
@@ -2604,8 +2657,15 @@ snapshots:
   '@gmod/tabix@3.2.2':
     dependencies:
       '@gmod/abortable-promise-cache': 3.0.4
-      '@gmod/bgzf-filehandle': 6.3.2
+      '@gmod/bgzf-filehandle': 6.8.4
       '@jbrowse/quick-lru': 7.3.5
+      generic-filehandle2: 2.5.1
+
+  '@gmod/tabix@3.9.1':
+    dependencies:
+      '@gmod/bgzf-filehandle': 6.8.4
+      '@gmod/shared-read-cache': 1.7.2
+      '@jbrowse/quick-lru': 8.0.0
       generic-filehandle2: 2.5.1
 
   '@gmod/vcf@5.0.10': {}
@@ -3825,7 +3885,7 @@ snapshots:
 
   ieee754@1.2.1: {}
 
-  igv@3.8.5: {}
+  igv@3.8.10: {}
 
   import-fresh@3.3.1:
     dependencies:

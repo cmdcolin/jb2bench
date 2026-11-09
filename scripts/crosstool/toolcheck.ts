@@ -36,7 +36,10 @@ const windows: Window[] = process.env.LOC
 // a recorded number, and a preflight that blocks every cross-tool run over an
 // arm nobody times is a preflight that gets deleted. Reach it with
 // `PAGES='gosling.html?bundle=gosling-patched.bundle.js'`.
-const pages = (process.env.PAGES ?? 'index.html,genomespy.html,gosling.html').split(',')
+const pages = (
+  process.env.PAGES ??
+  'index.html,index.html?igv=3.8.5,genomespy.html,genomespy.html?gs=0.85.0,gosling.html'
+).split(',')
 // Default tracks come from the WINDOW's corpus, since a window carries the
 // files it can be a window on: the two narrow ones get 20x and 200x of the
 // 250 kb contig, the 1 Mb one 20x and 100x of its own. `TRACKS=` still names

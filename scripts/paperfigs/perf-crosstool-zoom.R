@@ -104,9 +104,9 @@ d$measure <- factor(WAIT, levels = WAIT)
 ARCH <- c(
   "Release 2.4.0"    = "Release 2.4.0 \u2014 worker tiles, re-rasterized",
   "Release 4.1.15"   = "Release 4.1.15",
-  "This work"        = "This work \u2014 GPU, batched",
-  "igv.js 3.8.5"     = "igv.js 3.8.5 \u2014 2D canvas, per read"
+  "This work"        = "This work \u2014 GPU, batched"
 )
+ARCH[[IGV]] <- paste(IGV, "\u2014 2D canvas, per read")
 ARCH[[GENOMESPY]] <- paste(GENOMESPY, "\u2014 GPU")
 
 endpoints <- function(df) {
