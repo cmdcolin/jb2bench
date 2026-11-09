@@ -75,6 +75,18 @@ spread <- function(runs) {
   else c(lo = min(v), hi = max(v), sd = sd(v), n = length(v))
 }
 
+run_rows <- list()
+add_runs <- function(panel, case, series, session, format, window, metric,
+                     usable, runs) {
+  v <- unlist(runs)
+  if (length(v)) {
+    run_rows[[length(run_rows) + 1]] <<- data.frame(
+      panel = panel, case = case, series = series, session = session,
+      format = format, window = window, metric = metric, usable = usable,
+      run = seq_along(v), ms = v, stringsAsFactors = FALSE)
+  }
+}
+
 # `session` records which benchmark run a number came from, and it is what the
 # cold-load figure selects on. Cold load is measured twice, in two harnesses on
 # two dates: the version sweep interleaves four JBrowse builds, and the
@@ -95,6 +107,8 @@ add <- function(panel, case, series, ms, usable = TRUE, session = NA, format = "
   # the `@window` the cross-tool keys carry since 2026-08-29 -- is the label key.
   base <- sub("-(bam|cram)$", "", sub("@.*$", "", case))
   s <- spread(runs)
+  add_runs(panel, labels[match(base, READ_CASES)], series, session, format,
+           window, metric, usable, runs)
   rows[[length(rows) + 1]] <<- data.frame(
     panel = panel, case = labels[match(base, READ_CASES)],
     series = series, ms = ms, usable = usable, session = session, format = format,
@@ -324,6 +338,9 @@ for (base in names(WIDE_CASES)) {
       ms <- if (censored) arm$unsettled else arm$median
       if (is.null(ms)) next
       s <- spread(if (censored) NULL else arm$runs)
+      add_runs("Cold load", WIDE_CASES[[base]], xt_builds_cold[[b]], "cross-tool",
+               FORMATS[[fmt]], "1mb", NA, contention_ok(arm),
+               if (censored) NULL else arm$runs)
       rows[[length(rows) + 1]] <- data.frame(
         panel = "Cold load", case = WIDE_CASES[[base]], series = xt_builds_cold[[b]],
         ms = ms, usable = contention_ok(arm), session = "cross-tool",
@@ -433,6 +450,9 @@ out <- do.call(rbind, rows)
 out$case <- factor(out$case, levels = labels)
 dir.create("generated", showWarnings = FALSE)
 write.csv(out, "results/paper/perf.csv", row.names = FALSE)
+runs_out <- do.call(rbind, run_rows)
+write.csv(runs_out, "results/paper/perf-runs.csv", row.names = FALSE)
+cat("wrote results/paper/perf-runs.csv,", nrow(runs_out), "rows\n")
 
 # Memory at the end of each cold load, from runs recorded since 2026-11-03
 # (scripts/crosstool/memory.ts). Medians over the measured runs, in MB.

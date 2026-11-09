@@ -54,10 +54,19 @@ d <- subset(d, series != "Release 4.3.0")
 d$s <- d$ms / 1000
 
 d$coverage <- as.numeric(sub("x .*", "", d$case))
-d$lo_s <- d$lo / 1000
-d$hi_s <- d$hi / 1000
 d$reads <- factor(sub("^[0-9]+x ", "", d$case), levels = c("short read", "long read"))
 d$series <- factor(d$series, levels = PERF_SERIES)
+
+zoom_runs <- read.csv("results/paper/perf-runs.csv", stringsAsFactors = FALSE)
+zoom_runs <- subset(zoom_runs, session == "cross-tool motion" &
+                               panel == "Zoom in, both hold the data" &
+                               metric == "what the user waits" &
+                               series != "Release 4.3.0" & usable)
+zoom_runs$s <- zoom_runs$ms / 1000
+zoom_runs$coverage <- as.numeric(sub("x .*", "", zoom_runs$case))
+zoom_runs$reads <- factor(sub("^[0-9]+x ", "", zoom_runs$case),
+                          levels = c("short read", "long read"))
+zoom_runs$series <- factor(zoom_runs$series, levels = PERF_SERIES)
 
 # perf.csv carries two metrics per cell -- the wait, and the span of the final
 # burst of canvas draw calls inside it. This figure plots the wait only.
@@ -114,22 +123,8 @@ endpoints <- function(df) {
 zoom_panel <- function(df, ends, y_breaks) {
   ggplot(df, aes(x = coverage, y = s, colour = series)) +
     geom_line(linewidth = LINE_W) +
-    # The three runs behind each point, as their range.
-    #
-    # `geom_linerange` and not `geom_errorbar`, because an errorbar's cap width
-    # is measured in DATA space and this x axis is log10: a constant width draws
-    # a cap fifty times wider at 1000x than at 20x, and making it proportional
-    # (`width = coverage * k`) puts a width aesthetic into the scale's own
-    # training data and collapses the axis -- every point onto one x, every
-    # break label on top of the others. Capless is the honest trade: a cap is
-    # decoration, and the range on most of these cells is smaller than the
-    # marker anyway, which the caption says.
-    #
-    # `na.rm` because a cell whose plotted statistic has no per-run array
-    # recorded gets no bar -- see MOTION_RUNS in perf-data.R.
-    geom_linerange(aes(ymin = lo_s, ymax = hi_s),
-                   linewidth = 0.4, na.rm = TRUE, show.legend = FALSE) +
     geom_point(size = POINT_S, show.legend = FALSE) +
+    run_points(zoom_runs) +
     geom_text_repel(data = ends, aes(label = label), direction = "y",
                     nudge_x = ENDPOINT_NUDGE, hjust = 0, size = ENDPOINT_LABEL,
                     fontface = "bold", seed = REPEL_SEED, show.legend = FALSE,
@@ -192,9 +187,8 @@ cat("wrote results/figures/paper/png/perf-crosstool-zoom.png\n")
 #   step costs this work 18-20 batched WebGL calls and igv.js up to 882,597
 #   through the 2D API, which is the same fact stated in the units that cause
 #   it. GenomeSpy's long-read line stops at 200x: no 1000x step on that arm
-#   returned a usable measurement, and it reads no CRAM at all. Vertical bars
-#   are the range of the three runs behind each point and on most cells are
-#   shorter than the marker.
+#   returned a usable measurement, and it reads no CRAM at all. Small black
+#   dots are the individual runs.
 #
 # This figure was wrong until 2026-09-04 and the shape of the error is worth
 # keeping. It read a flat ~507 ms for this work at every coverage, and carried a

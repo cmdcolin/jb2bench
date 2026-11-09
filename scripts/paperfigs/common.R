@@ -128,6 +128,11 @@ perf_colour_scale <- function(...) {
   scale_colour_manual(values = PERF_COLOURS, drop = FALSE, ...)
 }
 
+run_points <- function(runs) {
+  geom_point(data = runs, colour = "black", size = 0.8, alpha = 0.6,
+             show.legend = FALSE)
+}
+
 # One type scale for every manuscript figure. The stock 11 pt base at 180 mm
 # printed labels at 6 pt, which is legible on paper and not on a screen or a
 # slide, where these figures are actually read.

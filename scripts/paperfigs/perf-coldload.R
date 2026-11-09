@@ -88,8 +88,16 @@ all$reads <- factor(sub("^[0-9]+x ", "", all$case),
 all$series <- factor(all$series, levels = PERF_SERIES)
 all$format <- factor(all$format, levels = c("BAM", "CRAM"))
 all$s <- all$ms / 1000
-all$lo_s <- all$lo / 1000
-all$hi_s <- all$hi / 1000
+
+runs <- read.csv("results/paper/perf-runs.csv", stringsAsFactors = FALSE)
+runs <- subset(runs, panel == "Cold load" & session == "cross-tool" &
+                     series %in% DRAWN & usable)
+runs$coverage <- as.numeric(sub("x .*", "", runs$case))
+runs$reads <- factor(sub("^[0-9]+x ", "", runs$case),
+                     levels = c("short read", "long read"))
+runs$series <- factor(runs$series, levels = PERF_SERIES)
+runs$format <- factor(runs$format, levels = c("BAM", "CRAM"))
+runs$s <- runs$ms / 1000
 
 # Every point carries its own duration, because a log axis is the right shape for
 # this data and the wrong thing to read a number off: its gridlines are a decade
@@ -144,14 +152,8 @@ draw <- function(win, out, width_label,
 
   fig <- ggplot(d, aes(x = coverage, y = s, colour = series)) +
     geom_line(data = meas, linewidth = LINE_W) +
-    # The three runs behind each point, as their range. Capless: an errorbar's
-    # cap width is in data space and this x axis is log10, so a fixed width
-    # draws fifty times wider at 1000x than at 20x and a proportional one
-    # collapses the scale. Censored points carry no bar -- they plot the
-    # ceiling a run was abandoned at, which is a bound and not a median.
-    geom_linerange(data = meas, aes(ymin = lo_s, ymax = hi_s),
-                   linewidth = 0.4, na.rm = TRUE, show.legend = FALSE) +
     geom_point(data = meas, size = POINT_S) +
+    run_points(subset(runs, window == win)) +
     geom_point(data = subset(d, censored), size = POINT_S, shape = 1) +
     endpoint_repel(labels) +
     note +
@@ -219,5 +221,5 @@ draw("1mb", "perf-coldload-1mb", "1 Mb",
 #   Bold labels give that tool's time at its last coverage and how many times
 #   slower that is than this work at the same point. A hollow marker is a run
 #   abandoned at the paint ceiling -- a lower bound rather than a measurement,
-#   so it carries no range bar. Vertical bars are the range of the three rounds.
+#   so it carries no runs. Small black dots are the individual runs.
 #   GenomeSpy reads no CRAM, so it has no curve in the right-hand panels.
