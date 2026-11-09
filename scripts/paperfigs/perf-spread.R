@@ -96,6 +96,10 @@ rows <- rows[order(match(rows$window, names(WINDOWS)),
                    rows$coverage, rows$format), ]
 series_cols <- intersect(PERF_SERIES, DRAWN)
 
+COLUMN <- c("Release 2.4.0" = "v2.4.0", "This work" = "v5.0.0",
+            "igv.js 3.8.5" = "igv.js")
+COLUMN[[GENOMESPY]] <- "GenomeSpy"
+
 line_for <- function(i) {
   k <- rows[i, ]
   vals <- vapply(series_cols, function(s) {
@@ -104,18 +108,18 @@ line_for <- function(i) {
                     tab$series == s]
     if (length(hit)) hit else "n/a"
   }, character(1))
-  paste(c(WINDOWS[[k$window]], k$reads, sprintf("%g$\\times$", k$coverage),
-          k$format, vals), collapse = " & ")
+  first <- i == 1 || rows$window[i - 1] != k$window
+  paste(c(if (first) WINDOWS[[k$window]] else "", sub(" read$", "", k$reads),
+          sprintf("%g$\\times$", k$coverage), k$format, vals), collapse = " & ")
 }
 
 body <- vapply(seq_len(nrow(rows)), line_for, character(1))
 breaks <- c(FALSE, rows$window[-1] != rows$window[-nrow(rows)])
 body <- paste0(ifelse(breaks, "\\midrule\n", ""), body, " \\\\")
-header <- paste(c("Window", "Reads", "Coverage", "Format", series_cols), collapse = " & ")
-tex <- c("\\begin{tabular}{@{}llrl" , paste(rep("r", length(series_cols)), collapse = ""), "@{}}",
+header <- paste(c("Window", "Reads", "Cov.", "Format", COLUMN[series_cols]), collapse = " & ")
+tex <- c(sprintf("\\begin{tabular}{@{}llrl%s@{}}", strrep("r", length(series_cols))),
          "\\toprule", paste(header, "\\\\"), "\\midrule", body, "\\bottomrule",
          "\\end{tabular}")
-tex <- c(paste0(tex[1], tex[2], tex[3]), tex[-(1:3)])
 dir.create("results/figures/paper/tex", showWarnings = FALSE, recursive = TRUE)
 writeLines(tex, "results/figures/paper/tex/perf-spread-table.tex")
 cat("wrote results/figures/paper/tex/perf-spread-table.tex,", nrow(rows), "rows\n")
