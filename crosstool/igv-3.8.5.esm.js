@@ -1,1 +1,1 @@
-../node_modules/igv/dist/igv.esm.js
+../node_modules/igv-3.8.5/dist/igv.esm.js

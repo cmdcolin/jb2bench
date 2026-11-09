@@ -17,6 +17,7 @@
     "gosling.js": "1.0.7",
     "http-server": "^14.1.0",
     "igv": "3.8.10",
+    "igv-3.8.5": "npm:igv@3.8.5",
     "pixi.js": "^6.5.10",
     "puppeteer": "24.43.1",
     "react": "^18.3.1",
