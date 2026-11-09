@@ -447,6 +447,21 @@ interface Detail {
   dataRequests: number
 }
 
+// The Chrome and the WebGL renderer the cells ran on, asked of the first run
+// that settles. paintprofile.ts probes after its clock stops.
+const hostFrom = (line?: string) => {
+  const seen: unknown = line ? JSON.parse(line.slice(4)) : null
+  return typeof seen === 'object' && seen !== null && 'chrome' in seen && 'glRenderer' in seen
+    ? {
+        chrome: String(seen.chrome),
+        glRenderer: String(seen.glRenderer),
+        webgpuAdapter: 'webgpuAdapter' in seen ? String(seen.webgpuAdapter) : null,
+      }
+    : null
+}
+type Host = NonNullable<ReturnType<typeof hostFrom>>
+let host: Host | null = null
+
 function runOnce(url: string, ceiling: number) {
   let out = ''
   try {
@@ -457,6 +472,7 @@ function runOnce(url: string, ceiling: number) {
         ...process.env,
         DISPLAY: (process.env.DISPLAY ?? '') || ':0',
         MAX_WAIT: String(ceiling),
+        ...(host ? {} : { GPU_PROBE: '1' }),
       },
     })
   } catch (e) {
@@ -466,6 +482,7 @@ function runOnce(url: string, ceiling: number) {
   const val = Number.parseFloat(lines.at(-1) ?? 'NaN')
   const detailLine = lines.find(l => l.startsWith('DETAIL '))
   const errorLine = lines.find(l => l.startsWith('ERROR '))
+  host ??= hostFrom(lines.find(l => l.startsWith('GPU ')))
   return {
     ms: Number.isFinite(val) ? val : Number.NaN,
     error: errorLine ? String(JSON.parse(errorLine.slice(6))) : null,
@@ -533,6 +550,8 @@ interface Recorded {
   jbrowseBuilds?: Record<string, string>
   rows: Record<string, Row>
   dates: Record<string, string>
+  /** what the rows measured on a date ran on, keyed like the values of `dates` */
+  hosts?: Record<string, Host>
 }
 const isRecorded = (x: unknown): x is Recorded =>
   typeof x === 'object' &&
@@ -740,6 +759,7 @@ function record(key: string, row: Row) {
   // TOOLS= subset must not delete what it did not look at.
   prior.rows[key] = { ...prior.rows[key], ...row }
   prior.dates[key] = today
+  prior.hosts = { ...prior.hosts, ...(host ? { [today]: host } : {}) }
   prior.igvVersion = igvVersion
   prior.gsVersion = gsVersion
   prior.jbrowseBuild = jbrowseBuild

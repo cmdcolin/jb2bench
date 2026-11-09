@@ -68,7 +68,7 @@ for (const [name, flags] of Object.entries(SETS)) {
   })
   const hardware =
     info.renderer !== 'no-webgl2' && !/swiftshader|llvmpipe|software/i.test(info.renderer)
-  console.log(JSON.stringify({ set: name, ...info, hardware }))
+  console.log(JSON.stringify({ set: name, chrome: await browser.version(), ...info, hardware }))
   await browser.close()
 }
 server.close()

@@ -214,9 +214,8 @@ try {
   })
   console.log(`DETAIL ${JSON.stringify({ memory, content, dataRequests: fetches })}`)
   if (process.env.GPU_PROBE === '1') {
-    console.log(
-      `GPU ${JSON.stringify(await gpuInfo(page).catch((e: unknown) => ({ error: String(e) })))}`,
-    )
+    const gpu = await gpuInfo(page).catch((e: unknown) => ({ error: String(e) }))
+    console.log(`GPU ${JSON.stringify({ chrome: await browser.version(), ...gpu })}`)
   }
   if (screenshotPath) {
     await page.screenshot({ path: screenshotPath })
