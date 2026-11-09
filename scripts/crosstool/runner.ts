@@ -465,8 +465,10 @@ function runOnce(url: string, ceiling: number) {
   const lines = out.trim().split('\n')
   const val = Number.parseFloat(lines.at(-1) ?? 'NaN')
   const detailLine = lines.find(l => l.startsWith('DETAIL '))
+  const errorLine = lines.find(l => l.startsWith('ERROR '))
   return {
     ms: Number.isFinite(val) ? val : Number.NaN,
+    error: errorLine ? String(JSON.parse(errorLine.slice(6))) : null,
     detail: detailLine ? (JSON.parse(detailLine.slice(7)) as Detail) : null,
   }
 }
@@ -511,6 +513,12 @@ interface Cell {
    * a different one; and neither is "nobody ran this row".
    */
   unsettled?: number
+  /**
+   * The error message the page showed — set instead of a timing when no run
+   * drew the track. A failed track settles like a drawn one, so without this it
+   * is recorded as a load time.
+   */
+  error?: string
 }
 type Row = Record<string, Cell>
 
@@ -604,6 +612,7 @@ async function measureRow(c: Case, w: Window): Promise<Row> {
   // Arms that gave up on this cell, and the ceiling they gave up against.
   const abandoned = new Map<string, number>()
   const fails: Record<string, number> = {}
+  const errors: Record<string, string> = {}
   const attempt = (t: Tool) => {
     if (abandoned.has(t.id)) {
       return { ms: Number.NaN, detail: null }
@@ -612,12 +621,18 @@ async function measureRow(c: Case, w: Window): Promise<Row> {
     if (Number.isFinite(got.ms)) {
       return got
     }
+    if (got.error) {
+      errors[t.id] = got.error
+      console.log(`${key} ${t.id}: the page shows "${got.error}"`)
+    }
     fails[t.id] = (fails[t.id] ?? 0) + 1
     if (fails[t.id]! >= FAIL_LIMIT) {
       abandoned.set(t.id, ceiling)
       console.log(
-        `${key} ${t.id}: no stable paint in ${(ceiling / 1000).toFixed(0)}s, ` +
-          `${FAIL_LIMIT} times — abandoning this cell`,
+        got.error
+          ? `${key} ${t.id}: failed ${FAIL_LIMIT} times — abandoning this cell`
+          : `${key} ${t.id}: no stable paint in ${(ceiling / 1000).toFixed(0)}s, ` +
+              `${FAIL_LIMIT} times — abandoning this cell`,
       )
     }
     return { ms: Number.NaN, detail: null }
@@ -679,8 +694,9 @@ async function measureRow(c: Case, w: Window): Promise<Row> {
     }
     const vals = runs[t.id]!.filter(Number.isFinite)
     const gaveUp = abandoned.get(t.id)
+    const error = errors[t.id]
     row[t.id] = {
-      ...(gaveUp && !vals.length ? { unsettled: gaveUp } : {}),
+      ...(vals.length ? {} : error ? { error } : gaveUp ? { unsettled: gaveUp } : {}),
       median: vals.length ? median(vals) : Number.NaN,
       mean: vals.length ? mean(vals) : Number.NaN,
       stddev: vals.length ? stddev(vals) : Number.NaN,
@@ -816,7 +832,7 @@ for (const [id, row] of Object.entries(prior.rows)) {
   for (const [tool, cell] of Object.entries(row)) {
     // An unsupported cell carries a zeroed load window and no timing, so it
     // would drag the median load down and read as the quietest cell in the run.
-    if (!cell.unsupported && !cell.unsettled) {
+    if (!cell.unsupported && !cell.unsettled && !cell.error) {
       cells.push({ key: `${id}/${tool}`, load: cell.load, value: cell.median })
     }
   }
@@ -829,6 +845,9 @@ const fmt = (c?: Cell) => {
   }
   if (c?.unsettled) {
     return `>${(c.unsettled / 1000).toFixed(0)}s`
+  }
+  if (c?.error) {
+    return 'error'
   }
   return c && Number.isFinite(c.median) ? `${c.median.toFixed(0)} ±${c.stddev.toFixed(0)}` : 'FAIL'
 }
@@ -911,7 +930,7 @@ lines.push(
 )
 lines.push('')
 lines.push(
-  `Median of ${RUNS} runs after ${WARMUP} warmup, tools interleaved within each round. A blank cell was not measured in the run that produced its row; \`n/a\` is a capability limit named in the list above, and an arm holding one is dropped from the interleaving rather than timed on a page it cannot draw. \`>Ns\` is an arm that failed to settle within the paint ceiling ${FAIL_LIMIT} times and was abandoned for that cell — a result about the tool at that width, not a gap in the run. The ceiling is ${(CEILING_100KB_MS / 1000).toFixed(0)}s at 100 kb and ${(CEILING_MS / 1000).toFixed(0)}s at the other windows, and each cell carries the ceiling it was judged against, so a row recorded under the older per-window ceilings still prints the one it actually got.`,
+  `Median of ${RUNS} runs after ${WARMUP} warmup, tools interleaved within each round. A blank cell was not measured in the run that produced its row; \`n/a\` is a capability limit named in the list above, and an arm holding one is dropped from the interleaving rather than timed on a page it cannot draw. \`>Ns\` is an arm that failed to settle within the paint ceiling ${FAIL_LIMIT} times and was abandoned for that cell — a result about the tool at that width, not a gap in the run. \`error\` is an arm whose page settled on an error message in place of the track; \`crosstool.json\` holds the message in the cell's \`error\` field. The ceiling is ${(CEILING_100KB_MS / 1000).toFixed(0)}s at 100 kb and ${(CEILING_MS / 1000).toFixed(0)}s at the other windows, and each cell carries the ceiling it was judged against, so a row recorded under the older per-window ceilings still prints the one it actually got.`,
 )
 lines.push('')
 lines.push(

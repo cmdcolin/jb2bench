@@ -65,7 +65,8 @@
 // Prints: a `DETAIL {json}` line with memory (see memory.ts) and whatever the
 // page's `__harnessContent()` reports, then a single floating-point
 // millisecond value as the last line on stdout (or "FAIL"). Memory is sampled
-// after the clock stops, so it costs the timing nothing.
+// after the clock stops, so it costs the timing nothing. A page that settled
+// on an error message prints `ERROR "<text>"` and then "FAIL".
 import crypto from 'crypto'
 import fs from 'fs'
 import path from 'path'
@@ -130,6 +131,21 @@ const hash = (b: Uint8Array) => crypto.createHash('sha1').update(b).digest('hex'
 
 const shot = async () => hash(await page.screenshot({ type: 'png', optimizeForSpeed: true }))
 
+// A track that failed still paints: its error box is a stable non-blank frame
+// with no request in flight, so it settles like a drawn pileup. v2.4.0 at 1 Mb
+// of long-read CRAM settled this way on "Error: sequence fetch failed" and was
+// recorded as a 9.8 s load. JBrowse renders `String(error)` into the page, and
+// each harness page keeps what its tool rejected with in its state object.
+const shownError = () =>
+  ['__igvState', '__gsState', '__goslingState']
+    .map((key): unknown => Reflect.get(window, key))
+    .map(state =>
+      typeof state === 'object' && state !== null && 'error' in state ? state.error : null,
+    )
+    .find((error): error is string => typeof error === 'string') ??
+  /\b\w*Error: [^\n]*/.exec(document.body.innerText)?.[0] ??
+  null
+
 const t0 = Date.now()
 await page.goto(url, { waitUntil: 'domcontentloaded' })
 
@@ -185,6 +201,11 @@ try {
       break
     }
     await new Promise(r => setTimeout(r, POLL_MS))
+  }
+  const shown = await page.evaluate(shownError)
+  if (shown) {
+    console.log(`ERROR ${JSON.stringify(shown)}`)
+    throw new Error(`the page shows an error: ${shown}`)
   }
   const memory = await sampleMemory(browser, page, gpuBaselineMB)
   const content = await page.evaluate(() => {
