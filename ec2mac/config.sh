@@ -23,7 +23,7 @@ KEY_NAME=jb2bench
 KEY_FILE=$HOME/.ssh/jb2bench-ec2.pem
 SG_NAME=jb2bench-ssh
 MAX_MINUTES=${EC2MAC_MAX_MINUTES:-360}
-BUILD=${EC2MAC_BUILD:-release-5.0.0-beta.20}
+BUILD=${EC2MAC_BUILD:-release-5.0.0-beta.21}
 
 HERE=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)
 CODE=$(dirname "$HERE")

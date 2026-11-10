@@ -55,6 +55,13 @@ runs per cell, memory per cold load, an igv.js arm tall enough for every row,
 and zoom timed to the compositor frame swap. Same 25 tracks as beta.10. Launch
 it with `EC2_BUILD=release-5.0.0-beta.20`.
 
+`release-5.0.0-beta.21` was staged 2026-11-09 from the tag cut 2026-11-08,
+and replaces beta.20 as the arm for the reviewer rerun: beta.20 to beta.21 is
+191 commits in the alignment, render-core and core util code, and main since
+beta.21 changes no alignment drawing or parsing the benchmark exercises. Same
+25 tracks as beta.20. Launch it with `EC2_BUILD=release-5.0.0-beta.21`; the
+ec2mac panel and CPU sweep default to it.
+
 `release-5.0.0-beta.9` was staged 2026-09-25 to prove that path end to end
 before the tag the manuscript names existed. It is not the arm; delete it if
 the disk is wanted.

@@ -8,7 +8,7 @@ driven from there is never touched.
 
 ## What the panel measures
 
-One build, `builds/release-5.0.0-beta.20`, in headless Chrome for Testing (the
+One build, `builds/release-5.0.0-beta.21`, in headless Chrome for Testing (the
 version puppeteer 24.43.1 pins), pinned to each backend with
 `?renderer=webgpu`, `webgl` and `canvas2d`. A pinned `webgpu` does not fall
 back: the build shows an error instead.
@@ -113,7 +113,7 @@ prints the allocate, launch, terminate and release calls without making them.
 make mac-test                                   # shellcheck, tsrs, the ps parser fixture; no AWS
 make mac-up HOST=mac1 DRY_RUN=1                 # what would be allocated and launched
 
-make stage-release TAG=v5.0.0-beta.20           # once, if builds/release-5.0.0-beta.20 is missing
+make stage-release TAG=v5.0.0-beta.21           # once, if builds/release-5.0.0-beta.21 is missing
 make mac-up        HOST=mac1 CONFIRM=1          # allocate host + launch; 24 h billing starts here
 make mac-provision HOST=mac1 CONFIRM=1          # node@24, rsync, Chrome for Testing, code, build, 3 BAMs
 make mac-run-panel HOST=mac1 CONFIRM=1          # detached on the Mac; results sync to results/ec2mac/mac1-<stamp>/
@@ -138,7 +138,7 @@ saw. On this laptop, under `taskset -c 0-1`, it read 2, so JBrowse's worker
 pool shrinks with the cores. The http-server is not confined.
 
 ```sh
-make ec2-up && EC2_BUILD=release-5.0.0-beta.20 make ec2-provision   # only when no ec2/ run is going
+make ec2-up && EC2_BUILD=release-5.0.0-beta.21 make ec2-provision   # only when no ec2/ run is going
 make cpu-sweep DRY_RUN=1
 make cpu-sweep CONFIRM=1                        # refuses while ec2/phases.sh runs there
 make ec2-down
@@ -147,7 +147,7 @@ make ec2-down
 To check the wiring on any box with the build served locally:
 
 ```sh
-npx http-server builds/release-5.0.0-beta.20 -p 8027 -s --cors &
+npx http-server builds/release-5.0.0-beta.21 -p 8027 -s --cors &
 PORT=8027 CELLS=cold-20x CHROME_ANGLE='--use-angle=gl --use-gl=angle --enable-unsafe-webgpu' make mac-panel-local
 ```
 

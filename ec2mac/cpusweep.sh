@@ -12,7 +12,7 @@
 set -euo pipefail
 . "$(dirname "$0")/../ec2/config.sh"
 MAC_HERE=$CODE/ec2mac
-BUILD=${EC2MAC_BUILD:-release-5.0.0-beta.20}
+BUILD=${EC2MAC_BUILD:-release-5.0.0-beta.21}
 SWEEP_CPUS=${SWEEP_CPUS:-2,4,8}
 DRIVE_ENV=$(printf '%q ' "CHROME_ANGLE=--use-angle=gl-egl --use-gl=angle" "EXPECT_BUILD=$BUILD" \
   "BACKENDS=webgl" "CPUS=$SWEEP_CPUS" "CELLS=${CELLS:-cold-20x,cold-1000x,zoom-200x}" \

@@ -9,7 +9,7 @@
 //   BACKENDS=webgpu,webgl,canvas2d
 //   CELLS=cold-20x,cold-1000x,zoom-200x
 //   CPUS=2,4,8        Linux only: each pass under taskset -c 0-(n-1)
-//   EXPECT_BUILD=release-5.0.0-beta.20   stop if port 8000 serves another
+//   EXPECT_BUILD=release-5.0.0-beta.21   stop if port 8000 serves another
 //   OUT=results/ec2mac/<label>-<stamp>   LABEL=<host label>
 import { execFileSync } from 'child_process'
 import fs from 'fs'
