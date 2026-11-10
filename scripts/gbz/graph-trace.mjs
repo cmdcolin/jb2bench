@@ -1,13 +1,19 @@
 import { launch } from 'puppeteer'
-import { loadavg } from 'node:os'
+import { hostname, loadavg } from 'node:os'
 // node graph-trace.mjs <trackId> <refName> <start> <end>
-// Opens a GraphGenomeView on a graph track of the hosted HPRC config from a cold
-// cache and counts the range requests to the graph's BED files and indexes
-// until the graph is cut.
+// Opens a GraphGenomeView on a graph track from a cold cache and counts the
+// range requests to the graph's BED files and indexes until the graph is cut.
+// CONFIG, APP and DATA default to the hosted HPRC demo; SHOT saves a screenshot.
 const [trackId, refName, start, end] = process.argv.slice(2)
 const load = loadavg()[0]
-const config = 'https://jbrowse.org/demos/hprc/config.json'
-const url = `https://jbrowse.org/code/jb2/main/?config=${encodeURIComponent(config)}`
+const config = process.env.CONFIG ?? 'https://jbrowse.org/demos/hprc/config.json'
+const app = process.env.APP ?? 'https://jbrowse.org/code/jb2/main'
+const data = process.env.DATA ?? 'https://jbrowse.org/demos/hprc/'
+const appVersion = await fetch(`${app}/version.txt`)
+  .then(r => (r.ok ? r.text() : undefined))
+  .then(t => t?.trim())
+  .catch(() => undefined)
+const url = `${app}/?config=${encodeURIComponent(config)}`
 const browser = await launch({
   headless: true,
   executablePath: '/usr/bin/google-chrome',
@@ -16,7 +22,7 @@ const browser = await launch({
 const page = await browser.newPage()
 await page.setViewport({ width: 1600, height: 1000 })
 const net = { req: 0, bytes: 0, urls: {} }
-const isData = u => u.startsWith('https://jbrowse.org/demos/hprc/') && /\.bed\.gz(\.tbi)?$/.test(u)
+const isData = u => u.startsWith(data) && /\.bed\.gz(\.tbi)?$/.test(u)
 const watch = c => {
   const ids = new Map()
   c.on('Network.requestWillBeSent', e => {
@@ -72,11 +78,17 @@ const view = await page.evaluate(id => {
   return { nodes: v.nodeCount, error: v.error && String(v.error), plugin: plugin?.version }
 }, viewId)
 await new Promise(r => setTimeout(r, +(process.env.SETTLE_MS ?? 3000)))
+if (process.env.SHOT) {
+  await page.screenshot({ path: process.env.SHOT })
+}
 await browser.close()
 console.log(
   JSON.stringify({
     date: new Date().toISOString(),
+    host: hostname(),
     load,
+    app,
+    appVersion,
     trackId,
     refName,
     start: +start,

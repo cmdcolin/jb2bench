@@ -1,0 +1,13 @@
+{
+  "date": "2026-11-09T22:21:52-08:00",
+  "host": "Ada",
+  "cpu": "12th Gen Intel(R) Core(TM) i9-12900K",
+  "load": 6.00,
+  "tool": "gfa-to-tabix 4.0.0",
+  "gfaBytes": 7695644148,
+  "nodes": 4122486,
+  "links": 7685990,
+  "seconds": 102.77,
+  "peakGB": 6.9,
+  "indexBytes": 349382071
+}

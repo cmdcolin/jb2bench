@@ -30,7 +30,8 @@ LOGDIR := results/logs
         backends-webgpu ec2-up ec2-provision ec2-spike ec2-run ec2-run-light ec2-down \
         crosstool-cold-light crosstool-zoom-light \
         stage-release portals-fetch portals-variant portals-gene agent-evals \
-        wasmgate bgzfpool bgzfpool-standalone bgzfpool-endtoend pif pif-options
+        wasmgate bgzfpool bgzfpool-standalone bgzfpool-endtoend pif pif-options \
+        graph-hosted pggb-fetch pggb-index pggb-trace
 
 help:
 	@echo "preflight"
@@ -508,3 +509,10 @@ portals-gene:
 
 agent-evals:
 	$(NODE) scripts/agent-evals/run.ts $(SET) $(if $(CONFIG_DIR),--config-dir $(CONFIG_DIR))
+
+# The graph track's cost on the hosted HPRC demo (Figure 5 window, 1 Mb, MHC),
+# and the HPRC release 2 pggb chrY graph indexed and opened in a graph view.
+graph-hosted: ; scripts/gbz/hosted-windows.sh
+pggb-fetch:   ; scripts/pggb/fetch.sh
+pggb-index:   ; scripts/pggb/index.sh
+pggb-trace:   ; scripts/pggb/trace.sh

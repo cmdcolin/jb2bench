@@ -133,3 +133,7 @@ ecosystem/.libs
 
 # Written by scripts/cohort-signal/build-bedgraph.ts from the published Zarr store.
 /data/cohort-signal/
+
+# The HPRC pggb chrY graph, its index and the gfa-to-tabix binary, ~16 GB.
+# Regenerate with make pggb-fetch pggb-index.
+data/pggb/
