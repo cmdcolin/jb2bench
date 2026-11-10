@@ -1,0 +1,2793 @@
+{
+  "igvVersion": "3.8.10",
+  "gsVersion": "1.3.0",
+  "jbrowseBuild": "release-5.0.0-beta.21",
+  "jbrowseBuilds": {
+    "jbrowse": "release-5.0.0-beta.21",
+    "jbrowse-release-2.4.0": "release-2.4.0"
+  },
+  "rows": {
+    "20x-shortread-bam@19kb": {
+      "jbrowse": {
+        "median": 1433,
+        "mean": 1469.3333333333333,
+        "stddev": 72.85754746230634,
+        "lo": 1404,
+        "hi": 1571,
+        "runs": [
+          1571,
+          1404,
+          1433
+        ],
+        "memory": [
+          {
+            "jsHeap": {
+              "isolates": 6,
+              "usedMB": 33.01748275756836,
+              "totalMB": 54.9921875
+            },
+            "process": {
+              "source": "proc",
+              "byType": {
+                "browser": {
+                  "count": 1,
+                  "pssMB": 102.4189453125,
+                  "rssMB": 195.04296875,
+                  "peakRssMB": 197.8359375
+                },
+                "zygote": {
+                  "count": 2,
+                  "pssMB": 32.416015625,
+                  "rssMB": 137.4921875,
+                  "peakRssMB": 137.4921875
+                },
+                "utility": {
+                  "count": 2,
+                  "pssMB": 59.390625,
+                  "rssMB": 179.0546875,
+                  "peakRssMB": 179.0546875
+                },
+                "gpu-process": {
+                  "count": 1,
+                  "pssMB": 202.5634765625,
+                  "rssMB": 258.94140625,
+                  "peakRssMB": 284.87109375
+                },
+                "renderer": {
+                  "count": 3,
+                  "pssMB": 259.15625,
+                  "rssMB": 461.88671875,
+                  "peakRssMB": 461.88671875
+                }
+              },
+              "totalPssMB": 655.9453125
+            },
+            "gpuDevice": {
+              "usedMB": 62,
+              "baselineMB": 0,
+              "deltaMB": 62
+            }
+          },
+          {
+            "jsHeap": {
+              "isolates": 6,
+              "usedMB": 33.129417419433594,
+              "totalMB": 53.7421875
+            },
+            "process": {
+              "source": "proc",
+              "byType": {
+                "browser": {
+                  "count": 1,
+                  "pssMB": 102.1376953125,
+                  "rssMB": 194.93359375,
+                  "peakRssMB": 197.8671875
+                },
+                "zygote": {
+                  "count": 2,
+                  "pssMB": 32.3505859375,
+                  "rssMB": 137.3515625,
+                  "peakRssMB": 137.3515625
+                },
+                "utility": {
+                  "count": 2,
+                  "pssMB": 59.9775390625,
+                  "rssMB": 179.33984375,
+                  "peakRssMB": 179.33984375
+                },
+                "gpu-process": {
+                  "count": 1,
+                  "pssMB": 161.3232421875,
+                  "rssMB": 217.10546875,
+                  "peakRssMB": 243.11328125
+                },
+                "renderer": {
+                  "count": 3,
+                  "pssMB": 258.12890625,
+                  "rssMB": 461.73828125,
+                  "peakRssMB": 461.73828125
+                }
+              },
+              "totalPssMB": 613.91796875
+            },
+            "gpuDevice": {
+              "usedMB": 63,
+              "baselineMB": 0,
+              "deltaMB": 63
+            }
+          },
+          {
+            "jsHeap": {
+              "isolates": 6,
+              "usedMB": 34.52985763549805,
+              "totalMB": 55.4921875
+            },
+            "process": {
+              "source": "proc",
+              "byType": {
+                "browser": {
+                  "count": 1,
+                  "pssMB": 103.19921875,
+                  "rssMB": 194.05078125,
+                  "peakRssMB": 197.15625
+                },
+                "zygote": {
+                  "count": 2,
+                  "pssMB": 31.814453125,
+                  "rssMB": 136.55078125,
+                  "peakRssMB": 136.55078125
+                },
+                "utility": {
+                  "count": 2,
+                  "pssMB": 59.6328125,
+                  "rssMB": 179.35546875,
+                  "peakRssMB": 179.35546875
+                },
+                "gpu-process": {
+                  "count": 1,
+                  "pssMB": 160.5322265625,
+                  "rssMB": 217.42578125,
+                  "peakRssMB": 243.13671875
+                },
+                "renderer": {
+                  "count": 3,
+                  "pssMB": 260.328125,
+                  "rssMB": 462.75390625,
+                  "peakRssMB": 462.75390625
+                }
+              },
+              "totalPssMB": 615.5068359375
+            },
+            "gpuDevice": {
+              "usedMB": 63,
+              "baselineMB": 0,
+              "deltaMB": 63
+            }
+          }
+        ],
+        "memoryMedian": {
+          "jsHeapUsedMB": 33.1,
+          "rendererPssMB": 259.2,
+          "gpuProcessPssMB": 161.3,
+          "totalPssMB": 615.5,
+          "gpuDeviceDeltaMB": 63
+        },
+        "content": null,
+        "load": {
+          "before": 0.37,
+          "after": 1.75,
+          "foreignCores": 0.2341396420343787,
+          "foreignTop": "unattended-upgr 0.14, apt-check 0.05, apt-get 0.01"
+        }
+      },
+      "jbrowse-release-2.4.0": {
+        "median": 3970,
+        "mean": 3640.6666666666665,
+        "stddev": 545.3814159731598,
+        "lo": 2872,
+        "hi": 4080,
+        "runs": [
+          2872,
+          4080,
+          3970
+        ],
+        "memory": [
+          {
+            "jsHeap": {
+              "isolates": 2,
+              "usedMB": 88.42954635620117,
+              "totalMB": 152.890625
+            },
+            "process": {
+              "source": "proc",
+              "byType": {
+                "browser": {
+                  "count": 1,
+                  "pssMB": 100.5009765625,
+                  "rssMB": 191.984375,
+                  "peakRssMB": 195.21875
+                },
+                "zygote": {
+                  "count": 2,
+                  "pssMB": 31.4345703125,
+                  "rssMB": 137.578125,
+                  "peakRssMB": 137.578125
+                },
+                "utility": {
+                  "count": 2,
+                  "pssMB": 57.8271484375,
+                  "rssMB": 177.94921875,
+                  "peakRssMB": 177.94921875
+                },
+                "gpu-process": {
+                  "count": 1,
+                  "pssMB": 184.09765625,
+                  "rssMB": 240.93359375,
+                  "peakRssMB": 271.6484375
+                },
+                "renderer": {
+                  "count": 4,
+                  "pssMB": 328.8623046875,
+                  "rssMB": 590.328125,
+                  "peakRssMB": 590.328125
+                }
+              },
+              "totalPssMB": 702.72265625
+            },
+            "gpuDevice": {
+              "usedMB": 73,
+              "baselineMB": 0,
+              "deltaMB": 73
+            }
+          },
+          {
+            "jsHeap": {
+              "isolates": 2,
+              "usedMB": 91.6783332824707,
+              "totalMB": 141.78125
+            },
+            "process": {
+              "source": "proc",
+              "byType": {
+                "browser": {
+                  "count": 1,
+                  "pssMB": 100.861328125,
+                  "rssMB": 192.3359375,
+                  "peakRssMB": 196.53125
+                },
+                "zygote": {
+                  "count": 2,
+                  "pssMB": 31.4208984375,
+                  "rssMB": 137.09765625,
+                  "peakRssMB": 137.09765625
+                },
+                "utility": {
+                  "count": 2,
+                  "pssMB": 57.6513671875,
+                  "rssMB": 178.453125,
+                  "peakRssMB": 178.453125
+                },
+                "gpu-process": {
+                  "count": 1,
+                  "pssMB": 184.8955078125,
+                  "rssMB": 241.234375,
+                  "peakRssMB": 271.7890625
+                },
+                "renderer": {
+                  "count": 4,
+                  "pssMB": 322.28125,
+                  "rssMB": 583.37109375,
+                  "peakRssMB": 583.37109375
+                }
+              },
+              "totalPssMB": 697.1103515625
+            },
+            "gpuDevice": {
+              "usedMB": 74,
+              "baselineMB": 0,
+              "deltaMB": 74
+            }
+          },
+          {
+            "jsHeap": {
+              "isolates": 2,
+              "usedMB": 88.80298614501953,
+              "totalMB": 152.390625
+            },
+            "process": {
+              "source": "proc",
+              "byType": {
+                "browser": {
+                  "count": 1,
+                  "pssMB": 100.9755859375,
+                  "rssMB": 192.96484375,
+                  "peakRssMB": 197.05859375
+                },
+                "utility": {
+                  "count": 2,
+                  "pssMB": 57.6318359375,
+                  "rssMB": 177.26953125,
+                  "peakRssMB": 177.26953125
+                },
+                "zygote": {
+                  "count": 2,
+                  "pssMB": 31.2353515625,
+                  "rssMB": 136.38671875,
+                  "peakRssMB": 136.38671875
+                },
+                "gpu-process": {
+                  "count": 1,
+                  "pssMB": 160.828125,
+                  "rssMB": 217.4921875,
+                  "peakRssMB": 248.28515625
+                },
+                "renderer": {
+                  "count": 4,
+                  "pssMB": 329.03515625,
+                  "rssMB": 590.92578125,
+                  "peakRssMB": 590.92578125
+                }
+              },
+              "totalPssMB": 679.7060546875
+            },
+            "gpuDevice": {
+              "usedMB": 73,
+              "baselineMB": 0,
+              "deltaMB": 73
+            }
+          }
+        ],
+        "memoryMedian": {
+          "jsHeapUsedMB": 88.8,
+          "rendererPssMB": 328.9,
+          "gpuProcessPssMB": 184.1,
+          "totalPssMB": 697.1,
+          "gpuDeviceDeltaMB": 73
+        },
+        "content": null,
+        "load": {
+          "before": 0.5,
+          "after": 1.75,
+          "foreignCores": 0.23409297278143187,
+          "foreignTop": "unattended-upgr 0.14, apt-check 0.05, apt-get 0.01"
+        }
+      },
+      "igv": {
+        "median": 1768,
+        "mean": 1795.6666666666667,
+        "stddev": 42.71091455614387,
+        "lo": 1763,
+        "hi": 1856,
+        "runs": [
+          1763,
+          1856,
+          1768
+        ],
+        "memory": [
+          {
+            "jsHeap": {
+              "isolates": 1,
+              "usedMB": 27.953296661376953,
+              "totalMB": 91.15234375
+            },
+            "process": {
+              "source": "proc",
+              "byType": {
+                "browser": {
+                  "count": 1,
+                  "pssMB": 97.15625,
+                  "rssMB": 184.4453125,
+                  "peakRssMB": 189.96484375
+                },
+                "zygote": {
+                  "count": 2,
+                  "pssMB": 32.2861328125,
+                  "rssMB": 137.01953125,
+                  "peakRssMB": 137.01953125
+                },
+                "utility": {
+                  "count": 2,
+                  "pssMB": 56.177734375,
+                  "rssMB": 173.01953125,
+                  "peakRssMB": 173.33203125
+                },
+                "gpu-process": {
+                  "count": 1,
+                  "pssMB": 162.9111328125,
+                  "rssMB": 217.51171875,
+                  "peakRssMB": 246.53125
+                },
+                "renderer": {
+                  "count": 3,
+                  "pssMB": 240.26953125,
+                  "rssMB": 438.453125,
+                  "peakRssMB": 441.06640625
+                }
+              },
+              "totalPssMB": 588.80078125
+            },
+            "gpuDevice": {
+              "usedMB": 189,
+              "baselineMB": 0,
+              "deltaMB": 189
+            }
+          },
+          {
+            "jsHeap": {
+              "isolates": 1,
+              "usedMB": 29.683368682861328,
+              "totalMB": 90.40234375
+            },
+            "process": {
+              "source": "proc",
+              "byType": {
+                "browser": {
+                  "count": 1,
+                  "pssMB": 96.2119140625,
+                  "rssMB": 184.2890625,
+                  "peakRssMB": 190.4296875
+                },
+                "zygote": {
+                  "count": 2,
+                  "pssMB": 32.2685546875,
+                  "rssMB": 137.56640625,
+                  "peakRssMB": 137.56640625
+                },
+                "utility": {
+                  "count": 2,
+                  "pssMB": 57.31640625,
+                  "rssMB": 172.51953125,
+                  "peakRssMB": 172.51953125
+                },
+                "gpu-process": {
+                  "count": 1,
+                  "pssMB": 157.8984375,
+                  "rssMB": 212.90234375,
+                  "peakRssMB": 248.99609375
+                },
+                "renderer": {
+                  "count": 3,
+                  "pssMB": 240.091796875,
+                  "rssMB": 437.56640625,
+                  "peakRssMB": 440.2890625
+                }
+              },
+              "totalPssMB": 583.787109375
+            },
+            "gpuDevice": {
+              "usedMB": 92,
+              "baselineMB": 0,
+              "deltaMB": 92
+            }
+          },
+          {
+            "jsHeap": {
+              "isolates": 1,
+              "usedMB": 28.914161682128906,
+              "totalMB": 91.15234375
+            },
+            "process": {
+              "source": "proc",
+              "byType": {
+                "browser": {
+                  "count": 1,
+                  "pssMB": 96.921875,
+                  "rssMB": 184.421875,
+                  "peakRssMB": 190.20703125
+                },
+                "zygote": {
+                  "count": 2,
+                  "pssMB": 32.13671875,
+                  "rssMB": 136.66015625,
+                  "peakRssMB": 136.66015625
+                },
+                "utility": {
+                  "count": 2,
+                  "pssMB": 57.3515625,
+                  "rssMB": 173.48046875,
+                  "peakRssMB": 174.64453125
+                },
+                "gpu-process": {
+                  "count": 1,
+                  "pssMB": 162.48828125,
+                  "rssMB": 217.24609375,
+                  "peakRssMB": 246.515625
+                },
+                "renderer": {
+                  "count": 3,
+                  "pssMB": 239.443359375,
+                  "rssMB": 437.37890625,
+                  "peakRssMB": 439.91796875
+                }
+              },
+              "totalPssMB": 588.341796875
+            },
+            "gpuDevice": {
+              "usedMB": 191,
+              "baselineMB": 0,
+              "deltaMB": 191
+            }
+          }
+        ],
+        "memoryMedian": {
+          "jsHeapUsedMB": 28.9,
+          "rendererPssMB": 240.1,
+          "gpuProcessPssMB": 162.5,
+          "totalPssMB": 588.3,
+          "gpuDeviceDeltaMB": 189
+        },
+        "content": {
+          "trackHeight": 600,
+          "contentHeight": 709,
+          "rowsFit": false
+        },
+        "load": {
+          "before": 0.46,
+          "after": 1.75,
+          "foreignCores": 0.23406187028056405,
+          "foreignTop": "unattended-upgr 0.14, apt-check 0.05, apt-get 0.01"
+        }
+      },
+      "genomespy": {
+        "median": 2050,
+        "mean": 2106.6666666666665,
+        "stddev": 98.34745661287954,
+        "lo": 2025,
+        "hi": 2245,
+        "runs": [
+          2050,
+          2245,
+          2025
+        ],
+        "memory": [
+          {
+            "jsHeap": {
+              "isolates": 1,
+              "usedMB": 18.73941421508789,
+              "totalMB": 57.50390625
+            },
+            "process": {
+              "source": "proc",
+              "byType": {
+                "browser": {
+                  "count": 1,
+                  "pssMB": 96.9638671875,
+                  "rssMB": 184.83984375,
+                  "peakRssMB": 188.1640625
+                },
+                "zygote": {
+                  "count": 2,
+                  "pssMB": 32.0654296875,
+                  "rssMB": 136.828125,
+                  "peakRssMB": 136.828125
+                },
+                "utility": {
+                  "count": 2,
+                  "pssMB": 55.9345703125,
+                  "rssMB": 171.671875,
+                  "peakRssMB": 171.671875
+                },
+                "gpu-process": {
+                  "count": 1,
+                  "pssMB": 171.3212890625,
+                  "rssMB": 226.8125,
+                  "peakRssMB": 256.56640625
+                },
+                "renderer": {
+                  "count": 3,
+                  "pssMB": 198.2421875,
+                  "rssMB": 398.8203125,
+                  "peakRssMB": 398.8203125
+                }
+              },
+              "totalPssMB": 554.52734375
+            },
+            "gpuDevice": {
+              "usedMB": 80,
+              "baselineMB": 0,
+              "deltaMB": 80
+            }
+          },
+          {
+            "jsHeap": {
+              "isolates": 1,
+              "usedMB": 18.751781463623047,
+              "totalMB": 58.00390625
+            },
+            "process": {
+              "source": "proc",
+              "byType": {
+                "browser": {
+                  "count": 1,
+                  "pssMB": 97.2041015625,
+                  "rssMB": 184.30078125,
+                  "peakRssMB": 187.6328125
+                },
+                "zygote": {
+                  "count": 2,
+                  "pssMB": 31.787109375,
+                  "rssMB": 136.2578125,
+                  "peakRssMB": 136.2578125
+                },
+                "utility": {
+                  "count": 2,
+                  "pssMB": 56.421875,
+                  "rssMB": 172.3515625,
+                  "peakRssMB": 172.3515625
+                },
+                "gpu-process": {
+                  "count": 1,
+                  "pssMB": 171.021484375,
+                  "rssMB": 226.8671875,
+                  "peakRssMB": 257.0078125
+                },
+                "renderer": {
+                  "count": 3,
+                  "pssMB": 200.349609375,
+                  "rssMB": 399.4609375,
+                  "peakRssMB": 399.4609375
+                }
+              },
+              "totalPssMB": 556.7841796875
+            },
+            "gpuDevice": {
+              "usedMB": 76,
+              "baselineMB": 0,
+              "deltaMB": 76
+            }
+          },
+          {
+            "jsHeap": {
+              "isolates": 1,
+              "usedMB": 23.123676300048828,
+              "totalMB": 60.00390625
+            },
+            "process": {
+              "source": "proc",
+              "byType": {
+                "browser": {
+                  "count": 1,
+                  "pssMB": 96.0458984375,
+                  "rssMB": 183.68359375,
+                  "peakRssMB": 187.234375
+                },
+                "zygote": {
+                  "count": 2,
+                  "pssMB": 32.0986328125,
+                  "rssMB": 136.625,
+                  "peakRssMB": 136.625
+                },
+                "utility": {
+                  "count": 2,
+                  "pssMB": 57.01171875,
+                  "rssMB": 172.46484375,
+                  "peakRssMB": 172.46484375
+                },
+                "gpu-process": {
+                  "count": 1,
+                  "pssMB": 171.44140625,
+                  "rssMB": 227.09765625,
+                  "peakRssMB": 256.921875
+                },
+                "renderer": {
+                  "count": 3,
+                  "pssMB": 202.123046875,
+                  "rssMB": 401.01171875,
+                  "peakRssMB": 401.01171875
+                }
+              },
+              "totalPssMB": 558.720703125
+            },
+            "gpuDevice": {
+              "usedMB": 80,
+              "baselineMB": 0,
+              "deltaMB": 80
+            }
+          }
+        ],
+        "memoryMedian": {
+          "jsHeapUsedMB": 18.8,
+          "rendererPssMB": 200.3,
+          "gpuProcessPssMB": 171.3,
+          "totalPssMB": 556.8,
+          "gpuDeviceDeltaMB": 80
+        },
+        "content": null,
+        "load": {
+          "before": 0.5,
+          "after": 1.75,
+          "foreignCores": 0.23403077604339628,
+          "foreignTop": "unattended-upgr 0.14, apt-check 0.05, apt-get 0.01"
+        }
+      }
+    },
+    "200x-shortread-bam@19kb": {
+      "jbrowse": {
+        "median": 1947,
+        "mean": 1941,
+        "stddev": 9.201449161228174,
+        "lo": 1928,
+        "hi": 1948,
+        "runs": [
+          1948,
+          1947,
+          1928
+        ],
+        "memory": [
+          {
+            "jsHeap": {
+              "isolates": 6,
+              "usedMB": 64.76603698730469,
+              "totalMB": 104.85546875
+            },
+            "process": {
+              "source": "proc",
+              "byType": {
+                "browser": {
+                  "count": 1,
+                  "pssMB": 103.1474609375,
+                  "rssMB": 194.35546875,
+                  "peakRssMB": 197.57421875
+                },
+                "zygote": {
+                  "count": 2,
+                  "pssMB": 31.9853515625,
+                  "rssMB": 137.06640625,
+                  "peakRssMB": 137.06640625
+                },
+                "utility": {
+                  "count": 2,
+                  "pssMB": 60.8447265625,
+                  "rssMB": 178.9375,
+                  "peakRssMB": 178.9375
+                },
+                "gpu-process": {
+                  "count": 1,
+                  "pssMB": 177.19140625,
+                  "rssMB": 236.0625,
+                  "peakRssMB": 270.16796875
+                },
+                "renderer": {
+                  "count": 3,
+                  "pssMB": 386.6982421875,
+                  "rssMB": 592.05859375,
+                  "peakRssMB": 592.05859375
+                }
+              },
+              "totalPssMB": 759.8671875
+            },
+            "gpuDevice": {
+              "usedMB": 69,
+              "baselineMB": 0,
+              "deltaMB": 69
+            }
+          },
+          {
+            "jsHeap": {
+              "isolates": 6,
+              "usedMB": 68.66896057128906,
+              "totalMB": 108.609375
+            },
+            "process": {
+              "source": "proc",
+              "byType": {
+                "browser": {
+                  "count": 1,
+                  "pssMB": 102.0224609375,
+                  "rssMB": 193.21875,
+                  "peakRssMB": 196.44921875
+                },
+                "zygote": {
+                  "count": 2,
+                  "pssMB": 31.99609375,
+                  "rssMB": 136.62109375,
+                  "peakRssMB": 136.62109375
+                },
+                "utility": {
+                  "count": 2,
+                  "pssMB": 59.91796875,
+                  "rssMB": 178.80078125,
+                  "peakRssMB": 178.80078125
+                },
+                "gpu-process": {
+                  "count": 1,
+                  "pssMB": 177.28125,
+                  "rssMB": 236.390625,
+                  "peakRssMB": 270.35546875
+                },
+                "renderer": {
+                  "count": 3,
+                  "pssMB": 394.7216796875,
+                  "rssMB": 599.40234375,
+                  "peakRssMB": 599.40234375
+                }
+              },
+              "totalPssMB": 765.939453125
+            },
+            "gpuDevice": {
+              "usedMB": 69,
+              "baselineMB": 0,
+              "deltaMB": 69
+            }
+          },
+          {
+            "jsHeap": {
+              "isolates": 6,
+              "usedMB": 64.20098495483398,
+              "totalMB": 105.35546875
+            },
+            "process": {
+              "source": "proc",
+              "byType": {
+                "browser": {
+                  "count": 1,
+                  "pssMB": 102.6201171875,
+                  "rssMB": 194.08984375,
+                  "peakRssMB": 197.3671875
+                },
+                "zygote": {
+                  "count": 2,
+                  "pssMB": 32.0634765625,
+                  "rssMB": 136.734375,
+                  "peakRssMB": 136.734375
+                },
+                "utility": {
+                  "count": 2,
+                  "pssMB": 59.958984375,
+                  "rssMB": 178.84765625,
+                  "peakRssMB": 178.84765625
+                },
+                "gpu-process": {
+                  "count": 1,
+                  "pssMB": 176.943359375,
+                  "rssMB": 235.125,
+                  "peakRssMB": 269.05859375
+                },
+                "renderer": {
+                  "count": 3,
+                  "pssMB": 386.2265625,
+                  "rssMB": 590.61328125,
+                  "peakRssMB": 590.61328125
+                }
+              },
+              "totalPssMB": 757.8125
+            },
+            "gpuDevice": {
+              "usedMB": 69,
+              "baselineMB": 0,
+              "deltaMB": 69
+            }
+          }
+        ],
+        "memoryMedian": {
+          "jsHeapUsedMB": 64.8,
+          "rendererPssMB": 386.7,
+          "gpuProcessPssMB": 177.2,
+          "totalPssMB": 759.9,
+          "gpuDeviceDeltaMB": 69
+        },
+        "content": null,
+        "load": {
+          "before": 1.75,
+          "after": 2.41,
+          "foreignCores": 0.019233003317370354,
+          "foreignTop": ""
+        }
+      },
+      "jbrowse-release-2.4.0": {
+        "median": 6730,
+        "mean": 6698,
+        "stddev": 77.67024312223225,
+        "lo": 6591,
+        "hi": 6773,
+        "runs": [
+          6773,
+          6591,
+          6730
+        ],
+        "memory": [
+          {
+            "jsHeap": {
+              "isolates": 2,
+              "usedMB": 169.90651321411133,
+              "totalMB": 273.0078125
+            },
+            "process": {
+              "source": "proc",
+              "byType": {
+                "browser": {
+                  "count": 1,
+                  "pssMB": 100.845703125,
+                  "rssMB": 192.08203125,
+                  "peakRssMB": 196.17578125
+                },
+                "zygote": {
+                  "count": 2,
+                  "pssMB": 31.3662109375,
+                  "rssMB": 136.58984375,
+                  "peakRssMB": 136.58984375
+                },
+                "utility": {
+                  "count": 2,
+                  "pssMB": 58.09765625,
+                  "rssMB": 178.890625,
+                  "peakRssMB": 178.890625
+                },
+                "gpu-process": {
+                  "count": 1,
+                  "pssMB": 162.9423828125,
+                  "rssMB": 220.15625,
+                  "peakRssMB": 249.51171875
+                },
+                "renderer": {
+                  "count": 4,
+                  "pssMB": 516.4091796875,
+                  "rssMB": 779.0234375,
+                  "peakRssMB": 779.0234375
+                }
+              },
+              "totalPssMB": 869.6611328125
+            },
+            "gpuDevice": {
+              "usedMB": 123,
+              "baselineMB": 0,
+              "deltaMB": 123
+            }
+          },
+          {
+            "jsHeap": {
+              "isolates": 2,
+              "usedMB": 169.92085647583008,
+              "totalMB": 272.5078125
+            },
+            "process": {
+              "source": "proc",
+              "byType": {
+                "browser": {
+                  "count": 1,
+                  "pssMB": 100.197265625,
+                  "rssMB": 193.3125,
+                  "peakRssMB": 198.1796875
+                },
+                "zygote": {
+                  "count": 2,
+                  "pssMB": 31.28125,
+                  "rssMB": 135.765625,
+                  "peakRssMB": 135.765625
+                },
+                "utility": {
+                  "count": 2,
+                  "pssMB": 58.703125,
+                  "rssMB": 178.2734375,
+                  "peakRssMB": 178.2734375
+                },
+                "gpu-process": {
+                  "count": 1,
+                  "pssMB": 162.736328125,
+                  "rssMB": 219.421875,
+                  "peakRssMB": 248.83984375
+                },
+                "renderer": {
+                  "count": 4,
+                  "pssMB": 515.5009765625,
+                  "rssMB": 777.3359375,
+                  "peakRssMB": 777.3359375
+                }
+              },
+              "totalPssMB": 868.4189453125
+            },
+            "gpuDevice": {
+              "usedMB": 124,
+              "baselineMB": 0,
+              "deltaMB": 124
+            }
+          },
+          {
+            "jsHeap": {
+              "isolates": 2,
+              "usedMB": 170.15777587890625,
+              "totalMB": 271.0078125
+            },
+            "process": {
+              "source": "proc",
+              "byType": {
+                "browser": {
+                  "count": 1,
+                  "pssMB": 101.41015625,
+                  "rssMB": 193.41796875,
+                  "peakRssMB": 198.046875
+                },
+                "zygote": {
+                  "count": 2,
+                  "pssMB": 31.0224609375,
+                  "rssMB": 136.51953125,
+                  "peakRssMB": 136.51953125
+                },
+                "utility": {
+                  "count": 2,
+                  "pssMB": 58.7509765625,
+                  "rssMB": 179.53125,
+                  "peakRssMB": 179.53125
+                },
+                "gpu-process": {
+                  "count": 1,
+                  "pssMB": 162.4482421875,
+                  "rssMB": 219.94921875,
+                  "peakRssMB": 250.484375
+                },
+                "renderer": {
+                  "count": 4,
+                  "pssMB": 517.3212890625,
+                  "rssMB": 780.4921875,
+                  "peakRssMB": 780.4921875
+                }
+              },
+              "totalPssMB": 870.953125
+            },
+            "gpuDevice": {
+              "usedMB": 123,
+              "baselineMB": 0,
+              "deltaMB": 123
+            }
+          }
+        ],
+        "memoryMedian": {
+          "jsHeapUsedMB": 169.9,
+          "rendererPssMB": 516.4,
+          "gpuProcessPssMB": 162.7,
+          "totalPssMB": 869.7,
+          "gpuDeviceDeltaMB": 123
+        },
+        "content": null,
+        "load": {
+          "before": 1.61,
+          "after": 2.41,
+          "foreignCores": 0.019231513868631964,
+          "foreignTop": ""
+        }
+      },
+      "igv": {
+        "median": 7529,
+        "mean": 7551.333333333333,
+        "stddev": 73.16799543212562,
+        "lo": 7475,
+        "hi": 7650,
+        "runs": [
+          7529,
+          7650,
+          7475
+        ],
+        "memory": [
+          {
+            "jsHeap": {
+              "isolates": 1,
+              "usedMB": 145.86286163330078,
+              "totalMB": 216.15234375
+            },
+            "process": {
+              "source": "proc",
+              "byType": {
+                "browser": {
+                  "count": 1,
+                  "pssMB": 97.078125,
+                  "rssMB": 184.33984375,
+                  "peakRssMB": 190.83984375
+                },
+                "zygote": {
+                  "count": 2,
+                  "pssMB": 31.990234375,
+                  "rssMB": 137.078125,
+                  "peakRssMB": 137.078125
+                },
+                "utility": {
+                  "count": 2,
+                  "pssMB": 57.994140625,
+                  "rssMB": 172.8984375,
+                  "peakRssMB": 172.8984375
+                },
+                "gpu-process": {
+                  "count": 1,
+                  "pssMB": 160.169921875,
+                  "rssMB": 214.81640625,
+                  "peakRssMB": 245.84375
+                },
+                "renderer": {
+                  "count": 3,
+                  "pssMB": 544.228515625,
+                  "rssMB": 742.51953125,
+                  "peakRssMB": 801.359375
+                }
+              },
+              "totalPssMB": 891.4609375
+            },
+            "gpuDevice": {
+              "usedMB": 112,
+              "baselineMB": 0,
+              "deltaMB": 112
+            }
+          },
+          {
+            "jsHeap": {
+              "isolates": 1,
+              "usedMB": 155.42866134643555,
+              "totalMB": 216.15234375
+            },
+            "process": {
+              "source": "proc",
+              "byType": {
+                "browser": {
+                  "count": 1,
+                  "pssMB": 97.9228515625,
+                  "rssMB": 186.87890625,
+                  "peakRssMB": 193.37890625
+                },
+                "zygote": {
+                  "count": 2,
+                  "pssMB": 32.3525390625,
+                  "rssMB": 137.3125,
+                  "peakRssMB": 137.3125
+                },
+                "utility": {
+                  "count": 2,
+                  "pssMB": 57.8818359375,
+                  "rssMB": 175.48828125,
+                  "peakRssMB": 175.48828125
+                },
+                "gpu-process": {
+                  "count": 1,
+                  "pssMB": 162.3701171875,
+                  "rssMB": 217.29296875,
+                  "peakRssMB": 247.921875
+                },
+                "renderer": {
+                  "count": 3,
+                  "pssMB": 557.8759765625,
+                  "rssMB": 757.8984375,
+                  "peakRssMB": 757.8984375
+                }
+              },
+              "totalPssMB": 908.4033203125
+            },
+            "gpuDevice": {
+              "usedMB": 321,
+              "baselineMB": 0,
+              "deltaMB": 321
+            }
+          },
+          {
+            "jsHeap": {
+              "isolates": 1,
+              "usedMB": 145.93680953979492,
+              "totalMB": 216.90234375
+            },
+            "process": {
+              "source": "proc",
+              "byType": {
+                "browser": {
+                  "count": 1,
+                  "pssMB": 98.1357421875,
+                  "rssMB": 185.734375,
+                  "peakRssMB": 190.515625
+                },
+                "zygote": {
+                  "count": 2,
+                  "pssMB": 32.2978515625,
+                  "rssMB": 136.69921875,
+                  "peakRssMB": 136.69921875
+                },
+                "utility": {
+                  "count": 2,
+                  "pssMB": 58.033203125,
+                  "rssMB": 173.4375,
+                  "peakRssMB": 173.47265625
+                },
+                "gpu-process": {
+                  "count": 1,
+                  "pssMB": 163.4970703125,
+                  "rssMB": 218.08984375,
+                  "peakRssMB": 249.53125
+                },
+                "renderer": {
+                  "count": 3,
+                  "pssMB": 544.5302734375,
+                  "rssMB": 742.87890625,
+                  "peakRssMB": 801.9765625
+                }
+              },
+              "totalPssMB": 896.494140625
+            },
+            "gpuDevice": {
+              "usedMB": 124,
+              "baselineMB": 0,
+              "deltaMB": 124
+            }
+          }
+        ],
+        "memoryMedian": {
+          "jsHeapUsedMB": 145.9,
+          "rendererPssMB": 544.5,
+          "gpuProcessPssMB": 162.4,
+          "totalPssMB": 896.5,
+          "gpuDeviceDeltaMB": 124
+        },
+        "content": {
+          "trackHeight": 600,
+          "contentHeight": 4237,
+          "rowsFit": false
+        },
+        "load": {
+          "before": 1.36,
+          "after": 2.41,
+          "foreignCores": 0.01922952829579917,
+          "foreignTop": ""
+        }
+      },
+      "genomespy": {
+        "median": 3626,
+        "mean": 3622,
+        "stddev": 6.377042156569663,
+        "lo": 3613,
+        "hi": 3627,
+        "runs": [
+          3613,
+          3627,
+          3626
+        ],
+        "memory": [
+          {
+            "jsHeap": {
+              "isolates": 1,
+              "usedMB": 144.90156936645508,
+              "totalMB": 208.9375
+            },
+            "process": {
+              "source": "proc",
+              "byType": {
+                "browser": {
+                  "count": 1,
+                  "pssMB": 96.7138671875,
+                  "rssMB": 185.109375,
+                  "peakRssMB": 192.9609375
+                },
+                "zygote": {
+                  "count": 2,
+                  "pssMB": 31.9453125,
+                  "rssMB": 137.5625,
+                  "peakRssMB": 137.5625
+                },
+                "utility": {
+                  "count": 2,
+                  "pssMB": 58.9150390625,
+                  "rssMB": 174.3203125,
+                  "peakRssMB": 174.3203125
+                },
+                "gpu-process": {
+                  "count": 1,
+                  "pssMB": 215.0126953125,
+                  "rssMB": 277.73046875,
+                  "peakRssMB": 315.65625
+                },
+                "renderer": {
+                  "count": 3,
+                  "pssMB": 468.8896484375,
+                  "rssMB": 675.6015625,
+                  "peakRssMB": 675.6015625
+                }
+              },
+              "totalPssMB": 871.4765625
+            },
+            "gpuDevice": {
+              "usedMB": 108,
+              "baselineMB": 0,
+              "deltaMB": 108
+            }
+          },
+          {
+            "jsHeap": {
+              "isolates": 1,
+              "usedMB": 144.8372459411621,
+              "totalMB": 208.1875
+            },
+            "process": {
+              "source": "proc",
+              "byType": {
+                "browser": {
+                  "count": 1,
+                  "pssMB": 95.27734375,
+                  "rssMB": 183.3671875,
+                  "peakRssMB": 191.1171875
+                },
+                "zygote": {
+                  "count": 2,
+                  "pssMB": 31.99609375,
+                  "rssMB": 136.03125,
+                  "peakRssMB": 136.03125
+                },
+                "utility": {
+                  "count": 2,
+                  "pssMB": 58.0234375,
+                  "rssMB": 173.46484375,
+                  "peakRssMB": 173.46484375
+                },
+                "gpu-process": {
+                  "count": 1,
+                  "pssMB": 215.3369140625,
+                  "rssMB": 277.328125,
+                  "peakRssMB": 315.1796875
+                },
+                "renderer": {
+                  "count": 3,
+                  "pssMB": 470.228515625,
+                  "rssMB": 676.35546875,
+                  "peakRssMB": 676.35546875
+                }
+              },
+              "totalPssMB": 870.8623046875
+            },
+            "gpuDevice": {
+              "usedMB": 108,
+              "baselineMB": 0,
+              "deltaMB": 108
+            }
+          },
+          {
+            "jsHeap": {
+              "isolates": 1,
+              "usedMB": 144.8160629272461,
+              "totalMB": 208.4375
+            },
+            "process": {
+              "source": "proc",
+              "byType": {
+                "browser": {
+                  "count": 1,
+                  "pssMB": 95.19921875,
+                  "rssMB": 184.1171875,
+                  "peakRssMB": 192.84375
+                },
+                "zygote": {
+                  "count": 2,
+                  "pssMB": 32.265625,
+                  "rssMB": 136.453125,
+                  "peakRssMB": 136.453125
+                },
+                "utility": {
+                  "count": 2,
+                  "pssMB": 57.85546875,
+                  "rssMB": 172.67578125,
+                  "peakRssMB": 172.67578125
+                },
+                "gpu-process": {
+                  "count": 1,
+                  "pssMB": 215.322265625,
+                  "rssMB": 276.6953125,
+                  "peakRssMB": 314.44140625
+                },
+                "renderer": {
+                  "count": 3,
+                  "pssMB": 469.728515625,
+                  "rssMB": 674.5625,
+                  "peakRssMB": 674.5625
+                }
+              },
+              "totalPssMB": 870.37109375
+            },
+            "gpuDevice": {
+              "usedMB": 108,
+              "baselineMB": 0,
+              "deltaMB": 108
+            }
+          }
+        ],
+        "memoryMedian": {
+          "jsHeapUsedMB": 144.8,
+          "rendererPssMB": 469.7,
+          "gpuProcessPssMB": 215.3,
+          "totalPssMB": 870.9,
+          "gpuDeviceDeltaMB": 108
+        },
+        "content": null,
+        "load": {
+          "before": 1.22,
+          "after": 2.41,
+          "foreignCores": 0.01922803938521891,
+          "foreignTop": ""
+        }
+      }
+    },
+    "20x-shortread-bam@100kb": {
+      "jbrowse": {
+        "median": 1629,
+        "mean": 1629.3333333333333,
+        "stddev": 73.07682411149393,
+        "lo": 1540,
+        "hi": 1719,
+        "runs": [
+          1540,
+          1719,
+          1629
+        ],
+        "memory": [
+          {
+            "jsHeap": {
+              "isolates": 6,
+              "usedMB": 46.43367004394531,
+              "totalMB": 72.1640625
+            },
+            "process": {
+              "source": "proc",
+              "byType": {
+                "browser": {
+                  "count": 1,
+                  "pssMB": 102.025390625,
+                  "rssMB": 194.125,
+                  "peakRssMB": 197.2109375
+                },
+                "zygote": {
+                  "count": 2,
+                  "pssMB": 32.103515625,
+                  "rssMB": 137.2265625,
+                  "peakRssMB": 137.2265625
+                },
+                "utility": {
+                  "count": 2,
+                  "pssMB": 60.8125,
+                  "rssMB": 178.9453125,
+                  "peakRssMB": 178.9453125
+                },
+                "gpu-process": {
+                  "count": 1,
+                  "pssMB": 170.89453125,
+                  "rssMB": 227.9765625,
+                  "peakRssMB": 257.90234375
+                },
+                "renderer": {
+                  "count": 3,
+                  "pssMB": 313.6953125,
+                  "rssMB": 517.4296875,
+                  "peakRssMB": 517.4296875
+                }
+              },
+              "totalPssMB": 679.53125
+            },
+            "gpuDevice": {
+              "usedMB": 71,
+              "baselineMB": 0,
+              "deltaMB": 71
+            }
+          },
+          {
+            "jsHeap": {
+              "isolates": 6,
+              "usedMB": 45.9870491027832,
+              "totalMB": 75.4140625
+            },
+            "process": {
+              "source": "proc",
+              "byType": {
+                "browser": {
+                  "count": 1,
+                  "pssMB": 102.9482421875,
+                  "rssMB": 194.77734375,
+                  "peakRssMB": 198.078125
+                },
+                "zygote": {
+                  "count": 2,
+                  "pssMB": 32.244140625,
+                  "rssMB": 136.6953125,
+                  "peakRssMB": 136.6953125
+                },
+                "utility": {
+                  "count": 2,
+                  "pssMB": 59.328125,
+                  "rssMB": 177.6171875,
+                  "peakRssMB": 177.6171875
+                },
+                "gpu-process": {
+                  "count": 1,
+                  "pssMB": 171.412109375,
+                  "rssMB": 227.5625,
+                  "peakRssMB": 256.9375
+                },
+                "renderer": {
+                  "count": 3,
+                  "pssMB": 311.7431640625,
+                  "rssMB": 513.5,
+                  "peakRssMB": 513.5
+                }
+              },
+              "totalPssMB": 677.67578125
+            },
+            "gpuDevice": {
+              "usedMB": 71,
+              "baselineMB": 0,
+              "deltaMB": 71
+            }
+          },
+          {
+            "jsHeap": {
+              "isolates": 6,
+              "usedMB": 46.018192291259766,
+              "totalMB": 74.6640625
+            },
+            "process": {
+              "source": "proc",
+              "byType": {
+                "browser": {
+                  "count": 1,
+                  "pssMB": 102.03125,
+                  "rssMB": 194.4765625,
+                  "peakRssMB": 197.7265625
+                },
+                "zygote": {
+                  "count": 2,
+                  "pssMB": 32.248046875,
+                  "rssMB": 137.7578125,
+                  "peakRssMB": 137.7578125
+                },
+                "utility": {
+                  "count": 2,
+                  "pssMB": 59.4560546875,
+                  "rssMB": 178.734375,
+                  "peakRssMB": 178.734375
+                },
+                "gpu-process": {
+                  "count": 1,
+                  "pssMB": 171.0830078125,
+                  "rssMB": 227.57421875,
+                  "peakRssMB": 257.52734375
+                },
+                "renderer": {
+                  "count": 3,
+                  "pssMB": 313.4609375,
+                  "rssMB": 516.8203125,
+                  "peakRssMB": 516.8203125
+                }
+              },
+              "totalPssMB": 678.279296875
+            },
+            "gpuDevice": {
+              "usedMB": 71,
+              "baselineMB": 0,
+              "deltaMB": 71
+            }
+          }
+        ],
+        "memoryMedian": {
+          "jsHeapUsedMB": 46,
+          "rendererPssMB": 313.5,
+          "gpuProcessPssMB": 171.1,
+          "totalPssMB": 678.3,
+          "gpuDeviceDeltaMB": 71
+        },
+        "content": null,
+        "load": {
+          "before": 2.41,
+          "after": 3.67,
+          "foreignCores": 0.022514071294559106,
+          "foreignTop": ""
+        }
+      },
+      "jbrowse-release-2.4.0": {
+        "median": 6511,
+        "mean": 6503.333333333333,
+        "stddev": 46.44949467492144,
+        "lo": 6443,
+        "hi": 6556,
+        "runs": [
+          6556,
+          6511,
+          6443
+        ],
+        "memory": [
+          {
+            "jsHeap": {
+              "isolates": 2,
+              "usedMB": 185.8609962463379,
+              "totalMB": 324.6953125
+            },
+            "process": {
+              "source": "proc",
+              "byType": {
+                "browser": {
+                  "count": 1,
+                  "pssMB": 99.0634765625,
+                  "rssMB": 191.77734375,
+                  "peakRssMB": 198.16796875
+                },
+                "zygote": {
+                  "count": 2,
+                  "pssMB": 31.4052734375,
+                  "rssMB": 137.1875,
+                  "peakRssMB": 137.1875
+                },
+                "utility": {
+                  "count": 2,
+                  "pssMB": 58.4853515625,
+                  "rssMB": 178.42578125,
+                  "peakRssMB": 178.42578125
+                },
+                "gpu-process": {
+                  "count": 1,
+                  "pssMB": 164.24609375,
+                  "rssMB": 223.55859375,
+                  "peakRssMB": 254.01171875
+                },
+                "renderer": {
+                  "count": 4,
+                  "pssMB": 567.41796875,
+                  "rssMB": 832.35546875,
+                  "peakRssMB": 832.35546875
+                }
+              },
+              "totalPssMB": 920.6181640625
+            },
+            "gpuDevice": {
+              "usedMB": 86,
+              "baselineMB": 0,
+              "deltaMB": 86
+            }
+          },
+          {
+            "jsHeap": {
+              "isolates": 2,
+              "usedMB": 227.03009414672852,
+              "totalMB": 346.1171875
+            },
+            "process": {
+              "source": "proc",
+              "byType": {
+                "browser": {
+                  "count": 1,
+                  "pssMB": 101.0146484375,
+                  "rssMB": 193.171875,
+                  "peakRssMB": 197.53515625
+                },
+                "zygote": {
+                  "count": 2,
+                  "pssMB": 31.470703125,
+                  "rssMB": 136.5,
+                  "peakRssMB": 136.5
+                },
+                "utility": {
+                  "count": 2,
+                  "pssMB": 58.1533203125,
+                  "rssMB": 178.91796875,
+                  "peakRssMB": 178.91796875
+                },
+                "gpu-process": {
+                  "count": 1,
+                  "pssMB": 161.697265625,
+                  "rssMB": 219.97265625,
+                  "peakRssMB": 251.14453125
+                },
+                "renderer": {
+                  "count": 4,
+                  "pssMB": 586.951171875,
+                  "rssMB": 849.53125,
+                  "peakRssMB": 849.53125
+                }
+              },
+              "totalPssMB": 939.287109375
+            },
+            "gpuDevice": {
+              "usedMB": 86,
+              "baselineMB": 0,
+              "deltaMB": 86
+            }
+          },
+          {
+            "jsHeap": {
+              "isolates": 2,
+              "usedMB": 236.91322326660156,
+              "totalMB": 339.796875
+            },
+            "process": {
+              "source": "proc",
+              "byType": {
+                "browser": {
+                  "count": 1,
+                  "pssMB": 101.6875,
+                  "rssMB": 194.5625,
+                  "peakRssMB": 198.765625
+                },
+                "zygote": {
+                  "count": 2,
+                  "pssMB": 31.38671875,
+                  "rssMB": 136.9609375,
+                  "peakRssMB": 136.9609375
+                },
+                "utility": {
+                  "count": 2,
+                  "pssMB": 58.33203125,
+                  "rssMB": 178.125,
+                  "peakRssMB": 178.125
+                },
+                "gpu-process": {
+                  "count": 1,
+                  "pssMB": 164.064453125,
+                  "rssMB": 223,
+                  "peakRssMB": 253.79296875
+                },
+                "renderer": {
+                  "count": 4,
+                  "pssMB": 580.7548828125,
+                  "rssMB": 845.76171875,
+                  "peakRssMB": 845.76171875
+                }
+              },
+              "totalPssMB": 936.2255859375
+            },
+            "gpuDevice": {
+              "usedMB": 83,
+              "baselineMB": 0,
+              "deltaMB": 83
+            }
+          }
+        ],
+        "memoryMedian": {
+          "jsHeapUsedMB": 227,
+          "rendererPssMB": 580.8,
+          "gpuProcessPssMB": 164.1,
+          "totalPssMB": 936.2,
+          "gpuDeviceDeltaMB": 86
+        },
+        "content": null,
+        "load": {
+          "before": 2.54,
+          "after": 3.67,
+          "foreignCores": 0.022511607547641758,
+          "foreignTop": ""
+        }
+      },
+      "igv": {
+        "median": 3948,
+        "mean": 3942.6666666666665,
+        "stddev": 10.498677165349081,
+        "lo": 3928,
+        "hi": 3952,
+        "runs": [
+          3952,
+          3928,
+          3948
+        ],
+        "memory": [
+          {
+            "jsHeap": {
+              "isolates": 1,
+              "usedMB": 91.22727584838867,
+              "totalMB": 159.2734375
+            },
+            "process": {
+              "source": "proc",
+              "byType": {
+                "browser": {
+                  "count": 1,
+                  "pssMB": 97.3984375,
+                  "rssMB": 184.82421875,
+                  "peakRssMB": 191.359375
+                },
+                "zygote": {
+                  "count": 2,
+                  "pssMB": 32.291015625,
+                  "rssMB": 137.1171875,
+                  "peakRssMB": 137.1171875
+                },
+                "utility": {
+                  "count": 2,
+                  "pssMB": 57.5087890625,
+                  "rssMB": 172.66015625,
+                  "peakRssMB": 175.35546875
+                },
+                "gpu-process": {
+                  "count": 1,
+                  "pssMB": 159.7861328125,
+                  "rssMB": 217.7734375,
+                  "peakRssMB": 256.796875
+                },
+                "renderer": {
+                  "count": 3,
+                  "pssMB": 427.6875,
+                  "rssMB": 628.5859375,
+                  "peakRssMB": 651.328125
+                }
+              },
+              "totalPssMB": 774.671875
+            },
+            "gpuDevice": {
+              "usedMB": 84,
+              "baselineMB": 0,
+              "deltaMB": 84
+            }
+          },
+          {
+            "jsHeap": {
+              "isolates": 1,
+              "usedMB": 91.22704696655273,
+              "totalMB": 159.0234375
+            },
+            "process": {
+              "source": "proc",
+              "byType": {
+                "browser": {
+                  "count": 1,
+                  "pssMB": 96.890625,
+                  "rssMB": 184.84765625,
+                  "peakRssMB": 191.1328125
+                },
+                "zygote": {
+                  "count": 2,
+                  "pssMB": 32.09765625,
+                  "rssMB": 136.23828125,
+                  "peakRssMB": 136.23828125
+                },
+                "utility": {
+                  "count": 2,
+                  "pssMB": 57.2626953125,
+                  "rssMB": 171.73046875,
+                  "peakRssMB": 174.5
+                },
+                "gpu-process": {
+                  "count": 1,
+                  "pssMB": 159.458984375,
+                  "rssMB": 217.61328125,
+                  "peakRssMB": 256.19140625
+                },
+                "renderer": {
+                  "count": 3,
+                  "pssMB": 425.794921875,
+                  "rssMB": 627.7265625,
+                  "peakRssMB": 650.42578125
+                }
+              },
+              "totalPssMB": 771.5048828125
+            },
+            "gpuDevice": {
+              "usedMB": 84,
+              "baselineMB": 0,
+              "deltaMB": 84
+            }
+          },
+          {
+            "jsHeap": {
+              "isolates": 1,
+              "usedMB": 91.22930526733398,
+              "totalMB": 159.2734375
+            },
+            "process": {
+              "source": "proc",
+              "byType": {
+                "browser": {
+                  "count": 1,
+                  "pssMB": 97.1552734375,
+                  "rssMB": 184.98828125,
+                  "peakRssMB": 191.29296875
+                },
+                "zygote": {
+                  "count": 2,
+                  "pssMB": 32.224609375,
+                  "rssMB": 136.84765625,
+                  "peakRssMB": 136.84765625
+                },
+                "utility": {
+                  "count": 2,
+                  "pssMB": 57.54296875,
+                  "rssMB": 172.29296875,
+                  "peakRssMB": 175.68359375
+                },
+                "gpu-process": {
+                  "count": 1,
+                  "pssMB": 159.4775390625,
+                  "rssMB": 217.75,
+                  "peakRssMB": 257.078125
+                },
+                "renderer": {
+                  "count": 3,
+                  "pssMB": 427.48828125,
+                  "rssMB": 629.0078125,
+                  "peakRssMB": 649.63671875
+                }
+              },
+              "totalPssMB": 773.888671875
+            },
+            "gpuDevice": {
+              "usedMB": 84,
+              "baselineMB": 0,
+              "deltaMB": 84
+            }
+          }
+        ],
+        "memoryMedian": {
+          "jsHeapUsedMB": 91.2,
+          "rendererPssMB": 427.5,
+          "gpuProcessPssMB": 159.5,
+          "totalPssMB": 773.9,
+          "gpuDeviceDeltaMB": 84
+        },
+        "content": {
+          "trackHeight": 600,
+          "contentHeight": 723,
+          "rowsFit": false
+        },
+        "load": {
+          "before": 2.75,
+          "after": 3.67,
+          "foreignCores": 0.022509496193706728,
+          "foreignTop": ""
+        }
+      },
+      "genomespy": {
+        "median": 3194,
+        "mean": 3204,
+        "stddev": 24.711670657134185,
+        "lo": 3180,
+        "hi": 3238,
+        "runs": [
+          3180,
+          3194,
+          3238
+        ],
+        "memory": [
+          {
+            "jsHeap": {
+              "isolates": 1,
+              "usedMB": 129.24639129638672,
+              "totalMB": 190.87890625
+            },
+            "process": {
+              "source": "proc",
+              "byType": {
+                "browser": {
+                  "count": 1,
+                  "pssMB": 97.4951171875,
+                  "rssMB": 185.0703125,
+                  "peakRssMB": 188.26171875
+                },
+                "zygote": {
+                  "count": 2,
+                  "pssMB": 32.109375,
+                  "rssMB": 136.75390625,
+                  "peakRssMB": 136.75390625
+                },
+                "utility": {
+                  "count": 2,
+                  "pssMB": 57.080078125,
+                  "rssMB": 172.4765625,
+                  "peakRssMB": 172.4765625
+                },
+                "gpu-process": {
+                  "count": 1,
+                  "pssMB": 212.814453125,
+                  "rssMB": 273.2421875,
+                  "peakRssMB": 311.21875
+                },
+                "renderer": {
+                  "count": 3,
+                  "pssMB": 406.619140625,
+                  "rssMB": 611.359375,
+                  "peakRssMB": 611.359375
+                }
+              },
+              "totalPssMB": 806.1181640625
+            },
+            "gpuDevice": {
+              "usedMB": 107,
+              "baselineMB": 0,
+              "deltaMB": 107
+            }
+          },
+          {
+            "jsHeap": {
+              "isolates": 1,
+              "usedMB": 68.12018585205078,
+              "totalMB": 167.0703125
+            },
+            "process": {
+              "source": "proc",
+              "byType": {
+                "browser": {
+                  "count": 1,
+                  "pssMB": 97.59375,
+                  "rssMB": 186.11328125,
+                  "peakRssMB": 189.203125
+                },
+                "zygote": {
+                  "count": 2,
+                  "pssMB": 31.9287109375,
+                  "rssMB": 135.83984375,
+                  "peakRssMB": 135.83984375
+                },
+                "utility": {
+                  "count": 2,
+                  "pssMB": 56.1611328125,
+                  "rssMB": 171.54296875,
+                  "peakRssMB": 171.54296875
+                },
+                "gpu-process": {
+                  "count": 1,
+                  "pssMB": 213.1865234375,
+                  "rssMB": 273.98046875,
+                  "peakRssMB": 311.96875
+                },
+                "renderer": {
+                  "count": 3,
+                  "pssMB": 375.7783203125,
+                  "rssMB": 580.4140625,
+                  "peakRssMB": 610.90625
+                }
+              },
+              "totalPssMB": 774.6484375
+            },
+            "gpuDevice": {
+              "usedMB": 107,
+              "baselineMB": 0,
+              "deltaMB": 107
+            }
+          },
+          {
+            "jsHeap": {
+              "isolates": 1,
+              "usedMB": 67.66109466552734,
+              "totalMB": 165.8203125
+            },
+            "process": {
+              "source": "proc",
+              "byType": {
+                "browser": {
+                  "count": 1,
+                  "pssMB": 95.2841796875,
+                  "rssMB": 184.1328125,
+                  "peakRssMB": 189.62890625
+                },
+                "zygote": {
+                  "count": 2,
+                  "pssMB": 32.3369140625,
+                  "rssMB": 137.48828125,
+                  "peakRssMB": 137.48828125
+                },
+                "utility": {
+                  "count": 2,
+                  "pssMB": 57.0869140625,
+                  "rssMB": 172.125,
+                  "peakRssMB": 172.125
+                },
+                "gpu-process": {
+                  "count": 1,
+                  "pssMB": 213.3125,
+                  "rssMB": 274.328125,
+                  "peakRssMB": 311.8515625
+                },
+                "renderer": {
+                  "count": 3,
+                  "pssMB": 362.8037109375,
+                  "rssMB": 567.69921875,
+                  "peakRssMB": 612.0625
+                }
+              },
+              "totalPssMB": 760.82421875
+            },
+            "gpuDevice": {
+              "usedMB": 107,
+              "baselineMB": 0,
+              "deltaMB": 107
+            }
+          }
+        ],
+        "memoryMedian": {
+          "jsHeapUsedMB": 68.1,
+          "rendererPssMB": 375.8,
+          "gpuProcessPssMB": 213.2,
+          "totalPssMB": 774.6,
+          "gpuDeviceDeltaMB": 107
+        },
+        "content": null,
+        "load": {
+          "before": 2.61,
+          "after": 3.67,
+          "foreignCores": 0.022507385235780497,
+          "foreignTop": ""
+        }
+      }
+    },
+    "200x-shortread-bam@100kb": {
+      "jbrowse": {
+        "median": 3213,
+        "mean": 3241,
+        "stddev": 44.63929509598765,
+        "lo": 3206,
+        "hi": 3304,
+        "runs": [
+          3304,
+          3206,
+          3213
+        ],
+        "memory": [
+          {
+            "jsHeap": {
+              "isolates": 6,
+              "usedMB": 199.86214447021484,
+              "totalMB": 259.34765625
+            },
+            "process": {
+              "source": "proc",
+              "byType": {
+                "browser": {
+                  "count": 1,
+                  "pssMB": 104.279296875,
+                  "rssMB": 196.59375,
+                  "peakRssMB": 199.7578125
+                },
+                "zygote": {
+                  "count": 2,
+                  "pssMB": 31.5302734375,
+                  "rssMB": 137.66015625,
+                  "peakRssMB": 137.66015625
+                },
+                "utility": {
+                  "count": 2,
+                  "pssMB": 61.3798828125,
+                  "rssMB": 182.41796875,
+                  "peakRssMB": 182.41796875
+                },
+                "gpu-process": {
+                  "count": 1,
+                  "pssMB": 236.87109375,
+                  "rssMB": 302.03125,
+                  "peakRssMB": 339.9140625
+                },
+                "renderer": {
+                  "count": 4,
+                  "pssMB": 756.30859375,
+                  "rssMB": 1026.3359375,
+                  "peakRssMB": 1026.3359375
+                }
+              },
+              "totalPssMB": 1190.369140625
+            },
+            "gpuDevice": {
+              "usedMB": 103,
+              "baselineMB": 0,
+              "deltaMB": 103
+            }
+          },
+          {
+            "jsHeap": {
+              "isolates": 6,
+              "usedMB": 199.4374771118164,
+              "totalMB": 259.34765625
+            },
+            "process": {
+              "source": "proc",
+              "byType": {
+                "browser": {
+                  "count": 1,
+                  "pssMB": 102.2431640625,
+                  "rssMB": 194.21484375,
+                  "peakRssMB": 197.88671875
+                },
+                "zygote": {
+                  "count": 2,
+                  "pssMB": 32.140625,
+                  "rssMB": 136.05078125,
+                  "peakRssMB": 136.05078125
+                },
+                "utility": {
+                  "count": 2,
+                  "pssMB": 65.044921875,
+                  "rssMB": 182.8671875,
+                  "peakRssMB": 182.8671875
+                },
+                "gpu-process": {
+                  "count": 1,
+                  "pssMB": 237.4326171875,
+                  "rssMB": 300.77734375,
+                  "peakRssMB": 338.8671875
+                },
+                "renderer": {
+                  "count": 3,
+                  "pssMB": 736.724609375,
+                  "rssMB": 947.296875,
+                  "peakRssMB": 947.296875
+                }
+              },
+              "totalPssMB": 1173.5859375
+            },
+            "gpuDevice": {
+              "usedMB": 103,
+              "baselineMB": 0,
+              "deltaMB": 103
+            }
+          },
+          {
+            "jsHeap": {
+              "isolates": 6,
+              "usedMB": 199.6470489501953,
+              "totalMB": 260.34765625
+            },
+            "process": {
+              "source": "proc",
+              "byType": {
+                "browser": {
+                  "count": 1,
+                  "pssMB": 103.4716796875,
+                  "rssMB": 196.6953125,
+                  "peakRssMB": 199.82421875
+                },
+                "zygote": {
+                  "count": 2,
+                  "pssMB": 31.4072265625,
+                  "rssMB": 136.80859375,
+                  "peakRssMB": 136.80859375
+                },
+                "utility": {
+                  "count": 2,
+                  "pssMB": 59.9111328125,
+                  "rssMB": 180.296875,
+                  "peakRssMB": 180.296875
+                },
+                "gpu-process": {
+                  "count": 1,
+                  "pssMB": 236.6298828125,
+                  "rssMB": 301.38671875,
+                  "peakRssMB": 339.26953125
+                },
+                "renderer": {
+                  "count": 4,
+                  "pssMB": 753.4931640625,
+                  "rssMB": 1022.97265625,
+                  "peakRssMB": 1022.97265625
+                }
+              },
+              "totalPssMB": 1184.9130859375
+            },
+            "gpuDevice": {
+              "usedMB": 102,
+              "baselineMB": 0,
+              "deltaMB": 102
+            }
+          }
+        ],
+        "memoryMedian": {
+          "jsHeapUsedMB": 199.6,
+          "rendererPssMB": 753.5,
+          "gpuProcessPssMB": 236.9,
+          "totalPssMB": 1184.9,
+          "gpuDeviceDeltaMB": 103
+        },
+        "content": null,
+        "load": {
+          "before": 3.67,
+          "after": 1.8,
+          "foreignCores": 0.01366889508160425,
+          "foreignTop": ""
+        }
+      },
+      "jbrowse-release-2.4.0": {
+        "median": 19954,
+        "mean": 19841,
+        "stddev": 215.03023043283937,
+        "lo": 19540,
+        "hi": 20029,
+        "runs": [
+          20029,
+          19954,
+          19540
+        ],
+        "memory": [
+          {
+            "jsHeap": {
+              "isolates": 2,
+              "usedMB": 590.9223442077637,
+              "totalMB": 810.96484375
+            },
+            "process": {
+              "source": "proc",
+              "byType": {
+                "browser": {
+                  "count": 1,
+                  "pssMB": 101.8935546875,
+                  "rssMB": 193.8984375,
+                  "peakRssMB": 198.046875
+                },
+                "zygote": {
+                  "count": 2,
+                  "pssMB": 31.380859375,
+                  "rssMB": 136.86328125,
+                  "peakRssMB": 136.86328125
+                },
+                "utility": {
+                  "count": 2,
+                  "pssMB": 61.8994140625,
+                  "rssMB": 181.84375,
+                  "peakRssMB": 190.65625
+                },
+                "gpu-process": {
+                  "count": 1,
+                  "pssMB": 187.779296875,
+                  "rssMB": 248.69921875,
+                  "peakRssMB": 279.09765625
+                },
+                "renderer": {
+                  "count": 4,
+                  "pssMB": 1280.595703125,
+                  "rssMB": 1548.078125,
+                  "peakRssMB": 1694.2421875
+                }
+              },
+              "totalPssMB": 1663.548828125
+            },
+            "gpuDevice": {
+              "usedMB": 121,
+              "baselineMB": 0,
+              "deltaMB": 121
+            }
+          },
+          {
+            "jsHeap": {
+              "isolates": 2,
+              "usedMB": 608.6706809997559,
+              "totalMB": 811.08203125
+            },
+            "process": {
+              "source": "proc",
+              "byType": {
+                "browser": {
+                  "count": 1,
+                  "pssMB": 102.64453125,
+                  "rssMB": 193.87890625,
+                  "peakRssMB": 198.33203125
+                },
+                "zygote": {
+                  "count": 2,
+                  "pssMB": 31.1474609375,
+                  "rssMB": 137.1328125,
+                  "peakRssMB": 137.1328125
+                },
+                "utility": {
+                  "count": 2,
+                  "pssMB": 59.8037109375,
+                  "rssMB": 181.2890625,
+                  "peakRssMB": 184.3984375
+                },
+                "gpu-process": {
+                  "count": 1,
+                  "pssMB": 185.1787109375,
+                  "rssMB": 244.24609375,
+                  "peakRssMB": 274.4765625
+                },
+                "renderer": {
+                  "count": 4,
+                  "pssMB": 1288.3779296875,
+                  "rssMB": 1553.73046875,
+                  "peakRssMB": 1694.87109375
+                }
+              },
+              "totalPssMB": 1667.15234375
+            },
+            "gpuDevice": {
+              "usedMB": 121,
+              "baselineMB": 0,
+              "deltaMB": 121
+            }
+          },
+          {
+            "jsHeap": {
+              "isolates": 2,
+              "usedMB": 605.6294746398926,
+              "totalMB": 810.58984375
+            },
+            "process": {
+              "source": "proc",
+              "byType": {
+                "browser": {
+                  "count": 1,
+                  "pssMB": 102.623046875,
+                  "rssMB": 194.78515625,
+                  "peakRssMB": 199.65234375
+                },
+                "zygote": {
+                  "count": 2,
+                  "pssMB": 31.2646484375,
+                  "rssMB": 137.15625,
+                  "peakRssMB": 137.15625
+                },
+                "utility": {
+                  "count": 2,
+                  "pssMB": 59.50390625,
+                  "rssMB": 180.27734375,
+                  "peakRssMB": 184.03515625
+                },
+                "gpu-process": {
+                  "count": 1,
+                  "pssMB": 185.2080078125,
+                  "rssMB": 244.7109375,
+                  "peakRssMB": 275.67578125
+                },
+                "renderer": {
+                  "count": 4,
+                  "pssMB": 1319.673828125,
+                  "rssMB": 1585.05859375,
+                  "peakRssMB": 1688.4375
+                }
+              },
+              "totalPssMB": 1698.2734375
+            },
+            "gpuDevice": {
+              "usedMB": 125,
+              "baselineMB": 0,
+              "deltaMB": 125
+            }
+          }
+        ],
+        "memoryMedian": {
+          "jsHeapUsedMB": 605.6,
+          "rendererPssMB": 1288.4,
+          "gpuProcessPssMB": 185.2,
+          "totalPssMB": 1667.2,
+          "gpuDeviceDeltaMB": 121
+        },
+        "content": null,
+        "load": {
+          "before": 3.54,
+          "after": 1.8,
+          "foreignCores": 0.013668500363370327,
+          "foreignTop": ""
+        }
+      },
+      "igv": {
+        "median": 28041,
+        "mean": 28044.333333333332,
+        "stddev": 69.44222218666553,
+        "lo": 27961,
+        "hi": 28131,
+        "runs": [
+          27961,
+          28041,
+          28131
+        ],
+        "memory": [
+          {
+            "jsHeap": {
+              "isolates": 1,
+              "usedMB": 645.7058753967285,
+              "totalMB": 707.765625
+            },
+            "process": {
+              "source": "proc",
+              "byType": {
+                "browser": {
+                  "count": 1,
+                  "pssMB": 98.0986328125,
+                  "rssMB": 185.015625,
+                  "peakRssMB": 193.03515625
+                },
+                "zygote": {
+                  "count": 2,
+                  "pssMB": 32.3291015625,
+                  "rssMB": 137.0546875,
+                  "peakRssMB": 137.0546875
+                },
+                "utility": {
+                  "count": 2,
+                  "pssMB": 58.9287109375,
+                  "rssMB": 174.140625,
+                  "peakRssMB": 178.90234375
+                },
+                "gpu-process": {
+                  "count": 1,
+                  "pssMB": 160.447265625,
+                  "rssMB": 218.5703125,
+                  "peakRssMB": 258.36328125
+                },
+                "renderer": {
+                  "count": 3,
+                  "pssMB": 1624.1240234375,
+                  "rssMB": 1824.34375,
+                  "peakRssMB": 1841.75390625
+                }
+              },
+              "totalPssMB": 1973.927734375
+            },
+            "gpuDevice": {
+              "usedMB": 94,
+              "baselineMB": 0,
+              "deltaMB": 94
+            }
+          },
+          {
+            "jsHeap": {
+              "isolates": 1,
+              "usedMB": 683.6867828369141,
+              "totalMB": 744.7109375
+            },
+            "process": {
+              "source": "proc",
+              "byType": {
+                "browser": {
+                  "count": 1,
+                  "pssMB": 98.2001953125,
+                  "rssMB": 185.87890625,
+                  "peakRssMB": 193.87890625
+                },
+                "zygote": {
+                  "count": 2,
+                  "pssMB": 32.1748046875,
+                  "rssMB": 137.23046875,
+                  "peakRssMB": 137.23046875
+                },
+                "utility": {
+                  "count": 2,
+                  "pssMB": 60.615234375,
+                  "rssMB": 176.63671875,
+                  "peakRssMB": 181.46875
+                },
+                "gpu-process": {
+                  "count": 1,
+                  "pssMB": 159.916015625,
+                  "rssMB": 217.86328125,
+                  "peakRssMB": 257.39453125
+                },
+                "renderer": {
+                  "count": 3,
+                  "pssMB": 1677.2119140625,
+                  "rssMB": 1878.99609375,
+                  "peakRssMB": 1883.95703125
+                }
+              },
+              "totalPssMB": 2028.1181640625
+            },
+            "gpuDevice": {
+              "usedMB": 95,
+              "baselineMB": 0,
+              "deltaMB": 95
+            }
+          },
+          {
+            "jsHeap": {
+              "isolates": 1,
+              "usedMB": 632.5495567321777,
+              "totalMB": 710.515625
+            },
+            "process": {
+              "source": "proc",
+              "byType": {
+                "browser": {
+                  "count": 1,
+                  "pssMB": 98.8056640625,
+                  "rssMB": 186.4375,
+                  "peakRssMB": 194.2421875
+                },
+                "zygote": {
+                  "count": 2,
+                  "pssMB": 31.9599609375,
+                  "rssMB": 136.91015625,
+                  "peakRssMB": 136.91015625
+                },
+                "utility": {
+                  "count": 2,
+                  "pssMB": 60.4677734375,
+                  "rssMB": 175.80078125,
+                  "peakRssMB": 179.40234375
+                },
+                "gpu-process": {
+                  "count": 1,
+                  "pssMB": 161.9384765625,
+                  "rssMB": 220.4296875,
+                  "peakRssMB": 257.37890625
+                },
+                "renderer": {
+                  "count": 3,
+                  "pssMB": 1676.6396484375,
+                  "rssMB": 1878.62109375,
+                  "peakRssMB": 1896.7890625
+                }
+              },
+              "totalPssMB": 2029.8115234375
+            },
+            "gpuDevice": {
+              "usedMB": 90,
+              "baselineMB": 0,
+              "deltaMB": 90
+            }
+          }
+        ],
+        "memoryMedian": {
+          "jsHeapUsedMB": 645.7,
+          "rendererPssMB": 1676.6,
+          "gpuProcessPssMB": 160.4,
+          "totalPssMB": 2028.1,
+          "gpuDeviceDeltaMB": 94
+        },
+        "content": {
+          "trackHeight": 600,
+          "contentHeight": 4923,
+          "rowsFit": false
+        },
+        "load": {
+          "before": 3.32,
+          "after": 1.8,
+          "foreignCores": 0.013668105667932393,
+          "foreignTop": ""
+        }
+      },
+      "genomespy": {
+        "median": 12041,
+        "mean": 12062.666666666666,
+        "stddev": 48.609555530665865,
+        "lo": 12017,
+        "hi": 12130,
+        "runs": [
+          12041,
+          12017,
+          12130
+        ],
+        "memory": [
+          {
+            "jsHeap": {
+              "isolates": 1,
+              "usedMB": 812.5438766479492,
+              "totalMB": 888.0234375
+            },
+            "process": {
+              "source": "proc",
+              "byType": {
+                "browser": {
+                  "count": 1,
+                  "pssMB": 96.0634765625,
+                  "rssMB": 184.84765625,
+                  "peakRssMB": 193.84375
+                },
+                "zygote": {
+                  "count": 2,
+                  "pssMB": 31.9267578125,
+                  "rssMB": 137.1171875,
+                  "peakRssMB": 137.1171875
+                },
+                "utility": {
+                  "count": 2,
+                  "pssMB": 65.212890625,
+                  "rssMB": 180.48828125,
+                  "peakRssMB": 180.48828125
+                },
+                "gpu-process": {
+                  "count": 1,
+                  "pssMB": 433.8662109375,
+                  "rssMB": 496.0234375,
+                  "peakRssMB": 533.78125
+                },
+                "renderer": {
+                  "count": 3,
+                  "pssMB": 1487.0341796875,
+                  "rssMB": 1693.68359375,
+                  "peakRssMB": 1708.05859375
+                }
+              },
+              "totalPssMB": 2114.103515625
+            },
+            "gpuDevice": {
+              "usedMB": 306,
+              "baselineMB": 0,
+              "deltaMB": 306
+            }
+          },
+          {
+            "jsHeap": {
+              "isolates": 1,
+              "usedMB": 814.3706436157227,
+              "totalMB": 890.10546875
+            },
+            "process": {
+              "source": "proc",
+              "byType": {
+                "browser": {
+                  "count": 1,
+                  "pssMB": 95.544921875,
+                  "rssMB": 184.3984375,
+                  "peakRssMB": 193.8203125
+                },
+                "zygote": {
+                  "count": 2,
+                  "pssMB": 32.3427734375,
+                  "rssMB": 137.57421875,
+                  "peakRssMB": 137.57421875
+                },
+                "utility": {
+                  "count": 2,
+                  "pssMB": 65.3779296875,
+                  "rssMB": 181.203125,
+                  "peakRssMB": 181.203125
+                },
+                "gpu-process": {
+                  "count": 1,
+                  "pssMB": 434.7958984375,
+                  "rssMB": 497.05078125,
+                  "peakRssMB": 535.25390625
+                },
+                "renderer": {
+                  "count": 3,
+                  "pssMB": 1488.404296875,
+                  "rssMB": 1694.88671875,
+                  "peakRssMB": 1708.140625
+                }
+              },
+              "totalPssMB": 2116.4658203125
+            },
+            "gpuDevice": {
+              "usedMB": 306,
+              "baselineMB": 0,
+              "deltaMB": 306
+            }
+          },
+          {
+            "jsHeap": {
+              "isolates": 1,
+              "usedMB": 811.8445014953613,
+              "totalMB": 888.71875
+            },
+            "process": {
+              "source": "proc",
+              "byType": {
+                "browser": {
+                  "count": 1,
+                  "pssMB": 96.06640625,
+                  "rssMB": 184.94140625,
+                  "peakRssMB": 194.36328125
+                },
+                "zygote": {
+                  "count": 2,
+                  "pssMB": 32.4697265625,
+                  "rssMB": 137.65234375,
+                  "peakRssMB": 137.65234375
+                },
+                "utility": {
+                  "count": 2,
+                  "pssMB": 64.9404296875,
+                  "rssMB": 180.49609375,
+                  "peakRssMB": 180.49609375
+                },
+                "gpu-process": {
+                  "count": 1,
+                  "pssMB": 434.9423828125,
+                  "rssMB": 496.35546875,
+                  "peakRssMB": 534.0546875
+                },
+                "renderer": {
+                  "count": 3,
+                  "pssMB": 1482.1748046875,
+                  "rssMB": 1688.65625,
+                  "peakRssMB": 1708.15625
+                }
+              },
+              "totalPssMB": 2110.59375
+            },
+            "gpuDevice": {
+              "usedMB": 306,
+              "baselineMB": 0,
+              "deltaMB": 306
+            }
+          }
+        ],
+        "memoryMedian": {
+          "jsHeapUsedMB": 812.5,
+          "rendererPssMB": 1487,
+          "gpuProcessPssMB": 434.8,
+          "totalPssMB": 2114.1,
+          "gpuDeviceDeltaMB": 306
+        },
+        "content": null,
+        "load": {
+          "before": 2.4,
+          "after": 1.8,
+          "foreignCores": 0.013667710995288473,
+          "foreignTop": ""
+        }
+      }
+    }
+  },
+  "dates": {
+    "20x-shortread-bam@19kb": "2026-11-10",
+    "200x-shortread-bam@19kb": "2026-11-10",
+    "20x-shortread-bam@100kb": "2026-11-10",
+    "200x-shortread-bam@100kb": "2026-11-10"
+  }
+}

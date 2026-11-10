@@ -10,7 +10,11 @@ REGION=${EC2_REGION:-us-east-1}
 # Measured on the 2026-09-24 spike, going from 4 to 8 vCPUs sped JBrowse 20-30%
 # and igv.js and GenomeSpy 6-11%, so the 4-vCPU box understates JBrowse by about
 # a fifth of every ratio. Methods names the vCPU count for the same reason.
-INSTANCE_TYPE=${EC2_TYPE:-g4dn.2xlarge}
+# 2026-11-09 spike on beta.21 (results/ec2/2026-11-09-2153 against
+# 2026-11-09-2237): 8 to 16 vCPUs sped JBrowse v5 cold loads 3-6%, v2.4.0
+# 7-30%, igv.js and GenomeSpy 1-4%, and left the zoom unchanged. 16 vCPUs
+# match the 8-core, 16-thread laptop the submitted numbers came from.
+INSTANCE_TYPE=${EC2_TYPE:-g4dn.4xlarge}
 AMI_PARAM=/aws/service/deeplearning/ami/x86_64/base-oss-nvidia-driver-gpu-ubuntu-22.04/latest/ami-id
 KEY_NAME=jb2bench
 KEY_FILE=$HOME/.ssh/jb2bench-ec2.pem
