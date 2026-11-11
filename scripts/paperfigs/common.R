@@ -235,25 +235,34 @@ coldload_labels <- function(d, meas, cell, reference) {
                          ifelse(labels$label == "", 0, PLAIN_NUDGE))
   labels$nudge_y <- ifelse(labels$series == reference & labels$label != "",
                            REFERENCE_DROP, 0)
-  labels$leader <- ifelse(startsWith(labels$label, "timed out"), 0, 0.9)
+  labels$timed_out <- startsWith(labels$label, "timed out")
+  labels$stack <- ave(seq_along(labels$timed_out),
+                      do.call(paste, c(labels[cell], list(labels$timed_out))),
+                      FUN = seq_along) - 1
   labels
 }
 
-# The layer coldload_labels feeds, and the size scale that gives `face` its two
-# sizes. Returned as a list so a figure adds both with one `+`.
+# The layers coldload_labels feeds, and the size scale that gives `face` its two
+# sizes. Returned as a list so a figure adds them with one `+`. "Timed out"
+# notes name their own coverage, so they sit stacked in the panel's top-right
+# corner instead of competing with the point labels for space.
 endpoint_repel <- function(labels) {
+  repelled <- labels[!labels$timed_out, ]
+  notes <- labels[labels$timed_out, ]
   list(
     ggrepel::geom_text_repel(
-      data = labels, aes(label = label, fontface = face, size = face,
-                             segment.alpha = leader),
-      nudge_x = labels$nudge, nudge_y = labels$nudge_y, lineheight = 0.9,
-      seed = REPEL_SEED, show.legend = FALSE,
+      data = repelled, aes(label = label, fontface = face, size = face),
+      nudge_x = repelled$nudge, nudge_y = repelled$nudge_y, lineheight = 0.9,
+      seed = REPEL_SEED, show.legend = FALSE, segment.alpha = 0.9,
       box.padding = 0.38, point.padding = 0.3,
       force = 3, force_pull = 0.4,
       min.segment.length = 0.12, segment.size = 0.3,
       segment.linetype = "22",
       max.overlaps = Inf,
       max.time = 5, max.iter = 60000),
+    geom_text(data = notes, aes(x = Inf, y = Inf, label = label,
+                                vjust = 1.6 + 1.5 * stack),
+              hjust = 1.04, size = POINT_LABEL, show.legend = FALSE),
     scale_size_manual(values = c(plain = POINT_LABEL, bold = ENDPOINT_LABEL),
                       guide = "none")
   )
