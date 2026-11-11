@@ -196,7 +196,7 @@
 "1mb-20x-longread-bam@1mb","igv.js 3.8.10, every row",NA,NA,NA,NA,NA
 "1mb-20x-longread-cram@1mb","This work",307.7,1118.1,323.4,1641.8,175
 "1mb-20x-longread-cram@1mb","Release 4.3.0",2264.7,3391.4,176.1,3767.5,79
-"1mb-20x-longread-cram@1mb","Release 2.4.0",440.3,842.9,175.2,1219,73
+"1mb-20x-longread-cram@1mb","Release 2.4.0",NA,NA,NA,NA,NA
 "1mb-20x-longread-cram@1mb","igv.js 3.8.10",1038.8,4590.4,162.2,4985.8,149
 "1mb-20x-longread-cram@1mb","igv.js 3.8.10, no downsampling",1027.3,4595.9,162.2,4990.5,149
 "1mb-20x-longread-cram@1mb","igv.js 3.8.10, every row",1030.7,4792.3,144.2,5163.7,65
@@ -209,7 +209,7 @@
 "1mb-100x-longread-bam@1mb","igv.js 3.8.10, every row",NA,NA,NA,NA,NA
 "1mb-100x-longread-cram@1mb","This work",1147.1,3406.7,772.3,4438.5,517
 "1mb-100x-longread-cram@1mb","Release 4.3.0",3028,4217,178.7,4655.6,100
-"1mb-100x-longread-cram@1mb","Release 2.4.0",1762.3,2686,163.1,3078.6,57
+"1mb-100x-longread-cram@1mb","Release 2.4.0",NA,NA,NA,NA,NA
 "1mb-100x-longread-cram@1mb","igv.js 3.8.10",NA,NA,NA,NA,NA
 "1mb-100x-longread-cram@1mb","igv.js 3.8.10, no downsampling",NA,NA,NA,NA,NA
 "1mb-100x-longread-cram@1mb","igv.js 3.8.10, every row",NA,NA,NA,NA,NA

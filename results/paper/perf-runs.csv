@@ -993,11 +993,6 @@
 "Cold load","20x long read","Release 4.3.0","cross-tool","CRAM","1mb",NA,TRUE,3,24554
 "Cold load","20x long read","Release 4.3.0","cross-tool","CRAM","1mb",NA,TRUE,4,23574
 "Cold load","20x long read","Release 4.3.0","cross-tool","CRAM","1mb",NA,TRUE,5,23959
-"Cold load","20x long read","Release 2.4.0","cross-tool","CRAM","1mb",NA,TRUE,1,11870
-"Cold load","20x long read","Release 2.4.0","cross-tool","CRAM","1mb",NA,TRUE,2,11449
-"Cold load","20x long read","Release 2.4.0","cross-tool","CRAM","1mb",NA,TRUE,3,11609
-"Cold load","20x long read","Release 2.4.0","cross-tool","CRAM","1mb",NA,TRUE,4,12031
-"Cold load","20x long read","Release 2.4.0","cross-tool","CRAM","1mb",NA,TRUE,5,11954
 "Cold load","20x long read","igv.js 3.8.10","cross-tool","CRAM","1mb",NA,TRUE,1,76181
 "Cold load","20x long read","igv.js 3.8.10","cross-tool","CRAM","1mb",NA,TRUE,2,75933
 "Cold load","20x long read","igv.js 3.8.10","cross-tool","CRAM","1mb",NA,TRUE,3,75851
@@ -1036,11 +1031,6 @@
 "Cold load","100x long read","Release 4.3.0","cross-tool","CRAM","1mb",NA,TRUE,3,38528
 "Cold load","100x long read","Release 4.3.0","cross-tool","CRAM","1mb",NA,TRUE,4,38238
 "Cold load","100x long read","Release 4.3.0","cross-tool","CRAM","1mb",NA,TRUE,5,39635
-"Cold load","100x long read","Release 2.4.0","cross-tool","CRAM","1mb",NA,TRUE,1,34418
-"Cold load","100x long read","Release 2.4.0","cross-tool","CRAM","1mb",NA,TRUE,2,34362
-"Cold load","100x long read","Release 2.4.0","cross-tool","CRAM","1mb",NA,TRUE,3,33714
-"Cold load","100x long read","Release 2.4.0","cross-tool","CRAM","1mb",NA,TRUE,4,35313
-"Cold load","100x long read","Release 2.4.0","cross-tool","CRAM","1mb",NA,TRUE,5,43365
 "Zoom in, both hold the data","20x short read","This work","cross-tool motion","BAM",NA,"what the user waits",TRUE,1,27.612060546875
 "Zoom in, both hold the data","20x short read","This work","cross-tool motion","BAM",NA,"what the user waits",TRUE,2,26.281005859375
 "Zoom in, both hold the data","20x short read","This work","cross-tool motion","BAM",NA,"what the user waits",TRUE,3,30.911865234375

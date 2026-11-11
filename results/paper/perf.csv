@@ -250,7 +250,6 @@
 "Cold load","20x long read","igv.js 3.8.10, every row",6e+05,TRUE,"cross-tool","BAM","1mb",TRUE,NA,NA,NA,NA,0
 "Cold load","20x long read","This work",5511,TRUE,"cross-tool","CRAM","1mb",FALSE,NA,5464,5694,88.8172280585248,5
 "Cold load","20x long read","Release 4.3.0",24213,TRUE,"cross-tool","CRAM","1mb",FALSE,NA,23574,24554,364.084193559677,5
-"Cold load","20x long read","Release 2.4.0",11870,TRUE,"cross-tool","CRAM","1mb",FALSE,NA,11449,12031,245.023060139245,5
 "Cold load","20x long read","igv.js 3.8.10",75933,TRUE,"cross-tool","CRAM","1mb",FALSE,NA,75851,76495,273.676816701744,5
 "Cold load","20x long read","igv.js 3.8.10, no downsampling",76219,TRUE,"cross-tool","CRAM","1mb",FALSE,NA,75753,77783,779.493938398497,5
 "Cold load","20x long read","igv.js 3.8.10, every row",135688,TRUE,"cross-tool","CRAM","1mb",FALSE,NA,135516,136347,438.639183536233,3
@@ -263,7 +262,6 @@
 "Cold load","100x long read","igv.js 3.8.10, every row",6e+05,TRUE,"cross-tool","BAM","1mb",TRUE,NA,NA,NA,NA,0
 "Cold load","100x long read","This work",17092,TRUE,"cross-tool","CRAM","1mb",FALSE,NA,17067,17635,253.138697160272,5
 "Cold load","100x long read","Release 4.3.0",38853,TRUE,"cross-tool","CRAM","1mb",FALSE,NA,38238,39635,522.335620075828,5
-"Cold load","100x long read","Release 2.4.0",34418,TRUE,"cross-tool","CRAM","1mb",FALSE,NA,33714,43365,4026.53825264333,5
 "Cold load","100x long read","igv.js 3.8.10",6e+05,TRUE,"cross-tool","CRAM","1mb",TRUE,NA,NA,NA,NA,0
 "Cold load","100x long read","igv.js 3.8.10, no downsampling",6e+05,TRUE,"cross-tool","CRAM","1mb",TRUE,NA,NA,NA,NA,0
 "Cold load","100x long read","igv.js 3.8.10, every row",6e+05,TRUE,"cross-tool","CRAM","1mb",TRUE,NA,NA,NA,NA,0
