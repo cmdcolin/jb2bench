@@ -112,7 +112,7 @@
 "Cold load","1000x short read","Release 2.4.0",14433,TRUE,"cross-tool","BAM","19kb",FALSE,NA,14351,15483,473.402365858051,5
 "Cold load","1000x short read","igv.js 3.8.10",39385,TRUE,"cross-tool","BAM","19kb",FALSE,NA,39168,40390,533.846700842105,5
 "Cold load","1000x short read","GenomeSpy 1.3.0",8497,TRUE,"cross-tool","BAM","19kb",FALSE,NA,8340,8589,89.8431967374269,5
-"Cold load","1000x short read","Gosling 1.0.7",120000,TRUE,"cross-tool","BAM","19kb",TRUE,NA,NA,NA,NA,0
+"Cold load","1000x short read","Gosling 1.0.7",6e+05,TRUE,"cross-tool","BAM","19kb",TRUE,NA,NA,NA,NA,0
 "Cold load","1000x short read","igv.js 3.8.10, no downsampling",40436,TRUE,"cross-tool","BAM","19kb",FALSE,NA,39871,41496,650.617937041394,5
 "Cold load","1000x short read","igv.js 3.8.10, every row",49982,TRUE,"cross-tool","BAM","19kb",FALSE,NA,49843,50422,268.570661093128,5
 "Cold load","1000x short read","This work",8892,TRUE,"cross-tool","BAM","100kb",FALSE,NA,8503,9166,277.706679790026,5
@@ -139,7 +139,7 @@
 "Cold load","20x long read","Release 2.4.0",3948,TRUE,"cross-tool","BAM","19kb",FALSE,NA,3783,4009,85.7700413897533,5
 "Cold load","20x long read","igv.js 3.8.10",4893,TRUE,"cross-tool","BAM","19kb",FALSE,NA,4777,4921,63.2518774424918,5
 "Cold load","20x long read","GenomeSpy 1.3.0",7249,TRUE,"cross-tool","BAM","19kb",FALSE,NA,7206,7325,53.127205836558,5
-"Cold load","20x long read","Gosling 1.0.7",120000,TRUE,"cross-tool","BAM","19kb",TRUE,NA,NA,NA,NA,0
+"Cold load","20x long read","Gosling 1.0.7",6e+05,TRUE,"cross-tool","BAM","19kb",TRUE,NA,NA,NA,NA,0
 "Cold load","20x long read","igv.js 3.8.10, no downsampling",4852,TRUE,"cross-tool","BAM","19kb",FALSE,NA,4835,4893,26.0057685908338,5
 "Cold load","20x long read","igv.js 3.8.10, every row",7019,TRUE,"cross-tool","BAM","19kb",FALSE,NA,6925,7185,96.2642197288276,5
 "Cold load","20x long read","This work",1912,TRUE,"cross-tool","BAM","100kb",FALSE,NA,1882,1944,24.3310501211929,5
@@ -166,7 +166,7 @@
 "Cold load","200x long read","Release 2.4.0",12593,TRUE,"cross-tool","BAM","19kb",FALSE,NA,12488,12674,76.2017060176477,5
 "Cold load","200x long read","igv.js 3.8.10",26779,TRUE,"cross-tool","BAM","19kb",FALSE,NA,26600,26921,116.29617362579,5
 "Cold load","200x long read","GenomeSpy 1.3.0",59825,TRUE,"cross-tool","BAM","19kb",FALSE,NA,59257,61299,801.559417635399,5
-"Cold load","200x long read","Gosling 1.0.7",120000,TRUE,"cross-tool","BAM","19kb",TRUE,NA,NA,NA,NA,0
+"Cold load","200x long read","Gosling 1.0.7",6e+05,TRUE,"cross-tool","BAM","19kb",TRUE,NA,NA,NA,NA,0
 "Cold load","200x long read","igv.js 3.8.10, no downsampling",26790,TRUE,"cross-tool","BAM","19kb",FALSE,NA,26510,27163,261.11587466104,5
 "Cold load","200x long read","igv.js 3.8.10, every row",48909,TRUE,"cross-tool","BAM","19kb",FALSE,NA,48616,49461,352.612677026791,5
 "Cold load","200x long read","This work",5117,TRUE,"cross-tool","BAM","100kb",FALSE,NA,4901,5292,139.375392376129,5
@@ -192,10 +192,10 @@
 "Cold load","1000x long read","Release 4.3.0",28043,TRUE,"cross-tool","BAM","19kb",FALSE,NA,27420,32425,2521.03683035373,5
 "Cold load","1000x long read","Release 2.4.0",51384,TRUE,"cross-tool","BAM","19kb",FALSE,NA,50892,51991,467.138416317905,5
 "Cold load","1000x long read","igv.js 3.8.10",84619,TRUE,"cross-tool","BAM","19kb",FALSE,NA,82592,85992,1228.37913528357,5
-"Cold load","1000x long read","GenomeSpy 1.3.0",120000,TRUE,"cross-tool","BAM","19kb",TRUE,NA,NA,NA,NA,0
-"Cold load","1000x long read","Gosling 1.0.7",120000,TRUE,"cross-tool","BAM","19kb",TRUE,NA,NA,NA,NA,0
+"Cold load","1000x long read","GenomeSpy 1.3.0",304657,TRUE,"cross-tool","BAM","19kb",FALSE,NA,299673,308014,3010.38713457256,5
+"Cold load","1000x long read","Gosling 1.0.7",6e+05,TRUE,"cross-tool","BAM","19kb",TRUE,NA,NA,NA,NA,0
 "Cold load","1000x long read","igv.js 3.8.10, no downsampling",86601,TRUE,"cross-tool","BAM","19kb",FALSE,NA,83553,88378,1760.81336319327,5
-"Cold load","1000x long read","igv.js 3.8.10, every row",120000,TRUE,"cross-tool","BAM","19kb",TRUE,NA,NA,NA,NA,0
+"Cold load","1000x long read","igv.js 3.8.10, every row",6e+05,TRUE,"cross-tool","BAM","19kb",TRUE,NA,NA,NA,NA,0
 "Cold load","1000x long read","This work",17256,TRUE,"cross-tool","BAM","100kb",FALSE,NA,16875,17445,257.884987284384,4
 "Cold load","1000x long read","Release 4.3.0",40571,TRUE,"cross-tool","BAM","100kb",FALSE,NA,40357,41043,286.395181523712,5
 "Cold load","1000x long read","Release 2.4.0",91168,TRUE,"cross-tool","BAM","100kb",FALSE,NA,90639,91518,402.343758495146,5
@@ -208,7 +208,7 @@
 "Cold load","1000x long read","Release 2.4.0",31442,TRUE,"cross-tool","CRAM","19kb",FALSE,NA,31245,32255,431.615917222709,5
 "Cold load","1000x long read","igv.js 3.8.10",81544,TRUE,"cross-tool","CRAM","19kb",FALSE,NA,80003,83920,1561.93172065875,5
 "Cold load","1000x long read","igv.js 3.8.10, no downsampling",82191,TRUE,"cross-tool","CRAM","19kb",FALSE,NA,79088,83651,1765.67513999603,5
-"Cold load","1000x long read","igv.js 3.8.10, every row",120000,TRUE,"cross-tool","CRAM","19kb",TRUE,NA,NA,NA,NA,0
+"Cold load","1000x long read","igv.js 3.8.10, every row",181075.5,TRUE,"cross-tool","CRAM","19kb",FALSE,NA,180376,181775,989.24238687998,2
 "Cold load","1000x long read","This work",17524,TRUE,"cross-tool","CRAM","100kb",FALSE,NA,17089,17814,284.981929251663,5
 "Cold load","1000x long read","Release 4.3.0",27845,TRUE,"cross-tool","CRAM","100kb",FALSE,NA,27629,28419,305.008524471038,5
 "Cold load","1000x long read","Release 2.4.0",85138,TRUE,"cross-tool","CRAM","100kb",FALSE,NA,83331,86422,1177.19467379019,5
@@ -230,43 +230,43 @@
 "Cold load","20x short read","igv.js 3.8.10, every row",29470,TRUE,"cross-tool","CRAM","1mb",FALSE,NA,29401,30118,298.916041724093,5
 "Cold load","100x short read","This work",7941,TRUE,"cross-tool","BAM","1mb",FALSE,NA,7896,8313,171.829275736121,5
 "Cold load","100x short read","Release 4.3.0",29727,TRUE,"cross-tool","BAM","1mb",FALSE,NA,29067,30036,364.423928961862,5
-"Cold load","100x short read","Release 2.4.0",120000,TRUE,"cross-tool","BAM","1mb",TRUE,NA,NA,NA,NA,0
+"Cold load","100x short read","Release 2.4.0",84231.5,TRUE,"cross-tool","BAM","1mb",FALSE,NA,83954,84509,392.444263558534,2
 "Cold load","100x short read","igv.js 3.8.10",114941,TRUE,"cross-tool","BAM","1mb",FALSE,NA,113819,115351,578.788216880752,5
 "Cold load","100x short read","GenomeSpy 1.3.0",50079,TRUE,"cross-tool","BAM","1mb",FALSE,NA,49729,50683,455.772201872822,5
 "Cold load","100x short read","igv.js 3.8.10, no downsampling",115597,TRUE,"cross-tool","BAM","1mb",FALSE,NA,114188,115942,715.508350754902,5
-"Cold load","100x short read","igv.js 3.8.10, every row",120000,TRUE,"cross-tool","BAM","1mb",TRUE,NA,NA,NA,NA,0
+"Cold load","100x short read","igv.js 3.8.10, every row",136818,TRUE,"cross-tool","BAM","1mb",FALSE,NA,135852,137338,544.088871417161,5
 "Cold load","100x short read","This work",8713,TRUE,"cross-tool","CRAM","1mb",FALSE,NA,8602,8915,120.516803807602,5
 "Cold load","100x short read","Release 4.3.0",39306,TRUE,"cross-tool","CRAM","1mb",FALSE,NA,38843,39525,309.494749551588,5
-"Cold load","100x short read","Release 2.4.0",120000,TRUE,"cross-tool","CRAM","1mb",TRUE,NA,NA,NA,NA,0
+"Cold load","100x short read","Release 2.4.0",6e+05,TRUE,"cross-tool","CRAM","1mb",TRUE,NA,NA,NA,NA,0
 "Cold load","100x short read","igv.js 3.8.10",116869,TRUE,"cross-tool","CRAM","1mb",FALSE,NA,114661,117172,1048.43707488814,5
 "Cold load","100x short read","igv.js 3.8.10, no downsampling",116469,TRUE,"cross-tool","CRAM","1mb",FALSE,NA,115887,117873,858.615629953241,5
-"Cold load","100x short read","igv.js 3.8.10, every row",120000,TRUE,"cross-tool","CRAM","1mb",TRUE,NA,NA,NA,NA,0
+"Cold load","100x short read","igv.js 3.8.10, every row",138807.5,TRUE,"cross-tool","CRAM","1mb",FALSE,NA,137790,139825,1438.96229971462,2
 "Cold load","20x long read","This work",5343,TRUE,"cross-tool","BAM","1mb",FALSE,NA,5276,5516,96.2870707831534,5
 "Cold load","20x long read","Release 4.3.0",21682,TRUE,"cross-tool","BAM","1mb",FALSE,NA,21364,21996,228.451307722237,5
 "Cold load","20x long read","Release 2.4.0",37966,TRUE,"cross-tool","BAM","1mb",FALSE,NA,37345,38701,534.507062628736,5
 "Cold load","20x long read","igv.js 3.8.10",76159,TRUE,"cross-tool","BAM","1mb",FALSE,NA,75981,76206,92.8024784151803,5
-"Cold load","20x long read","GenomeSpy 1.3.0",120000,TRUE,"cross-tool","BAM","1mb",TRUE,NA,NA,NA,NA,0
+"Cold load","20x long read","GenomeSpy 1.3.0",120715,TRUE,"cross-tool","BAM","1mb",FALSE,NA,118426,120924,1050.98929585415,5
 "Cold load","20x long read","igv.js 3.8.10, no downsampling",76031,TRUE,"cross-tool","BAM","1mb",FALSE,NA,75849,76249,150.18721649994,5
-"Cold load","20x long read","igv.js 3.8.10, every row",120000,TRUE,"cross-tool","BAM","1mb",TRUE,NA,NA,NA,NA,0
+"Cold load","20x long read","igv.js 3.8.10, every row",6e+05,TRUE,"cross-tool","BAM","1mb",TRUE,NA,NA,NA,NA,0
 "Cold load","20x long read","This work",5511,TRUE,"cross-tool","CRAM","1mb",FALSE,NA,5464,5694,88.8172280585248,5
 "Cold load","20x long read","Release 4.3.0",24213,TRUE,"cross-tool","CRAM","1mb",FALSE,NA,23574,24554,364.084193559677,5
 "Cold load","20x long read","Release 2.4.0",11870,TRUE,"cross-tool","CRAM","1mb",FALSE,NA,11449,12031,245.023060139245,5
 "Cold load","20x long read","igv.js 3.8.10",75933,TRUE,"cross-tool","CRAM","1mb",FALSE,NA,75851,76495,273.676816701744,5
 "Cold load","20x long read","igv.js 3.8.10, no downsampling",76219,TRUE,"cross-tool","CRAM","1mb",FALSE,NA,75753,77783,779.493938398497,5
-"Cold load","20x long read","igv.js 3.8.10, every row",120000,TRUE,"cross-tool","CRAM","1mb",TRUE,NA,NA,NA,NA,0
+"Cold load","20x long read","igv.js 3.8.10, every row",135688,TRUE,"cross-tool","CRAM","1mb",FALSE,NA,135516,136347,438.639183536233,3
 "Cold load","100x long read","This work",16209,TRUE,"cross-tool","BAM","1mb",FALSE,NA,15925,16762,334.349667264677,5
 "Cold load","100x long read","Release 4.3.0",47908,TRUE,"cross-tool","BAM","1mb",FALSE,NA,47206,49305,783.707662333347,5
 "Cold load","100x long read","Release 2.4.0",99712,TRUE,"cross-tool","BAM","1mb",FALSE,NA,97977,100532,1038.13693701746,5
-"Cold load","100x long read","igv.js 3.8.10",120000,TRUE,"cross-tool","BAM","1mb",TRUE,NA,NA,NA,NA,0
-"Cold load","100x long read","GenomeSpy 1.3.0",120000,TRUE,"cross-tool","BAM","1mb",TRUE,NA,NA,NA,NA,0
-"Cold load","100x long read","igv.js 3.8.10, no downsampling",120000,TRUE,"cross-tool","BAM","1mb",TRUE,NA,NA,NA,NA,0
-"Cold load","100x long read","igv.js 3.8.10, every row",120000,TRUE,"cross-tool","BAM","1mb",TRUE,NA,NA,NA,NA,0
+"Cold load","100x long read","igv.js 3.8.10",6e+05,TRUE,"cross-tool","BAM","1mb",TRUE,NA,NA,NA,NA,0
+"Cold load","100x long read","GenomeSpy 1.3.0",6e+05,TRUE,"cross-tool","BAM","1mb",TRUE,NA,NA,NA,NA,0
+"Cold load","100x long read","igv.js 3.8.10, no downsampling",6e+05,TRUE,"cross-tool","BAM","1mb",TRUE,NA,NA,NA,NA,0
+"Cold load","100x long read","igv.js 3.8.10, every row",6e+05,TRUE,"cross-tool","BAM","1mb",TRUE,NA,NA,NA,NA,0
 "Cold load","100x long read","This work",17092,TRUE,"cross-tool","CRAM","1mb",FALSE,NA,17067,17635,253.138697160272,5
 "Cold load","100x long read","Release 4.3.0",38853,TRUE,"cross-tool","CRAM","1mb",FALSE,NA,38238,39635,522.335620075828,5
 "Cold load","100x long read","Release 2.4.0",34418,TRUE,"cross-tool","CRAM","1mb",FALSE,NA,33714,43365,4026.53825264333,5
-"Cold load","100x long read","igv.js 3.8.10",120000,TRUE,"cross-tool","CRAM","1mb",TRUE,NA,NA,NA,NA,0
-"Cold load","100x long read","igv.js 3.8.10, no downsampling",120000,TRUE,"cross-tool","CRAM","1mb",TRUE,NA,NA,NA,NA,0
-"Cold load","100x long read","igv.js 3.8.10, every row",120000,TRUE,"cross-tool","CRAM","1mb",TRUE,NA,NA,NA,NA,0
+"Cold load","100x long read","igv.js 3.8.10",6e+05,TRUE,"cross-tool","CRAM","1mb",TRUE,NA,NA,NA,NA,0
+"Cold load","100x long read","igv.js 3.8.10, no downsampling",6e+05,TRUE,"cross-tool","CRAM","1mb",TRUE,NA,NA,NA,NA,0
+"Cold load","100x long read","igv.js 3.8.10, every row",6e+05,TRUE,"cross-tool","CRAM","1mb",TRUE,NA,NA,NA,NA,0
 "Zoom in, both hold the data","20x short read","This work",27.612060546875,TRUE,"cross-tool motion","BAM",NA,FALSE,"what the user waits",24.532958984375,30.911865234375,2.56553864234991,5
 "Zoom in, both hold the data","20x short read","This work",1.60000000149012,TRUE,"cross-tool motion","BAM",NA,FALSE,"what the renderer did",1.5,1.80000000447035,0.109544513473445,5
 "Zoom in, both hold the data","20x short read","Release 4.3.0",1111.77319335938,TRUE,"cross-tool motion","BAM",NA,FALSE,"what the user waits",1099.7509765625,1119.86303710938,7.63469393372757,5

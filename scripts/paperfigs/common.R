@@ -257,11 +257,16 @@ coldload_labels <- function(d, meas, cell, reference) {
 # every panel that the point labels are kept out of.
 NOTE_BAND <- 3.6
 NOTE_LINE <- 0.12
+LABEL_HEADROOM <- 2.4
 endpoint_repel <- function(labels) {
   repelled <- labels[!labels$timed_out, ]
   notes <- labels[labels$timed_out, ]
   band <- if (nrow(notes)) max(repelled$s) * NOTE_BAND else Inf
-  room <- transform(notes, s = band * 10^(NOTE_LINE * (max(notes$stack) + 1)))
+  room <- if (nrow(notes)) {
+    transform(notes, s = band * 10^(NOTE_LINE * (max(notes$stack) + 1)))
+  } else {
+    transform(repelled[which.max(repelled$s), ], s = s * LABEL_HEADROOM)
+  }
   list(
     geom_blank(data = room),
     ggrepel::geom_text_repel(

@@ -87,7 +87,7 @@
 "1000x-longread-bam@19kb","Release 4.3.0",207.1,2323.1,163.1,2854.3,111
 "1000x-longread-bam@19kb","Release 2.4.0",1541.3,3603.4,161.4,3975.9,121
 "1000x-longread-bam@19kb","igv.js 3.8.10",2293.7,4216.6,155.1,4605.5,91
-"1000x-longread-bam@19kb","GenomeSpy 1.3.0",NA,NA,NA,NA,NA
+"1000x-longread-bam@19kb","GenomeSpy 1.3.0",1994.5,4749.3,146.1,5211.2,35
 "1000x-longread-bam@19kb","Gosling 1.0.7",NA,NA,NA,NA,NA
 "1000x-longread-bam@19kb","igv.js 3.8.10, no downsampling",2530,4628.7,158.6,5022.4,91
 "1000x-longread-bam@19kb","igv.js 3.8.10, every row",NA,NA,NA,NA,NA
@@ -96,7 +96,7 @@
 "1000x-longread-cram@19kb","Release 2.4.0",1007.1,1556.4,164,1950,121
 "1000x-longread-cram@19kb","igv.js 3.8.10",2388.9,4287.4,159.2,4707.3,91
 "1000x-longread-cram@19kb","igv.js 3.8.10, no downsampling",2560.6,4483.6,158.9,4909,91
-"1000x-longread-cram@19kb","igv.js 3.8.10, every row",NA,NA,NA,NA,NA
+"1000x-longread-cram@19kb","igv.js 3.8.10, every row",2395,9518.9,143.4,9920.3,308
 "20x-shortread-cram@100kb","This work",59.2,352.2,171.3,719.4,70
 "20x-shortread-cram@100kb","Release 4.3.0",194.6,500.3,160,851.2,73
 "20x-shortread-cram@100kb","Release 2.4.0",249.4,605.1,162.6,957.1,86
@@ -176,22 +176,22 @@
 "1mb-20x-shortread-cram@1mb","igv.js 3.8.10, every row",675.7,1986,171.7,2350.6,181
 "1mb-100x-shortread-bam@1mb","This work",600.7,2113,440.5,2756,241
 "1mb-100x-shortread-bam@1mb","Release 4.3.0",1485.1,3714.8,178,4144.4,102
-"1mb-100x-shortread-bam@1mb","Release 2.4.0",NA,NA,NA,NA,NA
+"1mb-100x-shortread-bam@1mb","Release 2.4.0",3418.1,5162.9,170.3,5566.8,127
 "1mb-100x-shortread-bam@1mb","igv.js 3.8.10",2498.6,7300.8,167.1,7697.2,290
 "1mb-100x-shortread-bam@1mb","GenomeSpy 1.3.0",2368.4,4506.1,1419.4,6134.5,1220
 "1mb-100x-shortread-bam@1mb","igv.js 3.8.10, no downsampling",2499.5,7300.8,170.4,7693.6,96
-"1mb-100x-shortread-bam@1mb","igv.js 3.8.10, every row",NA,NA,NA,NA,NA
+"1mb-100x-shortread-bam@1mb","igv.js 3.8.10, every row",2231.9,9964.2,144.2,10338.2,125
 "1mb-100x-shortread-cram@1mb","This work",675.8,2117.6,440.6,2769.5,245
 "1mb-100x-shortread-cram@1mb","Release 4.3.0",2845.8,3984.6,177.1,4363.8,102
 "1mb-100x-shortread-cram@1mb","Release 2.4.0",NA,NA,NA,NA,NA
 "1mb-100x-shortread-cram@1mb","igv.js 3.8.10",2817,7928.1,164.3,8319.1,287
 "1mb-100x-shortread-cram@1mb","igv.js 3.8.10, no downsampling",2854,7946.2,164.9,8338.8,94
-"1mb-100x-shortread-cram@1mb","igv.js 3.8.10, every row",NA,NA,NA,NA,NA
+"1mb-100x-shortread-cram@1mb","igv.js 3.8.10, every row",2373.1,9625.8,144.3,9999.6,105
 "1mb-20x-longread-bam@1mb","This work",324,1013.9,323.2,1536.8,175
 "1mb-20x-longread-bam@1mb","Release 4.3.0",2458,3943.6,175.8,4331.3,75
 "1mb-20x-longread-bam@1mb","Release 2.4.0",1314,2199.6,174.7,2573,69
 "1mb-20x-longread-bam@1mb","igv.js 3.8.10",1029.7,4748.4,162.1,5135.4,79
-"1mb-20x-longread-bam@1mb","GenomeSpy 1.3.0",NA,NA,NA,NA,NA
+"1mb-20x-longread-bam@1mb","GenomeSpy 1.3.0",968.4,2472.8,138.3,2839.2,31
 "1mb-20x-longread-bam@1mb","igv.js 3.8.10, no downsampling",1018.8,4745.4,162.8,5133.5,79
 "1mb-20x-longread-bam@1mb","igv.js 3.8.10, every row",NA,NA,NA,NA,NA
 "1mb-20x-longread-cram@1mb","This work",307.7,1118.1,323.4,1641.8,175
@@ -199,7 +199,7 @@
 "1mb-20x-longread-cram@1mb","Release 2.4.0",440.3,842.9,175.2,1219,73
 "1mb-20x-longread-cram@1mb","igv.js 3.8.10",1038.8,4590.4,162.2,4985.8,149
 "1mb-20x-longread-cram@1mb","igv.js 3.8.10, no downsampling",1027.3,4595.9,162.2,4990.5,149
-"1mb-20x-longread-cram@1mb","igv.js 3.8.10, every row",NA,NA,NA,NA,NA
+"1mb-20x-longread-cram@1mb","igv.js 3.8.10, every row",1030.7,4792.3,144.2,5163.7,65
 "1mb-100x-longread-bam@1mb","This work",1277.7,3522.2,768.7,4578.5,513
 "1mb-100x-longread-bam@1mb","Release 4.3.0",2142.2,4047.6,178.4,4487.5,147
 "1mb-100x-longread-bam@1mb","Release 2.4.0",1920.9,3524.9,170.6,3973.3,127

@@ -436,9 +436,10 @@ const ceilingFor = (w: Window) =>
  * Without this, an arm that cannot render a cell burns the ceiling WARMUP + RUNS
  * times over — at the 100 kb ceiling that is most of an hour per arm per cell,
  * spent proving the same thing four times. Two failures rather than one, because
- * a single timeout can be a load spike and this box has them.
+ * a single timeout can be a load spike and this box has them. A ten-minute
+ * ceiling is not a load spike, so `crosstool-cold-censored` sets FAIL_LIMIT=1.
  */
-const FAIL_LIMIT = 2
+const FAIL_LIMIT = Number(process.env.FAIL_LIMIT ?? 2)
 
 interface Detail {
   memory: MemorySample

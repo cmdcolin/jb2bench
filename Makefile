@@ -259,6 +259,24 @@ crosstool-cold-paper: gate toolcheck crosstool-bundles | $(LOGDIR)
 	  $(NODE) scripts/crosstool/runner.ts 2>&1 \
 	  | tee $(LOGDIR)/crosstool-cold-1mb-$(STAMP).log
 
+# The cells of `crosstool-cold-paper` that read 120000 ms at 19 kb and 1 Mb, run
+# again under the ten-minute ceiling the 100 kb window already had. Only the
+# cases holding one are named, and an arm that misses the ceiling once is
+# abandoned for that cell (FAIL_LIMIT=1), since a miss at ten minutes is not a
+# load spike. The runner skips a window that has none of them, so one CASES
+# list serves both passes. It writes a crosstool.json holding just these rows, to be merged into
+# the recorded file.
+CENSORED_19KB = 1000x-shortread-bam,20x-longread-bam,200x-longread-bam,1000x-longread-bam,1000x-longread-cram
+CENSORED_1MB = 1mb-100x-shortread-bam,1mb-100x-shortread-cram,1mb-20x-longread-bam,1mb-20x-longread-cram,1mb-100x-longread-bam,1mb-100x-longread-cram
+
+crosstool-cold-censored: gate toolcheck crosstool-bundles | $(LOGDIR)
+	WINDOWS=19kb CASES=$(CENSORED_19KB) MAX_WAIT=$(COLD_CEILING_100KB) FAIL_LIMIT=1 $(ARMS) $(TOOLARMS) \
+	  $(NODE) scripts/crosstool/runner.ts 2>&1 \
+	  | tee $(LOGDIR)/crosstool-cold-censored-19kb-$(STAMP).log
+	WINDOWS=1mb CASES=$(CENSORED_1MB) MAX_WAIT=$(COLD_CEILING_100KB) FAIL_LIMIT=1 $(ARMS) $(TOOLARMS) \
+	  $(NODE) scripts/crosstool/runner.ts 2>&1 \
+	  | tee $(LOGDIR)/crosstool-cold-censored-1mb-$(STAMP).log
+
 # Timed to the compositor frame swap (panprofile.ts INSTRUMENT=frames, the zoom
 # default), not to the last draw call.
 crosstool-zoom: gate toolcheck | $(LOGDIR)
