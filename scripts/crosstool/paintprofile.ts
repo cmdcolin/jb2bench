@@ -70,11 +70,12 @@
 import crypto from 'crypto'
 import fs from 'fs'
 import path from 'path'
-import { launch } from 'puppeteer'
+import { executablePath, launch } from 'puppeteer'
 import { isData } from './drewcheck.ts'
 import { ANGLE_ARGS } from '../angleargs.ts'
 import { gpuDeviceUsedMB, sampleMemory } from './memory.ts'
 import { gpuInfo } from './gpuinfo.ts'
+import { dropCaches, peakMemoryWanted, scopedChrome, watchScope } from './cgroupmemory.ts'
 
 const WAIT_TIMEOUT = Number(process.env.MAX_WAIT ?? 120000)
 const POLL_MS = Number(process.env.POLL_MS ?? 150)
@@ -89,8 +90,12 @@ if (screenshotPath) {
   fs.mkdirSync(path.dirname(screenshotPath), { recursive: true })
 }
 
+const cachesDropped = peakMemoryWanted ? dropCaches() : null
 const gpuBaselineMB = gpuDeviceUsedMB()
 const browser = await launch({
+  ...(peakMemoryWanted
+    ? { executablePath: scopedChrome, env: { ...process.env, SCOPED_CHROME: executablePath() } }
+    : {}),
   headless: process.env.HEADLESS !== '0',
   // Above MAX_WAIT, or a cell that blocks the main thread longer than
   // puppeteer's 180 s default dies with a protocol error instead of either
@@ -104,6 +109,7 @@ const browser = await launch({
     '--window-size=1280,900',
   ],
 })
+const scope = peakMemoryWanted ? watchScope(browser.process()?.pid ?? 0) : null
 const page = await browser.newPage()
 await page.setViewport({ width: 1280, height: 800 })
 
@@ -202,12 +208,16 @@ try {
     }
     await new Promise(r => setTimeout(r, POLL_MS))
   }
+  const peak = scope?.stop()
   const shown = await page.evaluate(shownError)
   if (shown) {
     console.log(`ERROR ${JSON.stringify(shown)}`)
     throw new Error(`the page shows an error: ${shown}`)
   }
-  const memory = await sampleMemory(browser, page, gpuBaselineMB)
+  const memory = {
+    ...(await sampleMemory(browser, page, gpuBaselineMB)),
+    ...(peak ? { cgroup: { ...peak, cachesDropped } } : {}),
+  }
   const content = await page.evaluate(() => {
     const f = (window as unknown as { __harnessContent?: () => unknown }).__harnessContent
     return typeof f === 'function' ? f() : null

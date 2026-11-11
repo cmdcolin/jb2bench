@@ -43,7 +43,7 @@ export function gpuDeviceUsedMB() {
   }
 }
 
-function descendants(root: number) {
+export function descendants(root: number) {
   const parent = new Map<number, number>()
   for (const d of fs.readdirSync('/proc')) {
     if (/^\d+$/.test(d)) {

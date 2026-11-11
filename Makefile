@@ -277,6 +277,21 @@ crosstool-cold-censored: gate toolcheck crosstool-bundles | $(LOGDIR)
 	  $(NODE) scripts/crosstool/runner.ts 2>&1 \
 	  | tee $(LOGDIR)/crosstool-cold-censored-1mb-$(STAMP).log
 
+# Peak memory of the whole browser over each 100 kb cold load of the paper's
+# Figure 8 (scripts/crosstool/cgroupmemory.ts), a pass of its own so polling
+# never touches a timed run. Chrome runs in a transient scope per run, page cache
+# is dropped first, and a blank page gives the browser's own cost. Writes
+# results/memory-peak/, not the timed crosstool.json.
+MEMORY_CASES = 20x-shortread-bam,200x-shortread-bam,1000x-shortread-bam,20x-longread-bam,200x-longread-bam,1000x-longread-bam,20x-shortread-cram,200x-shortread-cram,1000x-shortread-cram,20x-longread-cram,200x-longread-cram,1000x-longread-cram
+
+crosstool-memory: gate toolcheck crosstool-bundles | $(LOGDIR)
+	mkdir -p results/memory-peak
+	MEMORY_PEAK=1 RESULTS_DIR=results/memory-peak RUNS=3 WARMUP=0 FAIL_LIMIT=1 \
+	  WINDOWS=100kb CASES=$(MEMORY_CASES) MAX_WAIT=$(COLD_CEILING_100KB) \
+	  JBROWSE_PORTS=8000,8004 TOOLS=jbrowse,jbrowse-release-2.4.0,igv,igv-tall,genomespy \
+	  $(NODE) scripts/crosstool/runner.ts 2>&1 | tee $(LOGDIR)/crosstool-memory-$(STAMP).log
+	for _ in 1 2 3; do $(NODE) scripts/crosstool/blankmemory.ts; done >results/memory-peak/blank.jsonl
+
 # Timed to the compositor frame swap (panprofile.ts INSTRUMENT=frames, the zoom
 # default), not to the last draw call.
 crosstool-zoom: gate toolcheck | $(LOGDIR)

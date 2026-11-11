@@ -19,10 +19,11 @@ import puppeteer from 'puppeteer'
 import { SourceMapConsumer } from 'source-map'
 import { ANGLE_ARGS } from '../angleargs.ts'
 
-const url = process.argv[2]
-if (!url) {
+const urlArg = process.argv[2]
+if (!urlArg) {
   throw new Error('usage: boottrace.ts <url> [runs]')
 }
+const url: string = urlArg
 const RUNS = Number(process.argv[3] ?? 5)
 const QUIET_MS = Number(process.env.QUIET_MS ?? 2000)
 const CEILING_MS = Number(process.env.CEILING_MS ?? 60000)

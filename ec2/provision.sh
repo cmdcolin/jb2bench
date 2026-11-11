@@ -20,6 +20,16 @@ if ! command -v node >/dev/null; then
     libegl1 mesa-utils >/dev/null
   sudo corepack enable
 fi
+dpkg -s dbus-user-session >/dev/null 2>&1 ||
+  sudo DEBIAN_FRONTEND=noninteractive apt-get install -y -q dbus-user-session >/dev/null
+sudo loginctl enable-linger ubuntu
+sudo systemctl restart "user@$(id -u)"
+export XDG_RUNTIME_DIR="/run/user/$(id -u)"
+for _ in $(seq 20); do [ -S "$XDG_RUNTIME_DIR/bus" ] && break; sleep 1; done
+# MEMORY_PEAK runs start Chrome in a transient user scope and read its memory.peak
+systemd-run --user --scope --quiet -p MemoryAccounting=yes \
+  sh -c 'test -f "/sys/fs/cgroup$(cut -d: -f3 /proc/self/cgroup)/memory.peak"' ||
+  { echo "no transient user scope with memory.peak here; MEMORY_PEAK=1 runs would fail" >&2; exit 1; }
 sudo mkdir -p /home/cdiesh/src
 sudo chown ubuntu:ubuntu /home/cdiesh /home/cdiesh/src
 mkdir -p /home/cdiesh/src/jb2bench/builds /home/cdiesh/src/jb2bench/data

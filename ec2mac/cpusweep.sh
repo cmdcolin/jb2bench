@@ -1,22 +1,30 @@
 #!/bin/bash
 # shellcheck disable=SC2034
-# The panel cells on the Linux GPU instance with Chrome confined to 2, 4 and 8
-# CPUs (taskset, inherited by every Chrome process), WebGL2 only. Reads
+# The panel cells on the Linux GPU instance. By default, Chrome confined to 2, 4
+# and 8 CPUs (taskset, inherited by every Chrome process), WebGL2 only. Reads
 # ec2/config.sh and ec2/.state but writes nothing under ec2/; results land in
-# results/ec2mac/g4dn-cpusweep-<stamp>/.
+# results/ec2mac/<SWEEP_LABEL>-<stamp>/.
 #
 # Before this: make ec2-up and make ec2-provision (the instance must carry
 # builds/$EC2MAC_BUILD). Refuses while an ec2/phases.sh run is going there.
 #
 #   DRY_RUN=1 ec2mac/cpusweep.sh   print the plan and stop
+#
+# The no-GPU fallback is the same cells with the GPU switched off, so Canvas 2D
+# and the compositor rasterize in software, on every core:
+#
+#   SWEEP_LABEL=g4dn-nogpu BACKENDS=canvas2d SWEEP_CPUS= ALLOW_SOFTWARE=1 \
+#     SWEEP_CHROME_FLAGS=--disable-gpu ec2mac/cpusweep.sh
 set -euo pipefail
 . "$(dirname "$0")/../ec2/config.sh"
 MAC_HERE=$CODE/ec2mac
 BUILD=${EC2MAC_BUILD:-release-5.0.0-beta.21}
-SWEEP_CPUS=${SWEEP_CPUS:-2,4,8}
-DRIVE_ENV=$(printf '%q ' "CHROME_ANGLE=--use-angle=gl-egl --use-gl=angle" "EXPECT_BUILD=$BUILD" \
-  "BACKENDS=webgl" "CPUS=$SWEEP_CPUS" "CELLS=${CELLS:-cold-20x,cold-1000x,zoom-200x}" \
-  "RUNS=${RUNS:-5}" "WARMUP=${WARMUP:-1}")
+SWEEP_CPUS=${SWEEP_CPUS-2,4,8}
+SWEEP_LABEL=${SWEEP_LABEL:-g4dn-cpusweep}
+DRIVE_ENV=$(printf '%q ' "CHROME_ANGLE=${SWEEP_CHROME_FLAGS:---use-angle=gl-egl --use-gl=angle}" \
+  "EXPECT_BUILD=$BUILD" "BACKENDS=${BACKENDS:-webgl}" "CELLS=${CELLS:-cold-20x,cold-1000x,zoom-200x}" \
+  "RUNS=${RUNS:-5}" "WARMUP=${WARMUP:-1}" "ALLOW_SOFTWARE=${ALLOW_SOFTWARE:-0}" \
+  ${SWEEP_CPUS:+"CPUS=$SWEEP_CPUS"})
 
 if [ "${DRY_RUN:-0}" = 1 ]; then
   echo "DRY RUN: would read ec2/.state, refuse if ec2/phases.sh runs on the instance,"
@@ -47,5 +55,5 @@ if ! remote "$DRIVER"; then
     sleep 5
     nproc; curl -fsS -o /dev/null localhost:8000/config.json && echo serving $BUILD"
 fi
-start_or_attach g4dn-cpusweep
+start_or_attach "$SWEEP_LABEL"
 sync_until_finished
