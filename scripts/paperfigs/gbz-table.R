@@ -37,6 +37,7 @@ macros <- c(
   sprintf("\\newcommand{\\PifFigFiveSeconds}{%s}", one(p$seconds)),
   sprintf("\\newcommand{\\PifFigFiveRequests}{%g}", p$requests),
   sprintf("\\newcommand{\\WalkFigFiveRequests}{%g}", w$requests),
+  sprintf("\\newcommand{\\WalkFigFiveSeconds}{%s}", one(w$seconds)),
   sprintf("\\newcommand{\\WalkFigFiveMB}{%.2f}", w$MB),
   sprintf("\\newcommand{\\GbzRunDate}{%s}", format(as.Date(g$date), "%-d %B %Y")),
   sprintf("\\newcommand{\\GbzPluginVersion}{%s}", g$plugin),
