@@ -2,6 +2,8 @@ import { readFileSync } from 'node:fs'
 import { loadavg } from 'node:os'
 import { launch } from 'puppeteer'
 // node lanes-trace.mjs <trackId> <loc> [trackConf.json]
+// JB2_BUILD pins the hosted build (default main); CHROME_PATH picks the browser
+// (default puppeteer's own).
 // Opens a linear genome view on the HPRC demo with one lanes track as a
 // MultiWaySyntenyDisplay, from a cold cache, and counts the requests and bytes
 // to that track's files until the network has been quiet for 8 s. A track the
@@ -14,11 +16,11 @@ const match = {
   hprc_v2_1_gbz_lanes: u => /gbz\.db|haplotype-index/.test(u),
   hprc_v2_1_pif_lanes: u => u.includes('hprc_multiway_gfa.pif.gz'),
 }[trackId]
-const build = 'https://jbrowse.org/code/jb2/main/'
+const build = process.env.JB2_BUILD ?? 'https://jbrowse.org/code/jb2/main/'
 const config = 'https://jbrowse.org/demos/hprc/config.json'
 const browser = await launch({
   headless: true,
-  executablePath: '/usr/bin/google-chrome',
+  executablePath: process.env.CHROME_PATH,
   args: ['--no-sandbox'],
 })
 const page = await browser.newPage()
@@ -75,9 +77,33 @@ await page.evaluate(
   },
   { trackId, loc, trackConf },
 )
+let phase = null
+let settledAt = null
 while (net.req === 0 || Date.now() - net.last < 8000) {
   if (Date.now() - t0 > 180000) break
   await new Promise(r => setTimeout(r, 250))
+  const now = await page.evaluate(
+    () =>
+      document
+        .querySelector('[data-testid="multiway-synteny-display"]')
+        ?.getAttribute('data-display-phase') ?? null,
+  )
+  if (now !== phase) {
+    phase = now
+    settledAt = Date.now()
+  }
+}
+const message =
+  phase === 'error'
+    ? await page.evaluate(() =>
+        [...document.querySelectorAll('body *')]
+          .filter(e => e.children.length === 0 && /zoom in .* to see|error/i.test(e.textContent))
+          .map(e => e.textContent.trim().slice(0, 200))
+          .join(' | '),
+      )
+    : null
+if (process.env.SHOT) {
+  await page.screenshot({ path: process.env.SHOT })
 }
 const version = await page
   .evaluate(async b => (await (await fetch(`${b}version.txt`)).text()).trim(), build)
@@ -97,6 +123,9 @@ console.log(
     requests: net.req,
     MB: +(net.bytes / 1e6).toFixed(2),
     lastMs: net.last - t0,
+    phase,
+    message,
+    settledMs: settledAt === null ? null : settledAt - t0,
     urls: net.urls,
     version,
   }),
