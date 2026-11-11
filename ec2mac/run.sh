@@ -18,7 +18,7 @@ DRIVE_ENV=$(printf '%q ' "CHROME_ANGLE=$ANGLE" "EXPECT_BUILD=$BUILD" \
 
 if ! remote "$DRIVER"; then
   remote "$REMOTE_ENV cd $REMOTE_ROOT || exit 1
-    pkill -f '[h]ttp-server builds/' || true
+    kill $(lsof -ti tcp:8000) 2>/dev/null || true
     nohup npx http-server builds/$BUILD -p 8000 -s --cors >/dev/null 2>&1 </dev/null &
     sleep 5
     curl -fsS -o /dev/null localhost:8000/config.json && echo serving $BUILD"
