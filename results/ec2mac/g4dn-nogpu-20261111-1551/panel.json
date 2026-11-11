@@ -1,0 +1,977 @@
+{
+  "build": "release-5.0.0-beta.21",
+  "port": 8000,
+  "runs": 5,
+  "warmup": 1,
+  "stamp": "2026-11-111551",
+  "host": {
+    "label": "g4dn-nogpu",
+    "platform": "linux",
+    "arch": "x64",
+    "osRelease": "6.8.0-1069-aws",
+    "macos": null,
+    "cpuModel": "Intel(R) Xeon(R) Platinum 8259CL CPU @ 2.50GHz",
+    "logicalCpus": 16,
+    "memGB": 62.1,
+    "gpu": "GPU 0: Tesla T4 (UUID: GPU-625c892c-8781-658f-18c0-03d7d0121f0a)",
+    "chrome": "Chrome/148.0.7778.97",
+    "chromeAngle": "--disable-gpu",
+    "node": "v24.22.2"
+  },
+  "summary": {
+    "cold-20x/canvas2d": {
+      "n": 5,
+      "median": 1494,
+      "mean": 1558,
+      "sd": 113,
+      "min": 1448,
+      "max": 1704,
+      "rung": "canvas2d",
+      "glRenderer": "no-webgl2",
+      "webgpuAdapter": "no adapter",
+      "hardwareConcurrency": 16,
+      "refused": [],
+      "memory": {
+        "source": "proc",
+        "jsHeapUsedMB": 43.2,
+        "totalMB": 569.4,
+        "rendererMB": 326.3,
+        "gpuProcessMB": 42.9,
+        "gpuDeviceDeltaMB": 0
+      }
+    },
+    "cold-1000x/canvas2d": {
+      "n": 5,
+      "median": 8547,
+      "mean": 8528.6,
+      "sd": 229,
+      "min": 8170,
+      "max": 8833,
+      "rung": "canvas2d",
+      "glRenderer": "no-webgl2",
+      "webgpuAdapter": "no adapter",
+      "hardwareConcurrency": 16,
+      "refused": [],
+      "memory": {
+        "source": "proc",
+        "jsHeapUsedMB": 718.5,
+        "totalMB": 2591.6,
+        "rendererMB": 2287.5,
+        "gpuProcessMB": 41.8,
+        "gpuDeviceDeltaMB": 0
+      }
+    },
+    "zoom-200x/canvas2d": {
+      "n": 5,
+      "median": 133.6,
+      "mean": 134.9,
+      "sd": 3.8,
+      "min": 130.85888671875,
+      "max": 142.036865234375,
+      "rung": "canvas2d",
+      "glRenderer": "no-webgl2",
+      "webgpuAdapter": "no adapter",
+      "hardwareConcurrency": 16,
+      "refused": [],
+      "memory": null
+    }
+  },
+  "raw": {
+    "cold-20x/canvas2d": [
+      {
+        "ms": 1494,
+        "counted": true,
+        "gpu": {
+          "chrome": "Chrome/148.0.7778.97",
+          "glRenderer": "no-webgl2",
+          "webgpuAdapter": "no adapter",
+          "webgpuFallback": null,
+          "canvases": {
+            "webgpu": 0,
+            "webgl2": 0,
+            "canvas2d": 1,
+            "offscreen": 0
+          },
+          "hardwareConcurrency": 16,
+          "rung": "canvas2d",
+          "glHardware": false,
+          "webgpuHardware": false,
+          "hardware": null
+        },
+        "memory": {
+          "jsHeap": {
+            "isolates": 6,
+            "usedMB": 41.597137451171875,
+            "totalMB": 79.6640625
+          },
+          "process": {
+            "source": "proc",
+            "byType": {
+              "browser": {
+                "count": 1,
+                "pssMB": 107.888671875,
+                "rssMB": 200.81640625,
+                "peakRssMB": 204.8046875
+              },
+              "zygote": {
+                "count": 2,
+                "pssMB": 31.9892578125,
+                "rssMB": 137.3828125,
+                "peakRssMB": 137.3828125
+              },
+              "utility": {
+                "count": 2,
+                "pssMB": 60.2939453125,
+                "rssMB": 177.90625,
+                "peakRssMB": 177.90625
+              },
+              "gpu-process": {
+                "count": 1,
+                "pssMB": 42.9052734375,
+                "rssMB": 100.98046875,
+                "peakRssMB": 107.65625
+              },
+              "renderer": {
+                "count": 3,
+                "pssMB": 326.2939453125,
+                "rssMB": 538.44921875,
+                "peakRssMB": 538.44921875
+              }
+            },
+            "totalPssMB": 569.37109375
+          },
+          "gpuDevice": {
+            "usedMB": 0,
+            "baselineMB": 0,
+            "deltaMB": 0
+          }
+        },
+        "load": [
+          0.35,
+          0.35
+        ]
+      },
+      {
+        "ms": 1458,
+        "counted": true,
+        "gpu": {
+          "chrome": "Chrome/148.0.7778.97",
+          "glRenderer": "no-webgl2",
+          "webgpuAdapter": "no adapter",
+          "webgpuFallback": null,
+          "canvases": {
+            "webgpu": 0,
+            "webgl2": 0,
+            "canvas2d": 1,
+            "offscreen": 0
+          },
+          "hardwareConcurrency": 16,
+          "rung": "canvas2d",
+          "glHardware": false,
+          "webgpuHardware": false,
+          "hardware": null
+        },
+        "memory": {
+          "jsHeap": {
+            "isolates": 6,
+            "usedMB": 43.19963073730469,
+            "totalMB": 78.9140625
+          },
+          "process": {
+            "source": "proc",
+            "byType": {
+              "browser": {
+                "count": 1,
+                "pssMB": 107.142578125,
+                "rssMB": 200.75,
+                "peakRssMB": 204.77734375
+              },
+              "zygote": {
+                "count": 2,
+                "pssMB": 32.314453125,
+                "rssMB": 137.61328125,
+                "peakRssMB": 137.61328125
+              },
+              "utility": {
+                "count": 2,
+                "pssMB": 60.0673828125,
+                "rssMB": 178.4765625,
+                "peakRssMB": 178.4765625
+              },
+              "gpu-process": {
+                "count": 1,
+                "pssMB": 43.1220703125,
+                "rssMB": 101.359375,
+                "peakRssMB": 107.68359375
+              },
+              "renderer": {
+                "count": 3,
+                "pssMB": 327.4951171875,
+                "rssMB": 538.796875,
+                "peakRssMB": 538.796875
+              }
+            },
+            "totalPssMB": 570.1416015625
+          },
+          "gpuDevice": {
+            "usedMB": 0,
+            "baselineMB": 0,
+            "deltaMB": 0
+          }
+        },
+        "load": [
+          0.35,
+          1.04
+        ]
+      },
+      {
+        "ms": 1704,
+        "counted": true,
+        "gpu": {
+          "chrome": "Chrome/148.0.7778.97",
+          "glRenderer": "no-webgl2",
+          "webgpuAdapter": "no adapter",
+          "webgpuFallback": null,
+          "canvases": {
+            "webgpu": 0,
+            "webgl2": 0,
+            "canvas2d": 1,
+            "offscreen": 0
+          },
+          "hardwareConcurrency": 16,
+          "rung": "canvas2d",
+          "glHardware": false,
+          "webgpuHardware": false,
+          "hardware": null
+        },
+        "memory": {
+          "jsHeap": {
+            "isolates": 6,
+            "usedMB": 43.21736145019531,
+            "totalMB": 79.1640625
+          },
+          "process": {
+            "source": "proc",
+            "byType": {
+              "browser": {
+                "count": 1,
+                "pssMB": 106.7373046875,
+                "rssMB": 199.88671875,
+                "peakRssMB": 203.91796875
+              },
+              "zygote": {
+                "count": 2,
+                "pssMB": 32.25,
+                "rssMB": 137.35546875,
+                "peakRssMB": 137.35546875
+              },
+              "utility": {
+                "count": 2,
+                "pssMB": 60.185546875,
+                "rssMB": 177.62890625,
+                "peakRssMB": 177.62890625
+              },
+              "gpu-process": {
+                "count": 1,
+                "pssMB": 43.3017578125,
+                "rssMB": 100.8359375,
+                "peakRssMB": 107.328125
+              },
+              "renderer": {
+                "count": 3,
+                "pssMB": 328.51953125,
+                "rssMB": 540.9765625,
+                "peakRssMB": 540.9765625
+              }
+            },
+            "totalPssMB": 570.994140625
+          },
+          "gpuDevice": {
+            "usedMB": 0,
+            "baselineMB": 0,
+            "deltaMB": 0
+          }
+        },
+        "load": [
+          1.04,
+          0.96
+        ]
+      },
+      {
+        "ms": 1448,
+        "counted": true,
+        "gpu": {
+          "chrome": "Chrome/148.0.7778.97",
+          "glRenderer": "no-webgl2",
+          "webgpuAdapter": "no adapter",
+          "webgpuFallback": null,
+          "canvases": {
+            "webgpu": 0,
+            "webgl2": 0,
+            "canvas2d": 1,
+            "offscreen": 0
+          },
+          "hardwareConcurrency": 16,
+          "rung": "canvas2d",
+          "glHardware": false,
+          "webgpuHardware": false,
+          "hardware": null
+        },
+        "memory": {
+          "jsHeap": {
+            "isolates": 6,
+            "usedMB": 43.27338409423828,
+            "totalMB": 79.6640625
+          },
+          "process": {
+            "source": "proc",
+            "byType": {
+              "browser": {
+                "count": 1,
+                "pssMB": 107.486328125,
+                "rssMB": 200.55078125,
+                "peakRssMB": 205.06640625
+              },
+              "utility": {
+                "count": 2,
+                "pssMB": 60.3564453125,
+                "rssMB": 178.703125,
+                "peakRssMB": 178.703125
+              },
+              "zygote": {
+                "count": 2,
+                "pssMB": 31.9365234375,
+                "rssMB": 136.9765625,
+                "peakRssMB": 136.9765625
+              },
+              "gpu-process": {
+                "count": 1,
+                "pssMB": 42.7978515625,
+                "rssMB": 100.7421875,
+                "peakRssMB": 107.58203125
+              },
+              "renderer": {
+                "count": 3,
+                "pssMB": 326.20703125,
+                "rssMB": 538.12890625,
+                "peakRssMB": 538.12890625
+              }
+            },
+            "totalPssMB": 568.7841796875
+          },
+          "gpuDevice": {
+            "usedMB": 0,
+            "baselineMB": 0,
+            "deltaMB": 0
+          }
+        },
+        "load": [
+          0.96,
+          0.96
+        ]
+      },
+      {
+        "ms": 1686,
+        "counted": true,
+        "gpu": {
+          "chrome": "Chrome/148.0.7778.97",
+          "glRenderer": "no-webgl2",
+          "webgpuAdapter": "no adapter",
+          "webgpuFallback": null,
+          "canvases": {
+            "webgpu": 0,
+            "webgl2": 0,
+            "canvas2d": 1,
+            "offscreen": 0
+          },
+          "hardwareConcurrency": 16,
+          "rung": "canvas2d",
+          "glHardware": false,
+          "webgpuHardware": false,
+          "hardware": null
+        },
+        "memory": {
+          "jsHeap": {
+            "isolates": 6,
+            "usedMB": 43.25571823120117,
+            "totalMB": 79.6640625
+          },
+          "process": {
+            "source": "proc",
+            "byType": {
+              "browser": {
+                "count": 1,
+                "pssMB": 108.841796875,
+                "rssMB": 201.328125,
+                "peakRssMB": 203.4921875
+              },
+              "zygote": {
+                "count": 2,
+                "pssMB": 32.0068359375,
+                "rssMB": 137.4375,
+                "peakRssMB": 137.4375
+              },
+              "utility": {
+                "count": 2,
+                "pssMB": 60.1328125,
+                "rssMB": 178.1328125,
+                "peakRssMB": 178.1328125
+              },
+              "gpu-process": {
+                "count": 1,
+                "pssMB": 42.556640625,
+                "rssMB": 100.69921875,
+                "peakRssMB": 107.7578125
+              },
+              "renderer": {
+                "count": 3,
+                "pssMB": 325.6708984375,
+                "rssMB": 537.24609375,
+                "peakRssMB": 537.24609375
+              }
+            },
+            "totalPssMB": 569.208984375
+          },
+          "gpuDevice": {
+            "usedMB": 0,
+            "baselineMB": 0,
+            "deltaMB": 0
+          }
+        },
+        "load": [
+          0.96,
+          0.96
+        ]
+      }
+    ],
+    "cold-1000x/canvas2d": [
+      {
+        "ms": 8547,
+        "counted": true,
+        "gpu": {
+          "chrome": "Chrome/148.0.7778.97",
+          "glRenderer": "no-webgl2",
+          "webgpuAdapter": "no adapter",
+          "webgpuFallback": null,
+          "canvases": {
+            "webgpu": 0,
+            "webgl2": 0,
+            "canvas2d": 1,
+            "offscreen": 0
+          },
+          "hardwareConcurrency": 16,
+          "rung": "canvas2d",
+          "glHardware": false,
+          "webgpuHardware": false,
+          "hardware": null
+        },
+        "memory": {
+          "jsHeap": {
+            "isolates": 6,
+            "usedMB": 699.1133308410645,
+            "totalMB": 786.99609375
+          },
+          "process": {
+            "source": "proc",
+            "byType": {
+              "browser": {
+                "count": 1,
+                "pssMB": 107.603515625,
+                "rssMB": 200.7265625,
+                "peakRssMB": 204.3203125
+              },
+              "zygote": {
+                "count": 2,
+                "pssMB": 30.978515625,
+                "rssMB": 137.5,
+                "peakRssMB": 137.5
+              },
+              "utility": {
+                "count": 2,
+                "pssMB": 138.697265625,
+                "rssMB": 259.921875,
+                "peakRssMB": 259.921875
+              },
+              "gpu-process": {
+                "count": 1,
+                "pssMB": 40.8271484375,
+                "rssMB": 98.05078125,
+                "peakRssMB": 105.46875
+              },
+              "renderer": {
+                "count": 4,
+                "pssMB": 2273.4873046875,
+                "rssMB": 2545.3203125,
+                "peakRssMB": 2545.3203125
+              }
+            },
+            "totalPssMB": 2591.59375
+          },
+          "gpuDevice": {
+            "usedMB": 0,
+            "baselineMB": 0,
+            "deltaMB": 0
+          }
+        },
+        "load": [
+          1.12,
+          1.1
+        ]
+      },
+      {
+        "ms": 8170,
+        "counted": true,
+        "gpu": {
+          "chrome": "Chrome/148.0.7778.97",
+          "glRenderer": "no-webgl2",
+          "webgpuAdapter": "no adapter",
+          "webgpuFallback": null,
+          "canvases": {
+            "webgpu": 0,
+            "webgl2": 0,
+            "canvas2d": 1,
+            "offscreen": 0
+          },
+          "hardwareConcurrency": 16,
+          "rung": "canvas2d",
+          "glHardware": false,
+          "webgpuHardware": false,
+          "hardware": null
+        },
+        "memory": {
+          "jsHeap": {
+            "isolates": 6,
+            "usedMB": 817.3516273498535,
+            "totalMB": 916.8828125
+          },
+          "process": {
+            "source": "proc",
+            "byType": {
+              "browser": {
+                "count": 1,
+                "pssMB": 106.166015625,
+                "rssMB": 200.26171875,
+                "peakRssMB": 205.13671875
+              },
+              "zygote": {
+                "count": 2,
+                "pssMB": 31.513671875,
+                "rssMB": 137.37109375,
+                "peakRssMB": 137.37109375
+              },
+              "utility": {
+                "count": 2,
+                "pssMB": 129.46875,
+                "rssMB": 250.5859375,
+                "peakRssMB": 250.5859375
+              },
+              "gpu-process": {
+                "count": 1,
+                "pssMB": 42.28125,
+                "rssMB": 98.921875,
+                "peakRssMB": 106.67578125
+              },
+              "renderer": {
+                "count": 4,
+                "pssMB": 2378.6142578125,
+                "rssMB": 2650.6484375,
+                "peakRssMB": 2650.6484375
+              }
+            },
+            "totalPssMB": 2688.0439453125
+          },
+          "gpuDevice": {
+            "usedMB": 0,
+            "baselineMB": 0,
+            "deltaMB": 0
+          }
+        },
+        "load": [
+          1.1,
+          1.09
+        ]
+      },
+      {
+        "ms": 8688,
+        "counted": true,
+        "gpu": {
+          "chrome": "Chrome/148.0.7778.97",
+          "glRenderer": "no-webgl2",
+          "webgpuAdapter": "no adapter",
+          "webgpuFallback": null,
+          "canvases": {
+            "webgpu": 0,
+            "webgl2": 0,
+            "canvas2d": 1,
+            "offscreen": 0
+          },
+          "hardwareConcurrency": 16,
+          "rung": "canvas2d",
+          "glHardware": false,
+          "webgpuHardware": false,
+          "hardware": null
+        },
+        "memory": {
+          "jsHeap": {
+            "isolates": 6,
+            "usedMB": 718.5074729919434,
+            "totalMB": 807.40234375
+          },
+          "process": {
+            "source": "proc",
+            "byType": {
+              "browser": {
+                "count": 1,
+                "pssMB": 106.783203125,
+                "rssMB": 199.88671875,
+                "peakRssMB": 205.390625
+              },
+              "zygote": {
+                "count": 2,
+                "pssMB": 31.419921875,
+                "rssMB": 137.23046875,
+                "peakRssMB": 137.23046875
+              },
+              "utility": {
+                "count": 2,
+                "pssMB": 114.5703125,
+                "rssMB": 236.72265625,
+                "peakRssMB": 236.72265625
+              },
+              "gpu-process": {
+                "count": 1,
+                "pssMB": 41.76171875,
+                "rssMB": 98.1640625,
+                "peakRssMB": 105.9921875
+              },
+              "renderer": {
+                "count": 4,
+                "pssMB": 2287.5390625,
+                "rssMB": 2558.9140625,
+                "peakRssMB": 2558.9140625
+              }
+            },
+            "totalPssMB": 2582.07421875
+          },
+          "gpuDevice": {
+            "usedMB": 0,
+            "baselineMB": 0,
+            "deltaMB": 0
+          }
+        },
+        "load": [
+          1.09,
+          1.07
+        ]
+      },
+      {
+        "ms": 8833,
+        "counted": true,
+        "gpu": {
+          "chrome": "Chrome/148.0.7778.97",
+          "glRenderer": "no-webgl2",
+          "webgpuAdapter": "no adapter",
+          "webgpuFallback": null,
+          "canvases": {
+            "webgpu": 0,
+            "webgl2": 0,
+            "canvas2d": 1,
+            "offscreen": 0
+          },
+          "hardwareConcurrency": 16,
+          "rung": "canvas2d",
+          "glHardware": false,
+          "webgpuHardware": false,
+          "hardware": null
+        },
+        "memory": {
+          "jsHeap": {
+            "isolates": 6,
+            "usedMB": 773.0429077148438,
+            "totalMB": 862.15625
+          },
+          "process": {
+            "source": "proc",
+            "byType": {
+              "browser": {
+                "count": 1,
+                "pssMB": 107.4814453125,
+                "rssMB": 200.4453125,
+                "peakRssMB": 205.2421875
+              },
+              "zygote": {
+                "count": 2,
+                "pssMB": 31.2802734375,
+                "rssMB": 136.6015625,
+                "peakRssMB": 136.6015625
+              },
+              "utility": {
+                "count": 2,
+                "pssMB": 129.6748046875,
+                "rssMB": 251.2578125,
+                "peakRssMB": 251.6796875
+              },
+              "gpu-process": {
+                "count": 1,
+                "pssMB": 42.189453125,
+                "rssMB": 99.171875,
+                "peakRssMB": 106.87109375
+              },
+              "renderer": {
+                "count": 4,
+                "pssMB": 2328.939453125,
+                "rssMB": 2600.71875,
+                "peakRssMB": 2600.71875
+              }
+            },
+            "totalPssMB": 2639.5654296875
+          },
+          "gpuDevice": {
+            "usedMB": 0,
+            "baselineMB": 0,
+            "deltaMB": 0
+          }
+        },
+        "load": [
+          1.07,
+          1.06
+        ]
+      },
+      {
+        "ms": 8405,
+        "counted": true,
+        "gpu": {
+          "chrome": "Chrome/148.0.7778.97",
+          "glRenderer": "no-webgl2",
+          "webgpuAdapter": "no adapter",
+          "webgpuFallback": null,
+          "canvases": {
+            "webgpu": 0,
+            "webgl2": 0,
+            "canvas2d": 1,
+            "offscreen": 0
+          },
+          "hardwareConcurrency": 16,
+          "rung": "canvas2d",
+          "glHardware": false,
+          "webgpuHardware": false,
+          "hardware": null
+        },
+        "memory": {
+          "jsHeap": {
+            "isolates": 6,
+            "usedMB": 659.0208511352539,
+            "totalMB": 753.05859375
+          },
+          "process": {
+            "source": "proc",
+            "byType": {
+              "browser": {
+                "count": 1,
+                "pssMB": 106.1201171875,
+                "rssMB": 200.328125,
+                "peakRssMB": 204.90625
+              },
+              "zygote": {
+                "count": 2,
+                "pssMB": 31.29296875,
+                "rssMB": 137.10546875,
+                "peakRssMB": 137.10546875
+              },
+              "utility": {
+                "count": 2,
+                "pssMB": 145.5517578125,
+                "rssMB": 266.11328125,
+                "peakRssMB": 266.66015625
+              },
+              "gpu-process": {
+                "count": 1,
+                "pssMB": 41.458984375,
+                "rssMB": 98.44140625,
+                "peakRssMB": 106.21484375
+              },
+              "renderer": {
+                "count": 4,
+                "pssMB": 2195.8525390625,
+                "rssMB": 2466.40234375,
+                "peakRssMB": 2626.4765625
+              }
+            },
+            "totalPssMB": 2520.2763671875
+          },
+          "gpuDevice": {
+            "usedMB": 0,
+            "baselineMB": 0,
+            "deltaMB": 0
+          }
+        },
+        "load": [
+          1.06,
+          1.05
+        ]
+      }
+    ],
+    "zoom-200x/canvas2d": [
+      {
+        "ms": 133.599853515625,
+        "counted": true,
+        "gpu": {
+          "glRenderer": "no-webgl2",
+          "webgpuAdapter": "no adapter",
+          "webgpuFallback": null,
+          "canvases": {
+            "webgpu": 0,
+            "webgl2": 0,
+            "canvas2d": 1,
+            "offscreen": 0
+          },
+          "hardwareConcurrency": 16,
+          "rung": "canvas2d",
+          "glHardware": false,
+          "webgpuHardware": false,
+          "hardware": null
+        },
+        "steps": [
+          190.453125,
+          144.24609375,
+          133.599853515625,
+          131.18994140625,
+          113.16796875
+        ],
+        "drawClockMs": 85.5,
+        "load": [
+          0.96,
+          0.89
+        ]
+      },
+      {
+        "ms": 142.036865234375,
+        "counted": true,
+        "gpu": {
+          "glRenderer": "no-webgl2",
+          "webgpuAdapter": "no adapter",
+          "webgpuFallback": null,
+          "canvases": {
+            "webgpu": 0,
+            "webgl2": 0,
+            "canvas2d": 1,
+            "offscreen": 0
+          },
+          "hardwareConcurrency": 16,
+          "rung": "canvas2d",
+          "glHardware": false,
+          "webgpuHardware": false,
+          "hardware": null
+        },
+        "steps": [
+          190.842041015625,
+          146.651123046875,
+          142.036865234375,
+          138.8779296875,
+          114.64306640625
+        ],
+        "drawClockMs": 93.30000000004657,
+        "load": [
+          0.89,
+          0.84
+        ]
+      },
+      {
+        "ms": 133.31201171875,
+        "counted": true,
+        "gpu": {
+          "glRenderer": "no-webgl2",
+          "webgpuAdapter": "no adapter",
+          "webgpuFallback": null,
+          "canvases": {
+            "webgpu": 0,
+            "webgl2": 0,
+            "canvas2d": 1,
+            "offscreen": 0
+          },
+          "hardwareConcurrency": 16,
+          "rung": "canvas2d",
+          "glHardware": false,
+          "webgpuHardware": false,
+          "hardware": null
+        },
+        "steps": [
+          191.0478515625,
+          145.413818359375,
+          133.114990234375,
+          133.31201171875,
+          116.22412109375
+        ],
+        "drawClockMs": 86.09999999997672,
+        "load": [
+          0.84,
+          1
+        ]
+      },
+      {
+        "ms": 134.553955078125,
+        "counted": true,
+        "gpu": {
+          "glRenderer": "no-webgl2",
+          "webgpuAdapter": "no adapter",
+          "webgpuFallback": null,
+          "canvases": {
+            "webgpu": 0,
+            "webgl2": 0,
+            "canvas2d": 1,
+            "offscreen": 0
+          },
+          "hardwareConcurrency": 16,
+          "rung": "canvas2d",
+          "glHardware": false,
+          "webgpuHardware": false,
+          "hardware": null
+        },
+        "steps": [
+          191.782958984375,
+          147.555908203125,
+          133.2470703125,
+          134.553955078125,
+          115.416015625
+        ],
+        "drawClockMs": 87.80000000004657,
+        "load": [
+          1,
+          0.92
+        ]
+      },
+      {
+        "ms": 130.85888671875,
+        "counted": true,
+        "gpu": {
+          "glRenderer": "no-webgl2",
+          "webgpuAdapter": "no adapter",
+          "webgpuFallback": null,
+          "canvases": {
+            "webgpu": 0,
+            "webgl2": 0,
+            "canvas2d": 1,
+            "offscreen": 0
+          },
+          "hardwareConcurrency": 16,
+          "rung": "canvas2d",
+          "glHardware": false,
+          "webgpuHardware": false,
+          "hardware": null
+        },
+        "steps": [
+          192.259765625,
+          150.30810546875,
+          130.85888671875,
+          130.76904296875,
+          112.45703125
+        ],
+        "drawClockMs": 84.40000000002328,
+        "load": [
+          0.92,
+          0.86
+        ]
+      }
+    ]
+  }
+}

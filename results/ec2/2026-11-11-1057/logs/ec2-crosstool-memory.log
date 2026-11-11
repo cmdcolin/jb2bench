@@ -1,0 +1,283 @@
+node --experimental-strip-types scripts/crosstool/toolcheck.ts
+ok             index.html                                    19kb   20x.shortread.bam      3/12 canvases painted, 0.7 MB
+               page error: Failed to load resource: the server responded with a status of 404 (Not Found)
+ok             index.html                                    19kb   200x.shortread.bam     3/12 canvases painted, 6.0 MB
+ok             index.html                                    100kb  20x.shortread.bam      3/12 canvases painted, 2.4 MB
+ok             index.html                                    100kb  200x.shortread.bam     1/11 canvases painted, 22.6 MB
+ok             index.html?igv=3.8.5                          19kb   20x.shortread.bam      3/12 canvases painted, 0.7 MB
+ok             index.html?igv=3.8.5                          19kb   200x.shortread.bam     3/12 canvases painted, 6.0 MB
+ok             index.html?igv=3.8.5                          100kb  20x.shortread.bam      3/12 canvases painted, 2.4 MB
+ok             index.html?igv=3.8.5                          100kb  200x.shortread.bam     1/11 canvases painted, 22.6 MB
+ok             genomespy.html                                19kb   20x.shortread.bam      1/1 canvases painted, 0.9 MB
+ok             genomespy.html                                19kb   200x.shortread.bam     1/1 canvases painted, 5.0 MB
+ok             genomespy.html                                100kb  20x.shortread.bam      1/1 canvases painted, 2.3 MB
+ok             genomespy.html                                100kb  200x.shortread.bam     1/1 canvases painted, 19.8 MB
+ok             genomespy.html?gs=0.85.0                      19kb   20x.shortread.bam      1/1 canvases painted, 0.9 MB
+ok             genomespy.html?gs=0.85.0                      19kb   200x.shortread.bam     1/1 canvases painted, 5.0 MB
+ok             genomespy.html?gs=0.85.0                      100kb  20x.shortread.bam      1/1 canvases painted, 2.3 MB
+ok             genomespy.html?gs=0.85.0                      100kb  200x.shortread.bam     1/1 canvases painted, 19.9 MB
+ok             gosling.html                                  19kb   20x.shortread.bam      1/1 canvases painted, 3.1 MB, 41962 features
+ok             gosling.html                                  19kb   200x.shortread.bam     1/1 canvases painted, 19.1 MB, 389308 features
+empty, expected gosling.html                                  100kb  20x.shortread.bam      1/1 canvases painted, 0.8 MB, 0 features
+               Gosling's BAM fetcher declines a tile wider than 20 kb
+empty, expected gosling.html                                  100kb  200x.shortread.bam     1/1 canvases painted, 0.8 MB, 0 features
+               Gosling's BAM fetcher declines a tile wider than 20 kb
+mkdir -p results/memory-peak
+node --experimental-strip-types scripts/gate.ts --warn
+ ok   load average         0.51 (ceiling 4.0)
+ ok   agent sessions       0 (ceiling 2)
+ ok   free disk            44 GB
+ ok   alignment corpus     24 files
+ ok   ordinary-depth arms  16 files (10x, 30x)
+warn  variant corpus       absent — shell/generate_variants.sh
+warn  GFF3 corpus          absent — shell/generate_gff3.sh
+warn  cohort BigWigs       absent — shell/generate_cohort_bw.sh
+ ok   modBAM corpus        data/200x.longread.mod.bam
+ ok   wide-window corpus   data/2mb.100x.longread.bam
+warn  paper-2019 corpus    absent — shell/fetch_paper2019.sh
+ ok   mains power          on AC
+ ok   port 8000            release-5.0.0-beta.21
+ ok   port 8001            release-4.3.0
+ ok   port 8004            release-2.4.0
+ ok   port 8003            3 pages match crosstool/; 19kb corpus reachable; 1mb corpus reachable; 100kb-wide corpus reachable; 19kb-wide corpus reachable
+FAIL  sweep builds         absent — ecosystem/setup-sweep.sh
+
+1 check(s) failed, none of which affect a timing: the counting
+benchmarks (MODE=count sweep, cohort request counts) still produce results.
+MEMORY_PEAK=1 RESULTS_DIR=results/memory-peak RUNS=3 WARMUP=0 FAIL_LIMIT=1 \
+  WINDOWS=100kb CASES=20x-shortread-bam,200x-shortread-bam,1000x-shortread-bam,20x-longread-bam,200x-longread-bam,1000x-longread-bam,20x-shortread-cram,200x-shortread-cram,1000x-shortread-cram,20x-longread-cram,200x-longread-cram,1000x-longread-cram MAX_WAIT=600000 \
+  JBROWSE_PORTS=8000,8004 TOOLS=jbrowse,jbrowse-release-2.4.0,igv,igv-tall,genomespy \
+  node --experimental-strip-types scripts/crosstool/runner.ts 2>&1 | tee results/logs/crosstool-memory-2026-11-11.log
+port 8000 is serving builds/release-5.0.0-beta.21
+port 8004 is serving builds/release-2.4.0
+igv.js 3.8.10, GenomeSpy 1.3.0, Gosling 1.0.7
+windows: 100kb (chr22_mask:75000-175000, 100 kb)
+3 pages match crosstool/
+100kb: 26 corpus files reachable on every arm
+20x-shortread-bam@100kb jbrowse run 1: 5673 (js heap 50 MB, pss 734 MB)
+20x-shortread-bam@100kb jbrowse-release-2.4.0 run 1: 7114 (js heap 210 MB, pss 954 MB)
+20x-shortread-bam@100kb igv run 1: 4590 (js heap 91 MB, pss 796 MB)
+20x-shortread-bam@100kb igv-tall run 1: 5343 (js heap 91 MB, pss 899 MB)
+20x-shortread-bam@100kb genomespy run 1: 3931 (js heap 68 MB, pss 793 MB)
+20x-shortread-bam@100kb jbrowse run 2: 2209 (js heap 45 MB, pss 685 MB)
+20x-shortread-bam@100kb jbrowse-release-2.4.0 run 2: 5776 (js heap 229 MB, pss 909 MB)
+20x-shortread-bam@100kb igv run 2: 4447 (js heap 91 MB, pss 769 MB)
+20x-shortread-bam@100kb igv-tall run 2: 5240 (js heap 91 MB, pss 902 MB)
+20x-shortread-bam@100kb genomespy run 2: 4043 (js heap 68 MB, pss 770 MB)
+20x-shortread-bam@100kb jbrowse run 3: 2296 (js heap 46 MB, pss 662 MB)
+20x-shortread-bam@100kb jbrowse-release-2.4.0 run 3: 5901 (js heap 229 MB, pss 971 MB)
+20x-shortread-bam@100kb igv run 3: 4481 (js heap 91 MB, pss 764 MB)
+20x-shortread-bam@100kb igv-tall run 3: 5192 (js heap 91 MB, pss 898 MB)
+20x-shortread-bam@100kb genomespy run 3: 3967 (js heap 68 MB, pss 771 MB)
+20x-shortread-cram@100kb genomespy: unsupported — no cram reader
+20x-shortread-cram@100kb jbrowse run 1: 2429 (js heap 60 MB, pss 733 MB)
+20x-shortread-cram@100kb jbrowse-release-2.4.0 run 1: 8138 (js heap 241 MB, pss 905 MB)
+20x-shortread-cram@100kb igv run 1: 4529 (js heap 97 MB, pss 792 MB)
+20x-shortread-cram@100kb igv-tall run 1: 5270 (js heap 106 MB, pss 814 MB)
+20x-shortread-cram@100kb jbrowse run 2: 2356 (js heap 59 MB, pss 711 MB)
+20x-shortread-cram@100kb jbrowse-release-2.4.0 run 2: 7087 (js heap 251 MB, pss 918 MB)
+20x-shortread-cram@100kb igv run 2: 4574 (js heap 97 MB, pss 790 MB)
+20x-shortread-cram@100kb igv-tall run 2: 5238 (js heap 106 MB, pss 817 MB)
+20x-shortread-cram@100kb jbrowse run 3: 2330 (js heap 58 MB, pss 708 MB)
+20x-shortread-cram@100kb jbrowse-release-2.4.0 run 3: 7025 (js heap 256 MB, pss 934 MB)
+20x-shortread-cram@100kb igv run 3: 4571 (js heap 97 MB, pss 790 MB)
+20x-shortread-cram@100kb igv-tall run 3: 5320 (js heap 106 MB, pss 811 MB)
+200x-shortread-bam@100kb jbrowse run 1: 2128 (js heap 25 MB, pss 632 MB)
+200x-shortread-bam@100kb jbrowse-release-2.4.0 run 1: 19097 (js heap 647 MB, pss 1608 MB)
+200x-shortread-bam@100kb igv run 1: 27489 (js heap 690 MB, pss 2002 MB)
+200x-shortread-bam@100kb igv-tall run 1: 34065 (js heap 640 MB, pss 3092 MB)
+200x-shortread-bam@100kb genomespy run 1: 12577 (js heap 910 MB, pss 2177 MB)
+200x-shortread-bam@100kb jbrowse run 2: 3838 (js heap 174 MB, pss 1229 MB)
+200x-shortread-bam@100kb jbrowse-release-2.4.0 run 2: 19954 (js heap 606 MB, pss 1666 MB)
+200x-shortread-bam@100kb igv run 2: 27681 (js heap 689 MB, pss 2002 MB)
+200x-shortread-bam@100kb igv-tall run 2: 33745 (js heap 626 MB, pss 3108 MB)
+200x-shortread-bam@100kb genomespy run 2: 12509 (js heap 903 MB, pss 2164 MB)
+200x-shortread-bam@100kb jbrowse run 3: 3738 (js heap 174 MB, pss 1173 MB)
+200x-shortread-bam@100kb jbrowse-release-2.4.0 run 3: 19869 (js heap 586 MB, pss 1644 MB)
+200x-shortread-bam@100kb igv run 3: 27560 (js heap 691 MB, pss 1995 MB)
+200x-shortread-bam@100kb igv-tall run 3: 34190 (js heap 637 MB, pss 3140 MB)
+200x-shortread-bam@100kb genomespy run 3: 12304 (js heap 912 MB, pss 2174 MB)
+200x-shortread-cram@100kb genomespy: unsupported — no cram reader
+200x-shortread-cram@100kb jbrowse run 1: 3951 (js heap 169 MB, pss 1211 MB)
+200x-shortread-cram@100kb jbrowse-release-2.4.0 run 1: 23465 (js heap 714 MB, pss 1449 MB)
+200x-shortread-cram@100kb igv run 1: 27169 (js heap 799 MB, pss 2173 MB)
+200x-shortread-cram@100kb igv-tall run 1: 33495 (js heap 677 MB, pss 2756 MB)
+200x-shortread-cram@100kb jbrowse run 2: 3821 (js heap 211 MB, pss 1277 MB)
+200x-shortread-cram@100kb jbrowse-release-2.4.0 run 2: 23663 (js heap 720 MB, pss 1475 MB)
+200x-shortread-cram@100kb igv run 2: 27189 (js heap 788 MB, pss 2130 MB)
+200x-shortread-cram@100kb igv-tall run 2: 33934 (js heap 682 MB, pss 3099 MB)
+200x-shortread-cram@100kb jbrowse run 3: 3777 (js heap 209 MB, pss 1258 MB)
+200x-shortread-cram@100kb jbrowse-release-2.4.0 run 3: 23663 (js heap 721 MB, pss 1469 MB)
+200x-shortread-cram@100kb igv run 3: 27460 (js heap 801 MB, pss 2143 MB)
+200x-shortread-cram@100kb igv-tall run 3: 33394 (js heap 676 MB, pss 2596 MB)
+1000x-shortread-bam@100kb jbrowse run 1: 1954 (js heap 25 MB, pss 595 MB)
+1000x-shortread-bam@100kb jbrowse-release-2.4.0 run 1: 82111 (js heap 1834 MB, pss 3479 MB)
+1000x-shortread-bam@100kb igv run 1: 174755 (js heap 3417 MB, pss 4952 MB)
+1000x-shortread-bam@100kb igv-tall run 1: 223026 (js heap 3590 MB, pss 11477 MB)
+1000x-shortread-bam@100kb genomespy run 1: 45699 (js heap 3030 MB, pss 6476 MB)
+1000x-shortread-bam@100kb jbrowse run 2: 9402 (js heap 715 MB, pss 3040 MB)
+1000x-shortread-bam@100kb jbrowse-release-2.4.0 run 2: 80580 (js heap 1541 MB, pss 2938 MB)
+1000x-shortread-bam@100kb igv run 2: 174195 (js heap 3324 MB, pss 4910 MB)
+1000x-shortread-bam@100kb igv-tall run 2: 224614 (js heap 3376 MB, pss 11255 MB)
+1000x-shortread-bam@100kb genomespy run 2: 46230 (js heap 3178 MB, pss 6468 MB)
+1000x-shortread-bam@100kb jbrowse run 3: 9319 (js heap 819 MB, pss 3146 MB)
+1000x-shortread-bam@100kb jbrowse-release-2.4.0 run 3: 80381 (js heap 1735 MB, pss 3248 MB)
+1000x-shortread-bam@100kb igv run 3: 174819 (js heap 3359 MB, pss 4860 MB)
+1000x-shortread-bam@100kb igv-tall run 3: 226622 (js heap 3209 MB, pss 11070 MB)
+1000x-shortread-bam@100kb genomespy run 3: 48898 (js heap 3017 MB, pss 6473 MB)
+1000x-shortread-cram@100kb genomespy: unsupported — no cram reader
+1000x-shortread-cram@100kb jbrowse run 1: 11964 (js heap 729 MB, pss 2891 MB)
+1000x-shortread-cram@100kb jbrowse-release-2.4.0 run 1: 80841 (js heap 2421 MB, pss 3352 MB)
+1000x-shortread-cram@100kb igv run 1: 196102 (js heap 3203 MB, pss 5025 MB)
+1000x-shortread-cram@100kb igv-tall run 1: 247729 (js heap 3195 MB, pss 11276 MB)
+1000x-shortread-cram@100kb jbrowse run 2: 10386 (js heap 695 MB, pss 2887 MB)
+1000x-shortread-cram@100kb jbrowse-release-2.4.0 run 2: 80261 (js heap 2455 MB, pss 3411 MB)
+1000x-shortread-cram@100kb igv run 2: 197506 (js heap 3214 MB, pss 5029 MB)
+1000x-shortread-cram@100kb igv-tall run 2: 247201 (js heap 3205 MB, pss 11264 MB)
+1000x-shortread-cram@100kb jbrowse run 3: 10413 (js heap 740 MB, pss 2952 MB)
+1000x-shortread-cram@100kb jbrowse-release-2.4.0 run 3: 80600 (js heap 2416 MB, pss 3456 MB)
+1000x-shortread-cram@100kb igv: no stable paint in 600s, 1 times — abandoning this cell
+1000x-shortread-cram@100kb igv run 3: NaN
+1000x-shortread-cram@100kb igv-tall run 3: 249330 (js heap 3203 MB, pss 11344 MB)
+20x-longread-bam@100kb jbrowse run 1: 2998 (js heap 58 MB, pss 745 MB)
+20x-longread-bam@100kb jbrowse-release-2.4.0 run 1: 8248 (js heap 140 MB, pss 906 MB)
+20x-longread-bam@100kb igv run 1: 11406 (js heap 135 MB, pss 1039 MB)
+20x-longread-bam@100kb igv-tall run 1: 19238 (js heap 139 MB, pss 1170 MB)
+20x-longread-bam@100kb genomespy run 1: 17931 (js heap 187 MB, pss 1062 MB)
+20x-longread-bam@100kb jbrowse run 2: 2616 (js heap 58 MB, pss 747 MB)
+20x-longread-bam@100kb jbrowse-release-2.4.0 run 2: 6902 (js heap 143 MB, pss 858 MB)
+20x-longread-bam@100kb igv run 2: 11403 (js heap 135 MB, pss 1042 MB)
+20x-longread-bam@100kb igv-tall run 2: 19181 (js heap 146 MB, pss 1162 MB)
+20x-longread-bam@100kb genomespy run 2: 17860 (js heap 184 MB, pss 1040 MB)
+20x-longread-bam@100kb jbrowse run 3: 2589 (js heap 58 MB, pss 763 MB)
+20x-longread-bam@100kb jbrowse-release-2.4.0 run 3: 6816 (js heap 143 MB, pss 857 MB)
+20x-longread-bam@100kb igv run 3: 11354 (js heap 135 MB, pss 1038 MB)
+20x-longread-bam@100kb igv-tall run 3: 19185 (js heap 150 MB, pss 1160 MB)
+20x-longread-bam@100kb genomespy run 3: 17411 (js heap 187 MB, pss 1042 MB)
+20x-longread-cram@100kb genomespy: unsupported — no cram reader
+20x-longread-cram@100kb jbrowse run 1: 2602 (js heap 35 MB, pss 768 MB)
+20x-longread-cram@100kb jbrowse-release-2.4.0 run 1: 8340 (js heap 178 MB, pss 891 MB)
+20x-longread-cram@100kb igv run 1: 11460 (js heap 158 MB, pss 1183 MB)
+20x-longread-cram@100kb igv-tall run 1: 19222 (js heap 136 MB, pss 1202 MB)
+20x-longread-cram@100kb jbrowse run 2: 2577 (js heap 53 MB, pss 757 MB)
+20x-longread-cram@100kb jbrowse-release-2.4.0 run 2: 7255 (js heap 179 MB, pss 894 MB)
+20x-longread-cram@100kb igv run 2: 11499 (js heap 156 MB, pss 1186 MB)
+20x-longread-cram@100kb igv-tall run 2: 19223 (js heap 147 MB, pss 1191 MB)
+20x-longread-cram@100kb jbrowse run 3: 2510 (js heap 55 MB, pss 767 MB)
+20x-longread-cram@100kb jbrowse-release-2.4.0 run 3: 7250 (js heap 178 MB, pss 894 MB)
+20x-longread-cram@100kb igv run 3: 11493 (js heap 141 MB, pss 1172 MB)
+20x-longread-cram@100kb igv-tall run 3: 19342 (js heap 155 MB, pss 1186 MB)
+200x-longread-bam@100kb jbrowse run 1: 1956 (js heap 25 MB, pss 597 MB)
+200x-longread-bam@100kb jbrowse-release-2.4.0 run 1: 27643 (js heap 739 MB, pss 1814 MB)
+200x-longread-bam@100kb igv run 1: 58561 (js heap 1025 MB, pss 4567 MB)
+200x-longread-bam@100kb igv-tall run 1: 131600 (js heap 1021 MB, pss 5065 MB)
+200x-longread-bam@100kb genomespy run 1: 148181 (js heap 1083 MB, pss 2342 MB)
+200x-longread-bam@100kb jbrowse run 2: 5794 (js heap 331 MB, pss 1541 MB)
+200x-longread-bam@100kb jbrowse-release-2.4.0 run 2: 25306 (js heap 736 MB, pss 1784 MB)
+200x-longread-bam@100kb igv run 2: 58804 (js heap 1002 MB, pss 4465 MB)
+200x-longread-bam@100kb igv-tall run 2: 131875 (js heap 1021 MB, pss 5065 MB)
+200x-longread-bam@100kb genomespy run 2: 149741 (js heap 1249 MB, pss 3357 MB)
+200x-longread-bam@100kb jbrowse run 3: 5815 (js heap 333 MB, pss 1539 MB)
+200x-longread-bam@100kb jbrowse-release-2.4.0 run 3: 25597 (js heap 742 MB, pss 1784 MB)
+200x-longread-bam@100kb igv run 3: 58368 (js heap 1002 MB, pss 4468 MB)
+200x-longread-bam@100kb igv-tall run 3: 131759 (js heap 1001 MB, pss 5060 MB)
+200x-longread-bam@100kb genomespy run 3: 148926 (js heap 1083 MB, pss 2873 MB)
+200x-longread-cram@100kb genomespy: unsupported — no cram reader
+200x-longread-cram@100kb jbrowse run 1: 5998 (js heap 313 MB, pss 1647 MB)
+200x-longread-cram@100kb jbrowse-release-2.4.0 run 1: 23373 (js heap 689 MB, pss 1540 MB)
+200x-longread-cram@100kb igv run 1: 58228 (js heap 988 MB, pss 3874 MB)
+200x-longread-cram@100kb igv-tall: no stable paint in 600s, 1 times — abandoning this cell
+200x-longread-cram@100kb igv-tall run 1: NaN
+200x-longread-cram@100kb jbrowse run 2: 5696 (js heap 313 MB, pss 1622 MB)
+200x-longread-cram@100kb jbrowse-release-2.4.0 run 2: 23444 (js heap 687 MB, pss 1547 MB)
+200x-longread-cram@100kb igv run 2: 57656 (js heap 993 MB, pss 3847 MB)
+200x-longread-cram@100kb jbrowse run 3: 5942 (js heap 271 MB, pss 1592 MB)
+200x-longread-cram@100kb jbrowse-release-2.4.0 run 3: 23315 (js heap 662 MB, pss 1547 MB)
+200x-longread-cram@100kb igv run 3: 58330 (js heap 992 MB, pss 3976 MB)
+1000x-longread-bam@100kb jbrowse run 1: 1957 (js heap 25 MB, pss 585 MB)
+1000x-longread-bam@100kb jbrowse-release-2.4.0 run 1: 104797 (js heap 2286 MB, pss 4715 MB)
+1000x-longread-bam@100kb igv: no stable paint in 600s, 1 times — abandoning this cell
+1000x-longread-bam@100kb igv run 1: NaN
+1000x-longread-bam@100kb igv-tall: no stable paint in 600s, 1 times — abandoning this cell
+1000x-longread-bam@100kb igv-tall run 1: NaN
+1000x-longread-bam@100kb genomespy: no stable paint in 600s, 1 times — abandoning this cell
+1000x-longread-bam@100kb genomespy run 1: NaN
+1000x-longread-bam@100kb jbrowse run 2: 1947 (js heap 25 MB, pss 966 MB)
+1000x-longread-bam@100kb jbrowse-release-2.4.0 run 2: 91515 (js heap 2281 MB, pss 4707 MB)
+1000x-longread-bam@100kb jbrowse run 3: 17880 (js heap 1368 MB, pss 4690 MB)
+1000x-longread-bam@100kb jbrowse-release-2.4.0 run 3: 93034 (js heap 2303 MB, pss 4715 MB)
+1000x-longread-cram@100kb genomespy: unsupported — no cram reader
+1000x-longread-cram@100kb jbrowse run 1: 19693 (js heap 1227 MB, pss 4603 MB)
+1000x-longread-cram@100kb jbrowse-release-2.4.0 run 1: 85433 (js heap 2127 MB, pss 3520 MB)
+1000x-longread-cram@100kb igv: no stable paint in 600s, 1 times — abandoning this cell
+1000x-longread-cram@100kb igv run 1: NaN
+1000x-longread-cram@100kb igv-tall: no stable paint in 600s, 1 times — abandoning this cell
+1000x-longread-cram@100kb igv-tall run 1: NaN
+1000x-longread-cram@100kb jbrowse run 2: 17637 (js heap 1224 MB, pss 4522 MB)
+1000x-longread-cram@100kb jbrowse-release-2.4.0 run 2: 82762 (js heap 2115 MB, pss 3505 MB)
+1000x-longread-cram@100kb jbrowse run 3: 17899 (js heap 1249 MB, pss 4755 MB)
+1000x-longread-cram@100kb jbrowse-release-2.4.0 run 3: 83080 (js heap 2107 MB, pss 3566 MB)
+# Cross-tool render benchmark: JBrowse vs igv.js, GenomeSpy and Gosling
+
+JBrowse against igv.js 3.8.10, GenomeSpy 1.3.0 and Gosling 1.0.7 — same files, same windows, same instrument. The JBrowse arms are `builds/release-5.0.0-beta.21`, `builds/release-2.4.0`; only the build under test is asked for the WebGL2 renderer, since a release that predates the parameter ignores it.
+
+3 windows. The two narrow ones sit on the same contig, the wider containing the narrower; the 1 Mb one is a second corpus beside them — its own assembly, its own files, 20x and 100x rather than the 20x-to-1000x ladder — because a 250 kb contig cannot hold a megabase view: **19kb** `chr22_mask:124000-143000`, **100kb** `chr22_mask:75000-175000`, **1mb** `chr22_2mb:500001-1500000`. Same reads, more of them, so a row pair says how each tool scales with what is on screen rather than with what is in the file.
+
+Three limits decide which cells exist at all, and the table names them rather than leaving a reader to infer them from a suspiciously fast cell:
+
+- **Gosling stops at 20 kb.** `MAX_TILE_WIDTH = 2e4` in its `BamDataFetcher`, checked against every visible tile by `gosling-track.ts:calculateVisibleTiles`, which returns before fetching. Tile width is the declared genome length over 2^zoom, so on this 250 kb assembly the 19 kb window draws and the 100 kb one paints a full axis and no reads. Its 100 kb cells are `n/a`, not a timing — a page that draws nothing settles immediately under this instrument, so timing it would make Gosling the fastest tool in the table at the window it cannot render.
+- **`tile cap raised` is that same build with the cap patched out**, which is the only way Gosling reaches the wider window. Read the pair, not the patched column alone: a patched library is not the one anyone installs. It also fetches a whole tile rather than the window — 40002 reads at 100 kb on the 20x file against roughly 16000 in view — so it is an upper bound on what an unpatched Gosling would cost at this width even if it could draw it.
+- **Neither GenomeSpy nor Gosling reads CRAM**, so the format axis stops at BAM for both columns. igv.js and JBrowse carry the CRAM rows.
+
+The instrument is `scripts/crosstool/paintprofile.ts`: navigation to the last frame in which the pixels change, polled by screenshot. It belongs to neither tool — igv.js hides its spinner when features finish *loading*, before it draws them, so its own loading state would credit it with a render it has not done. Cost: the paint instrument reads a few hundred ms higher than the testid instrument used elsewhere in this repo, because it also waits out the settling of everything else on the page. That bias applies to every column.
+
+**Stable pixels alone were not enough, and the Gosling arms are why.** A page that is working with nothing moving on screen satisfies a pixel-stability test, and Gosling shows a *static* "Fetching" frame for its first few seconds while a worker boots and reads the index — no animation, and no request outstanding either. Measured 2026-08-28, it settled at 2.4 s on an empty plot against a true 7.6 s. So the instrument now also refuses to settle while a corpus read is in flight, and while a harness page exports `__harnessBusy()` returning true; Gosling's is `records === 0`, a content gate that adds no constant once the first feature lands. Correcting it moved the stock 19 kb Gosling cell up by roughly half while the ungated igv arm held within 9% across the same runs. **A page that defines no such predicate is measured exactly as before**, so every column other than GenomeSpy and Gosling is unaffected and comparable with the rows recorded before this axis existed.
+
+Three JBrowse arms and one igv.js arm carry the comparison; the remaining igv columns are controls rather than workload knobs:
+
+- **Downsampling.** igv draws at most `samplingDepth` reads per 100 bp window (default 500, hard maximum 10000) and JBrowse draws every read. On this corpus the deepest 100 bp window holds roughly 700 short reads, so the default clips a little and the maximum clips nothing — if the default and `no downsampling` columns agree, downsampling is not what the comparison is measuring.
+- **Track height.** The harness gives igv a 600 px track; igv's own default for a BAM track is 300, and JBrowse's pileup canvas at this viewport is about 210. igv draws packed rows until it runs out of canvas while JBrowse draws every read it holds and lets the rasterizer clip, so a taller igv track is more igv work and no more JBrowse work. The last two columns are that control, run as its own interleaved pair so it does not disturb the headline ratio.
+
+Median of 3 runs after 0 warmup, tools interleaved within each round. A blank cell was not measured in the run that produced its row; `n/a` is a capability limit named in the list above, and an arm holding one is dropped from the interleaving rather than timed on a page it cannot draw. `>Ns` is an arm that failed to settle within the paint ceiling 1 times and was abandoned for that cell — a result about the tool at that width, not a gap in the run. `error` is an arm whose page settled on an error message in place of the track; `crosstool.json` holds the message in the cell's `error` field. The ceiling is 600s at 100 kb and 120s at the other windows, and each cell carries the ceiling it was judged against, so a row recorded under the older per-window ceilings still prints the one it actually got.
+
+`foreign` is the most CPU any of the row's cells saw burned by processes **outside this benchmark**, in cores — outside the runner's process tree and outside the corpus http-servers, which serve the bytes under test and are apparatus rather than contention. That, and not the load average, is what says whether a row is trustworthy: a row above 0.5 is contended and its absolute milliseconds are not a run of record. `load` is kept as context, because it counts this benchmark's own threads and a heavy cell inflates it by working — the 1000x long-read cells drive it into the tens on an idle box. Rows recorded before 2026-08-24 have no foreign figure and show `?`; they were judged against a 4.0 load ceiling, which is the best that can be done with what they recorded.
+
+| case | window | JBrowse (release-5.0.0-beta.21) | JBrowse (release-2.4.0) | igv.js 3.8.10 | igv.js 3.8.10, every row | GenomeSpy 1.3.0 | igv default ÷ JBrowse | measured | foreign | by | load |
+|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|
+| 20x-shortread-bam | 100kb | 2296 ±1613 | 5901 ±603 | 4481 ±61 | 5240 ±63 | 3967 ±47 | 1.95× | 2026-11-11 | 0.01 | — | 1.7 |
+| 20x-shortread-cram | 100kb | 2356 ±42 | 7087 ±511 | 4571 ±21 | 5270 ±34 | n/a | 1.94× | 2026-11-11 | 0.01 | — | 1.7 |
+| 200x-shortread-bam | 100kb | 3738 ±784 | 19869 ±386 | 27560 ±79 | 34065 ±187 | 12509 ±116 | 7.37× | 2026-11-11 | 0.01 | — | 1.9 |
+| 200x-shortread-cram | 100kb | 3821 ±74 | 23663 ±93 | 27189 ±133 | 33495 ±234 | n/a | 7.12× | 2026-11-11 | 0.01 | — | 1.9 |
+| 1000x-shortread-bam | 100kb | 9319 ±3492 | 80580 ±773 | 174755 ±280 | 224614 ±1471 | 46230 ±1400 | 18.75× | 2026-11-11 | 0.01 | — | 2.1 |
+| 1000x-shortread-cram | 100kb | 10413 ±738 | 80600 ±238 | 196804 ±702 | 247729 ±905 | n/a | 18.90× | 2026-11-11 | 0.01 | — | 2.1 |
+| 20x-longread-bam | 100kb | 2616 ±187 | 6902 ±656 | 11403 ±24 | 19185 ±26 | 17860 ±230 | 4.36× | 2026-11-11 | 0.01 | — | 1.6 |
+| 20x-longread-cram | 100kb | 2577 ±39 | 7255 ±513 | 11493 ±17 | 19223 ±56 | n/a | 4.46× | 2026-11-11 | 0.01 | — | 1.6 |
+| 200x-longread-bam | 100kb | 5794 ±1814 | 25597 ±1040 | 58561 ±178 | 131759 ±113 | 148926 ±637 | 10.11× | 2026-11-11 | 0.01 | — | 1.6 |
+| 200x-longread-cram | 100kb | 5942 ±131 | 23373 ±53 | 58228 ±297 | >600s | n/a | 9.80× | 2026-11-11 | 0.01 | — | 1.5 |
+| 1000x-longread-bam | 100kb | 1957 ±7509 | 93034 ±5936 | >600s | >600s | >600s | — | 2026-11-11 | 0.01 | — | 1.5 |
+| 1000x-longread-cram | 100kb | 17899 ±914 | 83080 ±1191 | >600s | >600s | n/a | — | 2026-11-11 | 0.01 | — | 1.4 |
+
+Median cell load across the matrix: 1.69. No cell stands out from the run.
+
+A ratio above 1 means igv.js took longer. Read the ratios, not the absolutes: every column of a row is measured within seconds of the others, so a ratio survives load the absolutes do not.
+
+## Memory at the end of the cold load
+
+Median over the measured runs of each cell: JS heap used, summed over the page and its dedicated workers (`Runtime.getHeapUsage`), then total PSS over every Chrome process (`/proc/<pid>/smaps_rollup`), then the GPU device memory the run added (`nvidia-smi`, where present). MB. See `scripts/crosstool/memory.ts`.
+
+| case | window | JBrowse (release-5.0.0-beta.21) | JBrowse (release-2.4.0) | igv.js 3.8.10 | igv.js 3.8.10, every row | GenomeSpy 1.3.0 |
+|---|---:|---:|---:|---:|---:|---:|
+| 20x-shortread-bam | 100kb | 46 / 685 / 70 | 229 / 954 / 86 | 91 / 769 / 84 | 91 / 899 / 172 | 68 / 771 / 103 |
+| 20x-shortread-cram | 100kb | 59 / 711 / 70 | 252 / 918 / 82 | 97 / 790 / 84 | 106 / 814 / 185 |  |
+| 200x-shortread-bam | 100kb | 174 / 1174 / 102 | 606 / 1644 / 121 | 690 / 2002 / 98 | 637 / 3108 / 166 | 910 / 2174 / 302 |
+| 200x-shortread-cram | 100kb | 209 / 1258 / 102 | 720 / 1469 / 125 | 799 / 2143 / 293 | 677 / 2756 / 654 |  |
+| 1000x-shortread-bam | 100kb | 715 / 3040 / 224 | 1735 / 3248 / 125 | 3359 / 4910 / 85 | 3376 / 11255 / 2557 | 3030 / 6473 / 974 |
+| 1000x-shortread-cram | 100kb | 729 / 2891 / 224 | 2421 / 3411 / 125 | 3208 / 5027 / 85 | 3203 / 11276 / 353 |  |
+| 20x-longread-bam | 100kb | 58 / 747 / 81 | 143 / 858 / 70 | 135 / 1039 / 75 | 147 / 1162 / 91 | 187 / 1042 / 178 |
+| 20x-longread-cram | 100kb | 53 / 767 / 81 | 178 / 894 / 68 | 156 / 1183 / 75 | 147 / 1192 / 91 |  |
+| 200x-longread-bam | 100kb | 331 / 1539 / 161 | 739 / 1784 / 125 | 1002 / 4468 / 91 | 1021 / 5065 / 129 | 1083 / 2873 / 35 |
+| 200x-longread-cram | 100kb | 313 / 1622 / 165 | 687 / 1547 / 125 | 992 / 3874 / 91 | — / — / — |  |
+| 1000x-longread-bam | 100kb | 25 / 966 / 62 | 2286 / 4715 / 129 | — / — / — | — / — / — | — / — / — |
+| 1000x-longread-cram | 100kb | 1227 / 4603 / 482 | 2115 / 3520 / 125 | — / — / — | — / — / — |  |
+
+for _ in 1 2 3; do node --experimental-strip-types scripts/crosstool/blankmemory.ts; done >results/memory-peak/blank.jsonl

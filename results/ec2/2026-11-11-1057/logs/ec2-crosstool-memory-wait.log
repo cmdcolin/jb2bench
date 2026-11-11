@@ -1,0 +1,33 @@
+waiting for a quiet box: 3 consecutive 30s windows under 0.35 foreign cores, with the gate passing
+15:58:22 | foreign 0.00 | load 0.16 | busy | FAIL sweep builds absent — ecosystem/setup-sweep.sh
+15:58:52 | foreign 0.00 | load 0.10 | busy | FAIL sweep builds absent — ecosystem/setup-sweep.sh
+15:59:22 | foreign 0.00 | load 0.06 | busy | FAIL sweep builds absent — ecosystem/setup-sweep.sh
+15:59:52 | foreign 0.00 | load 0.03 | busy | FAIL sweep builds absent — ecosystem/setup-sweep.sh
+16:00:23 | foreign 0.00 | load 0.02 | busy | FAIL sweep builds absent — ecosystem/setup-sweep.sh
+16:00:53 | foreign 0.00 | load 0.01 | busy | FAIL sweep builds absent — ecosystem/setup-sweep.sh
+16:01:23 | foreign 0.00 | load 0.00 | busy | FAIL sweep builds absent — ecosystem/setup-sweep.sh
+16:01:53 | foreign 0.00 | load 0.00 | busy | FAIL sweep builds absent — ecosystem/setup-sweep.sh
+16:02:23 | foreign 0.00 | load 0.00 | busy | FAIL sweep builds absent — ecosystem/setup-sweep.sh
+16:02:54 | foreign 0.00 | load 0.00 | busy | FAIL sweep builds absent — ecosystem/setup-sweep.sh
+16:03:24 | foreign 0.00 | load 0.00 | busy | FAIL sweep builds absent — ecosystem/setup-sweep.sh
+16:03:54 | foreign 0.00 | load 0.00 | busy | FAIL sweep builds absent — ecosystem/setup-sweep.sh
+16:04:24 | foreign 0.00 | load 0.00 | busy | FAIL sweep builds absent — ecosystem/setup-sweep.sh
+16:04:55 | foreign 0.00 | load 0.00 | busy | FAIL sweep builds absent — ecosystem/setup-sweep.sh
+16:05:25 | foreign 0.00 | load 0.07 | busy | FAIL sweep builds absent — ecosystem/setup-sweep.sh
+16:05:55 | foreign 0.00 | load 0.04 | busy | FAIL sweep builds absent — ecosystem/setup-sweep.sh
+16:06:25 | foreign 0.00 | load 0.02 | busy | FAIL sweep builds absent — ecosystem/setup-sweep.sh
+16:06:56 | foreign 0.00 | load 0.01 | busy | FAIL sweep builds absent — ecosystem/setup-sweep.sh
+16:07:26 | foreign 0.00 | load 0.01 | busy | FAIL sweep builds absent — ecosystem/setup-sweep.sh
+16:07:56 | foreign 0.00 | load 0.08 | busy | FAIL sweep builds absent — ecosystem/setup-sweep.sh
+16:08:26 | foreign 0.00 | load 0.05 | busy | FAIL sweep builds absent — ecosystem/setup-sweep.sh
+16:08:57 | foreign 0.00 | load 0.03 | busy | FAIL sweep builds absent — ecosystem/setup-sweep.sh
+16:09:27 | foreign 0.00 | load 0.02 | busy | FAIL sweep builds absent — ecosystem/setup-sweep.sh
+16:09:57 | foreign 0.00 | load 0.01 | busy | FAIL sweep builds absent — ecosystem/setup-sweep.sh
+16:10:27 | foreign 0.00 | load 0.00 | busy | FAIL sweep builds absent — ecosystem/setup-sweep.sh
+16:10:58 | foreign 0.00 | load 0.00 | busy | FAIL sweep builds absent — ecosystem/setup-sweep.sh
+16:11:28 | foreign 0.00 | load 0.00 | busy | FAIL sweep builds absent — ecosystem/setup-sweep.sh
+16:11:58 | foreign 0.00 | load 0.00 | busy | FAIL sweep builds absent — ecosystem/setup-sweep.sh
+16:12:28 | foreign 0.00 | load 0.00 | busy | FAIL sweep builds absent — ecosystem/setup-sweep.sh
+16:12:59 | foreign 0.00 | load 0.00 | busy | FAIL sweep builds absent — ecosystem/setup-sweep.sh
+still not quiet after 0.3h; giving up
+make: *** [Makefile:98: wait-quiet] Error 1

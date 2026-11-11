@@ -1,0 +1,66 @@
+GPU 0: Tesla T4 (UUID: GPU-625c892c-8781-658f-18c0-03d7d0121f0a)
+{"set":"configured","chrome":"Chrome/148.0.7778.97","renderer":"ANGLE (NVIDIA Corporation, Tesla T4/PCIe/SSE2, OpenGL ES 3.2)","webgpu":"no adapter","hardware":true}
+{"set":"workstation-default","chrome":"Chrome/148.0.7778.97","renderer":"no-webgl2","webgpu":"no adapter","hardware":false}
+{"set":"angle-vulkan","chrome":"Chrome/148.0.7778.97","renderer":"ANGLE (NVIDIA, Vulkan 1.4.329 (NVIDIA Tesla T4 (0x00001EB8)), NVIDIA)","webgpu":"google swiftshader","hardware":true}
+{"set":"angle-gl-egl","chrome":"Chrome/148.0.7778.97","renderer":"ANGLE (NVIDIA Corporation, Tesla T4/PCIe/SSE2, OpenGL ES 3.2)","webgpu":"google swiftshader","hardware":true}
+node --experimental-strip-types scripts/crosstool/goslingbundle.ts
+
+  ../../../../tmp/goslingbundle-Ql4rnp/gosling.js  10.0mb ⚠️
+
+⚡ Done in 459ms
+▲ [WARNING] This case clause will never be evaluated because it duplicates an earlier case clause [duplicate-case]
+
+    ../../../../tmp/goslingbundle-Ql4rnp/gosling.js:68643:10:
+      68643 │           case 22:
+            ╵           ~~~~
+
+  The earlier case clause is here:
+
+    ../../../../tmp/goslingbundle-Ql4rnp/gosling.js:68641:10:
+      68641 │           case 22:
+            ╵           ~~~~
+
+1 warning
+
+  crosstool/gosling.bundle.js  5.9mb ⚠️
+
+⚡ Done in 810ms
+▲ [WARNING] This case clause will never be evaluated because it duplicates an earlier case clause [duplicate-case]
+
+    ../../../../tmp/goslingbundle-Ql4rnp/gosling-patched.js:68643:10:
+      68643 │           case 22:
+            ╵           ~~~~
+
+  The earlier case clause is here:
+
+    ../../../../tmp/goslingbundle-Ql4rnp/gosling-patched.js:68641:10:
+      68641 │           case 22:
+            ╵           ~~~~
+
+1 warning
+
+  crosstool/gosling-patched.bundle.js  5.9mb ⚠️
+
+⚡ Done in 796ms
+crosstool/gosling.bundle.js  6.1 MB
+crosstool/gosling-patched.bundle.js  6.1 MB
+ ok   load average         0.29 (ceiling 4.0)
+ ok   agent sessions       0 (ceiling 2)
+ ok   free disk            44 GB
+ ok   alignment corpus     24 files
+ ok   ordinary-depth arms  16 files (10x, 30x)
+warn  variant corpus       absent — shell/generate_variants.sh
+warn  GFF3 corpus          absent — shell/generate_gff3.sh
+warn  cohort BigWigs       absent — shell/generate_cohort_bw.sh
+ ok   modBAM corpus        data/200x.longread.mod.bam
+ ok   wide-window corpus   data/2mb.100x.longread.bam
+warn  paper-2019 corpus    absent — shell/fetch_paper2019.sh
+ ok   mains power          on AC
+ ok   port 8000            release-5.0.0-beta.21
+ ok   port 8001            release-4.3.0
+ ok   port 8004            release-2.4.0
+ ok   port 8003            3 pages match crosstool/; 19kb corpus reachable; 1mb corpus reachable; 100kb-wide corpus reachable; 19kb-wide corpus reachable
+FAIL  sweep builds         absent — ecosystem/setup-sweep.sh
+
+1 check(s) failed, none of which affect a timing: the counting
+benchmarks (MODE=count sweep, cohort request counts) still produce results.

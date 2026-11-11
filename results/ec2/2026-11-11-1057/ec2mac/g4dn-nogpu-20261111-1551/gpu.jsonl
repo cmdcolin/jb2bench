@@ -1,0 +1,3 @@
+{"set":"configured","version":"Chrome/148.0.7778.97","glRenderer":"no-webgl2","glHardware":false,"webgpuAdapter":"no adapter","webgpuHardware":false,"hardwareConcurrency":16}
+{"set":"configured+unsafe-webgpu","version":"Chrome/148.0.7778.97","glRenderer":"no-webgl2","glHardware":false,"webgpuAdapter":"no adapter","webgpuHardware":false,"hardwareConcurrency":16}
+{"set":"angle-gl-egl","version":"Chrome/148.0.7778.97","glRenderer":"ANGLE (NVIDIA Corporation, Tesla T4/PCIe/SSE2, OpenGL ES 3.2)","glHardware":true,"webgpuAdapter":"no adapter","webgpuHardware":false,"hardwareConcurrency":16}

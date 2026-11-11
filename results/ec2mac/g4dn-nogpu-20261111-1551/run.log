@@ -1,0 +1,30 @@
+=== gpu probe 2026-11-11T15:51:01+00:00
+{"set":"configured","version":"Chrome/148.0.7778.97","glRenderer":"no-webgl2","glHardware":false,"webgpuAdapter":"no adapter","webgpuHardware":false,"hardwareConcurrency":16}
+{"set":"configured+unsafe-webgpu","version":"Chrome/148.0.7778.97","glRenderer":"no-webgl2","glHardware":false,"webgpuAdapter":"no adapter","webgpuHardware":false,"hardwareConcurrency":16}
+{"set":"angle-gl-egl","version":"Chrome/148.0.7778.97","glRenderer":"ANGLE (NVIDIA Corporation, Tesla T4/PCIe/SSE2, OpenGL ES 3.2)","glHardware":true,"webgpuAdapter":"no adapter","webgpuHardware":false,"hardwareConcurrency":16}
+software WebGL2, continuing because ALLOW_SOFTWARE=1; the panel still refuses those runs
+=== panel Wed Nov 11 15:51:08 UTC 2026
+builds/release-5.0.0-beta.21 on port 8000; Intel(R) Xeon(R) Platinum 8259CL CPU @ 2.50GHz x16, GPU 0: Tesla T4 (UUID: GPU-625c892c-8781-658f-18c0-03d7d0121f0a); Chrome/148.0.7778.97
+cells cold-20x,cold-1000x,zoom-200x; backends canvas2d; 1 warm-up + 5 runs
+cold-20x/canvas2d warm-up 1469 ms 
+cold-20x/canvas2d run 1: 1494 ms, canvas2d on no-webgl2
+cold-20x/canvas2d run 2: 1458 ms, canvas2d on no-webgl2
+cold-20x/canvas2d run 3: 1704 ms, canvas2d on no-webgl2
+cold-20x/canvas2d run 4: 1448 ms, canvas2d on no-webgl2
+cold-20x/canvas2d run 5: 1686 ms, canvas2d on no-webgl2
+cold-1000x/canvas2d warm-up 8763 ms 
+cold-1000x/canvas2d run 1: 8547 ms, canvas2d on no-webgl2
+cold-1000x/canvas2d run 2: 8170 ms, canvas2d on no-webgl2
+cold-1000x/canvas2d run 3: 8688 ms, canvas2d on no-webgl2
+cold-1000x/canvas2d run 4: 8833 ms, canvas2d on no-webgl2
+cold-1000x/canvas2d run 5: 8405 ms, canvas2d on no-webgl2
+zoom-200x/canvas2d warm-up 135 ms 
+zoom-200x/canvas2d run 1: 134 ms, canvas2d on no-webgl2
+zoom-200x/canvas2d run 2: 142 ms, canvas2d on no-webgl2
+zoom-200x/canvas2d run 3: 133 ms, canvas2d on no-webgl2
+zoom-200x/canvas2d run 4: 135 ms, canvas2d on no-webgl2
+zoom-200x/canvas2d run 5: 131 ms, canvas2d on no-webgl2
+
+wrote results/ec2mac/g4dn-nogpu-20261111-1551/panel.md and panel.json
+=== panel exit 0 Wed Nov 11 15:53:37 UTC 2026
+ 15:53:37 up 12 min,  0 users,  load average: 0.86, 0.57, 0.30
