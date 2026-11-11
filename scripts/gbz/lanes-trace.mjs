@@ -10,7 +10,7 @@ const [trackId, loc, confPath] = process.argv.slice(2)
 const trackConf = confPath ? JSON.parse(readFileSync(confPath, 'utf8')) : undefined
 const load = loadavg()[0]
 const match = {
-  hprc_v2_1_walk_lanes: u => u.includes('/demos/hprc/hprc-v2.1-mc-grch38-f5s.GRCh38'),
+  hprc_v2_1_walk_lanes: u => u.includes('/demos/hprc/hprc-v2.1-mc-grch38.GRCh38.walks'),
   hprc_v2_1_gbz_lanes: u => /gbz\.db|haplotype-index/.test(u),
   hprc_v2_1_pif_lanes: u => u.includes('hprc_multiway_gfa.pif.gz'),
 }[trackId]
