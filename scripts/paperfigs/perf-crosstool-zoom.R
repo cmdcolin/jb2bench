@@ -91,9 +91,9 @@ d$measure <- factor(WAIT, levels = WAIT)
 # with the cold-load and interaction figures so a tool keeps its colour across
 # the set, and renaming here would fork that.
 ARCH <- c(
-  "Release 2.4.0"    = "Release 2.4.0 \u2014 worker tiles, re-rasterized",
-  "Release 4.1.15"   = "Release 4.1.15",
-  "This work"        = "This work \u2014 GPU, batched"
+  "Release 2.4.0"    = "JBrowse 2 v2.4.0 \u2014 worker tiles, re-rasterized",
+  "Release 4.1.15"   = "JBrowse 2 v4.1.15",
+  "This work"        = "JBrowse 2 v5.0.0 \u2014 GPU, batched"
 )
 ARCH[[IGV]] <- paste(IGV, "\u2014 2D canvas, per read")
 ARCH[[GENOMESPY]] <- paste(GENOMESPY, "\u2014 GPU")

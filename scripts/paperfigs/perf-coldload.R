@@ -163,7 +163,7 @@ draw <- function(win, out, width_label,
     # legend that has no curve for it prints a key with no glyph beside it.
     perf_colour_scale(breaks = intersect(PERF_SERIES,
                                              unique(as.character(d$series)))) +
-    guides(colour = guide_legend(nrow = 1)) +
+    guides(colour = guide_legend(nrow = 2)) +
     # Below the panels, not above them, and in the same place as on every other
     # figure here: three lines of provenance between the reader and the legend
     # read as a title, and the eye has to cross them before reaching the data.

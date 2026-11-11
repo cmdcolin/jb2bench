@@ -127,8 +127,14 @@ PERF_SERIES <- c("Release 2.4.0", "Release 4.1.15", "Release 4.3.0",
 PERF_COLOURS <- setNames(
   c("#F8766D", "#B79F00", "#00BA38", "#00BFC4", "#007C80", "#619CFF", "#F564E3"),
   PERF_SERIES)
-perf_colour_scale <- function(...) {
-  scale_colour_manual(values = PERF_COLOURS, drop = FALSE, ...)
+SERIES_NAMES <- c("Release 2.4.0" = "JBrowse 2 v2.4.0",
+                  "Release 4.1.15" = "JBrowse 2 v4.1.15",
+                  "Release 4.3.0" = "JBrowse 2 v4.3.0",
+                  "This work" = "JBrowse 2 v5.0.0",
+                  "This work, canvas backend" = "JBrowse 2 v5.0.0, canvas backend")
+series_name <- function(x) ifelse(x %in% names(SERIES_NAMES), SERIES_NAMES[x], x)
+perf_colour_scale <- function(labels = series_name, ...) {
+  scale_colour_manual(values = PERF_COLOURS, drop = FALSE, labels = labels, ...)
 }
 
 run_range <- function(cells, width = 0.14) {

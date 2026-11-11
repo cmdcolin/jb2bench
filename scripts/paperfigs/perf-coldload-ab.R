@@ -57,7 +57,8 @@ if (!identical(series_of("19kb"), series_of("1mb"))) {
 # return_all defaults FALSE and must stay that way: with it TRUE this returns a
 # LIST of matching components, and plot_grid renders a list on a black ground
 # with the legend floating in it.
-legend <- get_plot_component(a + theme(legend.position = "top"),
+legend <- get_plot_component(a + theme(legend.position = "top") +
+                               guides(colour = guide_legend(nrow = 1)),
                              "guide-box-top")
 
 strip <- function(p) p + theme(legend.position = "none")
