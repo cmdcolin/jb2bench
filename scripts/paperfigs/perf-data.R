@@ -246,16 +246,14 @@ crosstool <- read_results("crosstool.json")$rows
 # GenomeSpy column largely isolates the render path rather than the parser.
 gs_versions <- unique(c(
   read_results("crosstool.json")$gsVersion %||% "0.85.0",
-  read_results("crosstool-zoom.json")$gsVersion %||% "0.85.0",
-  read_results("crosstool-pan.json")$gsVersion %||% "0.85.0"))
+  read_results("crosstool-zoom.json")$gsVersion %||% "0.85.0"))
 if (length(gs_versions) != 1) {
   stop("the cross-tool results record GenomeSpy ", paste(gs_versions, collapse = " and "),
        "; one figure set cannot carry both")
 }
 igv_versions <- unique(c(
   read_results("crosstool.json")$igvVersion %||% "3.8.5",
-  read_results("crosstool-zoom.json")$igvVersion %||% "3.8.5",
-  read_results("crosstool-pan.json")$igvVersion %||% "3.8.5"))
+  read_results("crosstool-zoom.json")$igvVersion %||% "3.8.5"))
 if (length(igv_versions) != 1) {
   stop("the cross-tool results record igv.js ", paste(igv_versions, collapse = " and "),
        "; one figure set cannot carry both")
@@ -285,6 +283,26 @@ FORMATS <- c("bam" = "BAM", "cram" = "CRAM")
 # extracted and the figure chooses; reading only the narrow one here would
 # throw away half of what the run measured.
 WINDOWS <- c("19kb", "100kb")
+# A run that stops with a fraction of its cell's usual JS heap stopped before
+# the reads were loaded: the paint detector saw a settled page that had not
+# drawn them yet. Its time is not a load time, so it leaves the cell.
+drop_unloaded <- function(arm, label) {
+  heaps <- vapply(arm$memory %||% list(),
+                  function(m) as.numeric(m$jsHeap$usedMB %||% NA), numeric(1))
+  unloaded <- if (length(heaps) == length(arm$runs) && any(!is.na(heaps))) {
+    !is.na(heaps) & heaps < median(heaps, na.rm = TRUE) / 4
+  } else {
+    logical(length(arm$runs))
+  }
+  if (any(unloaded)) {
+    cat(label, ": dropped run ", paste(which(unloaded), collapse = ", "), " (",
+        paste(unlist(arm$runs[unloaded]), "ms with", round(heaps[unloaded]), "MB heap"),
+        "; cell median heap ", round(median(heaps, na.rm = TRUE)), " MB)\n", sep = "")
+    arm$runs <- arm$runs[!unloaded]
+    arm$median <- median(unlist(arm$runs))
+  }
+  arm
+}
 for (base in READ_CASES) {
   for (fmt in names(FORMATS)) {
     for (win in WINDOWS) {
@@ -302,6 +320,7 @@ for (base in READ_CASES) {
         # timing it would make the tool that cannot render the window the
         # fastest thing in the panel.
         if (!is.null(arm$unsupported)) next
+        arm <- drop_unloaded(arm, paste(key, b))
         # An arm that never settled records the ceiling it was abandoned at
         # rather than a median. That is a lower bound, not a measurement, so it
         # travels with a flag and the figure draws it as one.
@@ -345,6 +364,7 @@ for (base in names(WIDE_CASES)) {
       # GenomeSpy has no CRAM reader and its cells say so rather than going in
       # as a missing measurement.
       if (!is.null(arm$unsupported)) next
+      arm <- drop_unloaded(arm, paste(key, b))
       censored <- is.null(arm$median)
       ms <- if (censored) arm$unsettled else arm$median
       if (is.null(ms)) next
@@ -382,22 +402,15 @@ for (base in names(WIDE_CASES)) {
 # mistake this repo made once and retracted. So both travel, and the figures
 # draw them side by side.
 #
-# Pan's waiting figure is `fetchedMedian` -- the steps on which the tool went to
-# the network -- rather than the median over all five steps. This work serves
-# three of five from data it already holds and igv.js serves none, so a median
-# over every step prices residency twice: once by being fast on a step, and
-# again by not fetching on it. Zoom needs no such choice, since no arm issued a
-# single request on any zoom step.
-MOTIONS <- c("crosstool-zoom.json" = "Zoom in, both hold the data",
-             "crosstool-pan.json" = "Pan, both refetch")
-MOTION_WAIT <- c("crosstool-zoom.json" = "median",
-                 "crosstool-pan.json" = "fetchedMedian")
+# Pan is not read: no figure draws it, and crosstool-pan.json predates the
+# igv.js and GenomeSpy versions the cold-load and zoom runs use.
+MOTIONS <- c("crosstool-zoom.json" = "Zoom in, both hold the data")
+MOTION_WAIT <- c("crosstool-zoom.json" = "median")
 # The per-run values behind each of those, so an error bar is the spread of the
 # statistic actually plotted. `fetchedRuns` and `drawRuns` were added to
 # panrunner.ts on 2026-09-03 and are absent from runs recorded before it; those
 # cells get no bar rather than a bar borrowed from a different statistic.
-MOTION_RUNS <- c("crosstool-zoom.json" = "runs",
-                 "crosstool-pan.json" = "fetchedRuns")
+MOTION_RUNS <- c("crosstool-zoom.json" = "runs")
 # A motion recorded before the benchmark took the discrete navigation path is
 # not comparable with one recorded after it. Driven through the bare per-frame
 # chokepoint, a JBrowse step timed the 500ms LGVCoarseDynamicBlocks throttle

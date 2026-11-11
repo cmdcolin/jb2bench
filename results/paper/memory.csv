@@ -1,0 +1,215 @@
+"cell","series","js_heap_mb","renderer_pss_mb","gpu_process_pss_mb","total_pss_mb","gpu_device_mb"
+"20x-shortread-bam@19kb","This work",33.1,257.6,160.5,612.5,63
+"20x-shortread-bam@19kb","Release 4.3.0",69.2,306.6,158.8,655.8,72
+"20x-shortread-bam@19kb","Release 2.4.0",89.1,330.5,161.2,681.1,75
+"20x-shortread-bam@19kb","igv.js 3.8.10",28.4,241.1,163.2,590.6,187
+"20x-shortread-bam@19kb","GenomeSpy 1.3.0",18.7,198.9,171.1,554.2,80
+"20x-shortread-bam@19kb","Gosling 1.0.7",134.9,472.7,157.3,821.1,249
+"20x-shortread-bam@19kb","igv.js 3.8.10, no downsampling",27.6,240.7,163,589.4,187
+"20x-shortread-bam@19kb","igv.js 3.8.10, every row",34,266.4,161.7,613.8,112
+"200x-shortread-bam@19kb","This work",65.3,389,177.6,762.9,68
+"200x-shortread-bam@19kb","Release 4.3.0",97.5,501.6,161.5,856.7,112
+"200x-shortread-bam@19kb","Release 2.4.0",173,512.9,163.2,865.5,122
+"200x-shortread-bam@19kb","igv.js 3.8.10",145.9,546.2,162.4,898.1,112
+"200x-shortread-bam@19kb","GenomeSpy 1.3.0",144.8,469.5,215,869.4,108
+"200x-shortread-bam@19kb","Gosling 1.0.7",922.5,1610.8,246.9,2082.4,290
+"200x-shortread-bam@19kb","igv.js 3.8.10, no downsampling",145.9,545.8,162.6,897.6,115
+"200x-shortread-bam@19kb","igv.js 3.8.10, every row",167.7,703.1,167,1060.3,181
+"20x-shortread-bam@100kb","This work",46.1,307.6,171,673.6,71
+"20x-shortread-bam@100kb","Release 4.3.0",159.7,510.8,159.9,861.9,75
+"20x-shortread-bam@100kb","Release 2.4.0",229.4,566.9,161.8,920.3,83
+"20x-shortread-bam@100kb","igv.js 3.8.10",91.2,428.3,159.5,774.8,84
+"20x-shortread-bam@100kb","GenomeSpy 1.3.0",129,404.7,213.2,801.7,107
+"20x-shortread-bam@100kb","igv.js 3.8.10, no downsampling",91.2,428.2,159.4,775.1,84
+"20x-shortread-bam@100kb","igv.js 3.8.10, every row",91.2,552.3,168.8,908.3,89
+"200x-shortread-bam@100kb","This work",200.4,743.8,240.9,1183.4,103
+"200x-shortread-bam@100kb","Release 4.3.0",381.4,1185.9,159.2,1544.5,117
+"200x-shortread-bam@100kb","Release 2.4.0",649.7,1276.1,164.9,1635.6,121
+"200x-shortread-bam@100kb","igv.js 3.8.10",640.6,1573.6,163.6,1930.4,98
+"200x-shortread-bam@100kb","GenomeSpy 1.3.0",823.1,1494.4,434.4,2127.1,306
+"200x-shortread-bam@100kb","igv.js 3.8.10, no downsampling",638.8,1576.1,164.3,1930.9,97
+"200x-shortread-bam@100kb","igv.js 3.8.10, every row",643.6,2847.3,171,3208.7,166
+"20x-shortread-cram@19kb","This work",44.8,284.6,160.7,639.7,63
+"20x-shortread-cram@19kb","Release 4.3.0",79.1,337,159.1,686.9,72
+"20x-shortread-cram@19kb","Release 2.4.0",108.3,383.5,160.4,734.3,73
+"20x-shortread-cram@19kb","igv.js 3.8.10",41.6,275.8,157.5,619.2,93
+"20x-shortread-cram@19kb","igv.js 3.8.10, no downsampling",41.7,276,157.8,619.2,92
+"20x-shortread-cram@19kb","igv.js 3.8.10, every row",46,309.3,162.6,657.3,115
+"200x-shortread-cram@19kb","This work",78.2,410,177.4,782.1,69
+"200x-shortread-cram@19kb","Release 4.3.0",148,458.1,161.1,812.4,115
+"200x-shortread-cram@19kb","Release 2.4.0",195.8,522.6,163.1,877.8,122
+"200x-shortread-cram@19kb","igv.js 3.8.10",199.1,618.1,163,972.3,120
+"200x-shortread-cram@19kb","igv.js 3.8.10, no downsampling",197.6,618.1,162.3,970.5,125
+"200x-shortread-cram@19kb","igv.js 3.8.10, every row",170.6,773.7,166.8,1133.3,169
+"1000x-shortread-bam@19kb","This work",191.2,843,228,1272.3,90
+"1000x-shortread-bam@19kb","Release 4.3.0",188.7,885.7,162.1,1243.8,114
+"1000x-shortread-bam@19kb","Release 2.4.0",387,808.8,162.6,1171.4,121
+"1000x-shortread-bam@19kb","igv.js 3.8.10",991.1,1617.6,166.2,1978.1,110
+"1000x-shortread-bam@19kb","GenomeSpy 1.3.0",615.1,1245.5,331.8,1785.3,210
+"1000x-shortread-bam@19kb","Gosling 1.0.7",NA,NA,NA,NA,NA
+"1000x-shortread-bam@19kb","igv.js 3.8.10, no downsampling",1012.9,1637.1,165.4,1996.9,108
+"1000x-shortread-bam@19kb","igv.js 3.8.10, every row",693,1870.7,176.1,2242.9,396
+"1000x-shortread-cram@19kb","This work",176.9,771.4,227.6,1198.8,91
+"1000x-shortread-cram@19kb","Release 4.3.0",513.9,921.1,161.9,1275,114
+"1000x-shortread-cram@19kb","Release 2.4.0",552.7,870.3,161.8,1225.6,121
+"1000x-shortread-cram@19kb","igv.js 3.8.10",1090.2,1664.6,165.6,2022.8,108
+"1000x-shortread-cram@19kb","igv.js 3.8.10, no downsampling",1069,1641.1,165.8,2001.2,112
+"1000x-shortread-cram@19kb","igv.js 3.8.10, every row",752,2580.4,177,2953.7,384
+"20x-longread-bam@19kb","This work",42.7,311,167.3,672.6,63
+"20x-longread-bam@19kb","Release 4.3.0",71.5,405.2,157.7,757.5,63
+"20x-longread-bam@19kb","Release 2.4.0",114.3,445.2,161.3,796.9,63
+"20x-longread-bam@19kb","igv.js 3.8.10",74.8,516.8,156.8,859,75
+"20x-longread-bam@19kb","GenomeSpy 1.3.0",57.7,347.1,220,751.6,119
+"20x-longread-bam@19kb","Gosling 1.0.7",NA,NA,NA,NA,NA
+"20x-longread-bam@19kb","igv.js 3.8.10, no downsampling",74.8,516.7,155,860.3,75
+"20x-longread-bam@19kb","igv.js 3.8.10, every row",78.5,540.8,159.7,887.5,85
+"20x-longread-cram@19kb","This work",41.5,308.3,167.7,671.7,62
+"20x-longread-cram@19kb","Release 4.3.0",83.4,368.6,157.9,719.9,63
+"20x-longread-cram@19kb","Release 2.4.0",130,399.3,161.4,751.2,65
+"20x-longread-cram@19kb","igv.js 3.8.10",101.2,470,157,816.6,75
+"20x-longread-cram@19kb","igv.js 3.8.10, no downsampling",102.2,467,157,814.1,75
+"20x-longread-cram@19kb","igv.js 3.8.10, every row",82.7,688.5,160,1037.4,75
+"200x-longread-bam@19kb","This work",101.4,599.6,197.2,995.6,82
+"200x-longread-bam@19kb","Release 4.3.0",95.4,832.5,160.5,1241,113
+"200x-longread-bam@19kb","Release 2.4.0",429.6,1028.6,163.7,1392.9,121
+"200x-longread-bam@19kb","igv.js 3.8.10",536.4,1920,159.4,2275.2,91
+"200x-longread-bam@19kb","GenomeSpy 1.3.0",427.2,1378.6,517.9,2133.3,394
+"200x-longread-bam@19kb","Gosling 1.0.7",NA,NA,NA,NA,NA
+"200x-longread-bam@19kb","igv.js 3.8.10, no downsampling",536.6,1916.7,159.6,2272.9,91
+"200x-longread-bam@19kb","igv.js 3.8.10, every row",544.4,2596,160.8,2954.8,147
+"200x-longread-cram@19kb","This work",93.5,610.7,197.3,1005.7,83
+"200x-longread-cram@19kb","Release 4.3.0",185,552.6,164.9,917.9,120
+"200x-longread-cram@19kb","Release 2.4.0",317.5,643.4,162.9,1002.4,121
+"200x-longread-cram@19kb","igv.js 3.8.10",549.4,1921.5,159.3,2284.4,91
+"200x-longread-cram@19kb","igv.js 3.8.10, no downsampling",557.5,1830.5,159.8,2189.1,91
+"200x-longread-cram@19kb","igv.js 3.8.10, every row",559.7,2673.2,161,3037.2,151
+"1000x-longread-bam@19kb","This work",303.9,1719.8,297.6,2383.5,144
+"1000x-longread-bam@19kb","Release 4.3.0",207.1,2323.1,163.1,2854.3,111
+"1000x-longread-bam@19kb","Release 2.4.0",1541.3,3603.4,161.4,3975.9,121
+"1000x-longread-bam@19kb","igv.js 3.8.10",2293.7,4216.6,155.1,4605.5,91
+"1000x-longread-bam@19kb","GenomeSpy 1.3.0",NA,NA,NA,NA,NA
+"1000x-longread-bam@19kb","Gosling 1.0.7",NA,NA,NA,NA,NA
+"1000x-longread-bam@19kb","igv.js 3.8.10, no downsampling",2530,4628.7,158.6,5022.4,91
+"1000x-longread-bam@19kb","igv.js 3.8.10, every row",NA,NA,NA,NA,NA
+"1000x-longread-cram@19kb","This work",266.3,1433.1,297.5,1974.8,144
+"1000x-longread-cram@19kb","Release 4.3.0",706.1,1382.8,166.4,1764.7,115
+"1000x-longread-cram@19kb","Release 2.4.0",1007.1,1556.4,164,1950,121
+"1000x-longread-cram@19kb","igv.js 3.8.10",2388.9,4287.4,159.2,4707.3,91
+"1000x-longread-cram@19kb","igv.js 3.8.10, no downsampling",2560.6,4483.6,158.9,4909,91
+"1000x-longread-cram@19kb","igv.js 3.8.10, every row",NA,NA,NA,NA,NA
+"20x-shortread-cram@100kb","This work",59.2,352.2,171.3,719.4,70
+"20x-shortread-cram@100kb","Release 4.3.0",194.6,500.3,160,851.2,73
+"20x-shortread-cram@100kb","Release 2.4.0",249.4,605.1,162.6,957.1,86
+"20x-shortread-cram@100kb","igv.js 3.8.10",96.8,453,158.6,799.3,84
+"20x-shortread-cram@100kb","igv.js 3.8.10, no downsampling",96.8,453,159.1,800.2,84
+"20x-shortread-cram@100kb","igv.js 3.8.10, every row",106.1,483.6,169.7,838.8,185
+"200x-shortread-cram@100kb","This work",201.4,810.1,237.5,1246.7,103
+"200x-shortread-cram@100kb","Release 4.3.0",386.1,1053.5,164.8,1415.9,113
+"200x-shortread-cram@100kb","Release 2.4.0",719.9,1122.8,169.7,1483.7,125
+"200x-shortread-cram@100kb","igv.js 3.8.10",674.7,1769.4,167.1,2129.4,297
+"200x-shortread-cram@100kb","igv.js 3.8.10, no downsampling",674.6,1723.7,163.7,2078.9,293
+"200x-shortread-cram@100kb","igv.js 3.8.10, every row",686.4,2489.2,171.9,2857,655
+"1000x-shortread-bam@100kb","This work",695.1,2403,438.3,3095.4,225
+"1000x-shortread-bam@100kb","Release 4.3.0",565.3,2168.1,160.9,2558,81
+"1000x-shortread-bam@100kb","Release 2.4.0",1822.1,3188.3,162.3,3587.7,125
+"1000x-shortread-bam@100kb","igv.js 3.8.10",3471.4,4644.8,144.4,5020,71
+"1000x-shortread-bam@100kb","GenomeSpy 1.3.0",2866.2,4957.9,1199.1,6384.6,978
+"1000x-shortread-bam@100kb","igv.js 3.8.10, no downsampling",NA,NA,NA,NA,NA
+"1000x-shortread-bam@100kb","igv.js 3.8.10, every row",3164.4,10603.3,174.4,11007.7,1459.5
+"1000x-shortread-cram@100kb","This work",821.6,2369.7,438.1,3023.5,224
+"1000x-shortread-cram@100kb","Release 4.3.0",1576,2514.6,159.8,2871.5,78
+"1000x-shortread-cram@100kb","Release 2.4.0",2430.8,3026.8,164.9,3430.1,125
+"1000x-shortread-cram@100kb","igv.js 3.8.10",3191.4,4486.3,144.1,4864,71
+"1000x-shortread-cram@100kb","igv.js 3.8.10, no downsampling",3191,4512.7,144.4,4891.7,71
+"1000x-shortread-cram@100kb","igv.js 3.8.10, every row",3192.6,10869,176,11274.6,2392
+"20x-longread-bam@100kb","This work",57.7,367.9,189.1,751.9,82
+"20x-longread-bam@100kb","Release 4.3.0",188.1,649.8,165.5,1009.2,71
+"20x-longread-bam@100kb","Release 2.4.0",115.2,621.7,164.9,977.6,68
+"20x-longread-bam@100kb","igv.js 3.8.10",134.8,714,157,1058.2,75
+"20x-longread-bam@100kb","GenomeSpy 1.3.0",184.7,577.3,286.8,1049.7,182
+"20x-longread-bam@100kb","igv.js 3.8.10, no downsampling",137,712.2,160,1058.1,75
+"20x-longread-bam@100kb","igv.js 3.8.10, every row",141.1,824.6,166.1,1177.7,87
+"20x-longread-cram@100kb","This work",56.4,389.6,189.3,774.7,82
+"20x-longread-cram@100kb","Release 4.3.0",213.3,557.4,161.8,913.3,69
+"20x-longread-cram@100kb","Release 2.4.0",178.1,563.5,165.9,922.1,71
+"20x-longread-cram@100kb","igv.js 3.8.10",135.5,844.4,159.5,1193.8,75
+"20x-longread-cram@100kb","igv.js 3.8.10, no downsampling",133.5,843.5,157.2,1188.1,75
+"20x-longread-cram@100kb","igv.js 3.8.10, every row",147.9,843.8,165.5,1198.8,91
+"200x-longread-bam@100kb","This work",307.2,1003.2,313.5,1516.6,161
+"200x-longread-bam@100kb","Release 4.3.0",296.5,1028.5,174.8,1445.4,114
+"200x-longread-bam@100kb","Release 2.4.0",728.2,1424.4,172.4,1795.8,125
+"200x-longread-bam@100kb","igv.js 3.8.10",1022,4156.3,161.1,4516.4,91
+"200x-longread-bam@100kb","GenomeSpy 1.3.0",1078.9,1819.5,147,2205.6,35
+"200x-longread-bam@100kb","igv.js 3.8.10, no downsampling",1004.1,4326.4,161.7,4685.7,91
+"200x-longread-bam@100kb","igv.js 3.8.10, every row",1013.2,4637.1,144.7,5003.7,129
+"200x-longread-cram@100kb","This work",308.6,1122.9,313.3,1638.1,161
+"200x-longread-cram@100kb","Release 4.3.0",551.8,1017.2,176.6,1396.6,118
+"200x-longread-cram@100kb","Release 2.4.0",666.2,1181.1,174.8,1553.5,125
+"200x-longread-cram@100kb","igv.js 3.8.10",992.1,3437.5,161.9,3804.5,91
+"200x-longread-cram@100kb","igv.js 3.8.10, no downsampling",997.4,3387.3,161.8,3751.6,95
+"200x-longread-cram@100kb","igv.js 3.8.10, every row",995.6,4684.6,144.4,5058.6,129
+"1000x-longread-bam@100kb","This work",1385.6,3615.8,760.9,4626.1,482
+"1000x-longread-bam@100kb","Release 4.3.0",554.2,3398.1,173.7,3864.3,117
+"1000x-longread-bam@100kb","Release 2.4.0",2278.4,4307.5,168.1,4712.6,125
+"1000x-longread-bam@100kb","igv.js 3.8.10",NA,NA,NA,NA,NA
+"1000x-longread-bam@100kb","GenomeSpy 1.3.0",NA,NA,NA,NA,NA
+"1000x-longread-bam@100kb","igv.js 3.8.10, no downsampling",NA,NA,NA,NA,NA
+"1000x-longread-bam@100kb","igv.js 3.8.10, every row",NA,NA,NA,NA,NA
+"1000x-longread-cram@100kb","This work",1248.8,3674.3,753.4,4711.2,482
+"1000x-longread-cram@100kb","Release 4.3.0",1583.4,2802.2,174.5,3237.6,118
+"1000x-longread-cram@100kb","Release 2.4.0",2115.4,3064.9,167.9,3492.5,125
+"1000x-longread-cram@100kb","igv.js 3.8.10",NA,NA,NA,NA,NA
+"1000x-longread-cram@100kb","igv.js 3.8.10, no downsampling",NA,NA,NA,NA,NA
+"1000x-longread-cram@100kb","igv.js 3.8.10, every row",NA,NA,NA,NA,NA
+"1mb-20x-shortread-bam@1mb","This work",146.5,663.2,221.6,1078,108
+"1mb-20x-shortread-bam@1mb","Release 4.3.0",1680.6,2778.9,177.7,3160.5,90
+"1mb-20x-shortread-bam@1mb","Release 2.4.0",2389.8,3259.2,176.7,3633.3,88
+"1mb-20x-shortread-bam@1mb","igv.js 3.8.10",651.9,1618.9,168.9,1978.2,194
+"1mb-20x-shortread-bam@1mb","GenomeSpy 1.3.0",488.4,1610.3,475.7,2280.2,352
+"1mb-20x-shortread-bam@1mb","igv.js 3.8.10, no downsampling",652.3,1525.5,167.9,1884,194
+"1mb-20x-shortread-bam@1mb","igv.js 3.8.10, every row",656.4,2159.4,171.3,2520.1,110
+"1mb-20x-shortread-cram@1mb","This work",149.8,738.9,225.2,1160.1,105
+"1mb-20x-shortread-cram@1mb","Release 4.3.0",2290.1,3056.7,176.2,3428.9,91
+"1mb-20x-shortread-cram@1mb","Release 2.4.0",2465.1,3331.7,177.5,3707.7,109
+"1mb-20x-shortread-cram@1mb","igv.js 3.8.10",678.3,1895,163.7,2250.1,86
+"1mb-20x-shortread-cram@1mb","igv.js 3.8.10, no downsampling",683.5,1922,170.1,2277.2,88
+"1mb-20x-shortread-cram@1mb","igv.js 3.8.10, every row",675.7,1986,171.7,2350.6,181
+"1mb-100x-shortread-bam@1mb","This work",600.7,2113,440.5,2756,241
+"1mb-100x-shortread-bam@1mb","Release 4.3.0",1485.1,3714.8,178,4144.4,102
+"1mb-100x-shortread-bam@1mb","Release 2.4.0",NA,NA,NA,NA,NA
+"1mb-100x-shortread-bam@1mb","igv.js 3.8.10",2498.6,7300.8,167.1,7697.2,290
+"1mb-100x-shortread-bam@1mb","GenomeSpy 1.3.0",2368.4,4506.1,1419.4,6134.5,1220
+"1mb-100x-shortread-bam@1mb","igv.js 3.8.10, no downsampling",2499.5,7300.8,170.4,7693.6,96
+"1mb-100x-shortread-bam@1mb","igv.js 3.8.10, every row",NA,NA,NA,NA,NA
+"1mb-100x-shortread-cram@1mb","This work",675.8,2117.6,440.6,2769.5,245
+"1mb-100x-shortread-cram@1mb","Release 4.3.0",2845.8,3984.6,177.1,4363.8,102
+"1mb-100x-shortread-cram@1mb","Release 2.4.0",NA,NA,NA,NA,NA
+"1mb-100x-shortread-cram@1mb","igv.js 3.8.10",2817,7928.1,164.3,8319.1,287
+"1mb-100x-shortread-cram@1mb","igv.js 3.8.10, no downsampling",2854,7946.2,164.9,8338.8,94
+"1mb-100x-shortread-cram@1mb","igv.js 3.8.10, every row",NA,NA,NA,NA,NA
+"1mb-20x-longread-bam@1mb","This work",324,1013.9,323.2,1536.8,175
+"1mb-20x-longread-bam@1mb","Release 4.3.0",2458,3943.6,175.8,4331.3,75
+"1mb-20x-longread-bam@1mb","Release 2.4.0",1314,2199.6,174.7,2573,69
+"1mb-20x-longread-bam@1mb","igv.js 3.8.10",1029.7,4748.4,162.1,5135.4,79
+"1mb-20x-longread-bam@1mb","GenomeSpy 1.3.0",NA,NA,NA,NA,NA
+"1mb-20x-longread-bam@1mb","igv.js 3.8.10, no downsampling",1018.8,4745.4,162.8,5133.5,79
+"1mb-20x-longread-bam@1mb","igv.js 3.8.10, every row",NA,NA,NA,NA,NA
+"1mb-20x-longread-cram@1mb","This work",307.7,1118.1,323.4,1641.8,175
+"1mb-20x-longread-cram@1mb","Release 4.3.0",2264.7,3391.4,176.1,3767.5,79
+"1mb-20x-longread-cram@1mb","Release 2.4.0",440.3,842.9,175.2,1219,73
+"1mb-20x-longread-cram@1mb","igv.js 3.8.10",1038.8,4590.4,162.2,4985.8,149
+"1mb-20x-longread-cram@1mb","igv.js 3.8.10, no downsampling",1027.3,4595.9,162.2,4990.5,149
+"1mb-20x-longread-cram@1mb","igv.js 3.8.10, every row",NA,NA,NA,NA,NA
+"1mb-100x-longread-bam@1mb","This work",1277.7,3522.2,768.7,4578.5,513
+"1mb-100x-longread-bam@1mb","Release 4.3.0",2142.2,4047.6,178.4,4487.5,147
+"1mb-100x-longread-bam@1mb","Release 2.4.0",1920.9,3524.9,170.6,3973.3,127
+"1mb-100x-longread-bam@1mb","igv.js 3.8.10",NA,NA,NA,NA,NA
+"1mb-100x-longread-bam@1mb","GenomeSpy 1.3.0",NA,NA,NA,NA,NA
+"1mb-100x-longread-bam@1mb","igv.js 3.8.10, no downsampling",NA,NA,NA,NA,NA
+"1mb-100x-longread-bam@1mb","igv.js 3.8.10, every row",NA,NA,NA,NA,NA
+"1mb-100x-longread-cram@1mb","This work",1147.1,3406.7,772.3,4438.5,517
+"1mb-100x-longread-cram@1mb","Release 4.3.0",3028,4217,178.7,4655.6,100
+"1mb-100x-longread-cram@1mb","Release 2.4.0",1762.3,2686,163.1,3078.6,57
+"1mb-100x-longread-cram@1mb","igv.js 3.8.10",NA,NA,NA,NA,NA
+"1mb-100x-longread-cram@1mb","igv.js 3.8.10, no downsampling",NA,NA,NA,NA,NA
+"1mb-100x-longread-cram@1mb","igv.js 3.8.10, every row",NA,NA,NA,NA,NA
