@@ -50,7 +50,7 @@ if ! remote "$DRIVER"; then
     --exclude /crosstool --exclude /ec2/ --exclude '/ec2mac/.state-*' \
     "$CODE/" "ubuntu@$IP:$REMOTE_ROOT/"
   remote "cd $REMOTE_ROOT || exit 1
-    pkill -f 'http-server builds/' || true
+    pkill -f '[h]ttp-server builds/' || true
     nohup npx http-server builds/$BUILD -p 8000 -s --cors >/dev/null 2>&1 </dev/null &
     sleep 5
     nproc; curl -fsS -o /dev/null localhost:8000/config.json && echo serving $BUILD"
