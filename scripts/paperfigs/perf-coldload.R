@@ -153,7 +153,7 @@ draw <- function(win, out, width_label,
     # points are labelled: three decades carrying one gridline each is not a
     # scale a reader can place a value on.
     time_scale_y("time (log scale)", breaks = time_breaks,
-                 expand = expansion(mult = c(0.17, 0.28))) +
+                 expand = expansion(mult = c(0.17, 0.04))) +
     # drop = FALSE keeps every series the colour it has in the other figure and
     # in the other window, which is the whole point of a shared PERF_SERIES:
     # these two figures are meant to be compared by overlay. `breaks` then

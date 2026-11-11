@@ -163,7 +163,8 @@ paper_theme <- function(base = PAPER_BASE) {
 # rebuild reshuffles every label and the figure is a different picture each time
 # it is drawn.
 REPEL_SEED <- 7
-# In log10 coverage units: how far right of its point an endpoint label starts.
+# In log10 coverage units: how far right of its point an endpoint label starts,
+# or left, for a curve that stops before the cell's last coverage.
 # Small on purpose. A nudge large enough to clear the curve entirely needs a
 # right margin as wide as a third of the panel, and that margin is empty on
 # every cell -- the figure then spends a third of its width on nothing. The
@@ -226,12 +227,14 @@ coldload_labels <- function(d, meas, cell, reference) {
   labels <- rbind(
     label_rows(inner, cell,
                ifelse(inner$censored,
-                      sprintf("timed out at %g\u00d7", inner$coverage),
+                      sprintf("timed out (>%s) at %g\u00d7", fmt_time(inner$s), inner$coverage),
                       fmt_time(inner$s)), "plain"),
     label_rows(ends, cell, ends$label, "bold"),
     curve_obstacles(meas, cell)
   )
-  labels$nudge <- ifelse(labels$face == "bold", ENDPOINT_NUDGE,
+  last <- ave(labels$coverage, do.call(paste, labels[cell]), FUN = max)
+  labels$nudge <- ifelse(labels$face == "bold",
+                         ifelse(labels$coverage < last, -ENDPOINT_NUDGE, ENDPOINT_NUDGE),
                          ifelse(labels$label == "", 0, PLAIN_NUDGE))
   labels$nudge_y <- ifelse(labels$series == reference & labels$label != "",
                            REFERENCE_DROP, 0)
@@ -244,16 +247,22 @@ coldload_labels <- function(d, meas, cell, reference) {
 
 # The layers coldload_labels feeds, and the size scale that gives `face` its two
 # sizes. Returned as a list so a figure adds them with one `+`. "Timed out"
-# notes name their own coverage, so they sit stacked in the panel's top-right
-# corner instead of competing with the point labels for space.
+# notes name their own coverage, so they sit stacked in a band across the top of
+# every panel that the point labels are kept out of.
+NOTE_BAND <- 3.6
+NOTE_LINE <- 0.12
 endpoint_repel <- function(labels) {
   repelled <- labels[!labels$timed_out, ]
   notes <- labels[labels$timed_out, ]
+  band <- if (nrow(notes)) max(repelled$s) * NOTE_BAND else Inf
+  room <- transform(notes, s = band * 10^(NOTE_LINE * (max(notes$stack) + 1)))
   list(
+    geom_blank(data = room),
     ggrepel::geom_text_repel(
       data = repelled, aes(label = label, fontface = face, size = face),
       nudge_x = repelled$nudge, nudge_y = repelled$nudge_y, lineheight = 0.9,
-      seed = REPEL_SEED, show.legend = FALSE, segment.alpha = 0.9,
+      ylim = c(NA, log10(band)),
+      seed = REPEL_SEED, show.legend = FALSE, segment.colour = "grey35",
       box.padding = 0.38, point.padding = 0.3,
       force = 3, force_pull = 0.4,
       min.segment.length = 0.12, segment.size = 0.3,
