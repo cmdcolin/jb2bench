@@ -137,3 +137,7 @@ ecosystem/.libs
 # The HPRC pggb chrY graph, its index and the gfa-to-tabix binary, ~16 GB.
 # Regenerate with make pggb-fetch pggb-index.
 data/pggb/
+
+# Per-base ATAC cohort cut from ENCODE, ~GBs; regenerate with
+# scripts/cohort-signal/perbase/fetch-region.sh
+data/perbase-atac/

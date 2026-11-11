@@ -4,6 +4,8 @@
 // same numbers over the same regions and differ only in layout.
 //
 //   node scripts/cohort-signal/build-bedgraph.ts <zarr-url> <out.bedgraph.gz> [level-path]
+//     MERGE=1   join adjacent bins whose every sample holds the same value into
+//               one row, as a bedGraph written from per-base signal would be
 //
 // The level defaults to the store's finest, which is the only one a bedGraph
 // user would have: the format has no coarser levels to fall back on. Each
@@ -126,11 +128,23 @@ const write = (text: string) =>
   bgzip.stdin.write(text) ? Promise.resolve() : new Promise<void>(r => bgzip.stdin.once('drain', r))
 
 await write(`#chrom\tstart\tend\t${samples.map(s => s.name).join('\t')}\n`)
+const merge = process.env.MERGE === '1'
 const refs = Object.entries(level.refs).toSorted(([, a], [, b]) => a.binOffset - b.binOffset)
 let rows = 0
 let nanCells = 0
 for (const [refName, ref] of refs) {
   const lines: string[] = []
+  let open: { start: number; end: number; text: string } | undefined
+  const flush = async () => {
+    if (open) {
+      lines.push(`${refName}\t${open.start}\t${open.end}\t${open.text}\n`)
+      rows++
+      if (lines.length === 256) {
+        await write(lines.join(''))
+        lines.length = 0
+      }
+    }
+  }
   for (let i = 0; i < ref.numBins; i++) {
     const bin = ref.binOffset + i
     const chunk = await chunkAt(Math.floor(bin / chunkBins))
@@ -143,20 +157,22 @@ for (const [refName, ref] of refs) {
       }
     }
     const start = ref.start + i * level.binSize
-    lines.push(`${refName}\t${start}\t${start + level.binSize}\t${cells.join('\t')}\n`)
-    if (lines.length === 256) {
-      await write(lines.join(''))
-      lines.length = 0
+    const text = cells.join('\t')
+    if (merge && open?.end === start && open.text === text) {
+      open.end = start + level.binSize
+    } else {
+      await flush()
+      open = { start, end: start + level.binSize, text }
     }
   }
+  await flush()
   await write(lines.join(''))
-  rows += ref.numBins
 }
 bgzip.stdin.end()
 await finished
 execFileSync('tabix', ['-f', '-p', 'bed', outPath])
 
 console.log(
-  `${outPath}: ${rows} rows x ${nSamples} samples at ${level.binSize} bp from ` +
+  `${outPath}: ${rows} rows x ${nSamples} samples at ${level.binSize} bp${merge ? ', equal runs merged,' : ''} from ` +
     `${refs.length} sequences; ${nanCells} NaN cells`,
 )

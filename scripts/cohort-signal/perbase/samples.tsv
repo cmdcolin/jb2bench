@@ -1,0 +1,101 @@
+#name	biosample	url
+ENCFF003PQX	right atrium auricular region	https://www.encodeproject.org/files/ENCFF003PQX/@@download/ENCFF003PQX.bigWig
+ENCFF006JQO	K562	https://www.encodeproject.org/files/ENCFF006JQO/@@download/ENCFF006JQO.bigWig
+ENCFF006RKR	cardiac septum	https://www.encodeproject.org/files/ENCFF006RKR/@@download/ENCFF006RKR.bigWig
+ENCFF008HZU	HG02571	https://www.encodeproject.org/files/ENCFF008HZU/@@download/ENCFF008HZU.bigWig
+ENCFF008XXR	dendritic cell	https://www.encodeproject.org/files/ENCFF008XXR/@@download/ENCFF008XXR.bigWig
+ENCFF011GVM	motor neuron	https://www.encodeproject.org/files/ENCFF011GVM/@@download/ENCFF011GVM.bigWig
+ENCFF014EAL	GM19468	https://www.encodeproject.org/files/ENCFF014EAL/@@download/ENCFF014EAL.bigWig
+ENCFF015FKA	body of pancreas	https://www.encodeproject.org/files/ENCFF015FKA/@@download/ENCFF015FKA.bigWig
+ENCFF016GXU	posterior vena cava	https://www.encodeproject.org/files/ENCFF016GXU/@@download/ENCFF016GXU.bigWig
+ENCFF016KCE	heart left ventricle	https://www.encodeproject.org/files/ENCFF016KCE/@@download/ENCFF016KCE.bigWig
+ENCFF016KFP	T-cell	https://www.encodeproject.org/files/ENCFF016KFP/@@download/ENCFF016KFP.bigWig
+ENCFF016NIS	A549	https://www.encodeproject.org/files/ENCFF016NIS/@@download/ENCFF016NIS.bigWig
+ENCFF017WYO	HCT116	https://www.encodeproject.org/files/ENCFF017WYO/@@download/ENCFF017WYO.bigWig
+ENCFF021KYU	stimulated activated naive CD8-positive, alpha-beta T cell	https://www.encodeproject.org/files/ENCFF021KYU/@@download/ENCFF021KYU.bigWig
+ENCFF023VMB	GM19351	https://www.encodeproject.org/files/ENCFF023VMB/@@download/ENCFF023VMB.bigWig
+ENCFF024GLW	HepG2	https://www.encodeproject.org/files/ENCFF024GLW/@@download/ENCFF024GLW.bigWig
+ENCFF025ING	right lobe of liver	https://www.encodeproject.org/files/ENCFF025ING/@@download/ENCFF025ING.bigWig
+ENCFF027WJV	memory B cell	https://www.encodeproject.org/files/ENCFF027WJV/@@download/ENCFF027WJV.bigWig
+ENCFF030MOD	thyroid gland	https://www.encodeproject.org/files/ENCFF030MOD/@@download/ENCFF030MOD.bigWig
+ENCFF031ABQ	NCI-H929	https://www.encodeproject.org/files/ENCFF031ABQ/@@download/ENCFF031ABQ.bigWig
+ENCFF031MAM	transverse colon	https://www.encodeproject.org/files/ENCFF031MAM/@@download/ENCFF031MAM.bigWig
+ENCFF034VPU	HG03139	https://www.encodeproject.org/files/ENCFF034VPU/@@download/ENCFF034VPU.bigWig
+ENCFF042HSI	naive B cell	https://www.encodeproject.org/files/ENCFF042HSI/@@download/ENCFF042HSI.bigWig
+ENCFF045BFM	esophagus squamous epithelium	https://www.encodeproject.org/files/ENCFF045BFM/@@download/ENCFF045BFM.bigWig
+ENCFF047EBV	RWPE2	https://www.encodeproject.org/files/ENCFF047EBV/@@download/ENCFF047EBV.bigWig
+ENCFF049TUN	GM19455	https://www.encodeproject.org/files/ENCFF049TUN/@@download/ENCFF049TUN.bigWig
+ENCFF049WJI	sigmoid colon	https://www.encodeproject.org/files/ENCFF049WJI/@@download/ENCFF049WJI.bigWig
+ENCFF050XMF	mucosa of urinary bladder	https://www.encodeproject.org/files/ENCFF050XMF/@@download/ENCFF050XMF.bigWig
+ENCFF052HOE	HG03520	https://www.encodeproject.org/files/ENCFF052HOE/@@download/ENCFF052HOE.bigWig
+ENCFF052OSO	sciatic nerve	https://www.encodeproject.org/files/ENCFF052OSO/@@download/ENCFF052OSO.bigWig
+ENCFF054OLG	uterus	https://www.encodeproject.org/files/ENCFF054OLG/@@download/ENCFF054OLG.bigWig
+ENCFF055QKS	bile duct	https://www.encodeproject.org/files/ENCFF055QKS/@@download/ENCFF055QKS.bigWig
+ENCFF056HIV	breast epithelium	https://www.encodeproject.org/files/ENCFF056HIV/@@download/ENCFF056HIV.bigWig
+ENCFF056MYW	WTC11	https://www.encodeproject.org/files/ENCFF056MYW/@@download/ENCFF056MYW.bigWig
+ENCFF057BIJ	left colon	https://www.encodeproject.org/files/ENCFF057BIJ/@@download/ENCFF057BIJ.bigWig
+ENCFF059MRU	HG03196	https://www.encodeproject.org/files/ENCFF059MRU/@@download/ENCFF059MRU.bigWig
+ENCFF060JKX	GM19395	https://www.encodeproject.org/files/ENCFF060JKX/@@download/ENCFF060JKX.bigWig
+ENCFF060UZF	upper lobe of left lung	https://www.encodeproject.org/files/ENCFF060UZF/@@download/ENCFF060UZF.bigWig
+ENCFF060YOU	T-helper 17 cell	https://www.encodeproject.org/files/ENCFF060YOU/@@download/ENCFF060YOU.bigWig
+ENCFF061KDF	activated T-cell	https://www.encodeproject.org/files/ENCFF061KDF/@@download/ENCFF061KDF.bigWig
+ENCFF062JUV	GM21381	https://www.encodeproject.org/files/ENCFF062JUV/@@download/ENCFF062JUV.bigWig
+ENCFF064FOF	PC-3	https://www.encodeproject.org/files/ENCFF064FOF/@@download/ENCFF064FOF.bigWig
+ENCFF069UEK	gastrocnemius medialis	https://www.encodeproject.org/files/ENCFF069UEK/@@download/ENCFF069UEK.bigWig
+ENCFF071HWF	colonic mucosa	https://www.encodeproject.org/files/ENCFF071HWF/@@download/ENCFF071HWF.bigWig
+ENCFF077IHT	HG03342	https://www.encodeproject.org/files/ENCFF077IHT/@@download/ENCFF077IHT.bigWig
+ENCFF080PUV	right cardiac atrium	https://www.encodeproject.org/files/ENCFF080PUV/@@download/ENCFF080PUV.bigWig
+ENCFF080ZCT	natural killer cell	https://www.encodeproject.org/files/ENCFF080ZCT/@@download/ENCFF080ZCT.bigWig
+ENCFF083NYF	adrenal gland	https://www.encodeproject.org/files/ENCFF083NYF/@@download/ENCFF083NYF.bigWig
+ENCFF093FUQ	activated naive CD4-positive, alpha-beta T cell	https://www.encodeproject.org/files/ENCFF093FUQ/@@download/ENCFF093FUQ.bigWig
+ENCFF094EYJ	subcutaneous adipose tissue	https://www.encodeproject.org/files/ENCFF094EYJ/@@download/ENCFF094EYJ.bigWig
+ENCFF095DJH	GM23338	https://www.encodeproject.org/files/ENCFF095DJH/@@download/ENCFF095DJH.bigWig
+ENCFF095KQF	GM19452	https://www.encodeproject.org/files/ENCFF095KQF/@@download/ENCFF095KQF.bigWig
+ENCFF095RCU	HG02623	https://www.encodeproject.org/files/ENCFF095RCU/@@download/ENCFF095RCU.bigWig
+ENCFF099HUE	GM18519	https://www.encodeproject.org/files/ENCFF099HUE/@@download/ENCFF099HUE.bigWig
+ENCFF101BDO	HG03175	https://www.encodeproject.org/files/ENCFF101BDO/@@download/ENCFF101BDO.bigWig
+ENCFF101QQB	thoracic aorta	https://www.encodeproject.org/files/ENCFF101QQB/@@download/ENCFF101QQB.bigWig
+ENCFF104OXF	Right ventricle myocardium superior	https://www.encodeproject.org/files/ENCFF104OXF/@@download/ENCFF104OXF.bigWig
+ENCFF109DQE	spleen	https://www.encodeproject.org/files/ENCFF109DQE/@@download/ENCFF109DQE.bigWig
+ENCFF113SPI	DND-41	https://www.encodeproject.org/files/ENCFF113SPI/@@download/ENCFF113SPI.bigWig
+ENCFF113YOG	foreskin keratinocyte	https://www.encodeproject.org/files/ENCFF113YOG/@@download/ENCFF113YOG.bigWig
+ENCFF116IVX	activated CD8-positive, alpha-beta T cell	https://www.encodeproject.org/files/ENCFF116IVX/@@download/ENCFF116IVX.bigWig
+ENCFF120TUR	HG03439	https://www.encodeproject.org/files/ENCFF120TUR/@@download/ENCFF120TUR.bigWig
+ENCFF133HQE	activated naive CD8-positive, alpha-beta T cell	https://www.encodeproject.org/files/ENCFF133HQE/@@download/ENCFF133HQE.bigWig
+ENCFF138FYP	upper lobe of right lung	https://www.encodeproject.org/files/ENCFF138FYP/@@download/ENCFF138FYP.bigWig
+ENCFF139CHP	naive thymus-derived CD8-positive, alpha-beta T cell	https://www.encodeproject.org/files/ENCFF139CHP/@@download/ENCFF139CHP.bigWig
+ENCFF139KXZ	GM19463	https://www.encodeproject.org/files/ENCFF139KXZ/@@download/ENCFF139KXZ.bigWig
+ENCFF140GLW	pancreas	https://www.encodeproject.org/files/ENCFF140GLW/@@download/ENCFF140GLW.bigWig
+ENCFF141ATK	activated T-helper 17 cell	https://www.encodeproject.org/files/ENCFF141ATK/@@download/ENCFF141ATK.bigWig
+ENCFF146GHP	GM21717	https://www.encodeproject.org/files/ENCFF146GHP/@@download/ENCFF146GHP.bigWig
+ENCFF152NUP	gastroesophageal sphincter	https://www.encodeproject.org/files/ENCFF152NUP/@@download/ENCFF152NUP.bigWig
+ENCFF157LGS	left cardiac atrium	https://www.encodeproject.org/files/ENCFF157LGS/@@download/ENCFF157LGS.bigWig
+ENCFF165WGA	GM12878	https://www.encodeproject.org/files/ENCFF165WGA/@@download/ENCFF165WGA.bigWig
+ENCFF166IBK	GM21367	https://www.encodeproject.org/files/ENCFF166IBK/@@download/ENCFF166IBK.bigWig
+ENCFF169IGM	GM18861	https://www.encodeproject.org/files/ENCFF169IGM/@@download/ENCFF169IGM.bigWig
+ENCFF169PJA	GM19397	https://www.encodeproject.org/files/ENCFF169PJA/@@download/ENCFF169PJA.bigWig
+ENCFF171LKM	HG03378	https://www.encodeproject.org/files/ENCFF171LKM/@@download/ENCFF171LKM.bigWig
+ENCFF171ZOI	HG02610	https://www.encodeproject.org/files/ENCFF171ZOI/@@download/ENCFF171ZOI.bigWig
+ENCFF174PXJ	Panc1	https://www.encodeproject.org/files/ENCFF174PXJ/@@download/ENCFF174PXJ.bigWig
+ENCFF178BCK	GM18498	https://www.encodeproject.org/files/ENCFF178BCK/@@download/ENCFF178BCK.bigWig
+ENCFF181UOS	ovary	https://www.encodeproject.org/files/ENCFF181UOS/@@download/ENCFF181UOS.bigWig
+ENCFF186BYJ	GM21515	https://www.encodeproject.org/files/ENCFF186BYJ/@@download/ENCFF186BYJ.bigWig
+ENCFF190EVO	heart right ventricle	https://www.encodeproject.org/files/ENCFF190EVO/@@download/ENCFF190EVO.bigWig
+ENCFF194DID	MCF-7	https://www.encodeproject.org/files/ENCFF194DID/@@download/ENCFF194DID.bigWig
+ENCFF196CJY	stimulated activated naive B cell	https://www.encodeproject.org/files/ENCFF196CJY/@@download/ENCFF196CJY.bigWig
+ENCFF200SFT	GM21360	https://www.encodeproject.org/files/ENCFF200SFT/@@download/ENCFF200SFT.bigWig
+ENCFF201ZLC	GM19035	https://www.encodeproject.org/files/ENCFF201ZLC/@@download/ENCFF201ZLC.bigWig
+ENCFF202SER	HG02884	https://www.encodeproject.org/files/ENCFF202SER/@@download/ENCFF202SER.bigWig
+ENCFF208HFS	effector memory CD8-positive, alpha-beta T cell	https://www.encodeproject.org/files/ENCFF208HFS/@@download/ENCFF208HFS.bigWig
+ENCFF210UPW	naive thymus-derived CD4-positive, alpha-beta T cell	https://www.encodeproject.org/files/ENCFF210UPW/@@download/ENCFF210UPW.bigWig
+ENCFF216VWI	stimulated activated memory B cell	https://www.encodeproject.org/files/ENCFF216VWI/@@download/ENCFF216VWI.bigWig
+ENCFF221CEP	HG02938	https://www.encodeproject.org/files/ENCFF221CEP/@@download/ENCFF221CEP.bigWig
+ENCFF225VDO	left ventricle myocardium superior	https://www.encodeproject.org/files/ENCFF225VDO/@@download/ENCFF225VDO.bigWig
+ENCFF227LPR	GM18499	https://www.encodeproject.org/files/ENCFF227LPR/@@download/ENCFF227LPR.bigWig
+ENCFF228BMJ	B cell	https://www.encodeproject.org/files/ENCFF228BMJ/@@download/ENCFF228BMJ.bigWig
+ENCFF233YYJ	tibial nerve	https://www.encodeproject.org/files/ENCFF233YYJ/@@download/ENCFF233YYJ.bigWig
+ENCFF234SOC	HG02798	https://www.encodeproject.org/files/ENCFF234SOC/@@download/ENCFF234SOC.bigWig
+ENCFF241EBE	GM18502	https://www.encodeproject.org/files/ENCFF241EBE/@@download/ENCFF241EBE.bigWig
+ENCFF245DIM	HG03565	https://www.encodeproject.org/files/ENCFF245DIM/@@download/ENCFF245DIM.bigWig
+ENCFF257EBV	SK-N-SH	https://www.encodeproject.org/files/ENCFF257EBV/@@download/ENCFF257EBV.bigWig
+ENCFF260QGF	lung	https://www.encodeproject.org/files/ENCFF260QGF/@@download/ENCFF260QGF.bigWig

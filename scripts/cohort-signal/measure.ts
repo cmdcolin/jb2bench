@@ -16,8 +16,12 @@
 // mean, as the adapter does unless a display asks for the mean alone. The
 // bedGraph has one level, so at a wide window it returns every row in view.
 //
+// SET=perbase swaps in 100 ENCODE ATAC-seq fold-change tracks at their native
+// per-base resolution over chr1:10-20 Mb (perbase/fetch-region.sh), viewed
+// from 1 kb to the whole 10 Mb, where the bedGraph's single bin size is 1 bp.
+//
 //   node scripts/cohort-signal/measure.ts
-//     ROUNDS=3  WARMUP=1  CONCURRENCY=24  PIXELS=1500
+//     SET=cnv|perbase  ROUNDS=3  WARMUP=1  CONCURRENCY=24  PIXELS=1500
 //     HOST_LABEL=<machine>   recorded in the results file
 import { mkdirSync, readFileSync, writeFileSync } from 'node:fs'
 import { gunzipSync } from 'node:zlib'
@@ -42,6 +46,7 @@ const WHOLE_GENOME = {
   zarr: `${DEMOS}/qm2_cn_wg_10kb.zarr`,
   bedgraph: `${DEMOS}/qm2_cn_wg_10kb.bedgraph.gz`,
 }
+const PERBASE = 'https://jbrowse.org/demos/perbase-atac'
 
 interface Window {
   label: string
@@ -52,7 +57,7 @@ interface Window {
   bedgraph: string
 }
 
-const WINDOWS: Window[] = [
+const CNV_WINDOWS: Window[] = [
   {
     label: 'population_cnv tutorial',
     refName: 'chr17',
@@ -76,13 +81,28 @@ const WINDOWS: Window[] = [
   },
 ]
 
-const samples = readFileSync(here('samples.tsv'), 'utf8')
+const PERBASE_CENTER = 15_000_000
+const PERBASE_WINDOWS: Window[] = [1_000, 10_000, 100_000, 1_000_000, 10_000_000].map(width => ({
+  label: `${width >= 1e6 ? `${width / 1e6} Mb` : `${width / 1e3} kb`} of chr1`,
+  refName: 'chr1',
+  start: PERBASE_CENTER - width / 2,
+  end: PERBASE_CENTER + width / 2,
+  zarr: `${PERBASE}/atac.zarr`,
+  bedgraph: `${PERBASE}/atac.bedgraph.gz`,
+}))
+
+const SET = process.env.SET ?? 'cnv'
+const WINDOWS = SET === 'perbase' ? PERBASE_WINDOWS : CNV_WINDOWS
+
+const sampleRows = readFileSync(here(SET === 'perbase' ? 'perbase/samples.tsv' : 'samples.tsv'), 'utf8')
   .split('\n')
   .filter(line => line.trim() && !line.startsWith('#'))
-  .map(line => {
-    const cols = line.split('\t')
-    return { name: cols[0]!, url: cols.at(-1)! }
-  })
+  .map(line => line.split('\t'))
+const samples = sampleRows.map(cols =>
+  SET === 'perbase'
+    ? { name: cols[0]!, url: `${PERBASE}/bw/${cols[0]}.bw` }
+    : { name: cols[0]!, url: cols.at(-1)! },
+)
 
 interface Interval {
   start: number
@@ -255,12 +275,19 @@ const median = (xs: number[]) => [...xs].toSorted((a, b) => a - b)[xs.length >> 
 
 // The length-weighted mean of a sample's intervals over each of the given bins.
 // BigWig segments, bedGraph rows and Zarr bins all reduce to this, so the check
-// compares every arm over the Zarr arm's bins.
+// compares every arm over the Zarr arm's bins. Both lists are sorted and
+// non-overlapping, so one sweep covers them: a per-base bedGraph puts millions
+// of rows against thousands of bins.
 function meansOver(intervals: Interval[], bins: Interval[]) {
+  let first = 0
   return bins.map(bin => {
+    while (first < intervals.length && intervals[first]!.end <= bin.start) {
+      first++
+    }
     let sum = 0
     let covered = 0
-    for (const f of intervals) {
+    for (let k = first; k < intervals.length && intervals[k]!.start < bin.end; k++) {
+      const f = intervals[k]!
       const overlap = Math.min(f.end, bin.end) - Math.max(f.start, bin.start)
       if (overlap > 0 && !Number.isNaN(f.score)) {
         sum += f.score * overlap
@@ -301,7 +328,9 @@ for (const w of WINDOWS) {
       )
     }
   }
-  const zarrBins = runs.zarr![0]!.firstSample
+  // The store's first and last bins can hang past the window, where the
+  // bedGraph returns no rows, so only bins wholly inside it are compared.
+  const zarrBins = runs.zarr![0]!.firstSample.filter(b => b.start >= w.start && b.end <= w.end)
   const zarrValues = zarrBins.map(b => b.score)
   const maxDiff = {
     bedgraph: maxDifference(zarrValues, meansOver(runs.bedgraph![0]!.firstSample, zarrBins)),
@@ -333,6 +362,7 @@ for (const w of WINDOWS) {
 const out = {
   measured: new Date().toISOString(),
   host: process.env.HOST_LABEL ?? 'unlabelled',
+  set: SET,
   samples: samples.length,
   rounds: ROUNDS,
   warmup: WARMUP,
@@ -342,5 +372,5 @@ const out = {
 }
 mkdirSync(here('../../results/cohort-signal/'), { recursive: true })
 const stamp = out.measured.slice(0, 16).replace(':', '')
-writeFileSync(here(`../../results/cohort-signal/${stamp}.json`), JSON.stringify(out, null, 2))
-console.log(`wrote results/cohort-signal/${stamp}.json`)
+writeFileSync(here(`../../results/cohort-signal/${SET === 'perbase' ? 'perbase-' : ''}${stamp}.json`), JSON.stringify(out, null, 2))
+console.log(`wrote results/cohort-signal/${SET === 'perbase' ? 'perbase-' : ''}${stamp}.json`)

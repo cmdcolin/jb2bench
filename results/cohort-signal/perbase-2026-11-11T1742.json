@@ -1,0 +1,372 @@
+{
+  "measured": "2026-11-11T17:42:58.865Z",
+  "host": "workstation",
+  "set": "perbase",
+  "samples": 100,
+  "rounds": 3,
+  "warmup": 1,
+  "concurrency": 24,
+  "pixels": 1500,
+  "windows": [
+    {
+      "label": "1 kb of chr1",
+      "refName": "chr1",
+      "start": 14999500,
+      "end": 15000500,
+      "zarr": "https://jbrowse.org/demos/perbase-atac/atac.zarr",
+      "bedgraph": "https://jbrowse.org/demos/perbase-atac/atac.bedgraph.gz",
+      "bpPerPx": 0.6666666666666666,
+      "firstSampleMaxDifference": {
+        "bedgraph": 9.986877458345589e-8,
+        "bigwigs": 0
+      },
+      "arms": {
+        "bigwigs": {
+          "detail": "basesPerSpan 1",
+          "requests": [
+            692,
+            692,
+            692
+          ],
+          "megabytes": [
+            2.31,
+            2.31,
+            2.31
+          ],
+          "seconds": [
+            1.17,
+            0.9,
+            0.91
+          ],
+          "medianSeconds": 0.9
+        },
+        "zarr": {
+          "detail": "bin1, 1 arrays x 5 chunks",
+          "requests": [
+            7,
+            7,
+            7
+          ],
+          "megabytes": [
+            0.05,
+            0.05,
+            0.05
+          ],
+          "seconds": [
+            0.08,
+            0.09,
+            0.09
+          ],
+          "medianSeconds": 0.1
+        },
+        "bedgraph": {
+          "detail": "976 rows",
+          "requests": [
+            3,
+            3,
+            3
+          ],
+          "megabytes": [
+            1,
+            1,
+            1
+          ],
+          "seconds": [
+            0.17,
+            0.16,
+            0.16
+          ],
+          "medianSeconds": 0.2
+        }
+      }
+    },
+    {
+      "label": "10 kb of chr1",
+      "refName": "chr1",
+      "start": 14995000,
+      "end": 15005000,
+      "zarr": "https://jbrowse.org/demos/perbase-atac/atac.zarr",
+      "bedgraph": "https://jbrowse.org/demos/perbase-atac/atac.bedgraph.gz",
+      "bpPerPx": 6.666666666666667,
+      "firstSampleMaxDifference": {
+        "bedgraph": 1.1749267558869292e-7,
+        "bigwigs": 0
+      },
+      "arms": {
+        "bigwigs": {
+          "detail": "basesPerSpan 7",
+          "requests": [
+            692,
+            692,
+            692
+          ],
+          "megabytes": [
+            2.73,
+            2.73,
+            2.73
+          ],
+          "seconds": [
+            0.86,
+            0.84,
+            0.86
+          ],
+          "medianSeconds": 0.9
+        },
+        "zarr": {
+          "detail": "bin1, 1 arrays x 40 chunks",
+          "requests": [
+            42,
+            42,
+            42
+          ],
+          "megabytes": [
+            0.37,
+            0.37,
+            0.37
+          ],
+          "seconds": [
+            0.11,
+            0.07,
+            0.1
+          ],
+          "medianSeconds": 0.1
+        },
+        "bedgraph": {
+          "detail": "9762 rows",
+          "requests": [
+            3,
+            3,
+            3
+          ],
+          "megabytes": [
+            1,
+            1,
+            1
+          ],
+          "seconds": [
+            0.22,
+            0.24,
+            0.27
+          ],
+          "medianSeconds": 0.2
+        }
+      }
+    },
+    {
+      "label": "100 kb of chr1",
+      "refName": "chr1",
+      "start": 14950000,
+      "end": 15050000,
+      "zarr": "https://jbrowse.org/demos/perbase-atac/atac.zarr",
+      "bedgraph": "https://jbrowse.org/demos/perbase-atac/atac.bedgraph.gz",
+      "bpPerPx": 66.66666666666667,
+      "firstSampleMaxDifference": {
+        "bedgraph": 1.8880208374483232e-7,
+        "bigwigs": 1.4305114781620887e-7
+      },
+      "arms": {
+        "bigwigs": {
+          "detail": "basesPerSpan 67",
+          "requests": [
+            674,
+            674,
+            674
+          ],
+          "megabytes": [
+            5.76,
+            5.76,
+            5.76
+          ],
+          "seconds": [
+            0.9,
+            0.95,
+            0.91
+          ],
+          "medianSeconds": 0.9
+        },
+        "zarr": {
+          "detail": "bin30, 3 arrays x 14 chunks",
+          "requests": [
+            46,
+            46,
+            46
+          ],
+          "megabytes": [
+            2.11,
+            2.11,
+            2.11
+          ],
+          "seconds": [
+            0.16,
+            0.16,
+            0.47
+          ],
+          "medianSeconds": 0.2
+        },
+        "bedgraph": {
+          "detail": "97276 rows",
+          "requests": [
+            4,
+            4,
+            4
+          ],
+          "megabytes": [
+            6.48,
+            6.48,
+            6.48
+          ],
+          "seconds": [
+            1.45,
+            1.42,
+            1.7
+          ],
+          "medianSeconds": 1.5
+        }
+      }
+    },
+    {
+      "label": "1 Mb of chr1",
+      "refName": "chr1",
+      "start": 14500000,
+      "end": 15500000,
+      "zarr": "https://jbrowse.org/demos/perbase-atac/atac.zarr",
+      "bedgraph": "https://jbrowse.org/demos/perbase-atac/atac.bedgraph.gz",
+      "bpPerPx": 666.6666666666666,
+      "firstSampleMaxDifference": {
+        "bedgraph": 1.4058430952701428e-7,
+        "bigwigs": 1.8943136098649767
+      },
+      "arms": {
+        "bigwigs": {
+          "detail": "basesPerSpan 667",
+          "requests": [
+            600,
+            600,
+            600
+          ],
+          "megabytes": [
+            5.22,
+            5.22,
+            5.22
+          ],
+          "seconds": [
+            0.86,
+            1.14,
+            0.96
+          ],
+          "medianSeconds": 1
+        },
+        "zarr": {
+          "detail": "bin300, 3 arrays x 14 chunks",
+          "requests": [
+            46,
+            46,
+            46
+          ],
+          "megabytes": [
+            2.37,
+            2.37,
+            2.37
+          ],
+          "seconds": [
+            0.14,
+            0.97,
+            0.4
+          ],
+          "medianSeconds": 0.4
+        },
+        "bedgraph": {
+          "detail": "951404 rows",
+          "requests": [
+            14,
+            14,
+            14
+          ],
+          "megabytes": [
+            51.37,
+            51.37,
+            51.37
+          ],
+          "seconds": [
+            9.82,
+            11.02,
+            11.68
+          ],
+          "medianSeconds": 11
+        }
+      }
+    },
+    {
+      "label": "10 Mb of chr1",
+      "refName": "chr1",
+      "start": 10000000,
+      "end": 20000000,
+      "zarr": "https://jbrowse.org/demos/perbase-atac/atac.zarr",
+      "bedgraph": "https://jbrowse.org/demos/perbase-atac/atac.bedgraph.gz",
+      "bpPerPx": 6666.666666666667,
+      "firstSampleMaxDifference": {
+        "bedgraph": 1.1099487240429085e-7,
+        "bigwigs": 1.3504788894653321
+      },
+      "arms": {
+        "bigwigs": {
+          "detail": "basesPerSpan 6667",
+          "requests": [
+            600,
+            600,
+            600
+          ],
+          "megabytes": [
+            3.22,
+            3.22,
+            3.22
+          ],
+          "seconds": [
+            0.79,
+            0.93,
+            1.02
+          ],
+          "medianSeconds": 0.9
+        },
+        "zarr": {
+          "detail": "bin3000, 3 arrays x 14 chunks",
+          "requests": [
+            46,
+            46,
+            46
+          ],
+          "megabytes": [
+            2.09,
+            2.09,
+            2.09
+          ],
+          "seconds": [
+            0.11,
+            0.6,
+            0.22
+          ],
+          "medianSeconds": 0.2
+        },
+        "bedgraph": {
+          "detail": "8980800 rows",
+          "requests": [
+            111,
+            111,
+            111
+          ],
+          "megabytes": [
+            502.49,
+            502.49,
+            502.49
+          ],
+          "seconds": [
+            103.17,
+            108.97,
+            140.67
+          ],
+          "medianSeconds": 109
+        }
+      }
+    }
+  ]
+}
