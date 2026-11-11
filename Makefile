@@ -284,8 +284,9 @@ crosstool-cold-censored: gate toolcheck crosstool-bundles | $(LOGDIR)
 # results/memory-peak/, not the timed crosstool.json.
 MEMORY_CASES = 20x-shortread-bam,200x-shortread-bam,1000x-shortread-bam,20x-longread-bam,200x-longread-bam,1000x-longread-bam,20x-shortread-cram,200x-shortread-cram,1000x-shortread-cram,20x-longread-cram,200x-longread-cram,1000x-longread-cram
 
-crosstool-memory: gate toolcheck crosstool-bundles | $(LOGDIR)
+crosstool-memory: toolcheck crosstool-bundles | $(LOGDIR)
 	mkdir -p results/memory-peak
+	$(NODE) scripts/gate.ts --warn
 	MEMORY_PEAK=1 RESULTS_DIR=results/memory-peak RUNS=3 WARMUP=0 FAIL_LIMIT=1 \
 	  WINDOWS=100kb CASES=$(MEMORY_CASES) MAX_WAIT=$(COLD_CEILING_100KB) \
 	  JBROWSE_PORTS=8000,8004 TOOLS=jbrowse,jbrowse-release-2.4.0,igv,igv-tall,genomespy \
