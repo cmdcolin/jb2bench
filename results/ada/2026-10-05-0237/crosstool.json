@@ -1,0 +1,281 @@
+{
+  "igvVersion": "3.8.5",
+  "gsVersion": "1.0.0",
+  "jbrowseBuild": "main-2026-10-05",
+  "jbrowseBuilds": {
+    "jbrowse": "main-2026-10-05",
+    "jbrowse-release-2.4.0": "release-2.4.0"
+  },
+  "rows": {
+    "20x-shortread-bam@19kb": {
+      "jbrowse": {
+        "median": 1120,
+        "mean": 1150.3333333333333,
+        "stddev": 102.29478101165388,
+        "runs": [
+          1043,
+          1288,
+          1120
+        ],
+        "load": {
+          "before": 0.39,
+          "after": 1.27,
+          "foreignCores": 0.06110788597248956,
+          "foreignTop": "claude 0.01"
+        }
+      },
+      "jbrowse-release-2.4.0": {
+        "median": 2126,
+        "mean": 2139.3333333333335,
+        "stddev": 22.484562605386735,
+        "runs": [
+          2126,
+          2171,
+          2121
+        ],
+        "load": {
+          "before": 0.43,
+          "after": 1.27,
+          "foreignCores": 0.06109855196412326,
+          "foreignTop": "claude 0.01"
+        }
+      },
+      "igv": {
+        "median": 1356,
+        "mean": 1353.3333333333333,
+        "stddev": 98.81407906883624,
+        "runs": [
+          1356,
+          1473,
+          1231
+        ],
+        "load": {
+          "before": 0.4,
+          "after": 1.27,
+          "foreignCores": 0.06108548914185916,
+          "foreignTop": "claude 0.01"
+        }
+      },
+      "genomespy": {
+        "median": 1460,
+        "mean": 1550,
+        "stddev": 130.83067937860244,
+        "runs": [
+          1735,
+          1460,
+          1455
+        ],
+        "load": {
+          "before": 0.37,
+          "after": 1.27,
+          "foreignCores": 0.06106497313121674,
+          "foreignTop": "claude 0.01"
+        }
+      }
+    },
+    "200x-shortread-bam@19kb": {
+      "jbrowse": {
+        "median": 1086,
+        "mean": 1111,
+        "stddev": 64.91532946846992,
+        "runs": [
+          1200,
+          1086,
+          1047
+        ],
+        "load": {
+          "before": 1.27,
+          "after": 1.54,
+          "foreignCores": 0.06255543625446783,
+          "foreignTop": "claude 0.01"
+        }
+      },
+      "jbrowse-release-2.4.0": {
+        "median": 3126,
+        "mean": 3130,
+        "stddev": 19.79898987322333,
+        "runs": [
+          3108,
+          3156,
+          3126
+        ],
+        "load": {
+          "before": 1.17,
+          "after": 1.54,
+          "foreignCores": 0.06254521692487364,
+          "foreignTop": "claude 0.01"
+        }
+      },
+      "igv": {
+        "median": 3305,
+        "mean": 3331.3333333333335,
+        "stddev": 80.962268303753,
+        "runs": [
+          3441,
+          3305,
+          3248
+        ],
+        "load": {
+          "before": 1.16,
+          "after": 1.54,
+          "foreignCores": 0.06252624702566166,
+          "foreignTop": "claude 0.01"
+        }
+      },
+      "genomespy": {
+        "median": 1878,
+        "mean": 1938.3333333333333,
+        "stddev": 95.39508489551346,
+        "runs": [
+          1864,
+          1878,
+          2073
+        ],
+        "load": {
+          "before": 1.06,
+          "after": 1.54,
+          "foreignCores": 0.06251166262394828,
+          "foreignTop": "claude 0.01"
+        }
+      }
+    },
+    "20x-shortread-bam@100kb": {
+      "jbrowse": {
+        "median": 1150,
+        "mean": 1150.3333333333333,
+        "stddev": 5.312459150169742,
+        "runs": [
+          1144,
+          1150,
+          1157
+        ],
+        "load": {
+          "before": 1.54,
+          "after": 1.27,
+          "foreignCores": 0.06168359941957825,
+          "foreignTop": "claude 0.01"
+        }
+      },
+      "jbrowse-release-2.4.0": {
+        "median": 3053,
+        "mean": 3055,
+        "stddev": 5.887840577551898,
+        "runs": [
+          3053,
+          3049,
+          3063
+        ],
+        "load": {
+          "before": 1.58,
+          "after": 1.27,
+          "foreignCores": 0.06165483653709672,
+          "foreignTop": "claude 0.01"
+        }
+      },
+      "igv": {
+        "median": 2253,
+        "mean": 2263.3333333333335,
+        "stddev": 16.779617264870957,
+        "runs": [
+          2253,
+          2287,
+          2250
+        ],
+        "load": {
+          "before": 1.53,
+          "after": 1.27,
+          "foreignCores": 0.06163408002084701,
+          "foreignTop": "claude 0.01"
+        }
+      },
+      "genomespy": {
+        "median": 1685,
+        "mean": 1646.3333333333333,
+        "stddev": 76.11540944878084,
+        "runs": [
+          1540,
+          1685,
+          1714
+        ],
+        "load": {
+          "before": 1.41,
+          "after": 1.27,
+          "foreignCores": 0.061626100466209414,
+          "foreignTop": "claude 0.01"
+        }
+      }
+    },
+    "200x-shortread-bam@100kb": {
+      "jbrowse": {
+        "median": 1708,
+        "mean": 1670.6666666666667,
+        "stddev": 75.78185065626788,
+        "runs": [
+          1708,
+          1739,
+          1565
+        ],
+        "load": {
+          "before": 1.27,
+          "after": 2.09,
+          "foreignCores": 0.03845856310856549,
+          "foreignTop": ""
+        }
+      },
+      "jbrowse-release-2.4.0": {
+        "median": 8041,
+        "mean": 8030.333333333333,
+        "stddev": 17.249798710580816,
+        "runs": [
+          8041,
+          8044,
+          8006
+        ],
+        "load": {
+          "before": 2.61,
+          "after": 2.09,
+          "foreignCores": 0.0384534635742358,
+          "foreignTop": ""
+        }
+      },
+      "igv": {
+        "median": 10659,
+        "mean": 10704.666666666666,
+        "stddev": 76.17669518224643,
+        "runs": [
+          10812,
+          10659,
+          10643
+        ],
+        "load": {
+          "before": 2.36,
+          "after": 2.09,
+          "foreignCores": 0.038447091057789574,
+          "foreignTop": ""
+        }
+      },
+      "genomespy": {
+        "median": 5041,
+        "mean": 4983,
+        "stddev": 160.46391079201163,
+        "runs": [
+          5041,
+          5144,
+          4764
+        ],
+        "load": {
+          "before": 2.05,
+          "after": 2.09,
+          "foreignCores": 0.03844156991841954,
+          "foreignTop": ""
+        }
+      }
+    }
+  },
+  "dates": {
+    "20x-shortread-bam@19kb": "2026-10-05",
+    "200x-shortread-bam@19kb": "2026-10-05",
+    "20x-shortread-bam@100kb": "2026-10-05",
+    "200x-shortread-bam@100kb": "2026-10-05"
+  }
+}

@@ -1,0 +1,9 @@
+GPU 0: Tesla T4 (UUID: GPU-5707ffdf-9c80-fb33-0765-30743b760768)
+{"set":"configured","renderer":"ANGLE (NVIDIA Corporation, Tesla T4/PCIe/SSE2, OpenGL ES 3.2)","webgpu":"no adapter","hardware":true}
+{"set":"workstation-default","renderer":"no-webgl2","webgpu":"no adapter","hardware":false}
+{"set":"angle-vulkan","renderer":"ANGLE (NVIDIA, Vulkan 1.4.329 (NVIDIA Tesla T4 (0x00001EB8)), NVIDIA)","webgpu":"google swiftshader","hardware":true}
+{"set":"angle-gl-egl","renderer":"ANGLE (NVIDIA Corporation, Tesla T4/PCIe/SSE2, OpenGL ES 3.2)","webgpu":"google swiftshader","hardware":true}
+bash: line 23: TOOLS=jbrowse,jbrowse-release-2.4.0,igv,genomespy: command not found
+bash: line 26: TOOLS=jbrowse,jbrowse-release-2.4.0,igv,genomespy: command not found
+bash: line 28: TOOLS=jbrowse,jbrowse-release-2.4.0,igv,genomespy: command not found
+ 14:14:28 up 31 min,  0 users,  load average: 0.87, 0.19, 0.15

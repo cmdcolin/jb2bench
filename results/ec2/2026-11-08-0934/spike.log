@@ -1,0 +1,135 @@
+GPU 0: Tesla T4 (UUID: GPU-5707ffdf-9c80-fb33-0765-30743b760768)
+{"set":"configured","renderer":"ANGLE (NVIDIA Corporation, Tesla T4/PCIe/SSE2, OpenGL ES 3.2)","webgpu":"no adapter","hardware":true}
+{"set":"workstation-default","renderer":"no-webgl2","webgpu":"no adapter","hardware":false}
+{"set":"angle-vulkan","renderer":"ANGLE (NVIDIA, Vulkan 1.4.329 (NVIDIA Tesla T4 (0x00001EB8)), NVIDIA)","webgpu":"google swiftshader","hardware":true}
+{"set":"angle-gl-egl","renderer":"ANGLE (NVIDIA Corporation, Tesla T4/PCIe/SSE2, OpenGL ES 3.2)","webgpu":"google swiftshader","hardware":true}
+port 8000 is serving builds/release-5.0.0-beta.20
+port 8004 is serving builds/release-2.4.0
+igv.js 3.8.5, GenomeSpy 1.0.0, Gosling 1.0.7
+windows: 100kb (chr22_mask:75000-175000, 100 kb)
+3 pages match crosstool/
+100kb: 6 corpus files reachable on every arm
+200x-longread-cram@100kb genomespy: unsupported — no cram reader
+200x-longread-cram@100kb jbrowse run 1: 5251 (js heap 277 MB, pss 1687 MB)
+200x-longread-cram@100kb jbrowse-release-2.4.0 run 1: 23653 (js heap 700 MB, pss 1613 MB)
+200x-longread-cram@100kb igv run 1: 58225 (js heap 991 MB, pss 3867 MB)
+1000x-longread-bam@100kb jbrowse run 1: 15852 (js heap 1208 MB, pss 4492 MB)
+1000x-longread-bam@100kb jbrowse-release-2.4.0 run 1: 95665 (js heap 2294 MB, pss 4745 MB)
+1000x-longread-bam@100kb igv run 1: NaN
+1000x-longread-bam@100kb genomespy run 1: NaN
+# Cross-tool render benchmark: JBrowse vs igv.js, GenomeSpy and Gosling
+
+JBrowse against igv.js 3.8.5, GenomeSpy 1.0.0 and Gosling 1.0.7 — same files, same windows, same instrument. The JBrowse arms are `builds/release-5.0.0-beta.20`, `builds/release-2.4.0`; only the build under test is asked for the WebGL2 renderer, since a release that predates the parameter ignores it.
+
+3 windows. The two narrow ones sit on the same contig, the wider containing the narrower; the 1 Mb one is a second corpus beside them — its own assembly, its own files, 20x and 100x rather than the 20x-to-1000x ladder — because a 250 kb contig cannot hold a megabase view: **19kb** `chr22_mask:124000-143000`, **100kb** `chr22_mask:75000-175000`, **1mb** `chr22_2mb:500001-1500000`. Same reads, more of them, so a row pair says how each tool scales with what is on screen rather than with what is in the file.
+
+Three limits decide which cells exist at all, and the table names them rather than leaving a reader to infer them from a suspiciously fast cell:
+
+- **Gosling stops at 20 kb.** `MAX_TILE_WIDTH = 2e4` in its `BamDataFetcher`, checked against every visible tile by `gosling-track.ts:calculateVisibleTiles`, which returns before fetching. Tile width is the declared genome length over 2^zoom, so on this 250 kb assembly the 19 kb window draws and the 100 kb one paints a full axis and no reads. Its 100 kb cells are `n/a`, not a timing — a page that draws nothing settles immediately under this instrument, so timing it would make Gosling the fastest tool in the table at the window it cannot render.
+- **`tile cap raised` is that same build with the cap patched out**, which is the only way Gosling reaches the wider window. Read the pair, not the patched column alone: a patched library is not the one anyone installs. It also fetches a whole tile rather than the window — 40002 reads at 100 kb on the 20x file against roughly 16000 in view — so it is an upper bound on what an unpatched Gosling would cost at this width even if it could draw it.
+- **Neither GenomeSpy nor Gosling reads CRAM**, so the format axis stops at BAM for both columns. igv.js and JBrowse carry the CRAM rows.
+
+The instrument is `scripts/crosstool/paintprofile.ts`: navigation to the last frame in which the pixels change, polled by screenshot. It belongs to neither tool — igv.js hides its spinner when features finish *loading*, before it draws them, so its own loading state would credit it with a render it has not done. Cost: the paint instrument reads a few hundred ms higher than the testid instrument used elsewhere in this repo, because it also waits out the settling of everything else on the page. That bias applies to every column.
+
+**Stable pixels alone were not enough, and the Gosling arms are why.** A page that is working with nothing moving on screen satisfies a pixel-stability test, and Gosling shows a *static* "Fetching" frame for its first few seconds while a worker boots and reads the index — no animation, and no request outstanding either. Measured 2026-08-28, it settled at 2.4 s on an empty plot against a true 7.6 s. So the instrument now also refuses to settle while a corpus read is in flight, and while a harness page exports `__harnessBusy()` returning true; Gosling's is `records === 0`, a content gate that adds no constant once the first feature lands. Correcting it moved the stock 19 kb Gosling cell up by roughly half while the ungated igv arm held within 9% across the same runs. **A page that defines no such predicate is measured exactly as before**, so every column other than GenomeSpy and Gosling is unaffected and comparable with the rows recorded before this axis existed.
+
+Three JBrowse arms and one igv.js arm carry the comparison; the remaining igv columns are controls rather than workload knobs:
+
+- **Downsampling.** igv draws at most `samplingDepth` reads per 100 bp window (default 500, hard maximum 10000) and JBrowse draws every read. On this corpus the deepest 100 bp window holds roughly 700 short reads, so the default clips a little and the maximum clips nothing — if the default and `no downsampling` columns agree, downsampling is not what the comparison is measuring.
+- **Track height.** The harness gives igv a 600 px track; igv's own default for a BAM track is 300, and JBrowse's pileup canvas at this viewport is about 210. igv draws packed rows until it runs out of canvas while JBrowse draws every read it holds and lets the rasterizer clip, so a taller igv track is more igv work and no more JBrowse work. The last two columns are that control, run as its own interleaved pair so it does not disturb the headline ratio.
+
+Median of 1 runs after 0 warmup, tools interleaved within each round. A blank cell was not measured in the run that produced its row; `n/a` is a capability limit named in the list above, and an arm holding one is dropped from the interleaving rather than timed on a page it cannot draw. `>Ns` is an arm that failed to settle within the paint ceiling 2 times and was abandoned for that cell — a result about the tool at that width, not a gap in the run. The ceiling is 120s at every window, and each cell carries the ceiling it was judged against, so a row recorded under the older per-window ceilings still prints the one it actually got.
+
+`foreign` is the most CPU any of the row's cells saw burned by processes **outside this benchmark**, in cores — outside the runner's process tree and outside the corpus http-servers, which serve the bytes under test and are apparatus rather than contention. That, and not the load average, is what says whether a row is trustworthy: a row above 0.5 is contended and its absolute milliseconds are not a run of record. `load` is kept as context, because it counts this benchmark's own threads and a heavy cell inflates it by working — the 1000x long-read cells drive it into the tens on an idle box. Rows recorded before 2026-08-24 have no foreign figure and show `?`; they were judged against a 4.0 load ceiling, which is the best that can be done with what they recorded.
+
+| case | window | JBrowse (release-5.0.0-beta.20) | JBrowse (release-2.4.0) | igv.js 3.8.5 | GenomeSpy 1.0.0 | igv default ÷ JBrowse | measured | foreign | by | load |
+|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|
+| 200x-longread-cram | 100kb | 5251 ±0 | 23653 ±0 | 58225 ±0 | n/a | 11.09× | 2026-11-08 | 0.01 | — | 1.1 |
+| 1000x-longread-bam | 100kb | 15852 ±0 | 95665 ±0 | FAIL | FAIL | — | 2026-11-08 | 0.01 | — | 1.1 |
+
+Median cell load across the matrix: 1.08. No cell stands out from the run.
+
+A ratio above 1 means igv.js took longer. Read the ratios, not the absolutes: every column of a row is measured within seconds of the others, so a ratio survives load the absolutes do not.
+
+## Memory at the end of the cold load
+
+Median over the measured runs of each cell: JS heap used, summed over the page and its dedicated workers (`Runtime.getHeapUsage`), then total PSS over every Chrome process (`/proc/<pid>/smaps_rollup`), then the GPU device memory the run added (`nvidia-smi`, where present). MB. See `scripts/crosstool/memory.ts`.
+
+| case | window | JBrowse (release-5.0.0-beta.20) | JBrowse (release-2.4.0) | igv.js 3.8.5 | GenomeSpy 1.0.0 |
+|---|---:|---:|---:|---:|---:|
+| 200x-longread-cram | 100kb | 277 / 1687 / 164 | 700 / 1613 / 129 | 991 / 3867 / 91 |  |
+| 1000x-longread-bam | 100kb | 1208 / 4492 / 482 | 2294 / 4745 / 125 | — / — / — | — / — / — |
+
+port 8000 is serving builds/release-5.0.0-beta.20
+port 8004 is serving builds/release-2.4.0
+igv.js 3.8.5, GenomeSpy 1.0.0, Gosling 1.0.7
+windows: 1mb (chr22_2mb:500001-1500000, 1000 kb)
+# Cross-tool render benchmark: JBrowse vs igv.js, GenomeSpy and Gosling
+
+JBrowse against igv.js 3.8.5, GenomeSpy 1.0.0 and Gosling 1.0.7 — same files, same windows, same instrument. The JBrowse arms are `builds/release-5.0.0-beta.20`, `builds/release-2.4.0`; only the build under test is asked for the WebGL2 renderer, since a release that predates the parameter ignores it.
+
+3 windows. The two narrow ones sit on the same contig, the wider containing the narrower; the 1 Mb one is a second corpus beside them — its own assembly, its own files, 20x and 100x rather than the 20x-to-1000x ladder — because a 250 kb contig cannot hold a megabase view: **19kb** `chr22_mask:124000-143000`, **100kb** `chr22_mask:75000-175000`, **1mb** `chr22_2mb:500001-1500000`. Same reads, more of them, so a row pair says how each tool scales with what is on screen rather than with what is in the file.
+
+Three limits decide which cells exist at all, and the table names them rather than leaving a reader to infer them from a suspiciously fast cell:
+
+- **Gosling stops at 20 kb.** `MAX_TILE_WIDTH = 2e4` in its `BamDataFetcher`, checked against every visible tile by `gosling-track.ts:calculateVisibleTiles`, which returns before fetching. Tile width is the declared genome length over 2^zoom, so on this 250 kb assembly the 19 kb window draws and the 100 kb one paints a full axis and no reads. Its 100 kb cells are `n/a`, not a timing — a page that draws nothing settles immediately under this instrument, so timing it would make Gosling the fastest tool in the table at the window it cannot render.
+- **`tile cap raised` is that same build with the cap patched out**, which is the only way Gosling reaches the wider window. Read the pair, not the patched column alone: a patched library is not the one anyone installs. It also fetches a whole tile rather than the window — 40002 reads at 100 kb on the 20x file against roughly 16000 in view — so it is an upper bound on what an unpatched Gosling would cost at this width even if it could draw it.
+- **Neither GenomeSpy nor Gosling reads CRAM**, so the format axis stops at BAM for both columns. igv.js and JBrowse carry the CRAM rows.
+
+The instrument is `scripts/crosstool/paintprofile.ts`: navigation to the last frame in which the pixels change, polled by screenshot. It belongs to neither tool — igv.js hides its spinner when features finish *loading*, before it draws them, so its own loading state would credit it with a render it has not done. Cost: the paint instrument reads a few hundred ms higher than the testid instrument used elsewhere in this repo, because it also waits out the settling of everything else on the page. That bias applies to every column.
+
+**Stable pixels alone were not enough, and the Gosling arms are why.** A page that is working with nothing moving on screen satisfies a pixel-stability test, and Gosling shows a *static* "Fetching" frame for its first few seconds while a worker boots and reads the index — no animation, and no request outstanding either. Measured 2026-08-28, it settled at 2.4 s on an empty plot against a true 7.6 s. So the instrument now also refuses to settle while a corpus read is in flight, and while a harness page exports `__harnessBusy()` returning true; Gosling's is `records === 0`, a content gate that adds no constant once the first feature lands. Correcting it moved the stock 19 kb Gosling cell up by roughly half while the ungated igv arm held within 9% across the same runs. **A page that defines no such predicate is measured exactly as before**, so every column other than GenomeSpy and Gosling is unaffected and comparable with the rows recorded before this axis existed.
+
+Three JBrowse arms and one igv.js arm carry the comparison; the remaining igv columns are controls rather than workload knobs:
+
+- **Downsampling.** igv draws at most `samplingDepth` reads per 100 bp window (default 500, hard maximum 10000) and JBrowse draws every read. On this corpus the deepest 100 bp window holds roughly 700 short reads, so the default clips a little and the maximum clips nothing — if the default and `no downsampling` columns agree, downsampling is not what the comparison is measuring.
+- **Track height.** The harness gives igv a 600 px track; igv's own default for a BAM track is 300, and JBrowse's pileup canvas at this viewport is about 210. igv draws packed rows until it runs out of canvas while JBrowse draws every read it holds and lets the rasterizer clip, so a taller igv track is more igv work and no more JBrowse work. The last two columns are that control, run as its own interleaved pair so it does not disturb the headline ratio.
+
+Median of 1 runs after 0 warmup, tools interleaved within each round. A blank cell was not measured in the run that produced its row; `n/a` is a capability limit named in the list above, and an arm holding one is dropped from the interleaving rather than timed on a page it cannot draw. `>Ns` is an arm that failed to settle within the paint ceiling 2 times and was abandoned for that cell — a result about the tool at that width, not a gap in the run. The ceiling is 120s at every window, and each cell carries the ceiling it was judged against, so a row recorded under the older per-window ceilings still prints the one it actually got.
+
+`foreign` is the most CPU any of the row's cells saw burned by processes **outside this benchmark**, in cores — outside the runner's process tree and outside the corpus http-servers, which serve the bytes under test and are apparatus rather than contention. That, and not the load average, is what says whether a row is trustworthy: a row above 0.5 is contended and its absolute milliseconds are not a run of record. `load` is kept as context, because it counts this benchmark's own threads and a heavy cell inflates it by working — the 1000x long-read cells drive it into the tens on an idle box. Rows recorded before 2026-08-24 have no foreign figure and show `?`; they were judged against a 4.0 load ceiling, which is the best that can be done with what they recorded.
+
+| case | window | JBrowse (release-5.0.0-beta.20) | JBrowse (release-2.4.0) | igv.js 3.8.5 | GenomeSpy 1.0.0 | igv default ÷ JBrowse | measured | foreign | by | load |
+|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|
+| 200x-longread-cram | 100kb | 5251 ±0 | 23653 ±0 | 58225 ±0 | n/a | 11.09× | 2026-11-08 | 0.01 | — | 1.1 |
+| 1000x-longread-bam | 100kb | 15852 ±0 | 95665 ±0 | FAIL | FAIL | — | 2026-11-08 | 0.01 | — | 1.1 |
+
+Median cell load across the matrix: 1.08. No cell stands out from the run.
+
+A ratio above 1 means igv.js took longer. Read the ratios, not the absolutes: every column of a row is measured within seconds of the others, so a ratio survives load the absolutes do not.
+
+## Memory at the end of the cold load
+
+Median over the measured runs of each cell: JS heap used, summed over the page and its dedicated workers (`Runtime.getHeapUsage`), then total PSS over every Chrome process (`/proc/<pid>/smaps_rollup`), then the GPU device memory the run added (`nvidia-smi`, where present). MB. See `scripts/crosstool/memory.ts`.
+
+| case | window | JBrowse (release-5.0.0-beta.20) | JBrowse (release-2.4.0) | igv.js 3.8.5 | GenomeSpy 1.0.0 |
+|---|---:|---:|---:|---:|---:|
+| 200x-longread-cram | 100kb | 277 / 1687 / 164 | 700 / 1613 / 129 | 991 / 3867 / 91 |  |
+| 1000x-longread-bam | 100kb | 1208 / 4492 / 482 | 2294 / 4745 / 125 | — / — / — | — / — / — |
+
+port 8000 is serving builds/release-5.0.0-beta.20
+port 8004 is serving builds/release-2.4.0
+igv.js 3.8.5, GenomeSpy 1.0.0
+1000x-longread-bam jbrowse run 1: 887 ms (5 steps, 5 cached, 0 reqs)
+1000x-longread-bam jbrowse-release-2.4.0 run 1: 12274 ms (5 steps, 5 cached, 0 reqs)
+1000x-longread-bam igv run 1: FAIL ms (0 steps, 0 cached, 0 reqs) [igv blocked past the 120s interactive ceiling (Runtime.evaluate timed out. Increase the 'protocolTimeout' setting in launch/connect calls for a higher timeout if needed.)]
+1000x-longread-bam genomespy run 1: FAIL ms (0 steps, 0 cached, 0 reqs) [genomespy did not come up within the 120s interactive ceiling]
+1000x-longread-bam jbrowse run 2: 1030 ms (5 steps, 5 cached, 0 reqs)
+1000x-longread-bam jbrowse-release-2.4.0 run 2: 12179 ms (5 steps, 5 cached, 0 reqs)
+1000x-longread-bam igv run 2: FAIL ms (0 steps, 0 cached, 0 reqs) [igv blocked past the 120s interactive ceiling (Runtime.evaluate timed out. Increase the 'protocolTimeout' setting in launch/connect calls for a higher timeout if needed.)]
+1000x-longread-bam genomespy run 2: FAIL ms (0 steps, 0 cached, 0 reqs) [genomespy did not come up within the 120s interactive ceiling]
+1000x-longread-bam jbrowse run 3: 896 ms (5 steps, 5 cached, 0 reqs)
+1000x-longread-bam jbrowse-release-2.4.0 run 3: 12114 ms (5 steps, 5 cached, 0 reqs)
+1000x-longread-bam igv run 3: FAIL ms (0 steps, 0 cached, 0 reqs) [igv blocked past the 120s interactive ceiling (Runtime.evaluate timed out. Increase the 'protocolTimeout' setting in launch/connect calls for a higher timeout if needed.)]
+1000x-longread-bam genomespy run 3: FAIL ms (0 steps, 0 cached, 0 reqs) [genomespy did not come up within the 120s interactive ceiling]
+1000x-longread-bam jbrowse run 4: 1044 ms (5 steps, 5 cached, 0 reqs)
+1000x-longread-bam jbrowse-release-2.4.0 run 4: 12178 ms (5 steps, 5 cached, 0 reqs)
+1000x-longread-bam igv run 4: FAIL ms (0 steps, 0 cached, 0 reqs) [igv blocked past the 120s interactive ceiling (Runtime.evaluate timed out. Increase the 'protocolTimeout' setting in launch/connect calls for a higher timeout if needed.)]
+1000x-longread-bam genomespy run 4: FAIL ms (0 steps, 0 cached, 0 reqs) [genomespy did not come up within the 120s interactive ceiling]
+1000x-longread-bam jbrowse run 5: 1045 ms (5 steps, 5 cached, 0 reqs)
+1000x-longread-bam jbrowse-release-2.4.0 run 5: 12318 ms (5 steps, 5 cached, 0 reqs)
+1000x-longread-bam igv run 5: FAIL ms (0 steps, 0 cached, 0 reqs) [igv blocked past the 120s interactive ceiling (Runtime.evaluate timed out. Increase the 'protocolTimeout' setting in launch/connect calls for a higher timeout if needed.)]
+1000x-longread-bam genomespy run 5: FAIL ms (0 steps, 0 cached, 0 reqs) [genomespy did not come up within the 120s interactive ceiling]
+
+wrote results/crosstool-pan.md and results/crosstool-pan.json
+ 16:02:08 up  2:19,  0 users,  load average: 1.15, 1.42, 1.44

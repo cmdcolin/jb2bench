@@ -1,0 +1,486 @@
+{
+  "loc": "chr22_mask:124000-143000",
+  "builds": {
+    "new": "release-5.0.0-beta.21",
+    "baseline": "release-4.3.0",
+    "published": "release-2.4.0"
+  },
+  "measuredAt": {
+    "in": "2026-11-10"
+  },
+  "detector": {
+    "in": "structural"
+  },
+  "results": {
+    "20x-shortread-bam": {
+      "in": {
+        "new": {
+          "mode": "in",
+          "maxWaitMs": 120000,
+          "stepsAttempted": 5,
+          "stepsMeasured": 5,
+          "stepsBailed": 0,
+          "stepsCensored": 0,
+          "censored": false,
+          "allBailed": false,
+          "crashed": false,
+          "zoomTimeToContentMs": 0,
+          "zoomRedrawGapMs": 16.800000000000182,
+          "loadingEverSeen": false,
+          "settlesCoarseBlocks": true,
+          "steps": [
+            {
+              "timeToContentMs": 0,
+              "loadingSeen": false,
+              "redrawGapMs": 16.800000000000182,
+              "applied": true,
+              "censored": false,
+              "bailed": false,
+              "locus": "chr22_mask:131,127..135,877"
+            },
+            {
+              "timeToContentMs": 0,
+              "loadingSeen": false,
+              "redrawGapMs": 16.800000000000182,
+              "applied": true,
+              "censored": false,
+              "bailed": false,
+              "locus": "chr22_mask:132,315..134,689"
+            },
+            {
+              "timeToContentMs": 0,
+              "loadingSeen": false,
+              "redrawGapMs": 16.700000000000728,
+              "applied": true,
+              "censored": false,
+              "bailed": false,
+              "locus": "chr22_mask:132,909..134,095"
+            },
+            {
+              "timeToContentMs": 0,
+              "loadingSeen": false,
+              "redrawGapMs": 16.800000000000182,
+              "applied": true,
+              "censored": false,
+              "bailed": false,
+              "locus": "chr22_mask:133,206..133,798"
+            },
+            {
+              "timeToContentMs": 0,
+              "loadingSeen": false,
+              "redrawGapMs": 16.800000000000182,
+              "applied": true,
+              "censored": false,
+              "bailed": false,
+              "locus": "chr22_mask:133,354..133,650"
+            }
+          ],
+          "load": {
+            "before": 0.73,
+            "after": 0.67,
+            "foreignCores": 0.01554330931185521,
+            "foreignTop": ""
+          }
+        },
+        "baseline": {
+          "mode": "in",
+          "maxWaitMs": 120000,
+          "stepsAttempted": 5,
+          "stepsMeasured": 5,
+          "stepsBailed": 0,
+          "stepsCensored": 0,
+          "censored": false,
+          "allBailed": false,
+          "crashed": false,
+          "zoomTimeToContentMs": 1060,
+          "zoomRedrawGapMs": 16.800000000000182,
+          "loadingEverSeen": true,
+          "settlesCoarseBlocks": false,
+          "steps": [
+            {
+              "timeToContentMs": 1110,
+              "loadingSeen": true,
+              "redrawGapMs": 16.800000000000182,
+              "applied": true,
+              "censored": false,
+              "bailed": false,
+              "locus": "chr22_mask:131,127..135,877"
+            },
+            {
+              "timeToContentMs": 1067,
+              "loadingSeen": true,
+              "redrawGapMs": 16.800000000000182,
+              "applied": true,
+              "censored": false,
+              "bailed": false,
+              "locus": "chr22_mask:132,315..134,689"
+            },
+            {
+              "timeToContentMs": 1060,
+              "loadingSeen": true,
+              "redrawGapMs": 16.80000000000109,
+              "applied": true,
+              "censored": false,
+              "bailed": false,
+              "locus": "chr22_mask:132,909..134,095"
+            },
+            {
+              "timeToContentMs": 1060,
+              "loadingSeen": true,
+              "redrawGapMs": 16.80000000000109,
+              "applied": true,
+              "censored": false,
+              "bailed": false,
+              "locus": "chr22_mask:133,206..133,798"
+            },
+            {
+              "timeToContentMs": 1057,
+              "loadingSeen": true,
+              "redrawGapMs": 16.799999999999272,
+              "applied": true,
+              "censored": false,
+              "bailed": false,
+              "locus": "chr22_mask:133,354..133,650"
+            }
+          ],
+          "load": {
+            "before": 0.62,
+            "after": 0.67,
+            "foreignCores": 0.010857763300759932,
+            "foreignTop": ""
+          }
+        },
+        "published": {
+          "mode": "in",
+          "maxWaitMs": 120000,
+          "stepsAttempted": 5,
+          "stepsMeasured": 5,
+          "stepsBailed": 0,
+          "stepsCensored": 0,
+          "censored": false,
+          "allBailed": false,
+          "crashed": false,
+          "zoomTimeToContentMs": 533,
+          "zoomRedrawGapMs": 16.800000000000182,
+          "loadingEverSeen": true,
+          "settlesCoarseBlocks": false,
+          "steps": [
+            {
+              "timeToContentMs": 602,
+              "loadingSeen": true,
+              "redrawGapMs": 16.800000000000182,
+              "applied": true,
+              "censored": false,
+              "bailed": false,
+              "locus": "chr22_mask:131,127..135,877"
+            },
+            {
+              "timeToContentMs": 575,
+              "loadingSeen": true,
+              "redrawGapMs": 16.800000000000182,
+              "applied": true,
+              "censored": false,
+              "bailed": false,
+              "locus": "chr22_mask:132,315..134,689"
+            },
+            {
+              "timeToContentMs": 135,
+              "loadingSeen": true,
+              "redrawGapMs": 16.800000000000182,
+              "applied": true,
+              "censored": false,
+              "bailed": false,
+              "locus": "chr22_mask:132,909..134,095"
+            },
+            {
+              "timeToContentMs": 533,
+              "loadingSeen": true,
+              "redrawGapMs": 16.800000000000182,
+              "applied": true,
+              "censored": false,
+              "bailed": false,
+              "locus": "chr22_mask:133,206..133,798"
+            },
+            {
+              "timeToContentMs": 110,
+              "loadingSeen": true,
+              "redrawGapMs": 16.799999999999272,
+              "applied": true,
+              "censored": false,
+              "bailed": false,
+              "locus": "chr22_mask:133,354..133,650"
+            }
+          ],
+          "load": {
+            "before": 0.67,
+            "after": 0.71,
+            "foreignCores": 0.013548605622671418,
+            "foreignTop": ""
+          }
+        }
+      },
+      "out": {},
+      "pan": {}
+    },
+    "20x-shortread-cram": {
+      "in": {},
+      "out": {},
+      "pan": {}
+    },
+    "200x-shortread-bam": {
+      "in": {
+        "new": {
+          "mode": "in",
+          "maxWaitMs": 120000,
+          "stepsAttempted": 5,
+          "stepsMeasured": 5,
+          "stepsBailed": 0,
+          "stepsCensored": 0,
+          "censored": false,
+          "allBailed": false,
+          "crashed": false,
+          "zoomTimeToContentMs": 0,
+          "zoomRedrawGapMs": 16.800000000000182,
+          "loadingEverSeen": false,
+          "settlesCoarseBlocks": true,
+          "steps": [
+            {
+              "timeToContentMs": 0,
+              "loadingSeen": false,
+              "redrawGapMs": 16.799999999999727,
+              "applied": true,
+              "censored": false,
+              "bailed": false,
+              "locus": "chr22_mask:131,127..135,877"
+            },
+            {
+              "timeToContentMs": 0,
+              "loadingSeen": false,
+              "redrawGapMs": 16.800000000000182,
+              "applied": true,
+              "censored": false,
+              "bailed": false,
+              "locus": "chr22_mask:132,315..134,689"
+            },
+            {
+              "timeToContentMs": 0,
+              "loadingSeen": false,
+              "redrawGapMs": 16.800000000000182,
+              "applied": true,
+              "censored": false,
+              "bailed": false,
+              "locus": "chr22_mask:132,909..134,095"
+            },
+            {
+              "timeToContentMs": 0,
+              "loadingSeen": false,
+              "redrawGapMs": 16.800000000000182,
+              "applied": true,
+              "censored": false,
+              "bailed": false,
+              "locus": "chr22_mask:133,206..133,798"
+            },
+            {
+              "timeToContentMs": 0,
+              "loadingSeen": false,
+              "redrawGapMs": 16.800000000000182,
+              "applied": true,
+              "censored": false,
+              "bailed": false,
+              "locus": "chr22_mask:133,354..133,650"
+            }
+          ],
+          "load": {
+            "before": 0.71,
+            "after": 0.75,
+            "foreignCores": 0.017596101786681227,
+            "foreignTop": ""
+          }
+        },
+        "baseline": {
+          "mode": "in",
+          "maxWaitMs": 120000,
+          "stepsAttempted": 5,
+          "stepsMeasured": 5,
+          "stepsBailed": 0,
+          "stepsCensored": 0,
+          "censored": false,
+          "allBailed": false,
+          "crashed": false,
+          "zoomTimeToContentMs": 1181,
+          "zoomRedrawGapMs": 16.800000000000182,
+          "loadingEverSeen": true,
+          "settlesCoarseBlocks": false,
+          "steps": [
+            {
+              "timeToContentMs": 1535,
+              "loadingSeen": true,
+              "redrawGapMs": 16.800000000000182,
+              "applied": true,
+              "censored": false,
+              "bailed": false,
+              "locus": "chr22_mask:131,127..135,877"
+            },
+            {
+              "timeToContentMs": 1221,
+              "loadingSeen": true,
+              "redrawGapMs": 16.800000000000182,
+              "applied": true,
+              "censored": false,
+              "bailed": false,
+              "locus": "chr22_mask:132,315..134,689"
+            },
+            {
+              "timeToContentMs": 1175,
+              "loadingSeen": true,
+              "redrawGapMs": 16.799999999999272,
+              "applied": true,
+              "censored": false,
+              "bailed": false,
+              "locus": "chr22_mask:132,909..134,095"
+            },
+            {
+              "timeToContentMs": 1181,
+              "loadingSeen": true,
+              "redrawGapMs": 16.80000000000109,
+              "applied": true,
+              "censored": false,
+              "bailed": false,
+              "locus": "chr22_mask:133,206..133,798"
+            },
+            {
+              "timeToContentMs": 1147,
+              "loadingSeen": true,
+              "redrawGapMs": 16.80000000000109,
+              "applied": true,
+              "censored": false,
+              "bailed": false,
+              "locus": "chr22_mask:133,354..133,650"
+            }
+          ],
+          "load": {
+            "before": 0.75,
+            "after": 1.75,
+            "foreignCores": 0.01207324434905089,
+            "foreignTop": ""
+          }
+        },
+        "published": {
+          "mode": "in",
+          "maxWaitMs": 120000,
+          "stepsAttempted": 5,
+          "stepsMeasured": 5,
+          "stepsBailed": 0,
+          "stepsCensored": 0,
+          "censored": false,
+          "allBailed": false,
+          "crashed": false,
+          "zoomTimeToContentMs": 607,
+          "zoomRedrawGapMs": 16.80000000000109,
+          "loadingEverSeen": true,
+          "settlesCoarseBlocks": false,
+          "steps": [
+            {
+              "timeToContentMs": 1176,
+              "loadingSeen": true,
+              "redrawGapMs": 16.800000000000182,
+              "applied": true,
+              "censored": false,
+              "bailed": false,
+              "locus": "chr22_mask:131,127..135,877"
+            },
+            {
+              "timeToContentMs": 621,
+              "loadingSeen": true,
+              "redrawGapMs": 16.80000000000109,
+              "applied": true,
+              "censored": false,
+              "bailed": false,
+              "locus": "chr22_mask:132,315..134,689"
+            },
+            {
+              "timeToContentMs": 607,
+              "loadingSeen": true,
+              "redrawGapMs": 16.80000000000109,
+              "applied": true,
+              "censored": false,
+              "bailed": false,
+              "locus": "chr22_mask:132,909..134,095"
+            },
+            {
+              "timeToContentMs": 597,
+              "loadingSeen": true,
+              "redrawGapMs": 16.799999999999272,
+              "applied": true,
+              "censored": false,
+              "bailed": false,
+              "locus": "chr22_mask:133,206..133,798"
+            },
+            {
+              "timeToContentMs": 597,
+              "loadingSeen": true,
+              "redrawGapMs": 16.80000000000109,
+              "applied": true,
+              "censored": false,
+              "bailed": false,
+              "locus": "chr22_mask:133,354..133,650"
+            }
+          ],
+          "load": {
+            "before": 1.75,
+            "after": 1.5,
+            "foreignCores": 0.013361628546726421,
+            "foreignTop": ""
+          }
+        }
+      },
+      "out": {},
+      "pan": {}
+    },
+    "200x-shortread-cram": {
+      "in": {},
+      "out": {},
+      "pan": {}
+    },
+    "1000x-shortread-bam": {
+      "in": {},
+      "out": {},
+      "pan": {}
+    },
+    "1000x-shortread-cram": {
+      "in": {},
+      "out": {},
+      "pan": {}
+    },
+    "20x-longread-bam": {
+      "in": {},
+      "out": {},
+      "pan": {}
+    },
+    "20x-longread-cram": {
+      "in": {},
+      "out": {},
+      "pan": {}
+    },
+    "200x-longread-bam": {
+      "in": {},
+      "out": {},
+      "pan": {}
+    },
+    "200x-longread-cram": {
+      "in": {},
+      "out": {},
+      "pan": {}
+    },
+    "1000x-longread-bam": {
+      "in": {},
+      "out": {},
+      "pan": {}
+    },
+    "1000x-longread-cram": {
+      "in": {},
+      "out": {},
+      "pan": {}
+    }
+  }
+}

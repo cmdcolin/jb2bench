@@ -1,0 +1,214 @@
+{
+  "igvVersion": "3.8.5",
+  "gsVersion": "1.0.0",
+  "jbrowseBuild": "release-5.0.0-beta.20",
+  "jbrowseBuilds": {
+    "jbrowse": "release-5.0.0-beta.20",
+    "jbrowse-release-2.4.0": "release-2.4.0"
+  },
+  "panDir": "left",
+  "motion": "pan",
+  "steps": 5,
+  "rows": {
+    "1000x-longread-bam": {
+      "jbrowse": {
+        "median": 1029.6000000005588,
+        "stddev": 72.69969463481017,
+        "lo": 886.7000000001863,
+        "hi": 1044.5,
+        "instrument": "draws",
+        "drawClockRuns": [],
+        "drawMedian": 0.6000000005587935,
+        "fetchedMedian": null,
+        "runs": [
+          886.7000000001863,
+          1029.6000000005588,
+          896,
+          1043.5999999996275,
+          1044.5
+        ],
+        "fetchedRuns": [],
+        "drawRuns": [
+          0.40000000037252903,
+          0.6000000005587935,
+          0.7000000001862645,
+          0.5,
+          0.6000000005587935
+        ],
+        "settlesCoarseBlocks": true,
+        "appliedSteps": [
+          5,
+          5,
+          5,
+          5,
+          5
+        ],
+        "cachedSteps": 5,
+        "requests": 0,
+        "bytes": 0,
+        "drawsPerStep": [
+          20,
+          26,
+          26,
+          26,
+          36
+        ],
+        "loci": [
+          "chr22_mask:105,001..124,001",
+          "chr22_mask:86,000..105,000",
+          "chr22_mask:66,999..85,999",
+          "chr22_mask:47,998..66,998",
+          "chr22_mask:28,997..47,997"
+        ],
+        "load": {
+          "before": 0.02,
+          "after": 1.15
+        },
+        "failures": []
+      },
+      "jbrowse-release-2.4.0": {
+        "median": 12179.200000000186,
+        "stddev": 73.2685307618615,
+        "lo": 12114.200000000186,
+        "hi": 12318,
+        "instrument": "draws",
+        "drawClockRuns": [],
+        "drawMedian": 0.10000000055879354,
+        "fetchedMedian": null,
+        "runs": [
+          12273.900000000373,
+          12179.200000000186,
+          12114.200000000186,
+          12178.299999999814,
+          12318
+        ],
+        "fetchedRuns": [],
+        "drawRuns": [
+          0.20000000018626451,
+          0.09999999962747097,
+          0.10000000055879354,
+          0.20000000018626451,
+          0.09999999962747097
+        ],
+        "settlesCoarseBlocks": false,
+        "appliedSteps": [
+          5,
+          5,
+          5,
+          5,
+          5
+        ],
+        "cachedSteps": 5,
+        "requests": 0,
+        "bytes": 0,
+        "drawsPerStep": [
+          4,
+          1,
+          2,
+          2,
+          2
+        ],
+        "loci": [
+          "chr22_mask:105,001..124,001",
+          "chr22_mask:86,000..105,000",
+          "chr22_mask:66,999..85,999",
+          "chr22_mask:47,998..66,998",
+          "chr22_mask:28,997..47,997"
+        ],
+        "load": {
+          "before": 0.95,
+          "after": 1.15
+        },
+        "failures": []
+      },
+      "igv": {
+        "median": null,
+        "stddev": null,
+        "lo": null,
+        "hi": null,
+        "instrument": "draws",
+        "drawClockRuns": [],
+        "drawMedian": null,
+        "fetchedMedian": null,
+        "runs": [
+          null,
+          null,
+          null,
+          null,
+          null
+        ],
+        "fetchedRuns": [],
+        "drawRuns": [],
+        "appliedSteps": [
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        "cachedSteps": 0,
+        "requests": 0,
+        "bytes": 0,
+        "drawsPerStep": [],
+        "loci": [],
+        "load": {
+          "before": 1.26,
+          "after": 1.15
+        },
+        "failures": [
+          "igv blocked past the 120s interactive ceiling (Runtime.evaluate timed out. Increase the 'protocolTimeout' setting in launch/connect calls for a higher timeout if needed.)",
+          "igv blocked past the 120s interactive ceiling (Runtime.evaluate timed out. Increase the 'protocolTimeout' setting in launch/connect calls for a higher timeout if needed.)",
+          "igv blocked past the 120s interactive ceiling (Runtime.evaluate timed out. Increase the 'protocolTimeout' setting in launch/connect calls for a higher timeout if needed.)",
+          "igv blocked past the 120s interactive ceiling (Runtime.evaluate timed out. Increase the 'protocolTimeout' setting in launch/connect calls for a higher timeout if needed.)",
+          "igv blocked past the 120s interactive ceiling (Runtime.evaluate timed out. Increase the 'protocolTimeout' setting in launch/connect calls for a higher timeout if needed.)"
+        ]
+      },
+      "genomespy": {
+        "median": null,
+        "stddev": null,
+        "lo": null,
+        "hi": null,
+        "instrument": "draws",
+        "drawClockRuns": [],
+        "drawMedian": null,
+        "fetchedMedian": null,
+        "runs": [
+          null,
+          null,
+          null,
+          null,
+          null
+        ],
+        "fetchedRuns": [],
+        "drawRuns": [],
+        "appliedSteps": [
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        "cachedSteps": 0,
+        "requests": 0,
+        "bytes": 0,
+        "drawsPerStep": [],
+        "loci": [],
+        "load": {
+          "before": 0.43,
+          "after": 1.15
+        },
+        "failures": [
+          "genomespy did not come up within the 120s interactive ceiling",
+          "genomespy did not come up within the 120s interactive ceiling",
+          "genomespy did not come up within the 120s interactive ceiling",
+          "genomespy did not come up within the 120s interactive ceiling",
+          "genomespy did not come up within the 120s interactive ceiling"
+        ]
+      }
+    }
+  },
+  "dates": {
+    "1000x-longread-bam": "2026-11-08"
+  },
+  "locusMismatch": {}
+}

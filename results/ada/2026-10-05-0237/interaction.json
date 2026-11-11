@@ -1,0 +1,486 @@
+{
+  "loc": "chr22_mask:124000-143000",
+  "builds": {
+    "new": "main-2026-10-05",
+    "baseline": "release-4.3.0",
+    "published": "release-2.4.0"
+  },
+  "measuredAt": {
+    "in": "2026-10-05"
+  },
+  "detector": {
+    "in": "structural"
+  },
+  "results": {
+    "20x-shortread-bam": {
+      "in": {
+        "new": {
+          "mode": "in",
+          "maxWaitMs": 120000,
+          "stepsAttempted": 5,
+          "stepsMeasured": 5,
+          "stepsBailed": 0,
+          "stepsCensored": 0,
+          "censored": false,
+          "allBailed": false,
+          "crashed": false,
+          "zoomTimeToContentMs": 0,
+          "zoomRedrawGapMs": 16.800000000000182,
+          "loadingEverSeen": false,
+          "settlesCoarseBlocks": true,
+          "steps": [
+            {
+              "timeToContentMs": 0,
+              "loadingSeen": false,
+              "redrawGapMs": 16.800000000000182,
+              "applied": true,
+              "censored": false,
+              "bailed": false,
+              "locus": "chr22_mask:131,127..135,877"
+            },
+            {
+              "timeToContentMs": 0,
+              "loadingSeen": false,
+              "redrawGapMs": 16.799999999999727,
+              "applied": true,
+              "censored": false,
+              "bailed": false,
+              "locus": "chr22_mask:132,315..134,689"
+            },
+            {
+              "timeToContentMs": 0,
+              "loadingSeen": false,
+              "redrawGapMs": 16.800000000000182,
+              "applied": true,
+              "censored": false,
+              "bailed": false,
+              "locus": "chr22_mask:132,909..134,095"
+            },
+            {
+              "timeToContentMs": 0,
+              "loadingSeen": false,
+              "redrawGapMs": 16.800000000000182,
+              "applied": true,
+              "censored": false,
+              "bailed": false,
+              "locus": "chr22_mask:133,206..133,798"
+            },
+            {
+              "timeToContentMs": 0,
+              "loadingSeen": false,
+              "redrawGapMs": 16.800000000000182,
+              "applied": true,
+              "censored": false,
+              "bailed": false,
+              "locus": "chr22_mask:133,354..133,650"
+            }
+          ],
+          "load": {
+            "before": 1.09,
+            "after": 1.08,
+            "foreignCores": 0.08399511301138039,
+            "foreignTop": "claude 0.02, claude 0.02"
+          }
+        },
+        "baseline": {
+          "mode": "in",
+          "maxWaitMs": 120000,
+          "stepsAttempted": 5,
+          "stepsMeasured": 5,
+          "stepsBailed": 0,
+          "stepsCensored": 0,
+          "censored": false,
+          "allBailed": false,
+          "crashed": false,
+          "zoomTimeToContentMs": 1058,
+          "zoomRedrawGapMs": 16.800000000000182,
+          "loadingEverSeen": true,
+          "settlesCoarseBlocks": false,
+          "steps": [
+            {
+              "timeToContentMs": 1058,
+              "loadingSeen": true,
+              "redrawGapMs": 16.800000000000182,
+              "applied": true,
+              "censored": false,
+              "bailed": false,
+              "locus": "chr22_mask:131,127..135,877"
+            },
+            {
+              "timeToContentMs": 1050,
+              "loadingSeen": true,
+              "redrawGapMs": 16.800000000000182,
+              "applied": true,
+              "censored": false,
+              "bailed": false,
+              "locus": "chr22_mask:132,315..134,689"
+            },
+            {
+              "timeToContentMs": 1057,
+              "loadingSeen": true,
+              "redrawGapMs": 16.80000000000109,
+              "applied": true,
+              "censored": false,
+              "bailed": false,
+              "locus": "chr22_mask:132,909..134,095"
+            },
+            {
+              "timeToContentMs": 1071,
+              "loadingSeen": true,
+              "redrawGapMs": 16.80000000000109,
+              "applied": true,
+              "censored": false,
+              "bailed": false,
+              "locus": "chr22_mask:133,206..133,798"
+            },
+            {
+              "timeToContentMs": 1062,
+              "loadingSeen": true,
+              "redrawGapMs": 16.799999999999272,
+              "applied": true,
+              "censored": false,
+              "bailed": false,
+              "locus": "chr22_mask:133,354..133,650"
+            }
+          ],
+          "load": {
+            "before": 1.08,
+            "after": 1.61,
+            "foreignCores": 0.061805664214424044,
+            "foreignTop": "claude 0.02, claude 0.02"
+          }
+        },
+        "published": {
+          "mode": "in",
+          "maxWaitMs": 120000,
+          "stepsAttempted": 5,
+          "stepsMeasured": 5,
+          "stepsBailed": 0,
+          "stepsCensored": 0,
+          "censored": false,
+          "allBailed": false,
+          "crashed": false,
+          "zoomTimeToContentMs": 556,
+          "zoomRedrawGapMs": 16.800000000000182,
+          "loadingEverSeen": true,
+          "settlesCoarseBlocks": false,
+          "steps": [
+            {
+              "timeToContentMs": 570,
+              "loadingSeen": true,
+              "redrawGapMs": 16.800000000000182,
+              "applied": true,
+              "censored": false,
+              "bailed": false,
+              "locus": "chr22_mask:131,127..135,877"
+            },
+            {
+              "timeToContentMs": 78,
+              "loadingSeen": true,
+              "redrawGapMs": 16.700000000000728,
+              "applied": true,
+              "censored": false,
+              "bailed": false,
+              "locus": "chr22_mask:132,315..134,689"
+            },
+            {
+              "timeToContentMs": 567,
+              "loadingSeen": true,
+              "redrawGapMs": 16.800000000000182,
+              "applied": true,
+              "censored": false,
+              "bailed": false,
+              "locus": "chr22_mask:132,909..134,095"
+            },
+            {
+              "timeToContentMs": 85,
+              "loadingSeen": true,
+              "redrawGapMs": 16.800000000000182,
+              "applied": true,
+              "censored": false,
+              "bailed": false,
+              "locus": "chr22_mask:133,206..133,798"
+            },
+            {
+              "timeToContentMs": 556,
+              "loadingSeen": true,
+              "redrawGapMs": 16.800000000000182,
+              "applied": true,
+              "censored": false,
+              "bailed": false,
+              "locus": "chr22_mask:133,354..133,650"
+            }
+          ],
+          "load": {
+            "before": 1.61,
+            "after": 1.83,
+            "foreignCores": 0.0743218134520748,
+            "foreignTop": "claude 0.03"
+          }
+        }
+      },
+      "out": {},
+      "pan": {}
+    },
+    "20x-shortread-cram": {
+      "in": {},
+      "out": {},
+      "pan": {}
+    },
+    "200x-shortread-bam": {
+      "in": {
+        "new": {
+          "mode": "in",
+          "maxWaitMs": 120000,
+          "stepsAttempted": 5,
+          "stepsMeasured": 5,
+          "stepsBailed": 0,
+          "stepsCensored": 0,
+          "censored": false,
+          "allBailed": false,
+          "crashed": false,
+          "zoomTimeToContentMs": 0,
+          "zoomRedrawGapMs": 16.800000000000182,
+          "loadingEverSeen": false,
+          "settlesCoarseBlocks": true,
+          "steps": [
+            {
+              "timeToContentMs": 0,
+              "loadingSeen": false,
+              "redrawGapMs": 16.800000000000182,
+              "applied": true,
+              "censored": false,
+              "bailed": false,
+              "locus": "chr22_mask:131,127..135,877"
+            },
+            {
+              "timeToContentMs": 0,
+              "loadingSeen": false,
+              "redrawGapMs": 16.800000000000182,
+              "applied": true,
+              "censored": false,
+              "bailed": false,
+              "locus": "chr22_mask:132,315..134,689"
+            },
+            {
+              "timeToContentMs": 0,
+              "loadingSeen": false,
+              "redrawGapMs": 16.800000000000182,
+              "applied": true,
+              "censored": false,
+              "bailed": false,
+              "locus": "chr22_mask:132,909..134,095"
+            },
+            {
+              "timeToContentMs": 0,
+              "loadingSeen": false,
+              "redrawGapMs": 16.800000000000182,
+              "applied": true,
+              "censored": false,
+              "bailed": false,
+              "locus": "chr22_mask:133,206..133,798"
+            },
+            {
+              "timeToContentMs": 0,
+              "loadingSeen": false,
+              "redrawGapMs": 16.800000000000182,
+              "applied": true,
+              "censored": false,
+              "bailed": false,
+              "locus": "chr22_mask:133,354..133,650"
+            }
+          ],
+          "load": {
+            "before": 1.83,
+            "after": 1.92,
+            "foreignCores": 0.053802530172603696,
+            "foreignTop": "claude 0.01"
+          }
+        },
+        "baseline": {
+          "mode": "in",
+          "maxWaitMs": 120000,
+          "stepsAttempted": 5,
+          "stepsMeasured": 5,
+          "stepsBailed": 0,
+          "stepsCensored": 0,
+          "censored": false,
+          "allBailed": false,
+          "crashed": false,
+          "zoomTimeToContentMs": 1080,
+          "zoomRedrawGapMs": 16.80000000000109,
+          "loadingEverSeen": true,
+          "settlesCoarseBlocks": false,
+          "steps": [
+            {
+              "timeToContentMs": 1218,
+              "loadingSeen": true,
+              "redrawGapMs": 16.800000000000182,
+              "applied": true,
+              "censored": false,
+              "bailed": false,
+              "locus": "chr22_mask:131,127..135,877"
+            },
+            {
+              "timeToContentMs": 1083,
+              "loadingSeen": true,
+              "redrawGapMs": 16.800000000000182,
+              "applied": true,
+              "censored": false,
+              "bailed": false,
+              "locus": "chr22_mask:132,315..134,689"
+            },
+            {
+              "timeToContentMs": 1080,
+              "loadingSeen": true,
+              "redrawGapMs": 16.80000000000109,
+              "applied": true,
+              "censored": false,
+              "bailed": false,
+              "locus": "chr22_mask:132,909..134,095"
+            },
+            {
+              "timeToContentMs": 1076,
+              "loadingSeen": true,
+              "redrawGapMs": 16.80000000000109,
+              "applied": true,
+              "censored": false,
+              "bailed": false,
+              "locus": "chr22_mask:133,206..133,798"
+            },
+            {
+              "timeToContentMs": 1061,
+              "loadingSeen": true,
+              "redrawGapMs": 16.80000000000109,
+              "applied": true,
+              "censored": false,
+              "bailed": false,
+              "locus": "chr22_mask:133,354..133,650"
+            }
+          ],
+          "load": {
+            "before": 1.92,
+            "after": 1.66,
+            "foreignCores": 0.05409111686684989,
+            "foreignTop": "claude 0.02"
+          }
+        },
+        "published": {
+          "mode": "in",
+          "maxWaitMs": 120000,
+          "stepsAttempted": 5,
+          "stepsMeasured": 5,
+          "stepsBailed": 0,
+          "stepsCensored": 0,
+          "censored": false,
+          "allBailed": false,
+          "crashed": false,
+          "zoomTimeToContentMs": 586,
+          "zoomRedrawGapMs": 16.800000000000182,
+          "loadingEverSeen": true,
+          "settlesCoarseBlocks": false,
+          "steps": [
+            {
+              "timeToContentMs": 661,
+              "loadingSeen": true,
+              "redrawGapMs": 16.800000000000182,
+              "applied": true,
+              "censored": false,
+              "bailed": false,
+              "locus": "chr22_mask:131,127..135,877"
+            },
+            {
+              "timeToContentMs": 592,
+              "loadingSeen": true,
+              "redrawGapMs": 16.800000000000182,
+              "applied": true,
+              "censored": false,
+              "bailed": false,
+              "locus": "chr22_mask:132,315..134,689"
+            },
+            {
+              "timeToContentMs": 585,
+              "loadingSeen": true,
+              "redrawGapMs": 16.800000000000182,
+              "applied": true,
+              "censored": false,
+              "bailed": false,
+              "locus": "chr22_mask:132,909..134,095"
+            },
+            {
+              "timeToContentMs": 586,
+              "loadingSeen": true,
+              "redrawGapMs": 16.800000000000182,
+              "applied": true,
+              "censored": false,
+              "bailed": false,
+              "locus": "chr22_mask:133,206..133,798"
+            },
+            {
+              "timeToContentMs": 583,
+              "loadingSeen": true,
+              "redrawGapMs": 16.80000000000109,
+              "applied": true,
+              "censored": false,
+              "bailed": false,
+              "locus": "chr22_mask:133,354..133,650"
+            }
+          ],
+          "load": {
+            "before": 1.66,
+            "after": 1.56,
+            "foreignCores": 0.05146986043776052,
+            "foreignTop": "claude 0.01, claude 0.01"
+          }
+        }
+      },
+      "out": {},
+      "pan": {}
+    },
+    "200x-shortread-cram": {
+      "in": {},
+      "out": {},
+      "pan": {}
+    },
+    "1000x-shortread-bam": {
+      "in": {},
+      "out": {},
+      "pan": {}
+    },
+    "1000x-shortread-cram": {
+      "in": {},
+      "out": {},
+      "pan": {}
+    },
+    "20x-longread-bam": {
+      "in": {},
+      "out": {},
+      "pan": {}
+    },
+    "20x-longread-cram": {
+      "in": {},
+      "out": {},
+      "pan": {}
+    },
+    "200x-longread-bam": {
+      "in": {},
+      "out": {},
+      "pan": {}
+    },
+    "200x-longread-cram": {
+      "in": {},
+      "out": {},
+      "pan": {}
+    },
+    "1000x-longread-bam": {
+      "in": {},
+      "out": {},
+      "pan": {}
+    },
+    "1000x-longread-cram": {
+      "in": {},
+      "out": {},
+      "pan": {}
+    }
+  }
+}

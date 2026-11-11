@@ -1,0 +1,65 @@
+GPU 0: Tesla T4 (UUID: GPU-c36034bd-99bd-7dfb-c91c-ba541164edb0)
+{"set":"configured","renderer":"ANGLE (NVIDIA Corporation, Tesla T4/PCIe/SSE2, OpenGL ES 3.2)","webgpu":"no adapter","hardware":true}
+{"set":"workstation-default","renderer":"no-webgl2","webgpu":"no adapter","hardware":false}
+{"set":"angle-vulkan","renderer":"ANGLE (NVIDIA, Vulkan 1.4.329 (NVIDIA Tesla T4 (0x00001EB8)), NVIDIA)","webgpu":"google swiftshader","hardware":true}
+{"set":"angle-gl-egl","renderer":"ANGLE (NVIDIA Corporation, Tesla T4/PCIe/SSE2, OpenGL ES 3.2)","webgpu":"google swiftshader","hardware":true}
+node --experimental-strip-types scripts/crosstool/goslingbundle.ts
+
+  ../../../../tmp/goslingbundle-WVqGS9/gosling.js  10.0mb ⚠️
+
+⚡ Done in 477ms
+▲ [WARNING] This case clause will never be evaluated because it duplicates an earlier case clause [duplicate-case]
+
+    ../../../../tmp/goslingbundle-WVqGS9/gosling.js:68643:10:
+      68643 │           case 22:
+            ╵           ~~~~
+
+  The earlier case clause is here:
+
+    ../../../../tmp/goslingbundle-WVqGS9/gosling.js:68641:10:
+      68641 │           case 22:
+            ╵           ~~~~
+
+1 warning
+
+  crosstool/gosling.bundle.js  5.9mb ⚠️
+
+⚡ Done in 817ms
+▲ [WARNING] This case clause will never be evaluated because it duplicates an earlier case clause [duplicate-case]
+
+    ../../../../tmp/goslingbundle-WVqGS9/gosling-patched.js:68643:10:
+      68643 │           case 22:
+            ╵           ~~~~
+
+  The earlier case clause is here:
+
+    ../../../../tmp/goslingbundle-WVqGS9/gosling-patched.js:68641:10:
+      68641 │           case 22:
+            ╵           ~~~~
+
+1 warning
+
+  crosstool/gosling-patched.bundle.js  5.9mb ⚠️
+
+⚡ Done in 828ms
+crosstool/gosling.bundle.js  6.1 MB
+crosstool/gosling-patched.bundle.js  6.1 MB
+ ok   load average         0.99 (ceiling 4.0)
+ ok   agent sessions       0 (ceiling 2)
+ ok   free disk            37 GB
+ ok   alignment corpus     24 files
+ ok   ordinary-depth arms  16 files (10x, 30x)
+warn  variant corpus       absent — shell/generate_variants.sh
+warn  GFF3 corpus          absent — shell/generate_gff3.sh
+warn  cohort BigWigs       absent — shell/generate_cohort_bw.sh
+ ok   modBAM corpus        data/200x.longread.mod.bam
+ ok   wide-window corpus   data/2mb.100x.longread.bam
+warn  paper-2019 corpus    absent — shell/fetch_paper2019.sh
+ ok   mains power          on AC
+ ok   port 8000            release-5.0.0-beta.21
+ ok   port 8001            release-4.3.0
+ ok   port 8004            release-2.4.0
+ ok   port 8003            3 pages match crosstool/; 19kb corpus reachable; 1mb corpus reachable; 100kb-wide corpus reachable; 19kb-wide corpus reachable
+ ok   sweep builds         ecosystem/.libs/*/sweep
+
+all clear — a timing run taken now is worth keeping
