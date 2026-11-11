@@ -89,16 +89,6 @@ all$series <- factor(all$series, levels = PERF_SERIES)
 all$format <- factor(all$format, levels = c("BAM", "CRAM"))
 all$s <- all$ms / 1000
 
-runs <- read.csv("results/paper/perf-runs.csv", stringsAsFactors = FALSE)
-runs <- subset(runs, panel == "Cold load" & session == "cross-tool" &
-                     series %in% DRAWN & usable)
-runs$coverage <- as.numeric(sub("x .*", "", runs$case))
-runs$reads <- factor(sub("^[0-9]+x ", "", runs$case),
-                     levels = c("short read", "long read"))
-runs$series <- factor(runs$series, levels = PERF_SERIES)
-runs$format <- factor(runs$format, levels = c("BAM", "CRAM"))
-runs$s <- runs$ms / 1000
-
 # Every point carries its own duration, because a log axis is the right shape for
 # this data and the wrong thing to read a number off: its gridlines are a decade
 # apart, so a reader who wants to know what 200x actually cost has to interpolate
@@ -136,9 +126,9 @@ draw <- function(win, out, width_label,
   d <- subset(d, usable)
 
   # An arm abandoned at the paint ceiling knows only that it took LONGER than
-  # the ceiling, so it is drawn hollow, labelled with a ">", and left off the
-  # line: joining it to the curve would draw the bound as though it were the
-  # measurement.
+  # the ceiling, so it gets no marker, only a "timed out at" note naming its
+  # coverage, and is left off the line: joining it to the curve would draw the bound as though it
+  # were the measurement.
   meas <- subset(d, !censored)
 
   CELL <- c("reads", "format")
@@ -152,9 +142,8 @@ draw <- function(win, out, width_label,
 
   fig <- ggplot(d, aes(x = coverage, y = s, colour = series)) +
     geom_line(data = meas, linewidth = LINE_W) +
-    geom_point(data = meas, size = POINT_S) +
-    run_points(subset(runs, window == win)) +
-    geom_point(data = subset(d, censored), size = POINT_S, shape = 1) +
+    run_range(meas, width = 0.08 * diff(log10(range(cov_breaks)))) +
+    geom_point(data = meas, size = RANGE_POINT_S) +
     endpoint_repel(labels) +
     note +
     facet_grid(reads ~ format) +
@@ -204,8 +193,8 @@ draw("100kb", "perf-coldload-100kb", "100 kb")
 # same day measured CRAM beside it.
 #
 # 120 is a labelled break because the paint ceiling is 120 s and the arms that
-# hit it -- igv at 100x long read, GenomeSpy above 20x short read -- are drawn
-# as hollow points sitting on exactly that line.
+# hit it -- igv at 100x long read, GenomeSpy above 20x short read -- are
+# noted as timed out instead of drawn.
 draw("1mb", "perf-coldload-1mb", "1 Mb",
      cov_breaks = c(20, 100), cov_labels = c("20×", "100×"),
      time_breaks = c(1, 2, 5, 10, 20, 60, 120))
@@ -219,7 +208,7 @@ draw("1mb", "perf-coldload-1mb", "1 Mb",
 #   Cold load of a single alignment track: navigation to render-complete, median
 #   of three interleaved rounds in one session, over both container formats.
 #   Bold labels give that tool's time at its last coverage and how many times
-#   slower that is than this work at the same point. A hollow marker is a run
+#   slower that is than this work at the same point. "Timed out" marks a run
 #   abandoned at the paint ceiling -- a lower bound rather than a measurement,
-#   so it carries no runs. Small black dots are the individual runs.
+#   so it carries no marker and no bar. Bars span the fastest to the slowest run.
 #   GenomeSpy reads no CRAM, so it has no curve in the right-hand panels.

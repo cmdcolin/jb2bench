@@ -29,6 +29,7 @@ POINT_LABEL <- 10 / .pt
 ENDPOINT_LABEL <- 12 / .pt
 LINE_W <- 0.9
 POINT_S <- 2.3
+RANGE_POINT_S <- 1.2
 
 # Durations in the unit a person would say out loud -- 10 ms, 1 s, 1 min --
 # rather than a bare number a reader has to convert.
@@ -130,9 +131,10 @@ perf_colour_scale <- function(...) {
   scale_colour_manual(values = PERF_COLOURS, drop = FALSE, ...)
 }
 
-run_points <- function(runs) {
-  geom_point(data = runs, colour = "black", size = 0.8, alpha = 0.6,
-             show.legend = FALSE)
+run_range <- function(cells, width = 0.14) {
+  geom_errorbar(data = subset(cells, !is.na(lo)),
+                aes(ymin = lo / 1000, ymax = hi / 1000),
+                width = width, linewidth = 0.25, show.legend = FALSE)
 }
 
 # One type scale for every manuscript figure. The stock 11 pt base at 180 mm
@@ -211,7 +213,7 @@ curve_obstacles <- function(df, cell) {
 #' the comparator's bold verdict on its last one, and the curves as obstacles.
 #'
 #' `d` is every usable row including the ones abandoned at the paint ceiling,
-#' which get a ">" and no ratio; `meas` is the measured subset the curves are
+#' which get a "timed out at" note, no leader and no ratio; `meas` is the measured subset the curves are
 #' drawn from. Both figures that call this used to carry their own copy, and the
 #' copies had already diverged -- the combined one dropped the censored rows
 #' before labelling, so an abandoned run appeared as a curve that simply stopped.
@@ -223,7 +225,8 @@ coldload_labels <- function(d, meas, cell, reference) {
 
   labels <- rbind(
     label_rows(inner, cell,
-               ifelse(inner$censored, paste0(">", fmt_time(inner$s)),
+               ifelse(inner$censored,
+                      sprintf("timed out at %g\u00d7", inner$coverage),
                       fmt_time(inner$s)), "plain"),
     label_rows(ends, cell, ends$label, "bold"),
     curve_obstacles(meas, cell)
@@ -232,6 +235,7 @@ coldload_labels <- function(d, meas, cell, reference) {
                          ifelse(labels$label == "", 0, PLAIN_NUDGE))
   labels$nudge_y <- ifelse(labels$series == reference & labels$label != "",
                            REFERENCE_DROP, 0)
+  labels$leader <- ifelse(startsWith(labels$label, "timed out"), 0, 0.9)
   labels
 }
 
@@ -240,13 +244,14 @@ coldload_labels <- function(d, meas, cell, reference) {
 endpoint_repel <- function(labels) {
   list(
     ggrepel::geom_text_repel(
-      data = labels, aes(label = label, fontface = face, size = face),
+      data = labels, aes(label = label, fontface = face, size = face,
+                             segment.alpha = leader),
       nudge_x = labels$nudge, nudge_y = labels$nudge_y, lineheight = 0.9,
       seed = REPEL_SEED, show.legend = FALSE,
       box.padding = 0.38, point.padding = 0.2,
       force = 3, force_pull = 0.4,
       min.segment.length = 0.25, segment.size = 0.45,
-      segment.alpha = 0.9, max.overlaps = Inf,
+      max.overlaps = Inf,
       max.time = 5, max.iter = 60000),
     scale_size_manual(values = c(plain = POINT_LABEL, bold = ENDPOINT_LABEL),
                       guide = "none")

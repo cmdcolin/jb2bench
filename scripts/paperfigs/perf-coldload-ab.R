@@ -93,7 +93,7 @@ cat("wrote results/figures/paper/png/perf-coldload-ab.png\n")
 #   own 2 Mb contig, 20x-100x. Navigation to render-complete, median of three
 #   interleaved rounds in one session, by container format and read length.
 #   Bold labels give each tool's time at its last coverage and how many times
-#   slower that is than this work at the same point. A hollow marker is a run
+#   slower that is than this work at the same point. "Timed out" marks a run
 #   abandoned at the 120 s paint ceiling -- a lower bound, not a measurement.
 #   The two panels share a colour key but not an x axis: B's corpus carries
 #   20x and 100x where A's carries 20x, 200x and 1000x.
