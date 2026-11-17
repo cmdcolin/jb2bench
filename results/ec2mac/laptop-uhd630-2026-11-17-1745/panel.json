@@ -1,0 +1,1849 @@
+{
+  "build": "release-5.0.0-beta.21",
+  "port": 8000,
+  "runs": 5,
+  "warmup": 1,
+  "stamp": "2026-11-172245",
+  "host": {
+    "label": "laptop-uhd630",
+    "platform": "linux",
+    "arch": "x64",
+    "osRelease": "7.0.0-43-generic",
+    "macos": null,
+    "cpuModel": "Intel(R) Core(TM) i9-9880H CPU @ 2.30GHz",
+    "logicalCpus": 16,
+    "memGB": 30.6,
+    "gpu": null,
+    "chrome": "Chrome/148.0.7778.97",
+    "chromeAngle": "--use-angle=gl --use-gl=angle",
+    "node": "v24.22.1"
+  },
+  "summary": {
+    "cold-20x/webgl": {
+      "n": 5,
+      "median": 1196,
+      "mean": 2519.2,
+      "sd": 2752.2,
+      "min": 1051,
+      "max": 8021,
+      "rung": "webgl2",
+      "glRenderer": "ANGLE (Intel, Mesa Intel(R) UHD Graphics 630 (CFL GT2), OpenGL 4.6)",
+      "webgpuAdapter": "amd gcn-4",
+      "hardwareConcurrency": 16,
+      "refused": [],
+      "memory": {
+        "source": "proc",
+        "jsHeapUsedMB": 43.2,
+        "totalMB": 618.2,
+        "rendererMB": 305.7,
+        "gpuProcessMB": 121.2,
+        "gpuDeviceDeltaMB": null
+      }
+    },
+    "cold-20x/canvas2d": {
+      "n": 5,
+      "median": 1305,
+      "mean": 2085,
+      "sd": 1043,
+      "min": 1153,
+      "max": 3531,
+      "rung": "canvas2d",
+      "glRenderer": "ANGLE (Intel, Mesa Intel(R) UHD Graphics 630 (CFL GT2), OpenGL 4.6)",
+      "webgpuAdapter": "amd gcn-4",
+      "hardwareConcurrency": 16,
+      "refused": [],
+      "memory": {
+        "source": "proc",
+        "jsHeapUsedMB": 43.2,
+        "totalMB": 615.8,
+        "rendererMB": 320.6,
+        "gpuProcessMB": 103.8,
+        "gpuDeviceDeltaMB": null
+      }
+    },
+    "cold-1000x/webgl": {
+      "n": 5,
+      "median": 10814,
+      "mean": 11410,
+      "sd": 1139.5,
+      "min": 10739,
+      "max": 13680,
+      "rung": "webgl2",
+      "glRenderer": "ANGLE (Intel, Mesa Intel(R) UHD Graphics 630 (CFL GT2), OpenGL 4.6)",
+      "webgpuAdapter": "amd gcn-4",
+      "hardwareConcurrency": 16,
+      "refused": [],
+      "memory": {
+        "source": "proc",
+        "jsHeapUsedMB": 714.6,
+        "totalMB": 2814.8,
+        "rendererMB": 2348.7,
+        "gpuProcessMB": 216.9,
+        "gpuDeviceDeltaMB": null
+      }
+    },
+    "cold-1000x/canvas2d": {
+      "n": 5,
+      "median": 10448,
+      "mean": 11123,
+      "sd": 1383.9,
+      "min": 9911,
+      "max": 13675,
+      "rung": "canvas2d",
+      "glRenderer": "ANGLE (Intel, Mesa Intel(R) UHD Graphics 630 (CFL GT2), OpenGL 4.6)",
+      "webgpuAdapter": "amd gcn-4",
+      "hardwareConcurrency": 16,
+      "refused": [],
+      "memory": {
+        "source": "proc",
+        "jsHeapUsedMB": 714.3,
+        "totalMB": 2546.3,
+        "rendererMB": 2195.2,
+        "gpuProcessMB": 107.9,
+        "gpuDeviceDeltaMB": null
+      }
+    },
+    "zoom-200x/webgl": {
+      "n": 5,
+      "median": 33,
+      "mean": 33,
+      "sd": 2.9,
+      "min": 29.833984375,
+      "max": 37.22900390625,
+      "rung": "webgl2",
+      "glRenderer": "ANGLE (Intel, Mesa Intel(R) UHD Graphics 630 (CFL GT2), OpenGL 4.6)",
+      "webgpuAdapter": "amd gcn-4",
+      "hardwareConcurrency": 16,
+      "refused": [],
+      "memory": null
+    },
+    "zoom-200x/canvas2d": {
+      "n": 5,
+      "median": 115.8,
+      "mean": 112.8,
+      "sd": 8.3,
+      "min": 100.27587890625,
+      "max": 122.72998046875,
+      "rung": "canvas2d",
+      "glRenderer": "ANGLE (Intel, Mesa Intel(R) UHD Graphics 630 (CFL GT2), OpenGL 4.6)",
+      "webgpuAdapter": "amd gcn-4",
+      "hardwareConcurrency": 16,
+      "refused": [],
+      "memory": null
+    }
+  },
+  "raw": {
+    "cold-20x/webgl": [
+      {
+        "ms": 1056,
+        "counted": true,
+        "gpu": {
+          "chrome": "Chrome/148.0.7778.97",
+          "glRenderer": "ANGLE (Intel, Mesa Intel(R) UHD Graphics 630 (CFL GT2), OpenGL 4.6)",
+          "webgpuAdapter": "amd gcn-4",
+          "webgpuFallback": false,
+          "canvases": {
+            "webgpu": 0,
+            "webgl2": 1,
+            "canvas2d": 0,
+            "offscreen": 0
+          },
+          "hardwareConcurrency": 16,
+          "rung": "webgl2",
+          "glHardware": true,
+          "webgpuHardware": true,
+          "hardware": true
+        },
+        "memory": {
+          "jsHeap": {
+            "isolates": 6,
+            "usedMB": 43.22905731201172,
+            "totalMB": 72.9140625
+          },
+          "process": {
+            "source": "proc",
+            "byType": {
+              "browser": {
+                "count": 1,
+                "pssMB": 105.2294921875,
+                "rssMB": 203.19140625,
+                "peakRssMB": 206.15625
+              },
+              "zygote": {
+                "count": 2,
+                "pssMB": 29.1474609375,
+                "rssMB": 134.453125,
+                "peakRssMB": 134.453125
+              },
+              "utility": {
+                "count": 2,
+                "pssMB": 57.611328125,
+                "rssMB": 175.06640625,
+                "peakRssMB": 175.5703125
+              },
+              "gpu-process": {
+                "count": 1,
+                "pssMB": 121.1845703125,
+                "rssMB": 185.24609375,
+                "peakRssMB": 188.48046875
+              },
+              "renderer": {
+                "count": 3,
+                "pssMB": 306.296875,
+                "rssMB": 507.515625,
+                "peakRssMB": 507.515625
+              }
+            },
+            "totalPssMB": 619.4697265625
+          },
+          "gpuDevice": null
+        },
+        "load": [
+          1.65,
+          1.65
+        ]
+      },
+      {
+        "ms": 1051,
+        "counted": true,
+        "gpu": {
+          "chrome": "Chrome/148.0.7778.97",
+          "glRenderer": "ANGLE (Intel, Mesa Intel(R) UHD Graphics 630 (CFL GT2), OpenGL 4.6)",
+          "webgpuAdapter": "amd gcn-4",
+          "webgpuFallback": false,
+          "canvases": {
+            "webgpu": 0,
+            "webgl2": 1,
+            "canvas2d": 0,
+            "offscreen": 0
+          },
+          "hardwareConcurrency": 16,
+          "rung": "webgl2",
+          "glHardware": true,
+          "webgpuHardware": true,
+          "hardware": true
+        },
+        "memory": {
+          "jsHeap": {
+            "isolates": 6,
+            "usedMB": 43.47954177856445,
+            "totalMB": 74.4140625
+          },
+          "process": {
+            "source": "proc",
+            "byType": {
+              "browser": {
+                "count": 1,
+                "pssMB": 104.787109375,
+                "rssMB": 202.37109375,
+                "peakRssMB": 205.48828125
+              },
+              "zygote": {
+                "count": 2,
+                "pssMB": 29.255859375,
+                "rssMB": 134.7265625,
+                "peakRssMB": 134.76171875
+              },
+              "utility": {
+                "count": 2,
+                "pssMB": 57.34375,
+                "rssMB": 175.1484375,
+                "peakRssMB": 175.79296875
+              },
+              "gpu-process": {
+                "count": 1,
+                "pssMB": 121.2412109375,
+                "rssMB": 184.25390625,
+                "peakRssMB": 187.625
+              },
+              "renderer": {
+                "count": 3,
+                "pssMB": 302.8955078125,
+                "rssMB": 503.21875,
+                "peakRssMB": 503.21875
+              }
+            },
+            "totalPssMB": 615.5234375
+          },
+          "gpuDevice": null
+        },
+        "load": [
+          1.68,
+          1.68
+        ]
+      },
+      {
+        "ms": 1196,
+        "counted": true,
+        "gpu": {
+          "chrome": "Chrome/148.0.7778.97",
+          "glRenderer": "ANGLE (Intel, Mesa Intel(R) UHD Graphics 630 (CFL GT2), OpenGL 4.6)",
+          "webgpuAdapter": "amd gcn-4",
+          "webgpuFallback": false,
+          "canvases": {
+            "webgpu": 0,
+            "webgl2": 1,
+            "canvas2d": 0,
+            "offscreen": 0
+          },
+          "hardwareConcurrency": 16,
+          "rung": "webgl2",
+          "glHardware": true,
+          "webgpuHardware": true,
+          "hardware": true
+        },
+        "memory": {
+          "jsHeap": {
+            "isolates": 6,
+            "usedMB": 43.23578643798828,
+            "totalMB": 74.1640625
+          },
+          "process": {
+            "source": "proc",
+            "byType": {
+              "browser": {
+                "count": 1,
+                "pssMB": 104.4189453125,
+                "rssMB": 202.28515625,
+                "peakRssMB": 204.80078125
+              },
+              "zygote": {
+                "count": 2,
+                "pssMB": 29.3310546875,
+                "rssMB": 134.62109375,
+                "peakRssMB": 134.62109375
+              },
+              "utility": {
+                "count": 2,
+                "pssMB": 57.4609375,
+                "rssMB": 175.03515625,
+                "peakRssMB": 175.03515625
+              },
+              "gpu-process": {
+                "count": 1,
+                "pssMB": 121.349609375,
+                "rssMB": 185.4140625,
+                "peakRssMB": 187.48828125
+              },
+              "renderer": {
+                "count": 3,
+                "pssMB": 305.666015625,
+                "rssMB": 505.265625,
+                "peakRssMB": 505.265625
+              }
+            },
+            "totalPssMB": 618.2265625
+          },
+          "gpuDevice": null
+        },
+        "load": [
+          1.87,
+          1.87
+        ]
+      },
+      {
+        "ms": 1272,
+        "counted": true,
+        "gpu": {
+          "chrome": "Chrome/148.0.7778.97",
+          "glRenderer": "ANGLE (Intel, Mesa Intel(R) UHD Graphics 630 (CFL GT2), OpenGL 4.6)",
+          "webgpuAdapter": "amd gcn-4",
+          "webgpuFallback": false,
+          "canvases": {
+            "webgpu": 0,
+            "webgl2": 1,
+            "canvas2d": 0,
+            "offscreen": 0
+          },
+          "hardwareConcurrency": 16,
+          "rung": "webgl2",
+          "glHardware": true,
+          "webgpuHardware": true,
+          "hardware": true
+        },
+        "memory": {
+          "jsHeap": {
+            "isolates": 6,
+            "usedMB": 43.1872444152832,
+            "totalMB": 74.4140625
+          },
+          "process": {
+            "source": "proc",
+            "byType": {
+              "browser": {
+                "count": 1,
+                "pssMB": 103.615234375,
+                "rssMB": 201.8984375,
+                "peakRssMB": 204.40625
+              },
+              "zygote": {
+                "count": 2,
+                "pssMB": 29.45703125,
+                "rssMB": 136.41015625,
+                "peakRssMB": 136.41015625
+              },
+              "utility": {
+                "count": 2,
+                "pssMB": 56.8603515625,
+                "rssMB": 175.375,
+                "peakRssMB": 175.375
+              },
+              "gpu-process": {
+                "count": 1,
+                "pssMB": 121.6650390625,
+                "rssMB": 184.875,
+                "peakRssMB": 187.48828125
+              },
+              "renderer": {
+                "count": 3,
+                "pssMB": 304.8583984375,
+                "rssMB": 506.56640625,
+                "peakRssMB": 506.56640625
+              }
+            },
+            "totalPssMB": 616.4560546875
+          },
+          "gpuDevice": null
+        },
+        "load": [
+          2.04,
+          2.04
+        ]
+      },
+      {
+        "ms": 8021,
+        "counted": true,
+        "gpu": {
+          "chrome": "Chrome/148.0.7778.97",
+          "glRenderer": "ANGLE (Intel, Mesa Intel(R) UHD Graphics 630 (CFL GT2), OpenGL 4.6)",
+          "webgpuAdapter": "amd gcn-4",
+          "webgpuFallback": false,
+          "canvases": {
+            "webgpu": 0,
+            "webgl2": 1,
+            "canvas2d": 0,
+            "offscreen": 0
+          },
+          "hardwareConcurrency": 16,
+          "rung": "webgl2",
+          "glHardware": true,
+          "webgpuHardware": true,
+          "hardware": true
+        },
+        "memory": {
+          "jsHeap": {
+            "isolates": 6,
+            "usedMB": 45.45616912841797,
+            "totalMB": 73.6640625
+          },
+          "process": {
+            "source": "proc",
+            "byType": {
+              "browser": {
+                "count": 1,
+                "pssMB": 104.5546875,
+                "rssMB": 203.828125,
+                "peakRssMB": 206.40625
+              },
+              "zygote": {
+                "count": 2,
+                "pssMB": 28.677734375,
+                "rssMB": 136.90625,
+                "peakRssMB": 136.90625
+              },
+              "utility": {
+                "count": 2,
+                "pssMB": 56.0986328125,
+                "rssMB": 175.96484375,
+                "peakRssMB": 175.96484375
+              },
+              "gpu-process": {
+                "count": 1,
+                "pssMB": 120.6435546875,
+                "rssMB": 184.84375,
+                "peakRssMB": 188.109375
+              },
+              "renderer": {
+                "count": 4,
+                "pssMB": 316.46484375,
+                "rssMB": 575.36328125,
+                "peakRssMB": 575.36328125
+              }
+            },
+            "totalPssMB": 626.439453125
+          },
+          "gpuDevice": null
+        },
+        "load": [
+          8.84,
+          17.38
+        ]
+      }
+    ],
+    "cold-20x/canvas2d": [
+      {
+        "ms": 1153,
+        "counted": true,
+        "gpu": {
+          "chrome": "Chrome/148.0.7778.97",
+          "glRenderer": "ANGLE (Intel, Mesa Intel(R) UHD Graphics 630 (CFL GT2), OpenGL 4.6)",
+          "webgpuAdapter": "amd gcn-4",
+          "webgpuFallback": false,
+          "canvases": {
+            "webgpu": 0,
+            "webgl2": 0,
+            "canvas2d": 1,
+            "offscreen": 0
+          },
+          "hardwareConcurrency": 16,
+          "rung": "canvas2d",
+          "glHardware": true,
+          "webgpuHardware": true,
+          "hardware": null
+        },
+        "memory": {
+          "jsHeap": {
+            "isolates": 6,
+            "usedMB": 43.165775299072266,
+            "totalMB": 78.4140625
+          },
+          "process": {
+            "source": "proc",
+            "byType": {
+              "browser": {
+                "count": 1,
+                "pssMB": 105.1201171875,
+                "rssMB": 202.87109375,
+                "peakRssMB": 205.58984375
+              },
+              "zygote": {
+                "count": 2,
+                "pssMB": 29.3115234375,
+                "rssMB": 135.40625,
+                "peakRssMB": 135.40625
+              },
+              "utility": {
+                "count": 2,
+                "pssMB": 57.0732421875,
+                "rssMB": 176.08984375,
+                "peakRssMB": 176.48046875
+              },
+              "gpu-process": {
+                "count": 1,
+                "pssMB": 104.4150390625,
+                "rssMB": 167.20703125,
+                "peakRssMB": 170.98828125
+              },
+              "renderer": {
+                "count": 3,
+                "pssMB": 327.220703125,
+                "rssMB": 526.546875,
+                "peakRssMB": 526.546875
+              }
+            },
+            "totalPssMB": 623.140625
+          },
+          "gpuDevice": null
+        },
+        "load": [
+          1.65,
+          1.68
+        ]
+      },
+      {
+        "ms": 1260,
+        "counted": true,
+        "gpu": {
+          "chrome": "Chrome/148.0.7778.97",
+          "glRenderer": "ANGLE (Intel, Mesa Intel(R) UHD Graphics 630 (CFL GT2), OpenGL 4.6)",
+          "webgpuAdapter": "amd gcn-4",
+          "webgpuFallback": false,
+          "canvases": {
+            "webgpu": 0,
+            "webgl2": 0,
+            "canvas2d": 1,
+            "offscreen": 0
+          },
+          "hardwareConcurrency": 16,
+          "rung": "canvas2d",
+          "glHardware": true,
+          "webgpuHardware": true,
+          "hardware": null
+        },
+        "memory": {
+          "jsHeap": {
+            "isolates": 6,
+            "usedMB": 43.68181228637695,
+            "totalMB": 79.1640625
+          },
+          "process": {
+            "source": "proc",
+            "byType": {
+              "browser": {
+                "count": 1,
+                "pssMB": 104.7265625,
+                "rssMB": 202.50390625,
+                "peakRssMB": 205.44140625
+              },
+              "zygote": {
+                "count": 2,
+                "pssMB": 29.169921875,
+                "rssMB": 135.28515625,
+                "peakRssMB": 135.8125
+              },
+              "utility": {
+                "count": 2,
+                "pssMB": 57.64453125,
+                "rssMB": 175.71875,
+                "peakRssMB": 175.71875
+              },
+              "gpu-process": {
+                "count": 1,
+                "pssMB": 103.755859375,
+                "rssMB": 166.375,
+                "peakRssMB": 168.8984375
+              },
+              "renderer": {
+                "count": 3,
+                "pssMB": 325.5810546875,
+                "rssMB": 525.3671875,
+                "peakRssMB": 525.3671875
+              }
+            },
+            "totalPssMB": 620.8779296875
+          },
+          "gpuDevice": null
+        },
+        "load": [
+          1.68,
+          1.87
+        ]
+      },
+      {
+        "ms": 1305,
+        "counted": true,
+        "gpu": {
+          "chrome": "Chrome/148.0.7778.97",
+          "glRenderer": "ANGLE (Intel, Mesa Intel(R) UHD Graphics 630 (CFL GT2), OpenGL 4.6)",
+          "webgpuAdapter": "amd gcn-4",
+          "webgpuFallback": false,
+          "canvases": {
+            "webgpu": 0,
+            "webgl2": 0,
+            "canvas2d": 1,
+            "offscreen": 0
+          },
+          "hardwareConcurrency": 16,
+          "rung": "canvas2d",
+          "glHardware": true,
+          "webgpuHardware": true,
+          "hardware": null
+        },
+        "memory": {
+          "jsHeap": {
+            "isolates": 6,
+            "usedMB": 44.40894317626953,
+            "totalMB": 79.6640625
+          },
+          "process": {
+            "source": "proc",
+            "byType": {
+              "browser": {
+                "count": 1,
+                "pssMB": 104.6689453125,
+                "rssMB": 202.36328125,
+                "peakRssMB": 204.953125
+              },
+              "zygote": {
+                "count": 2,
+                "pssMB": 29.345703125,
+                "rssMB": 136.2109375,
+                "peakRssMB": 136.2109375
+              },
+              "utility": {
+                "count": 2,
+                "pssMB": 57.19921875,
+                "rssMB": 175.5234375,
+                "peakRssMB": 175.5234375
+              },
+              "gpu-process": {
+                "count": 1,
+                "pssMB": 103.98046875,
+                "rssMB": 166.578125,
+                "peakRssMB": 169.1953125
+              },
+              "renderer": {
+                "count": 3,
+                "pssMB": 320.6259765625,
+                "rssMB": 520.55859375,
+                "peakRssMB": 520.55859375
+              }
+            },
+            "totalPssMB": 615.8203125
+          },
+          "gpuDevice": null
+        },
+        "load": [
+          1.87,
+          2.04
+        ]
+      },
+      {
+        "ms": 3531,
+        "counted": true,
+        "gpu": {
+          "chrome": "Chrome/148.0.7778.97",
+          "glRenderer": "ANGLE (Intel, Mesa Intel(R) UHD Graphics 630 (CFL GT2), OpenGL 4.6)",
+          "webgpuAdapter": "amd gcn-4",
+          "webgpuFallback": false,
+          "canvases": {
+            "webgpu": 0,
+            "webgl2": 0,
+            "canvas2d": 1,
+            "offscreen": 0
+          },
+          "hardwareConcurrency": 16,
+          "rung": "canvas2d",
+          "glHardware": true,
+          "webgpuHardware": true,
+          "hardware": null
+        },
+        "memory": {
+          "jsHeap": {
+            "isolates": 6,
+            "usedMB": 43.19468688964844,
+            "totalMB": 78.1640625
+          },
+          "process": {
+            "source": "proc",
+            "byType": {
+              "browser": {
+                "count": 1,
+                "pssMB": 101.8271484375,
+                "rssMB": 200.0546875,
+                "peakRssMB": 205.69140625
+              },
+              "zygote": {
+                "count": 2,
+                "pssMB": 29.388671875,
+                "rssMB": 136.1328125,
+                "peakRssMB": 136.1328125
+              },
+              "utility": {
+                "count": 2,
+                "pssMB": 57.498046875,
+                "rssMB": 174.6015625,
+                "peakRssMB": 174.6015625
+              },
+              "gpu-process": {
+                "count": 1,
+                "pssMB": 103.76171875,
+                "rssMB": 166.015625,
+                "peakRssMB": 170.00390625
+              },
+              "renderer": {
+                "count": 3,
+                "pssMB": 316.2197265625,
+                "rssMB": 515.43359375,
+                "peakRssMB": 515.43359375
+              }
+            },
+            "totalPssMB": 608.6953125
+          },
+          "gpuDevice": null
+        },
+        "load": [
+          2.04,
+          8.84
+        ]
+      },
+      {
+        "ms": 3176,
+        "counted": true,
+        "gpu": {
+          "chrome": "Chrome/148.0.7778.97",
+          "glRenderer": "ANGLE (Intel, Mesa Intel(R) UHD Graphics 630 (CFL GT2), OpenGL 4.6)",
+          "webgpuAdapter": "amd gcn-4",
+          "webgpuFallback": false,
+          "canvases": {
+            "webgpu": 0,
+            "webgl2": 0,
+            "canvas2d": 1,
+            "offscreen": 0
+          },
+          "hardwareConcurrency": 16,
+          "rung": "canvas2d",
+          "glHardware": true,
+          "webgpuHardware": true,
+          "hardware": null
+        },
+        "memory": {
+          "jsHeap": {
+            "isolates": 6,
+            "usedMB": 41.4227180480957,
+            "totalMB": 78.1640625
+          },
+          "process": {
+            "source": "proc",
+            "byType": {
+              "browser": {
+                "count": 1,
+                "pssMB": 104.7294921875,
+                "rssMB": 202.17578125,
+                "peakRssMB": 204.71875
+              },
+              "zygote": {
+                "count": 2,
+                "pssMB": 29.1630859375,
+                "rssMB": 137.0234375,
+                "peakRssMB": 137.0234375
+              },
+              "utility": {
+                "count": 2,
+                "pssMB": 56.6533203125,
+                "rssMB": 175.75,
+                "peakRssMB": 175.75
+              },
+              "gpu-process": {
+                "count": 1,
+                "pssMB": 103.505859375,
+                "rssMB": 166.5078125,
+                "peakRssMB": 170.15234375
+              },
+              "renderer": {
+                "count": 3,
+                "pssMB": 318.9296875,
+                "rssMB": 518.53515625,
+                "peakRssMB": 518.53515625
+              }
+            },
+            "totalPssMB": 612.9814453125
+          },
+          "gpuDevice": null
+        },
+        "load": [
+          17.38,
+          18.79
+        ]
+      }
+    ],
+    "cold-1000x/webgl": [
+      {
+        "ms": 10785,
+        "counted": true,
+        "gpu": {
+          "chrome": "Chrome/148.0.7778.97",
+          "glRenderer": "ANGLE (Intel, Mesa Intel(R) UHD Graphics 630 (CFL GT2), OpenGL 4.6)",
+          "webgpuAdapter": "amd gcn-4",
+          "webgpuFallback": false,
+          "canvases": {
+            "webgpu": 0,
+            "webgl2": 1,
+            "canvas2d": 0,
+            "offscreen": 0
+          },
+          "hardwareConcurrency": 16,
+          "rung": "webgl2",
+          "glHardware": true,
+          "webgpuHardware": true,
+          "hardware": true
+        },
+        "memory": {
+          "jsHeap": {
+            "isolates": 6,
+            "usedMB": 655.7766799926758,
+            "totalMB": 737.55859375
+          },
+          "process": {
+            "source": "proc",
+            "byType": {
+              "browser": {
+                "count": 1,
+                "pssMB": 102.03515625,
+                "rssMB": 201.0546875,
+                "peakRssMB": 205.23828125
+              },
+              "zygote": {
+                "count": 2,
+                "pssMB": 28.2861328125,
+                "rssMB": 135.7890625,
+                "peakRssMB": 135.7890625
+              },
+              "utility": {
+                "count": 2,
+                "pssMB": 64.3701171875,
+                "rssMB": 183.71875,
+                "peakRssMB": 232.5546875
+              },
+              "gpu-process": {
+                "count": 1,
+                "pssMB": 216.939453125,
+                "rssMB": 290.83984375,
+                "peakRssMB": 308.1796875
+              },
+              "renderer": {
+                "count": 4,
+                "pssMB": 2309.6484375,
+                "rssMB": 2575.4765625,
+                "peakRssMB": 2632.96484375
+              }
+            },
+            "totalPssMB": 2721.279296875
+          },
+          "gpuDevice": null
+        },
+        "load": [
+          17.42,
+          16.25
+        ]
+      },
+      {
+        "ms": 10739,
+        "counted": true,
+        "gpu": {
+          "chrome": "Chrome/148.0.7778.97",
+          "glRenderer": "ANGLE (Intel, Mesa Intel(R) UHD Graphics 630 (CFL GT2), OpenGL 4.6)",
+          "webgpuAdapter": "amd gcn-4",
+          "webgpuFallback": false,
+          "canvases": {
+            "webgpu": 0,
+            "webgl2": 1,
+            "canvas2d": 0,
+            "offscreen": 0
+          },
+          "hardwareConcurrency": 16,
+          "rung": "webgl2",
+          "glHardware": true,
+          "webgpuHardware": true,
+          "hardware": true
+        },
+        "memory": {
+          "jsHeap": {
+            "isolates": 6,
+            "usedMB": 714.6443405151367,
+            "totalMB": 792.90234375
+          },
+          "process": {
+            "source": "proc",
+            "byType": {
+              "browser": {
+                "count": 1,
+                "pssMB": 102.6708984375,
+                "rssMB": 201.87890625,
+                "peakRssMB": 205.59765625
+              },
+              "zygote": {
+                "count": 2,
+                "pssMB": 28.5458984375,
+                "rssMB": 136.97265625,
+                "peakRssMB": 136.97265625
+              },
+              "utility": {
+                "count": 2,
+                "pssMB": 117.7275390625,
+                "rssMB": 237.6953125,
+                "peakRssMB": 237.6953125
+              },
+              "gpu-process": {
+                "count": 1,
+                "pssMB": 217.177734375,
+                "rssMB": 291.63671875,
+                "peakRssMB": 309.21875
+              },
+              "renderer": {
+                "count": 4,
+                "pssMB": 2348.7236328125,
+                "rssMB": 2615.11328125,
+                "peakRssMB": 2666.83984375
+              }
+            },
+            "totalPssMB": 2814.845703125
+          },
+          "gpuDevice": null
+        },
+        "load": [
+          16.02,
+          15
+        ]
+      },
+      {
+        "ms": 13680,
+        "counted": true,
+        "gpu": {
+          "chrome": "Chrome/148.0.7778.97",
+          "glRenderer": "ANGLE (Intel, Mesa Intel(R) UHD Graphics 630 (CFL GT2), OpenGL 4.6)",
+          "webgpuAdapter": "amd gcn-4",
+          "webgpuFallback": false,
+          "canvases": {
+            "webgpu": 0,
+            "webgl2": 1,
+            "canvas2d": 0,
+            "offscreen": 0
+          },
+          "hardwareConcurrency": 16,
+          "rung": "webgl2",
+          "glHardware": true,
+          "webgpuHardware": true,
+          "hardware": true
+        },
+        "memory": {
+          "jsHeap": {
+            "isolates": 6,
+            "usedMB": 655.799243927002,
+            "totalMB": 738.30859375
+          },
+          "process": {
+            "source": "proc",
+            "byType": {
+              "browser": {
+                "count": 1,
+                "pssMB": 97.69140625,
+                "rssMB": 196.765625,
+                "peakRssMB": 202.73828125
+              },
+              "zygote": {
+                "count": 2,
+                "pssMB": 28.376953125,
+                "rssMB": 136.2578125,
+                "peakRssMB": 136.2578125
+              },
+              "utility": {
+                "count": 2,
+                "pssMB": 95.84765625,
+                "rssMB": 214.72265625,
+                "peakRssMB": 243.8515625
+              },
+              "gpu-process": {
+                "count": 1,
+                "pssMB": 216.3134765625,
+                "rssMB": 290.46484375,
+                "peakRssMB": 308.11328125
+              },
+              "renderer": {
+                "count": 4,
+                "pssMB": 2201.7109375,
+                "rssMB": 2467.6484375,
+                "peakRssMB": 2576.43359375
+              }
+            },
+            "totalPssMB": 2639.9404296875
+          },
+          "gpuDevice": null
+        },
+        "load": [
+          19.36,
+          18.39
+        ]
+      },
+      {
+        "ms": 10814,
+        "counted": true,
+        "gpu": {
+          "chrome": "Chrome/148.0.7778.97",
+          "glRenderer": "ANGLE (Intel, Mesa Intel(R) UHD Graphics 630 (CFL GT2), OpenGL 4.6)",
+          "webgpuAdapter": "amd gcn-4",
+          "webgpuFallback": false,
+          "canvases": {
+            "webgpu": 0,
+            "webgl2": 1,
+            "canvas2d": 0,
+            "offscreen": 0
+          },
+          "hardwareConcurrency": 16,
+          "rung": "webgl2",
+          "glHardware": true,
+          "webgpuHardware": true,
+          "hardware": true
+        },
+        "memory": {
+          "jsHeap": {
+            "isolates": 6,
+            "usedMB": 739.0997657775879,
+            "totalMB": 817.12890625
+          },
+          "process": {
+            "source": "proc",
+            "byType": {
+              "browser": {
+                "count": 1,
+                "pssMB": 101.30859375,
+                "rssMB": 201.05078125,
+                "peakRssMB": 205.0546875
+              },
+              "zygote": {
+                "count": 2,
+                "pssMB": 28.4697265625,
+                "rssMB": 135.12109375,
+                "peakRssMB": 135.12109375
+              },
+              "utility": {
+                "count": 2,
+                "pssMB": 118.7109375,
+                "rssMB": 239.015625,
+                "peakRssMB": 239.015625
+              },
+              "gpu-process": {
+                "count": 1,
+                "pssMB": 217.0185546875,
+                "rssMB": 291.27734375,
+                "peakRssMB": 308.7734375
+              },
+              "renderer": {
+                "count": 4,
+                "pssMB": 2370.201171875,
+                "rssMB": 2636.6640625,
+                "peakRssMB": 2694.57421875
+              }
+            },
+            "totalPssMB": 2835.708984375
+          },
+          "gpuDevice": null
+        },
+        "load": [
+          19.17,
+          17.53
+        ]
+      },
+      {
+        "ms": 11032,
+        "counted": true,
+        "gpu": {
+          "chrome": "Chrome/148.0.7778.97",
+          "glRenderer": "ANGLE (Intel, Mesa Intel(R) UHD Graphics 630 (CFL GT2), OpenGL 4.6)",
+          "webgpuAdapter": "amd gcn-4",
+          "webgpuFallback": false,
+          "canvases": {
+            "webgpu": 0,
+            "webgl2": 1,
+            "canvas2d": 0,
+            "offscreen": 0
+          },
+          "hardwareConcurrency": 16,
+          "rung": "webgl2",
+          "glHardware": true,
+          "webgpuHardware": true,
+          "hardware": true
+        },
+        "memory": {
+          "jsHeap": {
+            "isolates": 6,
+            "usedMB": 815.3078231811523,
+            "totalMB": 904.6171875
+          },
+          "process": {
+            "source": "proc",
+            "byType": {
+              "browser": {
+                "count": 1,
+                "pssMB": 101.533203125,
+                "rssMB": 200.55078125,
+                "peakRssMB": 204.625
+              },
+              "zygote": {
+                "count": 2,
+                "pssMB": 28.01171875,
+                "rssMB": 135.1484375,
+                "peakRssMB": 135.765625
+              },
+              "utility": {
+                "count": 2,
+                "pssMB": 115.49609375,
+                "rssMB": 235.70703125,
+                "peakRssMB": 235.828125
+              },
+              "gpu-process": {
+                "count": 1,
+                "pssMB": 216.44140625,
+                "rssMB": 291.04296875,
+                "peakRssMB": 308.48828125
+              },
+              "renderer": {
+                "count": 4,
+                "pssMB": 2457.306640625,
+                "rssMB": 2723.265625,
+                "peakRssMB": 2765.11328125
+              }
+            },
+            "totalPssMB": 2918.7890625
+          },
+          "gpuDevice": null
+        },
+        "load": [
+          17,
+          16.76
+        ]
+      }
+    ],
+    "cold-1000x/canvas2d": [
+      {
+        "ms": 10448,
+        "counted": true,
+        "gpu": {
+          "chrome": "Chrome/148.0.7778.97",
+          "glRenderer": "ANGLE (Intel, Mesa Intel(R) UHD Graphics 630 (CFL GT2), OpenGL 4.6)",
+          "webgpuAdapter": "amd gcn-4",
+          "webgpuFallback": false,
+          "canvases": {
+            "webgpu": 0,
+            "webgl2": 0,
+            "canvas2d": 1,
+            "offscreen": 0
+          },
+          "hardwareConcurrency": 16,
+          "rung": "canvas2d",
+          "glHardware": true,
+          "webgpuHardware": true,
+          "hardware": null
+        },
+        "memory": {
+          "jsHeap": {
+            "isolates": 6,
+            "usedMB": 699.3798179626465,
+            "totalMB": 787.74609375
+          },
+          "process": {
+            "source": "proc",
+            "byType": {
+              "browser": {
+                "count": 1,
+                "pssMB": 102.5224609375,
+                "rssMB": 201.046875,
+                "peakRssMB": 205.27734375
+              },
+              "zygote": {
+                "count": 2,
+                "pssMB": 28.6279296875,
+                "rssMB": 136.07421875,
+                "peakRssMB": 136.07421875
+              },
+              "utility": {
+                "count": 2,
+                "pssMB": 117.498046875,
+                "rssMB": 237.109375,
+                "peakRssMB": 237.109375
+              },
+              "gpu-process": {
+                "count": 1,
+                "pssMB": 107.783203125,
+                "rssMB": 176.74609375,
+                "peakRssMB": 181.21875
+              },
+              "renderer": {
+                "count": 4,
+                "pssMB": 2189.8427734375,
+                "rssMB": 2452.55859375,
+                "peakRssMB": 2516.5546875
+              }
+            },
+            "totalPssMB": 2546.2744140625
+          },
+          "gpuDevice": null
+        },
+        "load": [
+          16.25,
+          16.02
+        ]
+      },
+      {
+        "ms": 13675,
+        "counted": true,
+        "gpu": {
+          "chrome": "Chrome/148.0.7778.97",
+          "glRenderer": "ANGLE (Intel, Mesa Intel(R) UHD Graphics 630 (CFL GT2), OpenGL 4.6)",
+          "webgpuAdapter": "amd gcn-4",
+          "webgpuFallback": false,
+          "canvases": {
+            "webgpu": 0,
+            "webgl2": 0,
+            "canvas2d": 1,
+            "offscreen": 0
+          },
+          "hardwareConcurrency": 16,
+          "rung": "canvas2d",
+          "glHardware": true,
+          "webgpuHardware": true,
+          "hardware": null
+        },
+        "memory": {
+          "jsHeap": {
+            "isolates": 6,
+            "usedMB": 658.5195770263672,
+            "totalMB": 751.05859375
+          },
+          "process": {
+            "source": "proc",
+            "byType": {
+              "browser": {
+                "count": 1,
+                "pssMB": 101.1611328125,
+                "rssMB": 199.44921875,
+                "peakRssMB": 204.65625
+              },
+              "zygote": {
+                "count": 2,
+                "pssMB": 28.1201171875,
+                "rssMB": 134.55859375,
+                "peakRssMB": 136.47265625
+              },
+              "utility": {
+                "count": 2,
+                "pssMB": 95.7744140625,
+                "rssMB": 215.21484375,
+                "peakRssMB": 243.8125
+              },
+              "gpu-process": {
+                "count": 1,
+                "pssMB": 106.537109375,
+                "rssMB": 175.6015625,
+                "peakRssMB": 180.5
+              },
+              "renderer": {
+                "count": 4,
+                "pssMB": 2060.3935546875,
+                "rssMB": 2324.02734375,
+                "peakRssMB": 2578.20703125
+              }
+            },
+            "totalPssMB": 2391.986328125
+          },
+          "gpuDevice": null
+        },
+        "load": [
+          15,
+          19.36
+        ]
+      },
+      {
+        "ms": 11468,
+        "counted": true,
+        "gpu": {
+          "chrome": "Chrome/148.0.7778.97",
+          "glRenderer": "ANGLE (Intel, Mesa Intel(R) UHD Graphics 630 (CFL GT2), OpenGL 4.6)",
+          "webgpuAdapter": "amd gcn-4",
+          "webgpuFallback": false,
+          "canvases": {
+            "webgpu": 0,
+            "webgl2": 0,
+            "canvas2d": 1,
+            "offscreen": 0
+          },
+          "hardwareConcurrency": 16,
+          "rung": "canvas2d",
+          "glHardware": true,
+          "webgpuHardware": true,
+          "hardware": null
+        },
+        "memory": {
+          "jsHeap": {
+            "isolates": 6,
+            "usedMB": 714.2942810058594,
+            "totalMB": 793.21484375
+          },
+          "process": {
+            "source": "proc",
+            "byType": {
+              "browser": {
+                "count": 1,
+                "pssMB": 101.677734375,
+                "rssMB": 200.65234375,
+                "peakRssMB": 205.390625
+              },
+              "zygote": {
+                "count": 2,
+                "pssMB": 28.6015625,
+                "rssMB": 136.59765625,
+                "peakRssMB": 136.59765625
+              },
+              "utility": {
+                "count": 2,
+                "pssMB": 124.419921875,
+                "rssMB": 245.48828125,
+                "peakRssMB": 245.56640625
+              },
+              "gpu-process": {
+                "count": 1,
+                "pssMB": 108.4384765625,
+                "rssMB": 177.04296875,
+                "peakRssMB": 180.921875
+              },
+              "renderer": {
+                "count": 4,
+                "pssMB": 2195.21875,
+                "rssMB": 2457.8515625,
+                "peakRssMB": 2524.2109375
+              }
+            },
+            "totalPssMB": 2558.3564453125
+          },
+          "gpuDevice": null
+        },
+        "load": [
+          18.39,
+          19.17
+        ]
+      },
+      {
+        "ms": 9911,
+        "counted": true,
+        "gpu": {
+          "chrome": "Chrome/148.0.7778.97",
+          "glRenderer": "ANGLE (Intel, Mesa Intel(R) UHD Graphics 630 (CFL GT2), OpenGL 4.6)",
+          "webgpuAdapter": "amd gcn-4",
+          "webgpuFallback": false,
+          "canvases": {
+            "webgpu": 0,
+            "webgl2": 0,
+            "canvas2d": 1,
+            "offscreen": 0
+          },
+          "hardwareConcurrency": 16,
+          "rung": "canvas2d",
+          "glHardware": true,
+          "webgpuHardware": true,
+          "hardware": null
+        },
+        "memory": {
+          "jsHeap": {
+            "isolates": 6,
+            "usedMB": 719.206714630127,
+            "totalMB": 806.90234375
+          },
+          "process": {
+            "source": "proc",
+            "byType": {
+              "browser": {
+                "count": 1,
+                "pssMB": 98.7236328125,
+                "rssMB": 198.01953125,
+                "peakRssMB": 204.47265625
+              },
+              "zygote": {
+                "count": 2,
+                "pssMB": 28.4306640625,
+                "rssMB": 136.44921875,
+                "peakRssMB": 136.44921875
+              },
+              "utility": {
+                "count": 2,
+                "pssMB": 125.513671875,
+                "rssMB": 245.328125,
+                "peakRssMB": 245.328125
+              },
+              "gpu-process": {
+                "count": 1,
+                "pssMB": 108.068359375,
+                "rssMB": 177.703125,
+                "peakRssMB": 181.8203125
+              },
+              "renderer": {
+                "count": 4,
+                "pssMB": 2213.361328125,
+                "rssMB": 2476.23046875,
+                "peakRssMB": 2532.75390625
+              }
+            },
+            "totalPssMB": 2574.09765625
+          },
+          "gpuDevice": null
+        },
+        "load": [
+          17.53,
+          17
+        ]
+      },
+      {
+        "ms": 10113,
+        "counted": true,
+        "gpu": {
+          "chrome": "Chrome/148.0.7778.97",
+          "glRenderer": "ANGLE (Intel, Mesa Intel(R) UHD Graphics 630 (CFL GT2), OpenGL 4.6)",
+          "webgpuAdapter": "amd gcn-4",
+          "webgpuFallback": false,
+          "canvases": {
+            "webgpu": 0,
+            "webgl2": 0,
+            "canvas2d": 1,
+            "offscreen": 0
+          },
+          "hardwareConcurrency": 16,
+          "rung": "canvas2d",
+          "glHardware": true,
+          "webgpuHardware": true,
+          "hardware": null
+        },
+        "memory": {
+          "jsHeap": {
+            "isolates": 6,
+            "usedMB": 720.1018409729004,
+            "totalMB": 808.90234375
+          },
+          "process": {
+            "source": "proc",
+            "byType": {
+              "browser": {
+                "count": 1,
+                "pssMB": 99.404296875,
+                "rssMB": 197.859375,
+                "peakRssMB": 204.9453125
+              },
+              "zygote": {
+                "count": 2,
+                "pssMB": 28.48046875,
+                "rssMB": 136.10546875,
+                "peakRssMB": 136.10546875
+              },
+              "utility": {
+                "count": 2,
+                "pssMB": 88.7568359375,
+                "rssMB": 208.140625,
+                "peakRssMB": 236.04296875
+              },
+              "gpu-process": {
+                "count": 1,
+                "pssMB": 107.89453125,
+                "rssMB": 177.921875,
+                "peakRssMB": 182.2578125
+              },
+              "renderer": {
+                "count": 4,
+                "pssMB": 2214.5302734375,
+                "rssMB": 2478.78515625,
+                "peakRssMB": 2527.40625
+              }
+            },
+            "totalPssMB": 2539.06640625
+          },
+          "gpuDevice": null
+        },
+        "load": [
+          16.76,
+          15.9
+        ]
+      }
+    ],
+    "zoom-200x/webgl": [
+      {
+        "ms": 29.833984375,
+        "counted": true,
+        "gpu": {
+          "glRenderer": "ANGLE (Intel, Mesa Intel(R) UHD Graphics 630 (CFL GT2), OpenGL 4.6)",
+          "webgpuAdapter": "amd gcn-4",
+          "webgpuFallback": false,
+          "canvases": {
+            "webgpu": 0,
+            "webgl2": 1,
+            "canvas2d": 0,
+            "offscreen": 0
+          },
+          "hardwareConcurrency": 16,
+          "rung": "webgl2",
+          "glHardware": true,
+          "webgpuHardware": true,
+          "hardware": true
+        },
+        "steps": [
+          36.13916015625,
+          30.3740234375,
+          22.6728515625,
+          26.5390625,
+          29.833984375
+        ],
+        "drawClockMs": 2.199999988079071,
+        "load": [
+          11.17,
+          9.93
+        ]
+      },
+      {
+        "ms": 30.080078125,
+        "counted": true,
+        "gpu": {
+          "glRenderer": "ANGLE (Intel, Mesa Intel(R) UHD Graphics 630 (CFL GT2), OpenGL 4.6)",
+          "webgpuAdapter": "amd gcn-4",
+          "webgpuFallback": false,
+          "canvases": {
+            "webgpu": 0,
+            "webgl2": 1,
+            "canvas2d": 0,
+            "offscreen": 0
+          },
+          "hardwareConcurrency": 16,
+          "rung": "webgl2",
+          "glHardware": true,
+          "webgpuHardware": true,
+          "hardware": true
+        },
+        "steps": [
+          55.800048828125,
+          29.72900390625,
+          30.080078125,
+          31.89599609375,
+          29.822998046875
+        ],
+        "drawClockMs": 2.300000011920929,
+        "load": [
+          9.33,
+          8.21
+        ]
+      },
+      {
+        "ms": 37.22900390625,
+        "counted": true,
+        "gpu": {
+          "glRenderer": "ANGLE (Intel, Mesa Intel(R) UHD Graphics 630 (CFL GT2), OpenGL 4.6)",
+          "webgpuAdapter": "amd gcn-4",
+          "webgpuFallback": false,
+          "canvases": {
+            "webgpu": 0,
+            "webgl2": 1,
+            "canvas2d": 0,
+            "offscreen": 0
+          },
+          "hardwareConcurrency": 16,
+          "rung": "webgl2",
+          "glHardware": true,
+          "webgpuHardware": true,
+          "hardware": true
+        },
+        "steps": [
+          37.22900390625,
+          50.712890625,
+          34.53515625,
+          56.14794921875,
+          24.5068359375
+        ],
+        "drawClockMs": 4.299999952316284,
+        "load": [
+          6.86,
+          6.25
+        ]
+      },
+      {
+        "ms": 35.128173828125,
+        "counted": true,
+        "gpu": {
+          "glRenderer": "ANGLE (Intel, Mesa Intel(R) UHD Graphics 630 (CFL GT2), OpenGL 4.6)",
+          "webgpuAdapter": "amd gcn-4",
+          "webgpuFallback": false,
+          "canvases": {
+            "webgpu": 0,
+            "webgl2": 1,
+            "canvas2d": 0,
+            "offscreen": 0
+          },
+          "hardwareConcurrency": 16,
+          "rung": "webgl2",
+          "glHardware": true,
+          "webgpuHardware": true,
+          "hardware": true
+        },
+        "steps": [
+          60.93798828125,
+          35.06787109375,
+          47.410888671875,
+          35.128173828125,
+          31.62890625
+        ],
+        "drawClockMs": 2.5,
+        "load": [
+          8.19,
+          6.94
+        ]
+      },
+      {
+        "ms": 32.95703125,
+        "counted": true,
+        "gpu": {
+          "glRenderer": "ANGLE (Intel, Mesa Intel(R) UHD Graphics 630 (CFL GT2), OpenGL 4.6)",
+          "webgpuAdapter": "amd gcn-4",
+          "webgpuFallback": false,
+          "canvases": {
+            "webgpu": 0,
+            "webgl2": 1,
+            "canvas2d": 0,
+            "offscreen": 0
+          },
+          "hardwareConcurrency": 16,
+          "rung": "webgl2",
+          "glHardware": true,
+          "webgpuHardware": true,
+          "hardware": true
+        },
+        "steps": [
+          37.40087890625,
+          29.912109375,
+          32.95703125,
+          31.592041015625,
+          48.971923828125
+        ],
+        "drawClockMs": 2.899999976158142,
+        "load": [
+          5.72,
+          4.91
+        ]
+      }
+    ],
+    "zoom-200x/canvas2d": [
+      {
+        "ms": 119.0849609375,
+        "counted": true,
+        "gpu": {
+          "glRenderer": "ANGLE (Intel, Mesa Intel(R) UHD Graphics 630 (CFL GT2), OpenGL 4.6)",
+          "webgpuAdapter": "amd gcn-4",
+          "webgpuFallback": false,
+          "canvases": {
+            "webgpu": 0,
+            "webgl2": 0,
+            "canvas2d": 1,
+            "offscreen": 0
+          },
+          "hardwareConcurrency": 16,
+          "rung": "canvas2d",
+          "glHardware": true,
+          "webgpuHardware": true,
+          "hardware": null
+        },
+        "steps": [
+          159.174072265625,
+          139.98095703125,
+          101.199951171875,
+          119.0849609375,
+          80.01318359375
+        ],
+        "drawClockMs": 85.30000001192093,
+        "load": [
+          9.93,
+          9.33
+        ]
+      },
+      {
+        "ms": 115.77099609375,
+        "counted": true,
+        "gpu": {
+          "glRenderer": "ANGLE (Intel, Mesa Intel(R) UHD Graphics 630 (CFL GT2), OpenGL 4.6)",
+          "webgpuAdapter": "amd gcn-4",
+          "webgpuFallback": false,
+          "canvases": {
+            "webgpu": 0,
+            "webgl2": 0,
+            "canvas2d": 1,
+            "offscreen": 0
+          },
+          "hardwareConcurrency": 16,
+          "rung": "canvas2d",
+          "glHardware": true,
+          "webgpuHardware": true,
+          "hardware": null
+        },
+        "steps": [
+          153.804931640625,
+          155.77197265625,
+          98.109130859375,
+          95.81103515625,
+          115.77099609375
+        ],
+        "drawClockMs": 89.09999996423721,
+        "load": [
+          8.21,
+          6.86
+        ]
+      },
+      {
+        "ms": 106.152099609375,
+        "counted": true,
+        "gpu": {
+          "glRenderer": "ANGLE (Intel, Mesa Intel(R) UHD Graphics 630 (CFL GT2), OpenGL 4.6)",
+          "webgpuAdapter": "amd gcn-4",
+          "webgpuFallback": false,
+          "canvases": {
+            "webgpu": 0,
+            "webgl2": 0,
+            "canvas2d": 1,
+            "offscreen": 0
+          },
+          "hardwareConcurrency": 16,
+          "rung": "canvas2d",
+          "glHardware": true,
+          "webgpuHardware": true,
+          "hardware": null
+        },
+        "steps": [
+          178.805908203125,
+          106.152099609375,
+          111.40087890625,
+          86.930908203125,
+          79.166015625
+        ],
+        "drawClockMs": 71.10000002384186,
+        "load": [
+          6.25,
+          8.19
+        ]
+      },
+      {
+        "ms": 100.27587890625,
+        "counted": true,
+        "gpu": {
+          "glRenderer": "ANGLE (Intel, Mesa Intel(R) UHD Graphics 630 (CFL GT2), OpenGL 4.6)",
+          "webgpuAdapter": "amd gcn-4",
+          "webgpuFallback": false,
+          "canvases": {
+            "webgpu": 0,
+            "webgl2": 0,
+            "canvas2d": 1,
+            "offscreen": 0
+          },
+          "hardwareConcurrency": 16,
+          "rung": "canvas2d",
+          "glHardware": true,
+          "webgpuHardware": true,
+          "hardware": null
+        },
+        "steps": [
+          149.779052734375,
+          114.615966796875,
+          100.27587890625,
+          83.3759765625,
+          85.72802734375
+        ],
+        "drawClockMs": 72,
+        "load": [
+          6.94,
+          5.72
+        ]
+      },
+      {
+        "ms": 122.72998046875,
+        "counted": true,
+        "gpu": {
+          "glRenderer": "ANGLE (Intel, Mesa Intel(R) UHD Graphics 630 (CFL GT2), OpenGL 4.6)",
+          "webgpuAdapter": "amd gcn-4",
+          "webgpuFallback": false,
+          "canvases": {
+            "webgpu": 0,
+            "webgl2": 0,
+            "canvas2d": 1,
+            "offscreen": 0
+          },
+          "hardwareConcurrency": 16,
+          "rung": "canvas2d",
+          "glHardware": true,
+          "webgpuHardware": true,
+          "hardware": null
+        },
+        "steps": [
+          161.58203125,
+          128.239013671875,
+          122.72998046875,
+          98.057861328125,
+          77.93017578125
+        ],
+        "drawClockMs": 91.09999996423721,
+        "load": [
+          4.91,
+          4.93
+        ]
+      }
+    ]
+  }
+}
