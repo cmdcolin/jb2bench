@@ -40,7 +40,7 @@ macros <- c(
   sprintf("\\newcommand{\\WalkFigFiveSeconds}{%s}", one(w$seconds)),
   sprintf("\\newcommand{\\WalkFigFiveMB}{%.2f}", w$MB),
   sprintf("\\newcommand{\\GbzRunDate}{%s}", format(as.Date(g$date), "%-d %B %Y")),
-  sprintf("\\newcommand{\\GbzPluginVersion}{%s}", g$plugin),
+  sprintf("\\newcommand{\\GbzPluginVersion}{%s}", gsub(",", " and ", g$plugin)),
   sprintf("\\newcommand{\\GbzRuns}{%d}", min(d$runs)))
 dir.create("results/figures/paper/tex", showWarnings = FALSE, recursive = TRUE)
 writeLines(tex, "results/figures/paper/tex/gbz-requests-table.tex")
