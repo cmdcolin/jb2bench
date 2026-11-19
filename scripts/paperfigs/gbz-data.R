@@ -22,7 +22,7 @@ keys <- unique(runs[c("route", "loc", "bp")])
 out <- do.call(rbind, lapply(seq_len(nrow(keys)), function(i) {
   k <- keys[i, ]
   r <- runs[runs$route == k$route & runs$loc == k$loc, ]
-  ok <- r$phase == "ready" | r$limit
+  ok <- (r$phase == "ready" | r$limit) & r$requests > 0
   stopifnot(all(ok))
   data.frame(route = k$route, loc = k$loc, bp = k$bp, runs = nrow(r),
              requests = median(r$requests), MB = median(r$MB),
