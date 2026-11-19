@@ -125,6 +125,8 @@ const p = sh('node', [
   vcf,
   '--images',
   `${Object.keys(tracks).join(',')}=${lastDir}`,
+  '--support',
+  'AD,NAD',
   '--out',
   pageDir,
 ])
