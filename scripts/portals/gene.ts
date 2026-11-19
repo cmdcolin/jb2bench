@@ -83,6 +83,10 @@ for (const [mode, extra] of [
     mkdirSync(work, { recursive: true })
     const t0 = performance.now()
     const r = spawnSync('node', args(outDir, [...extra]), { encoding: 'utf8', maxBuffer: 1 << 28 })
+    if (r.status !== 0) {
+      console.error(`make-portal failed:\n${r.stderr}`)
+      process.exit(1)
+    }
     const seconds = +((performance.now() - t0) / 1000).toFixed(1)
     const log = r.stdout + r.stderr
     const models = Number(/(\d+) models/.exec(log)?.[1] ?? 0)

@@ -130,6 +130,10 @@ const p = sh('node', [
   '--out',
   pageDir,
 ])
+if (p.status !== 0) {
+  console.error(`make-portal failed:\n${p.stderr}`)
+  process.exit(1)
+}
 const pageSeconds = +((performance.now() - t0) / 1000).toFixed(2)
 const cards = Number(/wrote (\d+) cards/.exec(p.stdout + p.stderr)?.[1] ?? 0)
 console.log(`make-portal: ${pageSeconds} s, ${cards} cards`)
