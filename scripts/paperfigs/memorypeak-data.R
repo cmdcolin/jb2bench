@@ -15,7 +15,8 @@ suppressPackageStartupMessages(library(jsonlite))
 
 args <- commandArgs(trailingOnly = TRUE)
 memdir <- if (length(args) >= 1) args[1] else "results/ec2/2026-11-11-1057/memory-peak"
-panel_dir <- if (length(args) >= 2) args[2] else "results/ec2mac/g4dn-nogpu-20261111-1551"
+panel_dirs <- if (length(args) >= 2) args[-1] else c("results/ec2mac/g4dn-nogpu-20261111-1551",
+                                                     "results/ec2mac/laptop-uhd630-2026-11-17-1745")
 
 xt <- fromJSON(file.path(memdir, "crosstool.json"), simplifyVector = FALSE)
 SERIES <- c("jbrowse-release-2.4.0" = "Release 2.4.0",
@@ -53,12 +54,14 @@ out <- do.call(rbind, rows)
 write.csv(out, "results/paper/memory-peak.csv", row.names = FALSE)
 cat("wrote results/paper/memory-peak.csv,", nrow(out), "rows, from", memdir, "\n")
 
-panel <- fromJSON(file.path(panel_dir, "panel.json"), simplifyVector = FALSE)
-cells <- do.call(rbind, lapply(names(panel$summary), function(k) {
-  s <- panel$summary[[k]]
-  p <- strsplit(k, "/")[[1]]
-  data.frame(cell = p[1], backend = p[2], ms = s$median, n = s$n,
-             host = panel$host$label, stringsAsFactors = FALSE)
+cells <- do.call(rbind, lapply(panel_dirs, function(dir) {
+  panel <- fromJSON(file.path(dir, "panel.json"), simplifyVector = FALSE)
+  do.call(rbind, lapply(names(panel$summary), function(k) {
+    s <- panel$summary[[k]]
+    p <- strsplit(k, "/")[[1]]
+    data.frame(cell = p[1], backend = p[2], ms = s$median, n = s$n,
+               host = panel$host$label, stringsAsFactors = FALSE)
+  }))
 }))
 write.csv(cells, "results/paper/nogpu.csv", row.names = FALSE)
-cat("wrote results/paper/nogpu.csv,", nrow(cells), "rows, from", panel_dir, "\n")
+cat("wrote results/paper/nogpu.csv,", nrow(cells), "rows, from", panel_dirs, "\n")

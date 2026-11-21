@@ -63,22 +63,25 @@ webgl_cold <- function(k) {
 webgl_zoom <- subset(perf, panel == "Zoom in, both hold the data" &
                        metric == "what the user waits" & case == "200x short read" &
                        format == "BAM" & series == "This work")$ms
-canvas <- function(k) nogpu$ms[nogpu$cell == k & nogpu$backend == "canvas2d"]
+canvas <- function(k) nogpu$ms[nogpu$cell == k & nogpu$backend == "canvas2d" & nogpu$host == "g4dn-nogpu"]
+laptop <- function(k) nogpu$ms[nogpu$cell == k & nogpu$backend == "webgl" & nogpu$host == "laptop-uhd630"]
 NOGPU <- data.frame(
   label = c("Cold load, 100 kb, 20$\\times$ short-read BAM",
             "Cold load, 100 kb, 1000$\\times$ short-read BAM",
             "Zoom, 19 kb, 200$\\times$ short-read BAM"),
   webgl = c(webgl_cold("20x short read"), webgl_cold("1000x short read"), webgl_zoom),
   canvas = c(canvas("cold-20x"), canvas("cold-1000x"), canvas("zoom-200x")),
+  laptop = c(laptop("cold-20x"), laptop("cold-1000x"), laptop("zoom-200x")),
   unit = c("s", "s", "ms"))
 fmt <- function(ms, unit) {
   if (unit == "s") sprintf("%.2f s", ms / 1000) else sprintf("%.0f ms", ms)
 }
-nogpu_tex <- c("\\begin{tabular}{@{}lrr@{}}", "\\toprule",
-               "Cell & WebGL 2, T4 GPU & Canvas 2D, no GPU \\\\", "\\midrule",
-               sprintf("%s & %s & %s \\\\", NOGPU$label,
+nogpu_tex <- c("\\begin{tabular}{@{}lrrr@{}}", "\\toprule",
+               "Cell & WebGL 2, T4 GPU & Canvas 2D, no GPU & WebGL 2, laptop UHD 630 \\\\", "\\midrule",
+               sprintf("%s & %s & %s & %s \\\\", NOGPU$label,
                        mapply(fmt, NOGPU$webgl, NOGPU$unit),
-                       mapply(fmt, NOGPU$canvas, NOGPU$unit)),
+                       mapply(fmt, NOGPU$canvas, NOGPU$unit),
+                       mapply(fmt, NOGPU$laptop, NOGPU$unit)),
                "\\bottomrule", "\\end{tabular}")
 
 macros <- c(
