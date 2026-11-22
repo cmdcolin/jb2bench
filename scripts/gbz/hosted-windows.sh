@@ -1,10 +1,11 @@
 #!/usr/bin/env bash
 # hosted-windows.sh: the HPRC v2.1 graph track on the hosted demo, from a cold
 # cache, ROUNDS times over the Figure 5 window, 1 Mb of chr17, the MHC class II
-# region and the whole MHC; medians follow the runs.
+# region and the whole MHC, in the APP build; medians follow the runs.
 set -euo pipefail
 cd "$(dirname "$0")/../.."
 ROUNDS=${ROUNDS:-5}
+export APP=${APP:-https://jbrowse.org/code/jb2/v5.0.0-beta.22}
 out=results/graph-track/hosted-windows-$(hostname -s)-$(date -u +%Y-%m-%d).jsonl
 mkdir -p results/graph-track
 : >"$out"

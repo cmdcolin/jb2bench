@@ -3,8 +3,8 @@
 # chrY graph, ROUNDS times, served locally beside a staged JBrowse build
 set -euo pipefail
 cd "$(dirname "$0")/../.."
-BUILD=${BUILD:-release-5.0.0-beta.21}
-PLUGIN=${PLUGIN:-9.0.0}
+BUILD=${BUILD:-release-5.0.0-beta.22}
+PLUGIN=${PLUGIN:-10.4.3}
 ROUNDS=${ROUNDS:-3}
 dir=data/pggb
 out=results/pggb/windows-$(hostname -s)-$(date -u +%Y-%m-%d).jsonl
@@ -18,7 +18,7 @@ track.update(trackId='pggb_chrY', name='HPRC release 2 pggb chrY')
 track['adapter'] = {'type': 'RgfaTabixAdapter', 'uri': 'http://localhost:8192/chrY', 'format': 2,
                     'assemblyNameToPanSN': {'hg38': 'GRCh38'}}
 json.dump({
-    'plugins': [{'name': 'GraphGenomeView', 'storePlugin': 'GraphGenomeView',
+    'plugins': [{'name': 'GraphGenomeView',
                  'esmUrl': f'https://jbrowse.org/plugins/jbrowse-plugin-graphgenomeviewer/{plugin}/dist/jbrowse-plugin-graphgenomeviewer.esm.js'}],
     'assemblies': [hosted['assemblies'][0]],
     'tracks': [track],
