@@ -1,6 +1,6 @@
 # Supplementary comparison table, draft for reviewer 2 comment 4
 
-Checked 8 November 2026 against each tool's own documentation or source at
+Checked 8 November 2026 (VRPG and PangyPlot 21 November 2026) against each tool's own documentation or source at
 the version named. "Version" is the newest release (or, where a project has
 none, the newest commit on its default branch). The JBrowse 2 row comes from
 `paper.tex` (Method and Results), which describes v5.0.0; the newest tag on
@@ -37,6 +37,8 @@ Column key:
 | Bandage | 0.9.0 (Jan 2022); Bandage-NG 2026.11.1 (Nov 2026) | no, Qt desktop | no | no | no | no | partial, graph without reference coordinates | no | yes, SVG | Qt QGraphicsScene |
 | sequenceTubeMap | unversioned (master, Aug 2025) | yes | no, GAM/GAF reads | no | partial, haplotype paths through one graph | partial, edits from GAM/GAF, not BAM CIGAR | yes | no | yes, SVG | D3 SVG |
 | MoMI-G | 1.0 Rev.1 (Jan 2019) | yes | yes, BAM via pileup.js | no | no | partial, inherited from pileup.js and tube map | yes | no | yes, SVG (tube map) | D3 SVG; pileup.js |
+| VRPG | 0.1.6 (Jan 2025) | yes, Django server | no | no | partial, assembly paths highlighted through one graph | no, mapped query CIGAR listed as text | yes, rGFA or GFA projected on a linear reference | no | yes, SVG | D3 SVG |
+| PangyPlot | v0.3.0 (Jul 2026) | yes, Flask server | no | no | partial, one sample's paths through one graph | no | yes, reference region or gene search; force-directed graph | no | yes, SVG (and PNG) | Canvas 2D |
 | Panache | 1.1.0 (Apr 2022) | yes | no | yes, HAC on presence/absence | no | no | partial, linearized matrix, no graph drawn | no | no | SVG via Vue; Canvas 2D miniature |
 
 ## Per-row sources
@@ -183,6 +185,21 @@ Column key:
 - Pileup, Rows+cluster, Config plots: MoMI-G `docs/source/configure_file.rst` (https://momi-g.readthedocs.io/en/latest/); https://raw.githubusercontent.com/MoMI-G/MoMI-G/master/src/widgets/Linear.tsx
 - CIGAR: https://raw.githubusercontent.com/MoMI-G/MoMI-G/master/src/widgets/tubemap.js (`drawMismatches`)
 - Vector (SVG), Backend: https://raw.githubusercontent.com/MoMI-G/MoMI-G/master/src/widgets/SequenceTubeMap.tsx ; .../src/widgets/Circos.tsx
+
+### VRPG 0.1.6 (January 2025)
+- Version: https://github.com/codeatcg/VRPG/releases/tag/0.1.6
+- Browser, Graph+ref, Pileup, Config plots: https://github.com/codeatcg/VRPG/blob/main/README.md (Django `manage.py runserver`; rGFA and GFAv1 indexed against a reference; GFF3 and BED tracks only)
+- 3+ genomes (path highlighting, multi-select): https://raw.githubusercontent.com/codeatcg/VRPG/main/templates/vrpg/index.html (`asmSel`)
+- CIGAR: https://raw.githubusercontent.com/codeatcg/VRPG/main/vrpg/views.py (`queryMap`, minigraph); index.html prints `qCigar` in a table
+- Vector, Backend: https://raw.githubusercontent.com/codeatcg/VRPG/main/templates/vrpg/index.html (d3 6.7.0, `savePlot` "Save image (*.svg)")
+
+### PangyPlot v0.3.0 (July 2026)
+- Version: https://github.com/ScottMastro/pangyplot/releases/tag/v0.3.0 ; `pangyplot/version.py`
+- Browser, Pileup, Config plots: https://github.com/ScottMastro/pangyplot/blob/v0.3.0/README.md (Flask server, GFA prepared with odgi)
+- Graph+ref: https://github.com/ScottMastro/pangyplot/blob/v0.3.0/docs/source/basic/regions.rst
+- 3+ genomes: https://github.com/ScottMastro/pangyplot/blob/v0.3.0/docs/source/basic/tools.rst (Path Selector, one sample)
+- Vector: https://github.com/ScottMastro/pangyplot/blob/v0.3.0/pangyplot/static/js/graph/render/export.js
+- Backend: https://github.com/ScottMastro/pangyplot/blob/v0.3.0/docs/source/advanced/rendering.rst ; `pangyplot/static/js/graph/state.js` (`getContext('2d')`)
 
 ### Panache 1.1.0 (April 2022)
 - Version: https://github.com/SouthGreenPlatform/panache/releases/tag/v1.1.0
