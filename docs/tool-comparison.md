@@ -8,6 +8,7 @@ GitHub is v5.0.0-beta.20 (3 November 2026).
 
 Column key:
 - Browser: interactive in a web browser (pan, zoom)
+- Static site: runs from files on any web host with no server program of its own (n/a for tools not in the browser); cells in the section below
 - Pileup: BAM/CRAM read pileup
 - Rows+cluster: one row per sample, and clustering or similarity ordering of
   the rows inside the tool
@@ -209,6 +210,28 @@ Column key:
 - CIGAR: Functionalities-tour (no nucleotide-level zoom)
 - Vector: https://raw.githubusercontent.com/SouthGreenPlatform/panache/main/src/components/ExportLocalRegionAnnotated.vue (TSV only)
 - Backend: https://raw.githubusercontent.com/SouthGreenPlatform/panache/main/src/components/PavMatrix.vue
+
+## Static site compatible (added 21 November 2026)
+
+| Tool | Static site | Source |
+|---|---|---|
+| JBrowse 2 | yes | jbrowse.org/jb2/docs/quickstart_web (static files; Desktop separate) |
+| igv.js | yes | https://github.com/igvteam/igv.js README (embeddable JS library, files read by URL) |
+| IGV desktop | n/a | Java desktop |
+| UCSC Genome Browser | no, server | server-side CGI renders PNG |
+| GenomeSpy | yes | https://genomespy.app/docs/ (client-side, data loaded by URL) |
+| HiGlass | partial, server for most data | https://github.com/higlass/higlass/blob/develop/docs/data_preparation.rst (tilesets ingested into higlass-server; plugin data fetchers excepted) |
+| Gosling | yes | https://gosling.js.org (GitHub Pages; CSV, JSON, BigWig, BAM, VCF read by URL in the client) |
+| D-GENIES | no, server | http://dgenies.toulouse.inrae.fr/install (Flask app running minimap2) |
+| SVbyEye, plotsr, NGenomeSyn, Bandage | n/a | not in the browser |
+| ntSynt-viz | yes, HTML file | writes a self-contained ggiraph HTML file |
+| clinker | yes, HTML file | writes a self-contained HTML file |
+| SynVisio | yes | https://synvisio.github.io (GitHub Pages, files parsed in the client) |
+| sequenceTubeMap | no, server | README, `npm run serve` (Node server running vg) |
+| MoMI-G | no, server | README, momig-backend Docker image |
+| VRPG | no, server | README, Django `manage.py runserver` |
+| PangyPlot | no, server | README, Flask server on port 5700 |
+| Panache | yes | README, `npm run build` to `dist`, served by any web server; data in `public` or uploaded |
 
 ## Cells that needed a judgement
 
