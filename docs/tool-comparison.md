@@ -215,7 +215,7 @@ Column key:
 
 | Tool | Static site | Source |
 |---|---|---|
-| JBrowse 2 | yes | jbrowse.org/jb2/docs/quickstart_web (static files; Desktop separate) |
+| JBrowse 2 | yes | https://jbrowse.org/jb2/docs/quickstart_web/ (static files; Desktop separate) |
 | igv.js | yes | https://github.com/igvteam/igv.js README (embeddable JS library, files read by URL) |
 | IGV desktop | n/a | Java desktop |
 | UCSC Genome Browser | no, server | server-side CGI renders PNG |
