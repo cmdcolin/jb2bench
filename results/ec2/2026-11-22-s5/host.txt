@@ -1,0 +1,6 @@
+/home/ubuntu/.cache/puppeteer/chrome/linux-148.0.7778.97/chrome-linux64/chrome
+Google Chrome for Testing 148.0.7778.97 
+Model name:                              Intel(R) Xeon(R) Platinum 8259CL CPU @ 2.50GHz
+16
+6.8.0-1069-aws
+v24.22.3
