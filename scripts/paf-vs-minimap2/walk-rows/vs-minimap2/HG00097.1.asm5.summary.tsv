@@ -1,0 +1,2 @@
+haplotype	contig	mm2	window_bp	pif_placed	pif_eq	pif_X	mm2_placed	mm2_eq	mm2_X	both_placed	exact	within10	different	pif_only	mm2_only	neither	pif_eq_bases_identical	pif_X_bases_identical	mm2_X_where_pif_eq_same_base	pif_rows	mm2_rows	pif_multi	mm2_multi
+HG00097#1	HG00097#1#CM094060.1	asm5	260000	259903	259727	176	259921	259740	181	259877	259773	259832	45	26	44	53	259727	0	0	1	2	0	0

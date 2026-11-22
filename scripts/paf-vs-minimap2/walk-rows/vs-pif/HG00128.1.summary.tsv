@@ -1,0 +1,2 @@
+haplotype	contig	mm2	window_bp	pif_placed	pif_eq	pif_X	mm2_placed	mm2_eq	mm2_X	both_placed	exact	within10	different	pif_only	mm2_only	neither	pif_eq_bases_identical	pif_X_bases_identical	mm2_X_where_pif_eq_same_base	pif_rows	mm2_rows	pif_multi	mm2_multi
+HG00128#1	HG00128#1#JBHIKS010000054.1	1	260000	259896	259769	127	259899	259769	130	259896	259896	259896	0	0	3	101	259769	0	0	1	1	0	0
