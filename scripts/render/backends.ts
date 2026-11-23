@@ -51,6 +51,8 @@ const arg = (name: string, fallback: string) =>
 
 const PORT = Number(arg('port', '8000'))
 const RUNS = Number(arg('runs', '5'))
+const OUT = arg('out', 'results')
+const SHOTS = OUT === 'results' ? 'screenshots/backends' : `${OUT}/screenshots`
 const WARMUP = 1
 // Window, assembly and coverage ladder all come from the scale, so the backend
 // question can be asked at more than one width. `SCALE=19kb-wide,100kb-wide,1mb`
@@ -348,7 +350,7 @@ for (const c of cases) {
       first = await measure(
         c.track,
         b.extra,
-        `screenshots/backends/${BROWSER}${resultSuffix(scale)}-${c.id}-${b.id}.png`,
+        `${SHOTS}/${BROWSER}${resultSuffix(scale)}-${c.id}-${b.id}.png`,
       )
     }
     const runs: number[] = []
@@ -401,8 +403,8 @@ if (blank.length) {
 }
 
 const stamp = new Date().toISOString().slice(0, 10)
-fs.mkdirSync('results', { recursive: true })
-const outfile = `results/backends-${BROWSER}${resultSuffix(scale)}`
+fs.mkdirSync(OUT, { recursive: true })
+const outfile = `${OUT}/backends-${BROWSER}${resultSuffix(scale)}`
 fs.writeFileSync(
   `${outfile}.json`,
   JSON.stringify(
@@ -461,6 +463,6 @@ for (const c of cases) {
   md += `| ${c.id} | ${rungs.map(r => fmt(r.id)).join(' | ')} | ${ratio} |\n`
 }
 md += `\nScreenshots of every cell's warmup render are in `
-md += `\`screenshots/backends/\`.\n`
+md += `\`${SHOTS}/\`.\n`
 fs.writeFileSync(`${outfile}.md`, md)
 console.log(`\nwrote ${outfile}.md and ${outfile}.json`)
