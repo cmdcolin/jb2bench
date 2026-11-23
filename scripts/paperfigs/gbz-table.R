@@ -13,24 +13,25 @@ window <- function(bp) {
 }
 one <- function(x) sprintf("%.1f", x)
 cells <- function(r) {
-  c(sprintf("%g", r$requests), one(r$MB), paste0(one(r$seconds), if (r$limit) "*" else ""))
+  c(sprintf("%g", r$requests), sprintf("%.2f", r$MB), paste0(one(r$seconds), if (r$limit) "*" else ""))
 }
-gbz <- d[d$route == "GBZ-base", ]
-pif <- d[d$route == "PIF", ]
-body <- vapply(seq_len(nrow(gbz)), function(i) {
-  p <- pif[pif$loc == gbz$loc[i], ]
-  paste(c(window(gbz$bp[i]), cells(gbz[i, ]), cells(p)), collapse = " & ")
+ROUTES <- c("Walk file" = "walks", "PIF" = "PIF", "GBZ-base" = "GBZ-base")
+locs <- unique(d$loc[order(d$bp)])
+body <- vapply(locs, function(loc) {
+  rows <- lapply(ROUTES, function(route) d[d$route == route & d$loc == loc, ])
+  paste(c(window(rows[[1]]$bp), unlist(lapply(rows, cells))), collapse = " & ")
 }, character(1))
-tex <- c("\\begin{tabular}{@{}lrrrrrr@{}}", "\\toprule",
-         "& \\multicolumn{3}{c}{GBZ-base} & \\multicolumn{3}{c}{PIF} \\\\",
-         "\\cmidrule(lr){2-4}\\cmidrule(lr){5-7}",
-         "Window & Requests & MB & s & Requests & MB & s \\\\", "\\midrule",
+tex <- c("\\begin{tabular}{@{}lrrrrrrrrr@{}}", "\\toprule",
+         paste0("& ", paste(sprintf("\\multicolumn{3}{c}{%s}", names(ROUTES)), collapse = " & "), " \\\\"),
+         "\\cmidrule(lr){2-4}\\cmidrule(lr){5-7}\\cmidrule(lr){8-10}",
+         paste0("Window", strrep(" & Requests & MB & s", length(ROUTES)), " \\\\"), "\\midrule",
          paste(body, "\\\\"), "\\bottomrule", "\\end{tabular}")
 
 at <- function(route) d[d$route == route & d$loc == FIGURE5, ]
 g <- at("GBZ-base")
 p <- at("PIF")
 w <- at("walks")
+widest <- function(route) d[d$route == route & d$bp == max(d$bp), ]
 macros <- c(
   sprintf("\\newcommand{\\GbzFigFiveSeconds}{%s}", one(g$seconds)),
   sprintf("\\newcommand{\\GbzFigFiveRequests}{%g}", g$requests),
@@ -39,6 +40,9 @@ macros <- c(
   sprintf("\\newcommand{\\WalkFigFiveRequests}{%g}", w$requests),
   sprintf("\\newcommand{\\WalkFigFiveSeconds}{%s}", one(w$seconds)),
   sprintf("\\newcommand{\\WalkFigFiveMB}{%.2f}", w$MB),
+  sprintf("\\newcommand{\\WalkWidestSeconds}{%s}", one(widest("walks")$seconds)),
+  sprintf("\\newcommand{\\PifWidestSeconds}{%s}", one(widest("PIF")$seconds)),
+  sprintf("\\newcommand{\\GbzBuild}{%s}", g$build),
   sprintf("\\newcommand{\\GbzRunDate}{%s}", format(as.Date(g$date), "%-d %B %Y")),
   sprintf("\\newcommand{\\GbzPluginVersion}{%s}", gsub(",", " and ", g$plugin)),
   sprintf("\\newcommand{\\GbzRuns}{%d}", min(d$runs)))
