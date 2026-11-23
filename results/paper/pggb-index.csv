@@ -1,0 +1,2 @@
+"tool","command","gfaBytes","nodes","links","seconds","peakGB","load","date"
+"gfa-to-tabix 5.0.1","gfa-to-tabix build ../chrY.gfa --reference GRCh38 -o chrY",7695644148,4122486,7685990,107.5,9.5,1.03,"2026-11-23"
