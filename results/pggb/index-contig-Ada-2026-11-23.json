@@ -1,0 +1,51 @@
+{
+ "date": "2026-11-23T10:37:59-08:00",
+ "host": "Ada",
+ "cpu": "12th Gen Intel(R) Core(TM) i9-12900K",
+ "load": 1.03,
+ "loadAfter": 4.96,
+ "tool": "gfa-to-tabix 5.0.1",
+ "layout": "contig",
+ "command": "gfa-to-tabix build ../chrY.gfa --reference GRCh38 -o chrY",
+ "gfaBytes": 7695644148,
+ "nodes": 4122486,
+ "links": 7685990,
+ "seconds": 107.5,
+ "peakGB": 9.5,
+ "files": {
+  "chrY.config.json": {
+   "bytes": 1015,
+   "sha256": "1f6fc6d7d8ec865a43b9256eeecc92288305077fc3ee33c98b5cab6e4d199fa9"
+  },
+  "chrY.fold50.graph.bed.gz": {
+   "bytes": 89027228,
+   "sha256": "5dd3a87f8c898049649385707404b231a56380566bf875b783d5b459aac0c5ae"
+  },
+  "chrY.fold50.graph.bed.gz.tbi": {
+   "bytes": 281773,
+   "sha256": "51509a3441fcc03d1179b76767e53ced3584e459d34a0ebab589029e2531a442"
+  },
+  "chrY.graph.bed.gz": {
+   "bytes": 349474060,
+   "sha256": "c5fadd601f201b39effae1849a552cf112ea2565cec1af1afc9e17ece8f319a3"
+  },
+  "chrY.graph.bed.gz.tbi": {
+   "bytes": 924793,
+   "sha256": "341e3367a0004be22af6455f1b257706f4116ebbfcaeff7900ea27ee30ac105d"
+  },
+  "chrY.graph.json": {
+   "bytes": 201,
+   "sha256": "f5acd825ef06503916ae04051f68b75ce9d2a86c398875b281bf4cbb5732cf13"
+  }
+ },
+ "log": [
+  "paths graph: ../chrY.gfa",
+  "note: no --snarls given, so no bubble file or bubble tracks for this graph",
+  "4122486 segments, 7685990 links -> fold under 50 bp",
+  "tier folded under 50 bp from: plain GFA: coordinates from paths, reference GRCh38.0 (2 of 1053 paths)",
+  "1241179 nodes, 2374733 links -> chrY.fold50.graph.bed.gz (+ .tbi)",
+  "plain GFA: coordinates from paths, reference GRCh38.0 (2 of 1053 paths)",
+  "4122486 nodes, 7685990 links -> chrY.graph.bed.gz (+ .tbi)",
+  "1 tracks on assembly 'GRCh38', graph sample 'GRCh38' -> chrY.graph.json, chrY.config.json"
+ ]
+}

@@ -545,7 +545,8 @@ agent-evals:
 	$(NODE) scripts/agent-evals/run.ts $(SET) $(if $(CONFIG_DIR),--config-dir $(CONFIG_DIR))
 
 # The graph track's cost on the hosted HPRC demo (Figure 5 window, 1 Mb, MHC),
-# and the HPRC release 2 pggb chrY graph indexed and opened in a graph view.
+# and the HPRC release 2 pggb chrY graph indexed and opened in a graph view;
+# LAYOUT=anchored indexes and traces the bare command's layout instead of build's.
 graph-hosted: ; scripts/gbz/hosted-windows.sh
 pggb-fetch:   ; scripts/pggb/fetch.sh
 pggb-index:   ; scripts/pggb/index.sh
