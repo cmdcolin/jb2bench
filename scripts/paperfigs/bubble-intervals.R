@@ -46,7 +46,7 @@ fig <- ggplot(d, aes(interval_bp)) +
                 minor_breaks = as.vector(outer(c(2, 5), 10^(0:7)))) +
   scale_y_continuous(labels = scales::label_comma(), expand = expansion(c(0, 0.05))) +
   labs(
-    title = "Reference interval each bubble of the HPRC v2.1 SV rGFA is indexed under",
+    title = "Reference span each bubble of the HPRC v2.1 SV rGFA is indexed under",
     subtitle = sprintf(
       paste0("%s bubbles; %d are indexed under more than 1 Mb, the widest %s on %s.\n",
              "One bubble of %s nodes is indexed under its own coordinates and is not drawn."),
@@ -54,7 +54,7 @@ fig <- ggplot(d, aes(interval_bp)) +
       fmt_bp(signif(max(d$interval_bp), 3)),
       sub("GRCh38#0#", "", d$seqs[which.max(d$interval_bp)]),
       format(moved$nodes[1], big.mark = ",")),
-    x = "reference interval (bp, log scale)",
+    x = "reference span (bp, log scale)",
     y = "bubbles") +
   paper_theme()
 
