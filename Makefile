@@ -77,7 +77,7 @@ help:
 	@echo ""
 	@echo "  make backends        webgl vs webgpu vs canvas"
 	@echo "  make backends-webgpu the same + a WebGPU rung, 19kb/100kb/1mb, headed firefox"
-	@echo "  make webgpu-lite     the WebGPU rung at 100 kb on beta.21, any laptop, ~15 min"
+	@echo "  make webgpu-lite     the WebGPU rung at the paper's 100 kb, 20x/200x/1000x, beta.21, any laptop, ~30-45 min"
 	@echo "  make webgpu-lite-share  serve its BAMs over the LAN for webgpu-lite's DATA_URL"
 	@echo "  make mac-up HOST=mac1|mac2 CONFIRM=1  hardware panel on an EC2 Mac (ec2mac/README.md); DRY_RUN=1 to preview"
 	@echo ""

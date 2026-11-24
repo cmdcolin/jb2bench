@@ -1,9 +1,12 @@
 #!/bin/bash
 # WebGPU against WebGL 2 and Canvas 2D on one laptop, one window, one build:
-# the 100 kb window of the chr22_2mb corpus, 20x and 100x short and long BAM,
-# v5.0.0-beta.21 by default, headed Firefox Nightly, one warm-up and five runs
-# per cell. 72 page loads, about 10-15 minutes. Firefox windows take over the
-# display the whole time.
+# the paper's 100 kb window (chr22_mask:75000-175000), 20x, 200x and 1000x
+# short and long BAM, v5.0.0-beta.21 by default, headed Firefox Nightly, one
+# warm-up and five runs per cell. 108 page loads, about 30-45 minutes. Firefox
+# windows take over the display the whole time.
+#
+# SCALE=100kb-wide reruns the 23 Nov version: the chr22_2mb corpus at 20x and
+# 100x, written to results/webgpu-lite/ as before.
 #
 # Built to be run on a laptop that has only a clone of this repo. The 2mb.* BAMs
 # are not in git, so first run `make webgpu-lite-share` on a machine that has
@@ -17,7 +20,7 @@
 # beside the timings. Copy the BAMs rather than regenerate them: wgsim and pbsim
 # seed from the clock, so a regenerated corpus is different reads.
 #
-# Knobs: TAG (release tag), FIREFOX (Nightly binary), PORT, RUNS, DATA_URL.
+# Knobs: TAG (release tag), FIREFOX (Nightly binary), PORT, RUNS, DATA_URL, SCALE.
 set -euo pipefail
 cd "$(dirname "$0")/.."
 
@@ -25,8 +28,13 @@ TAG=${TAG:-v5.0.0-beta.21}
 BUILD="release-${TAG#v}"
 PORT=${PORT:-8090}
 RUNS=${RUNS:-5}
+SCALE=${SCALE:-100kb}
 HOST=$(hostname -s)
-OUT="results/webgpu-lite/$HOST"
+case "$SCALE" in
+  100kb-wide) PREFIX=2mb. COVS="20x 100x" REFS="chr22_2mb.fa chr22_2mb.fa.fai" OUT="results/webgpu-lite/$HOST" ;;
+  100kb) PREFIX= COVS="20x 200x 1000x" REFS="hg19mod.fa hg19mod.fa.fai" OUT="results/webgpu-lite-100kb/$HOST" ;;
+  *) echo "SCALE must be 100kb or 100kb-wide, not $SCALE" >&2; exit 1 ;;
+esac
 
 case "$(uname)" in
   Darwin) DEFAULT_FF="/Applications/Firefox Nightly.app/Contents/MacOS/firefox" ;;
@@ -41,10 +49,10 @@ FIREFOX=${FIREFOX:-$DEFAULT_FF}
 
 [ -d node_modules ] || pnpm install
 
-BAMS=()
+BAMS=($REFS)
 for k in shortread longread; do
-  for cov in 20x 100x; do
-    BAMS+=("2mb.$cov.$k.bam" "2mb.$cov.$k.bam.bai")
+  for cov in $COVS; do
+    BAMS+=("$PREFIX$cov.$k.bam" "$PREFIX$cov.$k.bam.bai")
   done
 done
 missing=()
@@ -91,7 +99,7 @@ done
 } > "$OUT/machine.txt"
 cat "$OUT/machine.txt"
 
-SCALE=100kb-wide node --experimental-strip-types scripts/render/backends.ts \
+SCALE=$SCALE node --experimental-strip-types scripts/render/backends.ts \
   --browser=firefox --firefox="$FIREFOX" --port="$PORT" --runs="$RUNS" \
   --wait-for-load=4 --out="$OUT" 2>&1 | tee "$OUT/run.log"
 

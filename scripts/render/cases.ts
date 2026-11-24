@@ -42,6 +42,9 @@ export const FORMATS = ['bam', 'cram'] as const
  * different contig at a different depth ladder, so pairing it with `1mb` varies
  * two things at once. `19kb-wide` is that window measured where the comparison
  * holds; it is not a replacement for `19kb`, which every existing figure uses.
+ *
+ * `100kb` is the 100 kb window of the paper's cross-tool figures
+ * (scripts/crosstool/windows.ts), on the same corpus and ladder as `19kb`.
  */
 export interface Scale {
   id: string
@@ -59,6 +62,14 @@ export const SCALES: readonly Scale[] = [
     label: '19 kb',
     assembly: 'hg19mod',
     loc: 'chr22_mask:124000-143000',
+    coverages: ['20x', '200x', '1000x'],
+    prefix: '',
+  },
+  {
+    id: '100kb',
+    label: '100 kb',
+    assembly: 'hg19mod',
+    loc: 'chr22_mask:75000-175000',
     coverages: ['20x', '200x', '1000x'],
     prefix: '',
   },
