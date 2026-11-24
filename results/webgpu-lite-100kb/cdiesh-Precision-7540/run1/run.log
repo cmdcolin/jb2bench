@@ -1,0 +1,22 @@
+load 0.2, starting
+port 8090 serving builds/release-5.0.0-beta.21, browser firefox
+20x-shortread / default: 699 728 749 775 745 => 745ms on WebGPU, ink 34.0% (load 0.2→1.2)
+20x-shortread / webgl: 737 757 752 722 728 => 737ms on WebGL2, ink 34.0% (load 1.2→1.6)
+20x-shortread / canvas2d: 726 776 713 714 734 => 726ms on Canvas2D, ink 36.7% (load 1.6→2.0)
+200x-shortread / default: 1972 1980 1985 1937 2047 => 1980ms on WebGPU, ink 38.7% (load 2.0→1.6)
+200x-shortread / webgl: 2094 2028 1982 1987 1983 => 1987ms on WebGL2, ink 38.7% (load 1.6→1.5)
+200x-shortread / canvas2d: 2036 2017 2181 2034 2043 => 2036ms on Canvas2D, ink 39.3% (load 1.5→1.6)
+1000x-shortread / default: 7830 7812 8024 8182 7627 => 7830ms on WebGPU, ink 39.6% (load 1.6→1.5)
+1000x-shortread / webgl: 9715 9262 9928 10087 9677 => 9715ms on WebGL2, ink 39.6% (load 1.5→1.7)
+1000x-shortread / canvas2d: 9565 9993 9529 9859 9532 => 9565ms on Canvas2D, ink 40.1% (load 1.7→1.8)
+20x-longread / default: 824 813 883 900 841 => 841ms on WebGPU, ink 36.8% (load 1.8→1.9)
+20x-longread / webgl: 928 886 916 887 926 => 916ms on WebGL2, ink 36.8% (load 1.9→1.9)
+20x-longread / canvas2d: 1182 1195 1183 1141 1183 => 1183ms on Canvas2D, ink 36.9% (load 1.9→1.9)
+200x-longread / default: 3013 3138 3167 3020 3175 => 3138ms on WebGPU, ink 40.2% (load 1.9→2.0)
+200x-longread / webgl: 3137 4702 FAIL 3131 4827 => 3920ms on WebGL2, ink 40.1% (load 2.0→1.6)
+200x-longread / canvas2d: 5065 3469 4941 5130 3521 => 4941ms on Canvas2D, ink 40.2% (load 1.6→2.1)
+1000x-longread / default: 14057 15105 14770 14673 14695 => 14695ms on WebGPU, ink 40.5% (load 2.1→1.6)
+1000x-longread / webgl: 14817 14560 14697 14612 14733 => 14697ms on WebGL2, ink 40.5% (load 1.6→1.8)
+1000x-longread / canvas2d: 14364 14570 14676 14948 15139 => 14676ms on Canvas2D, ink 40.6% (load 1.8→1.8)
+
+wrote results/webgpu-lite-100kb/cdiesh-Precision-7540/backends-firefox-100kb.md and results/webgpu-lite-100kb/cdiesh-Precision-7540/backends-firefox-100kb.json

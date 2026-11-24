@@ -1,0 +1,2 @@
+GPU 0: Tesla T4 (UUID: GPU-b587be9e-76fe-fbf7-6fdb-cf232462ee7e)
+Intel(R) Xeon(R) Platinum 8259CL CPU @ 2.50GHz

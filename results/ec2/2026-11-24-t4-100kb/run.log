@@ -1,0 +1,39 @@
+== A headless gl-egl 03:54:47
+port 8090 serving builds/release-5.0.0-beta.21, browser chrome
+20x-shortread / webgl: 1097 1036 1047 996 958 => 1036ms on WebGL2, ink 33.9% (load 0.3→1.2)
+20x-shortread / canvas2d: 967 949 963 964 958 => 963ms on Canvas2D, ink 36.8% (load 1.2→2.1)
+200x-shortread / webgl: 2572 2570 2542 2568 2536 => 2568ms on WebGL2, ink 38.6% (load 2.1→2.3)
+200x-shortread / canvas2d: 2534 2542 2445 2573 2484 => 2534ms on Canvas2D, ink 39.3% (load 2.3→2.3)
+1000x-shortread / webgl: 8359 8247 8252 8340 8169 => 8252ms on WebGL2, ink 39.5% (load 2.3→2.7)
+1000x-shortread / canvas2d: 7928 7840 7989 7726 8143 => 7928ms on Canvas2D, ink 40.1% (load 2.7→2.4)
+20x-longread / webgl: 1338 1251 1309 1290 1334 => 1309ms on WebGL2, ink 36.7% (load 2.4→2.4)
+20x-longread / canvas2d: 1559 1563 1553 1651 1484 => 1559ms on Canvas2D, ink 4.2% (load 2.4→4.0)
+200x-longread / webgl: 4370 4468 4465 4448 4552 => 4465ms on WebGL2, ink 4.2% (load 4.0→3.0)
+200x-longread / canvas2d: 4956 4826 4807 4877 4752 => 4826ms on Canvas2D, ink 4.2% (load 3.0→3.0)
+1000x-longread / webgl: 16932 16443 16058 16405 15863 => 16405ms on WebGL2, ink 40.4% (load 3.0→2.2)
+1000x-longread / canvas2d: 15963 16568 16417 15967 17019 => 16417ms on Canvas2D, ink 40.7% (load 2.2→2.0)
+
+wrote results/t4-headed-100kb/A-headless-glegl/backends-chrome-100kb.md and results/t4-headed-100kb/A-headless-glegl/backends-chrome-100kb.json
+== B headed vulkan 04:03:22
+port 8090 serving builds/release-5.0.0-beta.21, browser chrome
+20x-shortread / default: 960 984 988 929 969 => 969ms on WebGPU, ink 33.9% (load 2.0→2.0)
+20x-shortread / webgl: 958 963 994 984 981 => 981ms on WebGL2, ink 33.9% (load 2.0→2.4)
+20x-shortread / canvas2d: 972 952 976 963 976 => 972ms on Canvas2D, ink 36.7% (load 2.4→2.2)
+200x-shortread / default: 2373 2353 2355 2274 2337 => 2353ms on WebGPU, ink 38.6% (load 2.2→2.4)
+200x-shortread / webgl: 2445 2471 2442 2454 2456 => 2454ms on WebGL2, ink 38.6% (load 2.4→2.5)
+200x-shortread / canvas2d: 2460 2570 2551 2555 2456 => 2551ms on Canvas2D, ink 39.2% (load 2.5→2.7)
+1000x-shortread / default: 7668 7968 8071 8158 8194 => 8071ms on WebGPU, ink 39.5% (load 2.7→1.9)
+1000x-shortread / webgl: 8080 8068 8362 8266 8398 => 8266ms on WebGL2, ink 39.5% (load 1.9→2.2)
+1000x-shortread / canvas2d: 8258 7963 8069 7947 8071 => 8069ms on Canvas2D, ink 4.2% (load 2.2→2.1)
+20x-longread / default: 1161 1162 1159 1182 1190 => 1162ms on WebGPU, ink 36.7% (load 2.1→2.5)
+20x-longread / webgl: 1272 1270 1255 1266 1193 => 1266ms on WebGL2, ink 36.7% (load 2.5→3.0)
+20x-longread / canvas2d: 1591 1575 1566 1579 1546 => 1575ms on Canvas2D, ink 36.7% (load 3.0→2.9)
+200x-longread / default: 4263 4274 4284 4289 4412 => 4284ms on WebGPU, ink 40.1% (load 2.9→3.8)
+200x-longread / webgl: 4467 4482 4459 4479 4461 => 4467ms on WebGL2, ink 40.0% (load 3.8→3.4)
+200x-longread / canvas2d: 5092 4989 5089 4876 4964 => 4989ms on Canvas2D, ink 4.2% (load 3.4→2.6)
+1000x-longread / default: 16443 16368 16623 16275 16374 => 16374ms on WebGPU, ink 40.4% (load 2.6→2.2)
+1000x-longread / webgl: 16665 16854 17067 16787 17370 => 16854ms on WebGL2, ink 40.4% (load 2.2→2.8)
+1000x-longread / canvas2d: 16276 16492 16672 17192 16379 => 16492ms on Canvas2D, ink 40.5% (load 2.8→1.4)
+
+wrote results/t4-headed-100kb/B-headed-vulkan/backends-chrome-100kb.md and results/t4-headed-100kb/B-headed-vulkan/backends-chrome-100kb.json
+== done 04:16:13

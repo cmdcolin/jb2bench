@@ -9,3 +9,4 @@ gpus:
         Vendor: Intel
         Chipset Model: AMD Radeon Pro 5300M
         Vendor: AMD (0x1002)
+power: A/C (author, 2026-11-24)
