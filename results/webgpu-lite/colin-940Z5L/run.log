@@ -1,0 +1,16 @@
+load 3.6, starting
+port 8090 serving builds/release-5.0.0-beta.21, browser firefox
+20x-shortread / default: 1578 1459 1446 1476 1465 => 1465ms on WebGPU, ink 31.2% (load 3.6→3.5)
+20x-shortread / webgl: 1485 1505 1571 1489 1482 => 1489ms on WebGL2, ink 31.2% (load 3.5→2.8)
+20x-shortread / canvas2d: 1415 1421 1485 1421 1419 => 1421ms on Canvas2D, ink 33.0% (load 2.8→3.1)
+100x-shortread / default: 2296 2292 2218 2273 2236 => 2273ms on WebGPU, ink 38.2% (load 3.1→2.8)
+100x-shortread / webgl: 2244 2228 2263 2246 2346 => 2246ms on WebGL2, ink 38.2% (load 2.8→2.1)
+100x-shortread / canvas2d: 2217 2246 2232 2261 2259 => 2246ms on Canvas2D, ink 38.9% (load 2.1→2.1)
+20x-longread / default: 1755 1725 1781 1753 1816 => 1755ms on WebGPU, ink 34.2% (load 2.1→2.8)
+20x-longread / webgl: 1763 1761 1758 1770 1813 => 1763ms on WebGL2, ink 34.2% (load 2.8→2.5)
+20x-longread / canvas2d: 1945 1985 1955 2342 10871 => 1985ms on Canvas2D, ink 34.2% (load 2.5→2.6)
+100x-longread / default: 3379 3374 3380 3387 3505 => 3380ms on WebGPU, ink 40.0% (load 2.6→2.8)
+100x-longread / webgl: 3370 3404 3333 3368 3361 => 3368ms on WebGL2, ink 40.0% (load 2.8→2.3)
+100x-longread / canvas2d: 3724 3727 3738 3763 3715 => 3727ms on Canvas2D, ink 40.1% (load 2.3→1.9)
+
+wrote results/webgpu-lite/colin-940Z5L/backends-firefox-100kb-wide.md and results/webgpu-lite/colin-940Z5L/backends-firefox-100kb-wide.json

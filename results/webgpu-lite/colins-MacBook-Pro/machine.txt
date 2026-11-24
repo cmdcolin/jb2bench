@@ -1,0 +1,11 @@
+host: colins-MacBook-Pro
+date: 2026-11-24T00:39:46Z
+build: release-5.0.0-beta.21
+firefox: Mozilla Firefox 156.0a1
+os: Darwin 24.6.0 x86_64
+cpu: Intel(R) Core(TM) i9-9980HK CPU @ 2.40GHz
+gpus:
+        Chipset Model: Intel UHD Graphics 630
+        Vendor: Intel
+        Chipset Model: AMD Radeon Pro 5300M
+        Vendor: AMD (0x1002)

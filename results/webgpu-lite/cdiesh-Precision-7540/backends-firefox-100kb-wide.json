@@ -1,0 +1,235 @@
+{
+  "loc": "chr22_2mb:950001-1050000",
+  "scale": "100kb-wide",
+  "runs": 5,
+  "build": "release-5.0.0-beta.21",
+  "port": 8090,
+  "browser": "firefox",
+  "stamp": "2026-11-24",
+  "results": {
+    "20x-shortread": {
+      "default": {
+        "median": 730,
+        "mean": 1085.8,
+        "stddev": 719.6330731699314,
+        "runs": [
+          2525,
+          713,
+          730,
+          733,
+          728
+        ],
+        "load": {
+          "before": 0.34,
+          "after": 1.2
+        },
+        "rung": "WebGPU",
+        "drawn": 0.3128855020491803
+      },
+      "webgl": {
+        "median": 722,
+        "mean": 733,
+        "stddev": 30.509015061125783,
+        "runs": [
+          777,
+          759,
+          694,
+          722,
+          713
+        ],
+        "load": {
+          "before": 1.2,
+          "after": 1.13
+        },
+        "rung": "WebGL2",
+        "drawn": 0.31288678278688525
+      },
+      "canvas2d": {
+        "median": 687,
+        "mean": 690.6,
+        "stddev": 18.128430709799456,
+        "runs": [
+          721,
+          685,
+          665,
+          687,
+          695
+        ],
+        "load": {
+          "before": 1.13,
+          "after": 1.65
+        },
+        "rung": "Canvas2D",
+        "drawn": 0.34111808401639343
+      }
+    },
+    "100x-shortread": {
+      "default": {
+        "median": 1179,
+        "mean": 1179.6,
+        "stddev": 29.234226516191598,
+        "runs": [
+          1212,
+          1212,
+          1155,
+          1179,
+          1140
+        ],
+        "load": {
+          "before": 1.65,
+          "after": 1.84
+        },
+        "rung": "WebGPU",
+        "drawn": 0.38300717213114754
+      },
+      "webgl": {
+        "median": 1241,
+        "mean": 1229.2,
+        "stddev": 31.98374587192688,
+        "runs": [
+          1181,
+          1246,
+          1241,
+          1206,
+          1272
+        ],
+        "load": {
+          "before": 1.84,
+          "after": 2.12
+        },
+        "rung": "WebGL2",
+        "drawn": 0.3829546618852459
+      },
+      "canvas2d": {
+        "median": 1243,
+        "mean": 1236.4,
+        "stddev": 20.35288677313368,
+        "runs": [
+          1253,
+          1261,
+          1214,
+          1243,
+          1211
+        ],
+        "load": {
+          "before": 2.12,
+          "after": 1.68
+        },
+        "rung": "Canvas2D",
+        "drawn": 0.3904866803278689
+      }
+    },
+    "20x-longread": {
+      "default": {
+        "median": 843,
+        "mean": 841.8,
+        "stddev": 20.913153755471697,
+        "runs": [
+          868,
+          811,
+          843,
+          827,
+          860
+        ],
+        "load": {
+          "before": 1.68,
+          "after": 2.28
+        },
+        "rung": "WebGPU",
+        "drawn": 0.3430020491803279
+      },
+      "webgl": {
+        "median": 883,
+        "mean": 896,
+        "stddev": 24.091492274244864,
+        "runs": [
+          943,
+          878,
+          883,
+          882,
+          894
+        ],
+        "load": {
+          "before": 2.28,
+          "after": 1.77
+        },
+        "rung": "WebGL2",
+        "drawn": 0.34300717213114756
+      },
+      "canvas2d": {
+        "median": 1080,
+        "mean": 1380,
+        "stddev": 637.8567237240665,
+        "runs": [
+          1044,
+          1032,
+          1080,
+          2655,
+          1089
+        ],
+        "load": {
+          "before": 1.77,
+          "after": 1.55
+        },
+        "rung": "Canvas2D",
+        "drawn": 0.3437717725409836
+      }
+    },
+    "100x-longread": {
+      "default": {
+        "median": 1976,
+        "mean": 1978.4,
+        "stddev": 18.853116453255147,
+        "runs": [
+          1983,
+          1971,
+          2010,
+          1976,
+          1952
+        ],
+        "load": {
+          "before": 1.55,
+          "after": 2.95
+        },
+        "rung": "WebGPU",
+        "drawn": 0.401015625
+      },
+      "webgl": {
+        "median": 2033,
+        "mean": 2041.8,
+        "stddev": 42.291370278107564,
+        "runs": [
+          1991,
+          2033,
+          2004,
+          2098,
+          2083
+        ],
+        "load": {
+          "before": 2.95,
+          "after": 2.4
+        },
+        "rung": "WebGL2",
+        "drawn": 0.400874743852459
+      },
+      "canvas2d": {
+        "median": 2306,
+        "mean": 2300.6,
+        "stddev": 45.1734435260364,
+        "runs": [
+          2240,
+          2262,
+          2306,
+          2330,
+          2365
+        ],
+        "load": {
+          "before": 2.4,
+          "after": 2.28
+        },
+        "rung": "Canvas2D",
+        "drawn": 0.40189805327868855
+      }
+    }
+  }
+}

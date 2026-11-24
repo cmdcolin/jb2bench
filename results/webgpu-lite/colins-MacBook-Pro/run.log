@@ -1,0 +1,16 @@
+load 2.3, starting
+port 8090 serving builds/release-5.0.0-beta.21, browser firefox
+20x-shortread / default: 862 837 893 875 848 => 862ms on WebGPU, ink 31.2% (load 2.3→2.9)
+20x-shortread / webgl: 1173 1202 1206 1187 1212 => 1202ms on WebGL2, ink 31.2% (load 2.9→2.5)
+20x-shortread / canvas2d: 886 895 881 886 893 => 886ms on Canvas2D, ink 33.0% (load 2.5→2.6)
+100x-shortread / default: 1451 1459 1455 1456 1476 => 1456ms on WebGPU, ink 38.2% (load 2.6→2.6)
+100x-shortread / webgl: 1781 1781 1789 1783 1770 => 1781ms on WebGL2, ink 38.2% (load 2.6→3.2)
+100x-shortread / canvas2d: 1642 1627 1615 1613 1612 => 1615ms on Canvas2D, ink 38.9% (load 3.2→3.2)
+20x-longread / default: 1062 1050 1130 1056 1052 => 1056ms on WebGPU, ink 34.2% (load 3.2→2.9)
+20x-longread / webgl: 1382 1425 1391 1390 1405 => 1391ms on WebGL2, ink 34.2% (load 2.9→3.7)
+20x-longread / canvas2d: 1334 1328 1339 1383 1384 => 1339ms on Canvas2D, ink 34.2% (load 3.7→3.2)
+100x-longread / default: 2465 2406 2451 2482 2379 => 2451ms on WebGPU, ink 40.0% (load 3.2→4.1)
+100x-longread / webgl: 2715 2780 2824 2859 2850 => 2824ms on WebGL2, ink 40.0% (load 4.1→4.2)
+100x-longread / canvas2d: 2919 2898 2952 2882 2912 => 2912ms on Canvas2D, ink 40.1% (load 4.2→5.2)
+
+wrote results/webgpu-lite/colins-MacBook-Pro/backends-firefox-100kb-wide.md and results/webgpu-lite/colins-MacBook-Pro/backends-firefox-100kb-wide.json

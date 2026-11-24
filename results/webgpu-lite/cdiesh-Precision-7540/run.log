@@ -1,0 +1,16 @@
+load 0.3, starting
+port 8090 serving builds/release-5.0.0-beta.21, browser firefox
+20x-shortread / default: 2525 713 730 733 728 => 730ms on WebGPU, ink 31.3% (load 0.3→1.2)
+20x-shortread / webgl: 777 759 694 722 713 => 722ms on WebGL2, ink 31.3% (load 1.2→1.1)
+20x-shortread / canvas2d: 721 685 665 687 695 => 687ms on Canvas2D, ink 34.1% (load 1.1→1.6)
+100x-shortread / default: 1212 1212 1155 1179 1140 => 1179ms on WebGPU, ink 38.3% (load 1.6→1.8)
+100x-shortread / webgl: 1181 1246 1241 1206 1272 => 1241ms on WebGL2, ink 38.3% (load 1.8→2.1)
+100x-shortread / canvas2d: 1253 1261 1214 1243 1211 => 1243ms on Canvas2D, ink 39.0% (load 2.1→1.7)
+20x-longread / default: 868 811 843 827 860 => 843ms on WebGPU, ink 34.3% (load 1.7→2.3)
+20x-longread / webgl: 943 878 883 882 894 => 883ms on WebGL2, ink 34.3% (load 2.3→1.8)
+20x-longread / canvas2d: 1044 1032 1080 2655 1089 => 1080ms on Canvas2D, ink 34.4% (load 1.8→1.6)
+100x-longread / default: 1983 1971 2010 1976 1952 => 1976ms on WebGPU, ink 40.1% (load 1.6→3.0)
+100x-longread / webgl: 1991 2033 2004 2098 2083 => 2033ms on WebGL2, ink 40.1% (load 3.0→2.4)
+100x-longread / canvas2d: 2240 2262 2306 2330 2365 => 2306ms on Canvas2D, ink 40.2% (load 2.4→2.3)
+
+wrote results/webgpu-lite/cdiesh-Precision-7540/backends-firefox-100kb-wide.md and results/webgpu-lite/cdiesh-Precision-7540/backends-firefox-100kb-wide.json

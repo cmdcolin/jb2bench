@@ -455,6 +455,7 @@ paper-figs:
 	Rscript scripts/paperfigs/cluster.R
 	Rscript scripts/paperfigs/wasmgate.R
 	Rscript scripts/paperfigs/pif-deviation.R
+	Rscript scripts/paperfigs/webgpu-lite.R
 	@if [ -f results/paper/bgzfpool.csv ]; then \
 	   Rscript scripts/paperfigs/bgzfpool.R; \
 	 else echo "no results/paper/bgzfpool.csv; run make bgzfpool then make paper-data"; fi
@@ -471,6 +472,7 @@ paper-data:
 	 else echo "no 1 Mb run on disk; width.csv is left as committed"; fi
 	Rscript scripts/paperfigs/parser-data.R .
 	Rscript scripts/paperfigs/wasmgate-data.R .
+	Rscript scripts/paperfigs/webgpu-lite-data.R
 # Standalone alone is enough: that arm needs no staged build, and the figure
 # draws it as a single series until an end-to-end run exists beside it.
 	@if [ -f results/bgzfpool-standalone.json ]; then \
