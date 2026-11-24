@@ -1,0 +1,163 @@
+{
+  "loc": "chr22_2mb:950001-1050000",
+  "scale": "100kb-wide",
+  "runs": 5,
+  "build": "release-5.0.0-beta.21",
+  "port": 8090,
+  "browser": "chrome",
+  "stamp": "2026-11-24",
+  "results": {
+    "20x-shortread": {
+      "webgl": {
+        "median": 955,
+        "mean": 966.6,
+        "stddev": 28.49982456086353,
+        "runs": [
+          974,
+          1017,
+          932,
+          955,
+          955
+        ],
+        "load": {
+          "before": 0.32,
+          "after": 2.42
+        },
+        "rung": "WebGL2",
+        "drawn": 0.041741803278688525
+      },
+      "canvas2d": {
+        "median": 847,
+        "mean": 840.4,
+        "stddev": 16.46329250180534,
+        "runs": [
+          827,
+          816,
+          851,
+          847,
+          861
+        ],
+        "load": {
+          "before": 2.42,
+          "after": 2.5
+        },
+        "rung": "Canvas2D",
+        "drawn": 0.3421823770491803
+      }
+    },
+    "100x-shortread": {
+      "webgl": {
+        "median": 1538,
+        "mean": 1533.8,
+        "stddev": 11.702991070662234,
+        "runs": [
+          1512,
+          1538,
+          1544,
+          1532,
+          1543
+        ],
+        "load": {
+          "before": 2.5,
+          "after": 2.38
+        },
+        "rung": "WebGL2",
+        "drawn": 0.3817827868852459
+      },
+      "canvas2d": {
+        "median": 1546,
+        "mean": 1532.4,
+        "stddev": 32.793901872146904,
+        "runs": [
+          1551,
+          1558,
+          1468,
+          1539,
+          1546
+        ],
+        "load": {
+          "before": 2.38,
+          "after": 2.47
+        },
+        "rung": "Canvas2D",
+        "drawn": 0.39163678278688524
+      }
+    },
+    "20x-longread": {
+      "webgl": {
+        "median": 1241,
+        "mean": 1242.6,
+        "stddev": 9.200000000000001,
+        "runs": [
+          1241,
+          1236,
+          1242,
+          1260,
+          1234
+        ],
+        "load": {
+          "before": 2.47,
+          "after": 2.25
+        },
+        "rung": "WebGL2",
+        "drawn": 0.34195696721311475
+      },
+      "canvas2d": {
+        "median": 1349,
+        "mean": 1378,
+        "stddev": 58.36779934176035,
+        "runs": [
+          1463,
+          1349,
+          1324,
+          1322,
+          1432
+        ],
+        "load": {
+          "before": 2.25,
+          "after": 2.91
+        },
+        "rung": "Canvas2D",
+        "drawn": 0.3427279713114754
+      }
+    },
+    "100x-longread": {
+      "webgl": {
+        "median": 2525,
+        "mean": 2487.8,
+        "stddev": 63.31950726277013,
+        "runs": [
+          2525,
+          2451,
+          2530,
+          2552,
+          2381
+        ],
+        "load": {
+          "before": 2.91,
+          "after": 2.57
+        },
+        "rung": "WebGL2",
+        "drawn": 0.39963370901639345
+      },
+      "canvas2d": {
+        "median": 2845,
+        "mean": 2847,
+        "stddev": 14.422205101855956,
+        "runs": [
+          2864,
+          2826,
+          2838,
+          2845,
+          2862
+        ],
+        "load": {
+          "before": 2.57,
+          "after": 1.94
+        },
+        "rung": "Canvas2D",
+        "drawn": 0.4022003073770492
+      }
+    }
+  }
+}
