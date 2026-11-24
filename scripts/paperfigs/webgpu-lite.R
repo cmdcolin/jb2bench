@@ -14,12 +14,16 @@ LAPTOPS <- c("cdiesh-Precision-7540" = "Dell Precision 7540",
              "colins-MacBook-Pro" = "MacBook Pro (2019)")
 MAC <- "colins-MacBook-Pro"
 BACKENDS <- c(WebGPU = "WebGPU", WebGL2 = "WebGL 2", Canvas2D = "Canvas 2D")
-CASES <- c("20x-shortread", "100x-shortread", "20x-longread", "100x-longread")
+COVS <- c("20x", "200x", "1000x")
+CASES <- c(paste0(COVS, "-shortread"), paste0(COVS, "-longread"))
 stopifnot(setequal(unique(d$host), names(LAPTOPS)), setequal(unique(d$case), CASES))
 
 ms <- function(host, backend, case = CASES)
-  vapply(case, function(k) d$median_ms[d$host == host & d$backend == backend & d$case == k],
-         numeric(1))
+  vapply(case, function(k) {
+    i <- d$host == host & d$backend == backend & d$case == k
+    if (d$excluded[i]) NA_real_ else d$median_ms[i]
+  }, numeric(1))
+cell <- function(x) ifelse(is.na(x), "--", sprintf("%.2f", x / 1000))
 cpu_label <- function(host) gsub("\\(R\\)|\\(TM\\)", "", sub(" CPU @.*", "", d$cpu[d$host == host][1]))
 
 table_rows <- unlist(lapply(seq_along(LAPTOPS), function(i) {
@@ -27,20 +31,21 @@ table_rows <- unlist(lapply(seq_along(LAPTOPS), function(i) {
   first <- c(LAPTOPS[[host]], paste0("(", cpu_label(host), ")"), "")
   rows <- vapply(seq_along(BACKENDS), function(j) {
     sprintf("%s & %s & %s \\\\", first[j], BACKENDS[[j]],
-            paste(sprintf("%.2f", ms(host, names(BACKENDS)[j]) / 1000), collapse = " & "))
+            paste(cell(ms(host, names(BACKENDS)[j])), collapse = " & "))
   }, character(1))
   if (i < length(LAPTOPS)) c(rows, "\\midrule") else rows
 }))
-tex <- c("\\begin{tabular}{@{}llrrrr@{}}", "\\toprule",
-         "& & \\multicolumn{2}{c}{Short reads} & \\multicolumn{2}{c}{Long reads} \\\\",
-         "\\cmidrule(lr){3-4}\\cmidrule(lr){5-6}",
-         "Laptop & Backend & 20$\\times$ & 100$\\times$ & 20$\\times$ & 100$\\times$ \\\\",
+cov_head <- paste(sprintf("%s$\\times$", sub("x$", "", COVS)), collapse = " & ")
+tex <- c("\\begin{tabular}{@{}llrrrrrr@{}}", "\\toprule",
+         "& & \\multicolumn{3}{c}{Short reads} & \\multicolumn{3}{c}{Long reads} \\\\",
+         "\\cmidrule(lr){3-5}\\cmidrule(lr){6-8}",
+         sprintf("Laptop & Backend & %s & %s \\\\", cov_head, cov_head),
          "\\midrule", table_rows, "\\bottomrule", "\\end{tabular}")
 
 pct <- function(x) sprintf("%.0f", 100 * (x - 1))
-gpu_over_gl <- unlist(lapply(names(LAPTOPS), function(h) ms(h, "WebGPU") / ms(h, "WebGL2")))
-mac_gl_over_gpu <- ms(MAC, "WebGL2") / ms(MAC, "WebGPU")
-canvas_over_gpu <- unlist(lapply(names(LAPTOPS), function(h) ms(h, "Canvas2D") / ms(h, "WebGPU")))
+gpu_over_gl <- na.omit(unlist(lapply(names(LAPTOPS), function(h) ms(h, "WebGPU") / ms(h, "WebGL2"))))
+mac_gl_over_gpu <- na.omit(ms(MAC, "WebGL2") / ms(MAC, "WebGPU"))
+canvas_over_gpu <- na.omit(unlist(lapply(names(LAPTOPS), function(h) ms(h, "Canvas2D") / ms(h, "WebGPU"))))
 macros <- c(
   sprintf("\\newcommand{\\LaptopBuild}{%s}", sub("^release-", "", unique(d$build))),
   sprintf("\\newcommand{\\LaptopCount}{%s}", c("one", "two", "three", "four")[length(LAPTOPS)]),
