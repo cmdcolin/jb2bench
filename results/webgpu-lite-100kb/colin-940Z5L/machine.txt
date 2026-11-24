@@ -1,0 +1,10 @@
+host: colin-940Z5L
+date: 2026-11-24T04:57:18Z
+build: release-5.0.0-beta.21
+firefox: Mozilla Firefox 163.0a1
+os: Linux 7.0.0-44-generic x86_64
+cpu: Intel(R) Core(TM) i7-6700HQ CPU @ 2.60GHz
+gpus:
+  00:02.0 VGA compatible controller: Intel Corporation Skylake-H GT2 [HD Graphics 530] (rev 06)
+  01:00.0 3D controller: NVIDIA Corporation GM107M [GeForce GTX 950M] (rev a2)
+power: A/C (author, 2026-11-24)
