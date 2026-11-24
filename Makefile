@@ -27,7 +27,7 @@ LOGDIR := results/logs
         crosstool-zoom crosstool-pan crosstool-bundles crosstool-cold-paper \
         parsers parsers-count cram-samtools multibam backends clean-logs \
         formats toolcheck shots paper-tables paper-figs paper-data wait-quiet \
-        backends-webgpu webgpu-lite ec2-up ec2-provision ec2-spike ec2-run ec2-run-light ec2-down \
+        backends-webgpu webgpu-lite webgpu-lite-share ec2-up ec2-provision ec2-spike ec2-run ec2-run-light ec2-down \
         crosstool-cold-light crosstool-zoom-light \
         stage-release portals-fetch portals-variant portals-gene agent-evals \
         wasmgate bgzfpool bgzfpool-standalone bgzfpool-endtoend pif pif-options \
@@ -78,6 +78,7 @@ help:
 	@echo "  make backends        webgl vs webgpu vs canvas"
 	@echo "  make backends-webgpu the same + a WebGPU rung, 19kb/100kb/1mb, headed firefox"
 	@echo "  make webgpu-lite     the WebGPU rung at 100 kb on beta.21, any laptop, ~15 min"
+	@echo "  make webgpu-lite-share  serve its BAMs over the LAN for webgpu-lite's DATA_URL"
 	@echo "  make mac-up HOST=mac1|mac2 CONFIRM=1  hardware panel on an EC2 Mac (ec2mac/README.md); DRY_RUN=1 to preview"
 	@echo ""
 	@echo "present"
@@ -343,6 +344,7 @@ backends-webgpu: gate | $(LOGDIR)
 # The 100 kb window of backends-webgpu alone, on a released build, set up from
 # a bare clone so it can run on any laptop. shell/webgpu_lite.sh has the knobs.
 webgpu-lite: ; shell/webgpu_lite.sh
+webgpu-lite-share: ; shell/webgpu_lite_share.sh
 
 # What the BGZF inflate pool is worth, measured twice over the same files and
 # the same windows: once with nothing above the query and once through a real

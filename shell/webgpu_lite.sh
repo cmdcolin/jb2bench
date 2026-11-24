@@ -5,17 +5,19 @@
 # per cell. 72 page loads, about 10-15 minutes. Firefox windows take over the
 # display the whole time.
 #
-# Built to be run on a laptop that has only a clone of this repo:
+# Built to be run on a laptop that has only a clone of this repo. The 2mb.* BAMs
+# are not in git, so first run `make webgpu-lite-share` on a machine that has
+# them, then on the laptop:
 #
-#   DATA_FROM=user@host:src/jb2bench/data make webgpu-lite
+#   DATA_URL=http://<that machine's IP>:8099 make webgpu-lite
 #
-# It stages the build if builds/ lacks it (needs `gh auth login`), copies the
-# 2mb.* BAMs from DATA_FROM if data/ lacks them, serves the build on its own
+# It stages the build if builds/ lacks it (needs `gh auth login`), downloads the
+# BAMs from DATA_URL if data/ lacks them, serves the build on its own
 # port, runs, and writes results/webgpu-lite/<hostname>/ with the GPU listing
 # beside the timings. Copy the BAMs rather than regenerate them: wgsim and pbsim
 # seed from the clock, so a regenerated corpus is different reads.
 #
-# Knobs: TAG (release tag), FIREFOX (Nightly binary), PORT, RUNS, DATA_FROM.
+# Knobs: TAG (release tag), FIREFOX (Nightly binary), PORT, RUNS, DATA_URL.
 set -euo pipefail
 cd "$(dirname "$0")/.."
 
@@ -50,13 +52,14 @@ for f in "${BAMS[@]}"; do
   [ -f "data/$f" ] || missing+=("$f")
 done
 if [ ${#missing[@]} -gt 0 ]; then
-  [ -n "${DATA_FROM:-}" ] || {
+  [ -n "${DATA_URL:-}" ] || {
     echo "data/ lacks ${missing[*]}" >&2
-    echo "set DATA_FROM=user@host:path/to/jb2bench/data to copy them (~340 MB)" >&2
+    echo "run 'make webgpu-lite-share' where they exist, then set DATA_URL=http://<its IP>:8099" >&2
     exit 1
   }
   for f in "${missing[@]}"; do
-    rsync -t --progress "$DATA_FROM/$f" data/
+    curl -f --progress-bar -o "data/$f.part" "$DATA_URL/$f"
+    mv "data/$f.part" "data/$f"
   done
 fi
 
